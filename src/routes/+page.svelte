@@ -63,16 +63,22 @@
 
 <main>
     <header>
-        <h1>💰 Imanisa Finance</h1>
+        <div class="header-left">
+            <h1>💰 Imanisa Finance</h1>
+            {#if data?.user}
+                <span class="user-name">Bonjour, {data.user.name.split(' ')[0]}</span>
+            {/if}
+        </div>
         <div class="actions">
             <button onclick={syncBanks} disabled={syncing}>
-                {syncing ? '⏳' : '🔄'} Sync banques
+                {syncing ? '⏳' : '🔄'} Sync
             </button>
             <button onclick={updatePrices} disabled={updatingPrices}>
-                {updatingPrices ? '⏳' : '📈'} Màj prix
+                {updatingPrices ? '⏳' : '📈'} Prix
             </button>
-            <a href="/import" class="btn">📥 Import CSV</a>
+            <a href="/import" class="btn">📥 Import</a>
             <a href="/settings" class="btn">⚙️ Config</a>
+            <a href="/api/auth/logout" class="btn btn-secondary">Déconnexion</a>
         </div>
     </header>
 
@@ -243,8 +249,19 @@
         margin-bottom: 30px;
     }
 
+    .header-left {
+        display: flex;
+        align-items: baseline;
+        gap: 15px;
+    }
+
     header h1 {
         margin: 0;
+    }
+
+    .user-name {
+        font-size: 0.9em;
+        color: #666;
     }
 
     .actions {
@@ -270,6 +287,14 @@
     button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background: #545b62;
     }
 
     section {

@@ -2,13 +2,17 @@ import { json } from '@sveltejs/kit';
 import { autoParseCSV } from '$lib/csv-import.js';
 import * as db from '$lib/db.js';
 
-// POST: Import CSV de positions
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+    if (!locals.user) {
+        return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
+        const userId = locals.user.id;
         const formData = await request.formData();
         const file = formData.get('file');
         const accountId = formData.get('account_id');
-        const institution = formData.get('institution'); // 'bourse_direct' ou 'linxea'
+        const institution = formData.get('institution');
 
         if (!file) {
             return json({ error: 'No file provided' }, { status: 400 });
@@ -24,17 +28,16 @@ export async function POST({ request }) {
             }, { status: 400 });
         }
 
-        // Crée le compte si nécessaire
         let account;
         if (accountId) {
-            account = db.getInvestmentAccounts().find(a => a.id === accountId);
+            account = db.getInvestmentAccounts(userId).find(a => a.id === accountId);
         }
 
         if (!account) {
-            // Crée un nouveau compte
             const newAccountId = crypto.randomUUID();
             db.createInvestmentAccount({
                 id: newAccountId,
+                user_id: userId,
                 name: institution === 'linxea' ? 'Linxea' : 'Bourse Direct',
                 institution: institution || source,
                 account_type: institution === 'linxea' ? 'assurance_vie' : 'cto'
@@ -42,9 +45,7 @@ export async function POST({ request }) {
             account = { id: newAccountId };
         }
 
-        // Import des positions
         let imported = 0;
-        let updated = 0;
 
         for (const position of positions) {
             const positionId = `${account.id}_${position.symbol}`;
@@ -84,10 +85,13 @@ export async function POST({ request }) {
     }
 }
 
-// GET: Liste les comptes d'investissement
-export async function GET() {
+export async function GET({ locals }) {
+    if (!locals.user) {
+        return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
-        const accounts = db.getInvestmentAccounts();
+        const accounts = db.getInvestmentAccounts(locals.user.id);
         return json({ accounts });
     } catch (error) {
         return json({ error: error.message }, { status: 500 });

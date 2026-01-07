@@ -2,18 +2,21 @@ import { json } from '@sveltejs/kit';
 import { updateAllPrices, fetchYahooPrice, searchYahooSymbol } from '$lib/prices.js';
 import * as db from '$lib/db.js';
 
-// POST: Met à jour les prix de toutes les positions
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+    if (!locals.user) {
+        return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
-        const { symbols } = await request.json() || {};
+        const userId = locals.user.id;
+        const body = await request.json().catch(() => ({}));
+        const symbols = body.symbols;
         
         let positions;
         if (symbols && symbols.length > 0) {
-            // Mise à jour de symboles spécifiques
-            positions = db.getAllPositions().filter(p => symbols.includes(p.symbol));
+            positions = db.getAllPositions(userId).filter(p => symbols.includes(p.symbol));
         } else {
-            // Toutes les positions
-            positions = db.getAllPositions();
+            positions = db.getAllPositions(userId);
         }
 
         if (positions.length === 0) {
@@ -22,7 +25,6 @@ export async function POST({ request }) {
 
         const results = await updateAllPrices(positions);
 
-        // Sauvegarde les nouveaux prix
         const today = new Date().toISOString().split('T')[0];
         let updated = 0;
         let failed = 0;
@@ -52,8 +54,11 @@ export async function POST({ request }) {
     }
 }
 
-// GET: Recherche un symbole ou récupère un prix
-export async function GET({ url }) {
+export async function GET({ url, locals }) {
+    if (!locals.user) {
+        return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const action = url.searchParams.get('action');
     const symbol = url.searchParams.get('symbol');
     const query = url.searchParams.get('q');

@@ -2,35 +2,40 @@ import { redirect } from '@sveltejs/kit';
 import { GoCardlessClient, formatTransaction } from '$lib/gocardless.js';
 import * as db from '$lib/db.js';
 
-// Callback après authentification bancaire
-export async function GET({ url }) {
+export async function GET({ url, cookies }) {
     const ref = url.searchParams.get('ref');
+    const userId = cookies.get('gc_user_id');
     
     if (!ref) {
-        return new Response('Missing requisition reference', { status: 400 });
+        throw redirect(302, '/?error=missing_reference');
+    }
+
+    if (!userId) {
+        throw redirect(302, '/login?error=session_expired');
     }
 
     try {
-        const config = db.getGoCardlessConfig();
+        const config = db.getGoCardlessConfig(userId);
+        if (!config) {
+            throw redirect(302, '/settings?error=not_configured');
+        }
+
         const client = new GoCardlessClient(config.secret_id, config.secret_key);
         client.restoreTokens(config);
 
-        // Récupère la requisition pour avoir les comptes
         const requisition = await client.getRequisition(ref);
 
         if (requisition.status !== 'LN') {
-            // LN = Linked, la connexion a réussi
             throw redirect(302, `/?error=bank_connection_failed&status=${requisition.status}`);
         }
 
-        // Pour chaque compte lié, récupère les infos et sauvegarde
         for (const accountId of requisition.accounts) {
             const accountData = await client.getFullAccountData(accountId);
             
-            // Sauvegarde le compte
             const details = accountData.details?.account || {};
             db.upsertBankAccount({
                 id: accountId,
+                user_id: userId,
                 name: details.name || details.ownerName || 'Compte bancaire',
                 institution: requisition.institution_id,
                 iban: details.iban,
@@ -40,7 +45,6 @@ export async function GET({ url }) {
                 gocardless_requisition_id: requisition.id
             });
 
-            // Sauvegarde les transactions
             const transactions = accountData.transactions?.transactions?.booked || [];
             const formattedTxns = transactions.map(t => formatTransaction(t, accountId));
             
@@ -51,11 +55,11 @@ export async function GET({ url }) {
             db.updateBankAccountSync(accountId);
         }
 
-        // Redirige vers le dashboard avec succès
+        cookies.delete('gc_user_id', { path: '/' });
         throw redirect(302, '/?success=bank_connected');
 
     } catch (error) {
-        if (error.status === 302) throw error; // C'est notre redirect
+        if (error.status === 302) throw error;
         console.error('Callback error:', error);
         throw redirect(302, `/?error=${encodeURIComponent(error.message)}`);
     }

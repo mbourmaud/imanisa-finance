@@ -2,12 +2,17 @@ import { json } from '@sveltejs/kit';
 import { GoCardlessClient, formatTransaction } from '$lib/gocardless.js';
 import * as db from '$lib/db.js';
 
-// POST: Synchronise les transactions d'un ou tous les comptes
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+    if (!locals.user) {
+        return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
-        const { account_id } = await request.json();
+        const userId = locals.user.id;
+        const body = await request.json().catch(() => ({}));
+        const accountId = body.account_id;
         
-        const config = db.getGoCardlessConfig();
+        const config = db.getGoCardlessConfig(userId);
         if (!config?.access_token) {
             return json({ error: 'GoCardless not configured' }, { status: 400 });
         }
@@ -15,20 +20,18 @@ export async function POST({ request }) {
         const client = new GoCardlessClient(config.secret_id, config.secret_key);
         client.restoreTokens(config);
 
-        // Détermine quels comptes synchroniser
         let accounts = [];
-        if (account_id) {
-            const account = db.getBankAccount(account_id);
+        if (accountId) {
+            const account = db.getBankAccount(accountId, userId);
             if (account) accounts = [account];
         } else {
-            accounts = db.getBankAccounts().filter(a => a.gocardless_account_id);
+            accounts = db.getBankAccounts(userId).filter(a => a.gocardless_account_id);
         }
 
         const results = [];
 
         for (const account of accounts) {
             try {
-                // Récupère les nouvelles transactions (30 derniers jours)
                 const thirtyDaysAgo = new Date();
                 thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
                 const dateFrom = thirtyDaysAgo.toISOString().split('T')[0];
@@ -47,7 +50,6 @@ export async function POST({ request }) {
                     db.insertTransactions(formattedTxns);
                 }
 
-                // Récupère aussi les soldes
                 const balances = await client.getAccountBalances(account.gocardless_account_id);
                 
                 db.updateBankAccountSync(account.id);
