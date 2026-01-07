@@ -1,6 +1,8 @@
 <script>
     let file = null;
-    let institution = 'bourse_direct';
+    let importType = 'investment';
+    let institution = '';
+    let accountName = '';
     let importing = false;
     let result = null;
     let error = null;
@@ -20,7 +22,9 @@
         try {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('institution', institution);
+            formData.append('type', importType);
+            if (institution) formData.append('institution', institution);
+            if (accountName) formData.append('account_name', accountName);
 
             const res = await fetch('/api/import', {
                 method: 'POST',
@@ -43,12 +47,22 @@
 
     function handleFileSelect(e) {
         file = e.target.files[0];
-        // Auto-detect institution from filename
         if (file) {
             const name = file.name.toLowerCase();
-            if (name.includes('linxea')) {
+            if (name.includes('caisse') || name.includes('epargne') || name.includes('ce_')) {
+                importType = 'bank';
+                institution = 'caisse_epargne';
+            } else if (name.includes('cic')) {
+                importType = 'bank';
+                institution = 'cic';
+            } else if (name.includes('revolut')) {
+                importType = 'bank';
+                institution = 'revolut';
+            } else if (name.includes('linxea')) {
+                importType = 'investment';
                 institution = 'linxea';
             } else if (name.includes('bourse') || name.includes('bd_')) {
+                importType = 'investment';
                 institution = 'bourse_direct';
             }
         }
@@ -65,40 +79,41 @@
         <h1>📥 Import CSV</h1>
     </header>
 
-    <section class="instructions">
-        <h2>Comment exporter vos positions ?</h2>
-        
-        <div class="instruction-card">
-            <h3>📈 Bourse Direct</h3>
-            <ol>
-                <li>Connectez-vous sur boursedirect.fr</li>
-                <li>Allez dans "Portefeuille"</li>
-                <li>Cliquez sur "Exporter" ou le bouton CSV</li>
-                <li>Téléchargez le fichier</li>
-            </ol>
-        </div>
-
-        <div class="instruction-card">
-            <h3>💼 Linxea</h3>
-            <ol>
-                <li>Connectez-vous sur votre espace Linxea</li>
-                <li>Allez dans "Mes contrats" → votre contrat</li>
-                <li>Téléchargez le "Relevé de situation"</li>
-                <li>Ou exportez depuis "Répartition"</li>
-            </ol>
-            <p class="note">Note: Si PDF, copiez les données dans un fichier Excel et exportez en CSV</p>
-        </div>
-    </section>
-
     <section class="import-form">
         <h2>Importer un fichier</h2>
         
         <div class="form-group">
-            <label for="institution">Type de compte</label>
-            <select id="institution" bind:value={institution}>
-                <option value="bourse_direct">Bourse Direct (PEA / CTO)</option>
-                <option value="linxea">Linxea (Assurance Vie)</option>
+            <label for="importType">Type d'import</label>
+            <select id="importType" bind:value={importType}>
+                <option value="bank">Compte bancaire (transactions)</option>
+                <option value="investment">Investissements (positions)</option>
             </select>
+        </div>
+
+        {#if importType === 'bank'}
+            <div class="form-group">
+                <label for="institution">Banque</label>
+                <select id="institution" bind:value={institution}>
+                    <option value="">Détection automatique</option>
+                    <option value="caisse_epargne">Caisse d'Épargne</option>
+                    <option value="cic">CIC</option>
+                    <option value="revolut">Revolut</option>
+                </select>
+            </div>
+        {:else}
+            <div class="form-group">
+                <label for="institution">Plateforme</label>
+                <select id="institution" bind:value={institution}>
+                    <option value="">Détection automatique</option>
+                    <option value="bourse_direct">Bourse Direct (PEA / CTO)</option>
+                    <option value="linxea">Linxea (Assurance Vie)</option>
+                </select>
+            </div>
+        {/if}
+
+        <div class="form-group">
+            <label for="accountName">Nom du compte (optionnel)</label>
+            <input type="text" id="accountName" bind:value={accountName} placeholder="Ex: PEA, Compte Joint...">
         </div>
 
         <div class="form-group">
@@ -106,7 +121,7 @@
             <input 
                 type="file" 
                 id="file" 
-                accept=".csv,.txt,.xls,.xlsx"
+                accept=".csv,.txt"
                 onchange={handleFileSelect}
             >
         </div>
@@ -117,43 +132,112 @@
     </section>
 
     {#if error}
-        <div class="error">
-            ❌ {error}
-        </div>
+        <div class="error">❌ {error}</div>
     {/if}
 
     {#if result}
         <section class="result">
             <h2>✅ Import réussi !</h2>
-            <p>
-                <strong>{result.positions_imported}</strong> positions importées
-                (source détectée: {result.detected_source})
-            </p>
             
-            <table>
-                <thead>
-                    <tr>
-                        <th>Symbole</th>
-                        <th>Nom</th>
-                        <th>Quantité</th>
-                        <th>Valeur</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each result.positions as pos}
+            {#if result.type === 'bank'}
+                <p>
+                    <strong>{result.transactions_imported}</strong> transactions importées
+                    (format: {result.detected_format})
+                </p>
+                <p>Solde calculé: <strong>{fmt(result.balance)}</strong></p>
+            {:else}
+                <p>
+                    <strong>{result.positions_imported}</strong> positions importées
+                    (format: {result.detected_format})
+                </p>
+                
+                <table>
+                    <thead>
                         <tr>
-                            <td>{pos.symbol}</td>
-                            <td>{pos.name}</td>
-                            <td>{pos.quantity}</td>
-                            <td>{fmt(pos.value)}</td>
+                            <th>Symbole</th>
+                            <th>Nom</th>
+                            <th>Quantité</th>
+                            <th>Valeur</th>
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {#each result.positions as pos}
+                            <tr>
+                                <td>{pos.symbol}</td>
+                                <td>{pos.name}</td>
+                                <td>{pos.quantity}</td>
+                                <td>{fmt(pos.value)}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/if}
 
             <a href="/" class="btn">Voir le dashboard</a>
         </section>
     {/if}
+
+    <section class="instructions">
+        <h2>Comment exporter vos données ?</h2>
+        
+        <div class="tabs">
+            <h3>🏦 Comptes bancaires</h3>
+            
+            <div class="instruction-card">
+                <h4>Caisse d'Épargne</h4>
+                <ol>
+                    <li>Connectez-vous sur caisse-epargne.fr</li>
+                    <li>Allez dans "Mes comptes" → sélectionnez le compte</li>
+                    <li>Cliquez sur "Exporter" (icône téléchargement)</li>
+                    <li>Choisissez le format CSV</li>
+                </ol>
+            </div>
+
+            <div class="instruction-card">
+                <h4>CIC</h4>
+                <ol>
+                    <li>Connectez-vous sur cic.fr</li>
+                    <li>Allez dans "Comptes" → "Historique"</li>
+                    <li>Cliquez sur "Exporter" en haut à droite</li>
+                    <li>Sélectionnez CSV et la période</li>
+                </ol>
+            </div>
+
+            <div class="instruction-card">
+                <h4>Revolut</h4>
+                <ol>
+                    <li>Ouvrez l'app Revolut ou revolut.com</li>
+                    <li>Allez dans le compte → "Relevés"</li>
+                    <li>Cliquez sur "Générer un relevé"</li>
+                    <li>Choisissez CSV et la période</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <h3>📈 Investissements</h3>
+            
+            <div class="instruction-card">
+                <h4>Bourse Direct</h4>
+                <ol>
+                    <li>Connectez-vous sur boursedirect.fr</li>
+                    <li>Allez dans "Portefeuille"</li>
+                    <li>Cliquez sur "Exporter" ou l'icône CSV</li>
+                    <li>Téléchargez le fichier</li>
+                </ol>
+            </div>
+
+            <div class="instruction-card">
+                <h4>Linxea</h4>
+                <ol>
+                    <li>Connectez-vous sur votre espace Linxea</li>
+                    <li>Allez dans "Mes contrats" → votre contrat</li>
+                    <li>Téléchargez le "Relevé de situation"</li>
+                    <li>Si PDF, copiez dans Excel puis exportez en CSV</li>
+                </ol>
+            </div>
+        </div>
+    </section>
 </main>
 
 <style>
@@ -189,35 +273,15 @@
         margin-top: 0;
     }
 
-    .instructions {
-        display: grid;
-        gap: 15px;
+    h3 {
+        margin-top: 20px;
+        margin-bottom: 15px;
+        color: #333;
     }
 
-    .instruction-card {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-    }
-
-    .instruction-card h3 {
+    h4 {
         margin: 0 0 10px 0;
-    }
-
-    .instruction-card ol {
-        margin: 0;
-        padding-left: 20px;
-    }
-
-    .instruction-card li {
-        margin-bottom: 5px;
-    }
-
-    .note {
-        font-size: 0.85em;
-        color: #666;
-        margin-top: 10px;
-        margin-bottom: 0;
+        color: #007bff;
     }
 
     .form-group {
@@ -230,12 +294,13 @@
         font-weight: 500;
     }
 
-    select, input[type="file"] {
+    select, input[type="file"], input[type="text"] {
         width: 100%;
         padding: 10px;
         border: 1px solid #ddd;
         border-radius: 6px;
         font-size: 1em;
+        box-sizing: border-box;
     }
 
     button, .btn {
@@ -281,5 +346,21 @@
 
     .result th {
         background: #f8f9fa;
+    }
+
+    .instruction-card {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .instruction-card ol {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .instruction-card li {
+        margin-bottom: 5px;
     }
 </style>

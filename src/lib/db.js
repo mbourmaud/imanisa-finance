@@ -69,23 +69,26 @@ export function getBankAccount(id, userId) {
     return getDb().prepare('SELECT * FROM bank_accounts WHERE id = ? AND user_id = ?').get(id, userId);
 }
 
+export function getBankAccountByName(name, institution, userId) {
+    return getDb().prepare('SELECT * FROM bank_accounts WHERE name = ? AND institution = ? AND user_id = ?').get(name, institution, userId);
+}
+
 export function upsertBankAccount(account) {
-    const stmt = getDb().prepare(`
-        INSERT INTO bank_accounts (id, user_id, name, institution, iban, currency, account_type, gocardless_account_id, gocardless_requisition_id)
-        VALUES (@id, @user_id, @name, @institution, @iban, @currency, @account_type, @gocardless_account_id, @gocardless_requisition_id)
+    return getDb().prepare(`
+        INSERT INTO bank_accounts (id, user_id, name, institution, iban, currency, account_type, balance, last_import_at)
+        VALUES (@id, @user_id, @name, @institution, @iban, @currency, @account_type, @balance, @last_import_at)
         ON CONFLICT(id) DO UPDATE SET
             name = @name,
             iban = @iban,
             currency = @currency,
             account_type = @account_type,
-            gocardless_account_id = @gocardless_account_id,
-            gocardless_requisition_id = @gocardless_requisition_id
-    `);
-    return stmt.run(account);
+            balance = @balance,
+            last_import_at = @last_import_at
+    `).run(account);
 }
 
-export function updateBankAccountSync(id) {
-    return getDb().prepare('UPDATE bank_accounts SET last_synced_at = datetime("now") WHERE id = ?').run(id);
+export function updateBankAccountBalance(id, balance) {
+    return getDb().prepare('UPDATE bank_accounts SET balance = ?, last_import_at = datetime("now") WHERE id = ?').run(balance, id);
 }
 
 export function getTransactions(accountId, limit = 100, offset = 0) {
@@ -110,8 +113,8 @@ export function getRecentTransactions(userId, limit = 50) {
 
 export function insertTransactions(transactions) {
     const stmt = getDb().prepare(`
-        INSERT OR IGNORE INTO transactions (id, bank_account_id, date, amount, currency, description, category, counterparty, transaction_type, raw_data)
-        VALUES (@id, @bank_account_id, @date, @amount, @currency, @description, @category, @counterparty, @transaction_type, @raw_data)
+        INSERT OR IGNORE INTO transactions (id, bank_account_id, date, amount, currency, description, category, counterparty, transaction_type)
+        VALUES (@id, @bank_account_id, @date, @amount, @currency, @description, @category, @counterparty, @transaction_type)
     `);
     
     const insertMany = getDb().transaction((txns) => {
@@ -127,12 +130,15 @@ export function getInvestmentAccounts(userId) {
     return getDb().prepare('SELECT * FROM investment_accounts WHERE user_id = ? ORDER BY institution, name').all(userId);
 }
 
+export function getInvestmentAccountByName(name, institution, userId) {
+    return getDb().prepare('SELECT * FROM investment_accounts WHERE name = ? AND institution = ? AND user_id = ?').get(name, institution, userId);
+}
+
 export function createInvestmentAccount(account) {
-    const stmt = getDb().prepare(`
+    return getDb().prepare(`
         INSERT INTO investment_accounts (id, user_id, name, institution, account_type)
         VALUES (@id, @user_id, @name, @institution, @account_type)
-    `);
-    return stmt.run(account);
+    `).run(account);
 }
 
 export function getPositions(accountId) {
@@ -159,7 +165,7 @@ export function getAllPositions(userId) {
 }
 
 export function upsertPosition(position) {
-    const stmt = getDb().prepare(`
+    return getDb().prepare(`
         INSERT INTO positions (id, investment_account_id, symbol, name, quantity, average_cost, currency, asset_type, last_price, last_price_date)
         VALUES (@id, @investment_account_id, @symbol, @name, @quantity, @average_cost, @currency, @asset_type, @last_price, @last_price_date)
         ON CONFLICT(id) DO UPDATE SET
@@ -168,8 +174,7 @@ export function upsertPosition(position) {
             last_price = @last_price,
             last_price_date = @last_price_date,
             updated_at = datetime("now")
-    `);
-    return stmt.run(position);
+    `).run(position);
 }
 
 export function updatePositionPrice(symbol, price) {
@@ -223,11 +228,9 @@ export function insertNetWorthSnapshot(snapshot) {
 
 export function calculateTotals(userId) {
     const bankTotal = getDb().prepare(`
-        SELECT COALESCE(SUM(
-            (SELECT amount FROM transactions WHERE bank_account_id = ba.id ORDER BY date DESC LIMIT 1)
-        ), 0) as total
-        FROM bank_accounts ba
-        WHERE ba.user_id = ?
+        SELECT COALESCE(SUM(balance), 0) as total
+        FROM bank_accounts
+        WHERE user_id = ?
     `).get(userId)?.total || 0;
     
     const investmentTotal = getDb().prepare(`
@@ -244,36 +247,8 @@ export function calculateTotals(userId) {
     };
 }
 
-export function getGoCardlessConfig(userId) {
-    return getDb().prepare('SELECT * FROM gocardless_config WHERE user_id = ?').get(userId);
-}
-
-export function saveGoCardlessConfig(config) {
-    return getDb().prepare(`
-        INSERT INTO gocardless_config (user_id, secret_id, secret_key, access_token, refresh_token, access_expires_at, refresh_expires_at)
-        VALUES (@user_id, @secret_id, @secret_key, @access_token, @refresh_token, @access_expires_at, @refresh_expires_at)
-        ON CONFLICT(user_id) DO UPDATE SET
-            secret_id = @secret_id,
-            secret_key = @secret_key,
-            access_token = @access_token,
-            refresh_token = @refresh_token,
-            access_expires_at = @access_expires_at,
-            refresh_expires_at = @refresh_expires_at,
-            updated_at = datetime("now")
-    `).run(config);
-}
-
 export function getAllUsers() {
     return getDb().prepare('SELECT id, email, name FROM users').all();
-}
-
-export function getAllBankAccountsForSync() {
-    return getDb().prepare(`
-        SELECT ba.*, u.id as user_id 
-        FROM bank_accounts ba 
-        JOIN users u ON ba.user_id = u.id 
-        WHERE ba.gocardless_account_id IS NOT NULL
-    `).all();
 }
 
 export function getAllPositionsForPriceUpdate() {

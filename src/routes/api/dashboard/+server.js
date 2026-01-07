@@ -15,13 +15,10 @@ export async function GET({ locals }) {
         const netWorthHistory = db.getNetWorthHistory(userId, 30);
         const totals = db.calculateTotals(userId);
 
-        const bankAccountsWithBalance = bankAccounts.map(account => {
-            const transactions = db.getTransactions(account.id, 1);
-            return {
-                ...account,
-                balance: transactions[0]?.amount || 0
-            };
-        });
+        const bankAccountsWithBalance = bankAccounts.map(account => ({
+            ...account,
+            balance: account.balance || 0
+        }));
 
         const investmentAccountsWithValue = investmentAccounts.map(account => {
             const accountPositions = positions.filter(p => p.investment_account_id === account.id);

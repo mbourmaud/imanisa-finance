@@ -1,15 +1,8 @@
-/**
- * CSV Import Module
- * 
- * Import des positions depuis les exports CSV de Bourse Direct et Linxea
- */
-
-// Parser CSV simple (pas besoin de lib externe)
 export function parseCSV(content, delimiter = ';') {
     const lines = content.trim().split('\n');
     const headers = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
     
-    return lines.slice(1).map(line => {
+    return lines.slice(1).filter(line => line.trim()).map(line => {
         const values = line.split(delimiter).map(v => v.trim().replace(/^"|"$/g, ''));
         const row = {};
         headers.forEach((header, i) => {
@@ -19,23 +12,106 @@ export function parseCSV(content, delimiter = ';') {
     });
 }
 
-// Normalise un nombre français (1 234,56 -> 1234.56)
 function parseNumber(str) {
     if (!str) return 0;
     return parseFloat(str.replace(/\s/g, '').replace(',', '.')) || 0;
 }
 
-/**
- * Import Bourse Direct
- * 
- * Format attendu (export portefeuille):
- * Libellé;ISIN;Quantité;PRU;Cours;Valorisation;+/- value;% +/- value
- */
+function parseDate(str) {
+    if (!str) return null;
+    
+    const ddmmyyyy = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (ddmmyyyy) {
+        return `${ddmmyyyy[3]}-${ddmmyyyy[2]}-${ddmmyyyy[1]}`;
+    }
+    
+    const yyyymmdd = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (yyyymmdd) return str;
+    
+    const ddmmyy = str.match(/^(\d{2})\/(\d{2})\/(\d{2})$/);
+    if (ddmmyy) {
+        const year = parseInt(ddmmyy[3]) > 50 ? `19${ddmmyy[3]}` : `20${ddmmyy[3]}`;
+        return `${year}-${ddmmyy[2]}-${ddmmyy[1]}`;
+    }
+    
+    return null;
+}
+
+export function parseCaisseEpargneCSV(content) {
+    const rows = parseCSV(content, ';');
+    
+    return rows.map(row => {
+        const date = parseDate(row['Date'] || row['Date opération'] || row['Date comptable']);
+        const description = row['Libellé'] || row['Libelle'] || row['Description'] || '';
+        const debit = parseNumber(row['Débit'] || row['Debit'] || '');
+        const credit = parseNumber(row['Crédit'] || row['Credit'] || '');
+        let amount = credit - debit;
+        
+        if (!amount && row['Montant']) {
+            amount = parseNumber(row['Montant']);
+        }
+
+        if (!date) return null;
+
+        return {
+            id: `ce_${date}_${Math.abs(amount).toFixed(2)}_${description.slice(0, 20)}`.replace(/[^a-zA-Z0-9_]/g, ''),
+            date,
+            amount,
+            description,
+            currency: 'EUR',
+            transaction_type: amount >= 0 ? 'credit' : 'debit'
+        };
+    }).filter(Boolean);
+}
+
+export function parseCICCSV(content) {
+    const rows = parseCSV(content, ';');
+    
+    return rows.map(row => {
+        const date = parseDate(row['Date'] || row['Date opération'] || row['Date valeur']);
+        const description = row['Libellé'] || row['Libelle'] || row['Description'] || '';
+        const amount = parseNumber(row['Montant'] || row['Credit'] || '') - parseNumber(row['Debit'] || '');
+
+        if (!date) return null;
+
+        return {
+            id: `cic_${date}_${Math.abs(amount).toFixed(2)}_${description.slice(0, 20)}`.replace(/[^a-zA-Z0-9_]/g, ''),
+            date,
+            amount,
+            description,
+            currency: 'EUR',
+            transaction_type: amount >= 0 ? 'credit' : 'debit'
+        };
+    }).filter(Boolean);
+}
+
+export function parseRevolutCSV(content) {
+    const rows = parseCSV(content, ',');
+    
+    return rows.map(row => {
+        const dateStr = row['Started Date'] || row['Completed Date'] || row['Date'];
+        const date = dateStr ? dateStr.split(' ')[0] : null;
+        const description = row['Description'] || '';
+        const amount = parseNumber(row['Amount']);
+        const currency = row['Currency'] || 'EUR';
+
+        if (!date || !amount) return null;
+
+        return {
+            id: `rev_${date}_${Math.abs(amount).toFixed(2)}_${description.slice(0, 20)}`.replace(/[^a-zA-Z0-9_]/g, ''),
+            date: parseDate(date) || date,
+            amount,
+            description,
+            currency,
+            transaction_type: amount >= 0 ? 'credit' : 'debit'
+        };
+    }).filter(Boolean);
+}
+
 export function parseBourseDirectCSV(content) {
     const rows = parseCSV(content, ';');
     
     return rows.map(row => {
-        // Bourse Direct peut avoir différents noms de colonnes
         const name = row['Libellé'] || row['Libelle'] || row['Nom'] || '';
         const isin = row['ISIN'] || row['Code ISIN'] || '';
         const quantity = parseNumber(row['Quantité'] || row['Qté'] || row['Qty']);
@@ -56,12 +132,6 @@ export function parseBourseDirectCSV(content) {
     }).filter(Boolean);
 }
 
-/**
- * Import Linxea (Assurance Vie)
- * 
- * Format attendu (relevé de situation):
- * Support;ISIN;Nombre de parts;Valeur de la part;Valorisation
- */
 export function parseLinxeaCSV(content) {
     const rows = parseCSV(content, ';');
     
@@ -77,67 +147,16 @@ export function parseLinxeaCSV(content) {
             symbol: isin || generateSymbolFromName(name),
             name: name,
             quantity: quantity,
-            average_cost: null, // Linxea ne fournit pas toujours le PRU
+            average_cost: null,
             last_price: lastPrice,
             currency: 'EUR',
-            asset_type: 'fund' // Assurance vie = fonds
+            asset_type: 'fund'
         };
     }).filter(Boolean);
 }
 
-/**
- * Import générique (détection automatique)
- */
-export function parseGenericCSV(content) {
-    // Détecter le délimiteur
-    const firstLine = content.split('\n')[0];
-    const delimiter = firstLine.includes(';') ? ';' : ',';
-    
-    const rows = parseCSV(content, delimiter);
-    if (rows.length === 0) return [];
-
-    // Détecter les colonnes
-    const headers = Object.keys(rows[0]).map(h => h.toLowerCase());
-    
-    const findColumn = (options) => {
-        for (const opt of options) {
-            const found = headers.find(h => h.includes(opt.toLowerCase()));
-            if (found) return Object.keys(rows[0]).find(k => k.toLowerCase() === found);
-        }
-        return null;
-    };
-
-    const symbolCol = findColumn(['isin', 'symbol', 'ticker', 'code']);
-    const nameCol = findColumn(['libellé', 'libelle', 'nom', 'name', 'support']);
-    const qtyCol = findColumn(['quantité', 'quantite', 'qty', 'parts', 'nombre']);
-    const priceCol = findColumn(['cours', 'price', 'valeur', 'vl']);
-    const costCol = findColumn(['pru', 'prix de revient', 'cost', 'average']);
-
-    return rows.map(row => {
-        const symbol = symbolCol ? row[symbolCol] : '';
-        const name = nameCol ? row[nameCol] : '';
-        const quantity = qtyCol ? parseNumber(row[qtyCol]) : 0;
-        const price = priceCol ? parseNumber(row[priceCol]) : null;
-        const cost = costCol ? parseNumber(row[costCol]) : null;
-
-        if ((!symbol && !name) || quantity === 0) return null;
-
-        return {
-            symbol: symbol || generateSymbolFromName(name),
-            name: name || symbol,
-            quantity: quantity,
-            average_cost: cost,
-            last_price: price,
-            currency: 'EUR',
-            asset_type: guessAssetType(name, symbol)
-        };
-    }).filter(Boolean);
-}
-
-// Devine le type d'actif basé sur le nom
 function guessAssetType(name, symbol) {
     const nameLower = (name || '').toLowerCase();
-    const symbolLower = (symbol || '').toLowerCase();
     
     if (nameLower.includes('etf') || nameLower.includes('tracker')) return 'etf';
     if (nameLower.includes('action') || nameLower.includes('share')) return 'stock';
@@ -145,13 +164,11 @@ function guessAssetType(name, symbol) {
     if (nameLower.includes('fonds') || nameLower.includes('fund') || nameLower.includes('sicav')) return 'fund';
     if (nameLower.includes('monétaire') || nameLower.includes('money')) return 'money_market';
     
-    // Si ISIN commence par FR/LU et pas d'autre indice -> probablement un fonds
     if (/^(FR|LU)/i.test(symbol)) return 'fund';
     
-    return 'stock'; // Par défaut
+    return 'stock';
 }
 
-// Génère un symbole à partir du nom (pour les fonds sans ISIN)
 function generateSymbolFromName(name) {
     return name
         .toUpperCase()
@@ -159,31 +176,95 @@ function generateSymbolFromName(name) {
         .slice(0, 12);
 }
 
-/**
- * Détecte automatiquement le format et parse le fichier
- */
+export function detectBankFormat(content, filename = '') {
+    const lowerFilename = filename.toLowerCase();
+    const lowerContent = content.toLowerCase();
+
+    if (lowerFilename.includes('caisse') || lowerFilename.includes('epargne') || lowerFilename.includes('ce_')) {
+        return 'caisse_epargne';
+    }
+    if (lowerFilename.includes('cic')) {
+        return 'cic';
+    }
+    if (lowerFilename.includes('revolut')) {
+        return 'revolut';
+    }
+    
+    if (lowerContent.includes('started date') || lowerContent.includes('completed date')) {
+        return 'revolut';
+    }
+    
+    if (lowerContent.includes('débit') && lowerContent.includes('crédit')) {
+        return 'caisse_epargne';
+    }
+
+    return 'generic_bank';
+}
+
+export function detectInvestmentFormat(content, filename = '') {
+    const lowerFilename = filename.toLowerCase();
+    const lowerContent = content.toLowerCase();
+
+    if (lowerFilename.includes('bourse') || lowerFilename.includes('bd_')) {
+        return 'bourse_direct';
+    }
+    if (lowerFilename.includes('linxea')) {
+        return 'linxea';
+    }
+
+    if (lowerContent.includes('pru') || lowerContent.includes('prix de revient')) {
+        return 'bourse_direct';
+    }
+    if (lowerContent.includes('support') || lowerContent.includes('nombre de parts')) {
+        return 'linxea';
+    }
+
+    return 'generic_investment';
+}
+
+export function parseBankCSV(content, format) {
+    switch (format) {
+        case 'caisse_epargne':
+            return parseCaisseEpargneCSV(content);
+        case 'cic':
+            return parseCICCSV(content);
+        case 'revolut':
+            return parseRevolutCSV(content);
+        default:
+            return parseCaisseEpargneCSV(content);
+    }
+}
+
+export function parseInvestmentCSV(content, format) {
+    switch (format) {
+        case 'bourse_direct':
+            return parseBourseDirectCSV(content);
+        case 'linxea':
+            return parseLinxeaCSV(content);
+        default:
+            return parseBourseDirectCSV(content);
+    }
+}
+
 export function autoParseCSV(content, filename = '') {
     const lowerFilename = filename.toLowerCase();
     const lowerContent = content.toLowerCase();
 
-    // Détection par nom de fichier
     if (lowerFilename.includes('bourse') || lowerFilename.includes('bd_')) {
-        return { source: 'bourse_direct', positions: parseBourseDirectCSV(content) };
+        return { source: 'bourse_direct', type: 'investment', positions: parseBourseDirectCSV(content) };
     }
     
     if (lowerFilename.includes('linxea')) {
-        return { source: 'linxea', positions: parseLinxeaCSV(content) };
+        return { source: 'linxea', type: 'investment', positions: parseLinxeaCSV(content) };
     }
 
-    // Détection par contenu
     if (lowerContent.includes('pru') || lowerContent.includes('prix de revient')) {
-        return { source: 'bourse_direct', positions: parseBourseDirectCSV(content) };
+        return { source: 'bourse_direct', type: 'investment', positions: parseBourseDirectCSV(content) };
     }
     
     if (lowerContent.includes('support') || lowerContent.includes('nombre de parts')) {
-        return { source: 'linxea', positions: parseLinxeaCSV(content) };
+        return { source: 'linxea', type: 'investment', positions: parseLinxeaCSV(content) };
     }
 
-    // Fallback générique
-    return { source: 'generic', positions: parseGenericCSV(content) };
+    return { source: 'generic', type: 'investment', positions: parseBourseDirectCSV(content) };
 }

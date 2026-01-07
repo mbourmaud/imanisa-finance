@@ -1,5 +1,3 @@
--- Imanisa Finance - Database Schema with multi-user support
-
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
@@ -24,9 +22,8 @@ CREATE TABLE IF NOT EXISTS bank_accounts (
     iban TEXT,
     currency TEXT DEFAULT 'EUR',
     account_type TEXT,
-    gocardless_account_id TEXT,
-    gocardless_requisition_id TEXT,
-    last_synced_at TEXT,
+    balance REAL DEFAULT 0,
+    last_import_at TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -41,7 +38,6 @@ CREATE TABLE IF NOT EXISTS transactions (
     category TEXT,
     counterparty TEXT,
     transaction_type TEXT,
-    raw_data TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (bank_account_id) REFERENCES bank_accounts(id) ON DELETE CASCADE
 );
@@ -94,19 +90,6 @@ CREATE TABLE IF NOT EXISTS net_worth_snapshots (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE(user_id, date)
-);
-
-CREATE TABLE IF NOT EXISTS gocardless_config (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT UNIQUE NOT NULL,
-    secret_id TEXT,
-    secret_key TEXT,
-    access_token TEXT,
-    refresh_token TEXT,
-    access_expires_at TEXT,
-    refresh_expires_at TEXT,
-    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);

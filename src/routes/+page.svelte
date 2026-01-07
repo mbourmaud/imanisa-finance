@@ -4,19 +4,11 @@
     let data = null;
     let loading = true;
     let error = null;
-    let syncing = false;
     let updatingPrices = false;
 
-    // Format monétaire
     const fmt = (n) => new Intl.NumberFormat('fr-FR', { 
         style: 'currency', 
         currency: 'EUR' 
-    }).format(n || 0);
-
-    // Format pourcentage
-    const pct = (n) => new Intl.NumberFormat('fr-FR', { 
-        style: 'percent', 
-        minimumFractionDigits: 2 
     }).format(n || 0);
 
     async function loadDashboard() {
@@ -27,18 +19,6 @@
             error = e.message;
         } finally {
             loading = false;
-        }
-    }
-
-    async function syncBanks() {
-        syncing = true;
-        try {
-            await fetch('/api/sync', { method: 'POST', body: '{}' });
-            await loadDashboard();
-        } catch (e) {
-            error = e.message;
-        } finally {
-            syncing = false;
         }
     }
 
@@ -70,14 +50,10 @@
             {/if}
         </div>
         <div class="actions">
-            <button onclick={syncBanks} disabled={syncing}>
-                {syncing ? '⏳' : '🔄'} Sync
-            </button>
             <button onclick={updatePrices} disabled={updatingPrices}>
-                {updatingPrices ? '⏳' : '📈'} Prix
+                {updatingPrices ? '⏳' : '📈'} Màj Prix
             </button>
             <a href="/import" class="btn">📥 Import</a>
-            <a href="/settings" class="btn">⚙️ Config</a>
             <a href="/api/auth/logout" class="btn btn-secondary">Déconnexion</a>
         </div>
     </header>
@@ -115,9 +91,9 @@
                                 <span class="institution">{account.institution}</span>
                             </div>
                             <div class="balance">{fmt(account.balance)}</div>
-                            {#if account.last_synced_at}
+                            {#if account.last_import_at}
                                 <div class="sync-date">
-                                    Sync: {new Date(account.last_synced_at).toLocaleDateString('fr-FR')}
+                                    Import: {new Date(account.last_import_at).toLocaleDateString('fr-FR')}
                                 </div>
                             {/if}
                         </div>
@@ -213,14 +189,13 @@
             </section>
         {/if}
 
-        <!-- Message si vide -->
         {#if data.bank_accounts.length === 0 && data.investment_accounts.length === 0}
             <section class="empty">
                 <h2>🚀 Bienvenue !</h2>
                 <p>Ton patrimoine est vide. Pour commencer :</p>
                 <ol>
-                    <li><a href="/settings">Configure GoCardless</a> pour connecter tes banques (CE, CIC, Revolut)</li>
-                    <li><a href="/import">Importe un CSV</a> de Bourse Direct ou Linxea</li>
+                    <li><a href="/import">Importe tes relevés bancaires</a> (Caisse d'Épargne, CIC, Revolut)</li>
+                    <li><a href="/import">Importe tes positions</a> (Bourse Direct, Linxea)</li>
                 </ol>
             </section>
         {/if}
