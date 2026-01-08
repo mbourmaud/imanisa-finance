@@ -1,0 +1,66 @@
+import type { BankRepository } from '@domain/bank/BankRepository';
+import type { Bank } from '@domain/bank/Bank';
+import { Bank as BankEntity } from '@domain/bank/Bank';
+import { BankTemplate } from '@domain/bank/BankTemplate';
+import { UniqueId } from '@domain/shared/UniqueId';
+import { getDatabase } from '../connection';
+
+interface BankRow {
+	id: string;
+	user_id: string;
+	name: string;
+	template: string;
+	created_at: string;
+}
+
+export class SqliteBankRepository implements BankRepository {
+	async findById(id: UniqueId): Promise<Bank | null> {
+		const db = getDatabase();
+		const row = db.prepare('SELECT * FROM banks WHERE id = ?').get(id.toString()) as BankRow | undefined;
+		
+		if (!row) return null;
+		return this.toDomain(row);
+	}
+
+	async findByUserId(userId: UniqueId): Promise<Bank[]> {
+		const db = getDatabase();
+		const rows = db.prepare('SELECT * FROM banks WHERE user_id = ? ORDER BY created_at DESC').all(userId.toString()) as BankRow[];
+		
+		return rows.map((row) => this.toDomain(row)).filter((bank): bank is Bank => bank !== null);
+	}
+
+	async save(bank: Bank): Promise<void> {
+		const db = getDatabase();
+		db.prepare(`
+			INSERT INTO banks (id, user_id, name, template, created_at)
+			VALUES (?, ?, ?, ?, ?)
+			ON CONFLICT(id) DO UPDATE SET
+				name = excluded.name,
+				template = excluded.template
+		`).run(
+			bank.id.toString(),
+			bank.userId.toString(),
+			bank.name,
+			bank.template,
+			bank.createdAt.toISOString()
+		);
+	}
+
+	async delete(id: UniqueId): Promise<void> {
+		const db = getDatabase();
+		db.prepare('DELETE FROM banks WHERE id = ?').run(id.toString());
+	}
+
+	private toDomain(row: BankRow): Bank | null {
+		const result = BankEntity.reconstitute(
+			{
+				userId: UniqueId.fromString(row.user_id),
+				name: row.name,
+				template: row.template as BankTemplate,
+				createdAt: new Date(row.created_at)
+			},
+			UniqueId.fromString(row.id)
+		);
+		return result.isSuccess ? result.value : null;
+	}
+}

@@ -1,9 +1,21 @@
 import adapter from '@sveltejs/adapter-node';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+	preprocess: vitePreprocess(),
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		alias: {
+			'@domain': 'src/domain',
+			'@domain/*': 'src/domain/*',
+			'@application': 'src/application',
+			'@application/*': 'src/application/*',
+			'@infrastructure': 'src/infrastructure',
+			'@infrastructure/*': 'src/infrastructure/*',
+			'@lib': 'src/lib',
+			'@lib/*': 'src/lib/*'
+		}
 	}
 };
 

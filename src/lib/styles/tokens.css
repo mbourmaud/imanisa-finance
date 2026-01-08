@@ -1,0 +1,191 @@
+:root {
+	/* ═══════════════════════════════════════════════════════════════════════════
+	   FINARY-INSPIRED DARK MODE DESIGN SYSTEM
+	   Clean, sophisticated dark interface with coral accents
+	   ═══════════════════════════════════════════════════════════════════════════ */
+
+	/* Background Hierarchy - Dark to Light */
+	--color-bg-deep: #0D0D0D;
+	--color-bg-base: #141414;
+	--color-bg-elevated: #1A1A1A;
+	--color-bg-card: #1F1F1F;
+	--color-bg-card-hover: #252525;
+	--color-bg-subtle: #2D2D2D;
+	--color-bg-muted: #333333;
+
+	/* Primary - Coral/Salmon Accent */
+	--color-primary-50: #FFF5F3;
+	--color-primary-100: #FFE8E4;
+	--color-primary-200: #FFD4CC;
+	--color-primary-300: #FFB5A8;
+	--color-primary-400: #FF8F7D;
+	--color-primary-500: #FA8072;
+	--color-primary-600: #E86B5D;
+	--color-primary-700: #D15649;
+	--color-primary-800: #A94238;
+	--color-primary-900: #8A382F;
+
+	/* Gold Highlight - Premium accents */
+	--color-gold-300: #F5D485;
+	--color-gold-400: #EFC75E;
+	--color-gold-500: #D4A853;
+	--color-gold-600: #B8903D;
+
+	/* Text Hierarchy */
+	--color-text-primary: #FFFFFF;
+	--color-text-secondary: #B0B0B0;
+	--color-text-tertiary: #808080;
+	--color-text-muted: #6B6B6B;
+	--color-text-disabled: #4A4A4A;
+
+	/* Semantic Colors */
+	--color-success-50: rgba(16, 185, 129, 0.1);
+	--color-success-400: #34D399;
+	--color-success-500: #10B981;
+	--color-success-600: #059669;
+
+	--color-danger-50: rgba(239, 68, 68, 0.1);
+	--color-danger-400: #F87171;
+	--color-danger-500: #EF4444;
+	--color-danger-600: #DC2626;
+
+	--color-warning-50: rgba(245, 158, 11, 0.1);
+	--color-warning-400: #FBBF24;
+	--color-warning-500: #F59E0B;
+	--color-warning-600: #D97706;
+
+	/* Border Colors */
+	--color-border: rgba(255, 255, 255, 0.05);
+	--color-border-subtle: rgba(255, 255, 255, 0.03);
+	--color-border-hover: rgba(255, 255, 255, 0.1);
+	--color-border-active: rgba(250, 128, 114, 0.3);
+
+	/* Owner Colors */
+	--color-owner-mathieu: #3B82F6;
+	--color-owner-ninon: #EC4899;
+	--color-owner-joint: #8B5CF6;
+	--color-owner-sci: #F59E0B;
+	--color-owner-isaac: #14B8A6;
+
+	/* Typography - Premium Sans */
+	--font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	--font-family-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+	--font-family-mono: 'SF Mono', 'Fira Code', monospace;
+
+	--font-size-xs: 0.6875rem;
+	--font-size-sm: 0.8125rem;
+	--font-size-base: 0.9375rem;
+	--font-size-lg: 1.0625rem;
+	--font-size-xl: 1.25rem;
+	--font-size-2xl: 1.625rem;
+	--font-size-3xl: 2.25rem;
+	--font-size-4xl: 3rem;
+	--font-size-5xl: 4rem;
+
+	--font-weight-normal: 400;
+	--font-weight-medium: 500;
+	--font-weight-semibold: 600;
+	--font-weight-bold: 700;
+
+	--line-height-tight: 1.15;
+	--line-height-snug: 1.3;
+	--line-height-normal: 1.5;
+	--line-height-relaxed: 1.65;
+
+	--letter-spacing-tight: -0.03em;
+	--letter-spacing-normal: -0.01em;
+	--letter-spacing-wide: 0.02em;
+	--letter-spacing-caps: 0.08em;
+
+	/* Spacing Scale */
+	--spacing-0: 0;
+	--spacing-px: 1px;
+	--spacing-0-5: 0.125rem;
+	--spacing-1: 0.25rem;
+	--spacing-1-5: 0.375rem;
+	--spacing-2: 0.5rem;
+	--spacing-2-5: 0.625rem;
+	--spacing-3: 0.75rem;
+	--spacing-4: 1rem;
+	--spacing-5: 1.25rem;
+	--spacing-6: 1.5rem;
+	--spacing-8: 2rem;
+	--spacing-10: 2.5rem;
+	--spacing-12: 3rem;
+	--spacing-16: 4rem;
+	--spacing-20: 5rem;
+	--spacing-24: 6rem;
+
+	/* Border Radius */
+	--radius-sm: 0.25rem;
+	--radius-md: 0.5rem;
+	--radius-lg: 0.75rem;
+	--radius-xl: 1rem;
+	--radius-2xl: 1.25rem;
+	--radius-3xl: 1.5rem;
+	--radius-full: 9999px;
+
+	/* Shadows - Subtle for dark mode */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+	--shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+	/* Glow Effects */
+	--glow-coral: 0 0 20px rgba(250, 128, 114, 0.15);
+	--glow-coral-intense: 0 0 30px rgba(250, 128, 114, 0.25);
+	--glow-success: 0 0 20px rgba(16, 185, 129, 0.15);
+	--glow-gold: 0 0 20px rgba(212, 168, 83, 0.15);
+
+	/* Glass Effect - Subtle for dark mode */
+	--glass-blur: 12px;
+	--glass-bg: rgba(26, 26, 26, 0.8);
+	--glass-bg-hover: rgba(37, 37, 37, 0.9);
+	--glass-border: rgba(255, 255, 255, 0.05);
+	--glass-border-light: rgba(255, 255, 255, 0.03);
+
+	/* Transitions */
+	--transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	/* Gradients */
+	--gradient-main: linear-gradient(180deg, #0D0D0D 0%, #141414 100%);
+	--gradient-accent: linear-gradient(135deg, #FF8F7D 0%, #FA8072 50%, #E86B5D 100%);
+	--gradient-accent-soft: linear-gradient(135deg, rgba(250, 128, 114, 0.15) 0%, rgba(232, 107, 93, 0.1) 100%);
+	--gradient-gold: linear-gradient(135deg, #EFC75E 0%, #D4A853 100%);
+	--gradient-success: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+	--gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+
+	/* Layout */
+	--sidebar-width-collapsed: 72px;
+	--sidebar-width-expanded: 240px;
+	--header-height: 0px;
+	--content-max-width: 1400px;
+
+	/* Mobile Bottom Nav */
+	--mobile-nav-height: 72px;
+	--mobile-safe-area-bottom: env(safe-area-inset-bottom, 0);
+
+	/* Touch Target Sizes */
+	--touch-target-min: 44px;
+	--touch-target-comfortable: 48px;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+	:root {
+		--spacing-8: 1.5rem;
+		--font-size-3xl: 1.75rem;
+		--font-size-4xl: 2.25rem;
+	}
+}
+
+@media (max-width: 375px) {
+	:root {
+		--spacing-6: 1rem;
+		--font-size-2xl: 1.375rem;
+		--font-size-3xl: 1.5rem;
+	}
+}
