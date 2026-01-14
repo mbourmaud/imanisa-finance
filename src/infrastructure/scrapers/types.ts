@@ -42,3 +42,19 @@ export const DEFAULT_SCRAPER_CONFIG: ScraperConfig = {
 	maxRetries: 3,
 	retryDelays: [5 * 60 * 1000, 15 * 60 * 1000, 30 * 60 * 1000]
 };
+
+// Caisse d'Épargne types
+export interface CEAccount {
+	id: string;
+	name: string;
+	type: string;
+	balance: number;
+	currency: string;
+}
+
+export interface CEScraperData {
+	accounts: CEAccount[];
+	totalBalance: number;
+	lastUpdate: Date;
+	requires2FA?: boolean;
+}

@@ -5,6 +5,11 @@
 
 import cron, { type ScheduledTask } from 'node-cron';
 import { BinanceService } from '@infrastructure/scrapers/BinanceService';
+import {
+	createCEPersoService,
+	createCESCIService,
+	type CEScraperData
+} from '@infrastructure/scrapers/CaisseEpargneService';
 import { TelegramService } from './utils/telegram';
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
@@ -28,6 +33,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 
 interface SchedulerConfig {
 	binanceCron: string;
+	ceCron: string;
 	enabled: boolean;
 }
 
@@ -41,6 +47,7 @@ export class ScraperScheduler {
 	constructor(config?: Partial<SchedulerConfig>) {
 		this.config = {
 			binanceCron: config?.binanceCron || process.env.SCRAPER_CRON || '0 8 * * 1', // Default: Monday 8:00 AM
+			ceCron: config?.ceCron || process.env.CE_SCRAPER_CRON || '0 7 * * 1', // Default: Monday 7:00 AM
 			enabled: config?.enabled ?? true
 		};
 
@@ -59,6 +66,7 @@ export class ScraperScheduler {
 		}
 
 		this.scheduleBinance();
+		this.scheduleCE();
 		console.log('[Scheduler] All tasks scheduled');
 	}
 
@@ -189,12 +197,240 @@ export class ScraperScheduler {
 	}
 
 	/**
+	 * Schedule CE (Caisse d'Épargne) scrapers
+	 */
+	private scheduleCE(): void {
+		const cronExpression = this.config.ceCron;
+
+		if (!cron.validate(cronExpression)) {
+			console.error(`[Scheduler] Invalid cron expression for CE: ${cronExpression}`);
+			return;
+		}
+
+		const task = cron.schedule(cronExpression, async () => {
+			console.log('[Scheduler] Running scheduled CE sync...');
+			// Run both CE Perso and CE SCI in sequence (to avoid rate limiting)
+			await this.runCEPersoScrapeWithRetry();
+			await this.runCESCIScrapeWithRetry();
+		});
+
+		this.tasks.set('ce', task);
+		console.log(`[Scheduler] CE scrapers scheduled: ${cronExpression}`);
+	}
+
+	/**
+	 * Run CE Perso scrape with retry logic
+	 */
+	async runCEPersoScrapeWithRetry(config: RetryConfig = DEFAULT_RETRY_CONFIG): Promise<boolean> {
+		const source = 'CE Perso';
+		const username = env?.CE_PERSO_USERNAME || process.env.CE_PERSO_USERNAME;
+		const password = env?.CE_PERSO_PASSWORD || process.env.CE_PERSO_PASSWORD;
+
+		if (!username || !password) {
+			console.log('[Scheduler] CE Perso not configured, skipping');
+			return false;
+		}
+
+		const ceService = createCEPersoService(username, password);
+		let db: Database.Database | null = null;
+
+		try {
+			db = new Database(DB_PATH);
+
+			// Ensure sync status exists
+			this.getOrCreateSyncStatus(db, source);
+			this.updateSyncStatus(db, source, 'running');
+
+			// Notify start
+			await this.telegram.notifyScraperStart(source);
+
+			// Attempt with retries
+			const errors: string[] = [];
+			for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+				console.log(`[Scheduler] CE Perso scrape attempt ${attempt}/${config.maxAttempts}`);
+
+				const result = await ceService.scrape();
+
+				if (result.success && result.data) {
+					// Success!
+					this.updateSyncStatus(db, source, 'success');
+
+					const accountsSummary = result.data.accounts
+						.map((acc) => `${acc.name}: ${acc.balance.toFixed(2)} EUR`)
+						.join('\n');
+
+					const details = [
+						`Comptes: ${result.data.accounts.length}`,
+						accountsSummary,
+						`Total: ${result.data.totalBalance.toFixed(2)} EUR`
+					].join('\n');
+
+					await this.telegram.notifyScraperSuccess(source, details);
+					console.log(`[Scheduler] CE Perso scrape successful: ${result.data.totalBalance.toFixed(2)} EUR`);
+					return true;
+				}
+
+				// Check for 2FA requirement - no point retrying
+				if (result.data && this.isCEDataWith2FA(result.data)) {
+					console.log('[Scheduler] CE Perso requires mobile validation');
+					this.updateSyncStatus(db, source, 'failure', 'Validation mobile requise');
+					await this.telegram.notify2FARequired(source);
+					return false;
+				}
+
+				// Failed - log error for debugging
+				const error = result.error || 'Unknown error';
+				errors.push(`Tentative ${attempt}: ${error}`);
+				console.error(`[Scheduler] CE Perso scrape failed (attempt ${attempt}/${config.maxAttempts}): ${error}`);
+
+				if (attempt < config.maxAttempts) {
+					const delay = config.delaysMs[attempt - 1];
+					console.log(`[Scheduler] Waiting ${delay / 1000 / 60} minutes before retry...`);
+					await this.sleep(delay);
+				}
+			}
+
+			// All retries exhausted
+			const errorSummary = errors.join('\n');
+			console.error(`[Scheduler] CE Perso scrape failed after ${config.maxAttempts} attempts:\n${errorSummary}`);
+			await this.telegram.notifyScraperFailure(source, errorSummary, config.maxAttempts, config.maxAttempts);
+
+			this.updateSyncStatus(db, source, 'failure', 'Max retries exceeded');
+			return false;
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			console.error('[Scheduler] CE Perso scrape error:', errorMessage);
+
+			if (db) {
+				this.updateSyncStatus(db, source, 'failure', errorMessage);
+			}
+
+			await this.telegram.notifyScraperFailure(source, errorMessage, 1, 1);
+			return false;
+		} finally {
+			db?.close();
+		}
+	}
+
+	/**
+	 * Run CE SCI scrape with retry logic
+	 */
+	async runCESCIScrapeWithRetry(config: RetryConfig = DEFAULT_RETRY_CONFIG): Promise<boolean> {
+		const source = 'CE SCI';
+		const username = env?.CE_SCI_USERNAME || process.env.CE_SCI_USERNAME;
+		const password = env?.CE_SCI_PASSWORD || process.env.CE_SCI_PASSWORD;
+
+		if (!username || !password) {
+			console.log('[Scheduler] CE SCI not configured, skipping');
+			return false;
+		}
+
+		const ceService = createCESCIService(username, password);
+		let db: Database.Database | null = null;
+
+		try {
+			db = new Database(DB_PATH);
+
+			// Ensure sync status exists
+			this.getOrCreateSyncStatus(db, source);
+			this.updateSyncStatus(db, source, 'running');
+
+			// Notify start
+			await this.telegram.notifyScraperStart(source);
+
+			// Attempt with retries
+			const errors: string[] = [];
+			for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+				console.log(`[Scheduler] CE SCI scrape attempt ${attempt}/${config.maxAttempts}`);
+
+				const result = await ceService.scrape();
+
+				if (result.success && result.data) {
+					// Success!
+					this.updateSyncStatus(db, source, 'success');
+
+					const accountsSummary = result.data.accounts
+						.map((acc) => `${acc.name}: ${acc.balance.toFixed(2)} EUR`)
+						.join('\n');
+
+					const details = [
+						`Comptes: ${result.data.accounts.length}`,
+						accountsSummary,
+						`Total: ${result.data.totalBalance.toFixed(2)} EUR`
+					].join('\n');
+
+					await this.telegram.notifyScraperSuccess(source, details);
+					console.log(`[Scheduler] CE SCI scrape successful: ${result.data.totalBalance.toFixed(2)} EUR`);
+					return true;
+				}
+
+				// Check for 2FA requirement - no point retrying
+				if (result.data && this.isCEDataWith2FA(result.data)) {
+					console.log('[Scheduler] CE SCI requires mobile validation');
+					this.updateSyncStatus(db, source, 'failure', 'Validation mobile requise');
+					await this.telegram.notify2FARequired(source);
+					return false;
+				}
+
+				// Failed - log error for debugging
+				const error = result.error || 'Unknown error';
+				errors.push(`Tentative ${attempt}: ${error}`);
+				console.error(`[Scheduler] CE SCI scrape failed (attempt ${attempt}/${config.maxAttempts}): ${error}`);
+
+				if (attempt < config.maxAttempts) {
+					const delay = config.delaysMs[attempt - 1];
+					console.log(`[Scheduler] Waiting ${delay / 1000 / 60} minutes before retry...`);
+					await this.sleep(delay);
+				}
+			}
+
+			// All retries exhausted
+			const errorSummary = errors.join('\n');
+			console.error(`[Scheduler] CE SCI scrape failed after ${config.maxAttempts} attempts:\n${errorSummary}`);
+			await this.telegram.notifyScraperFailure(source, errorSummary, config.maxAttempts, config.maxAttempts);
+
+			this.updateSyncStatus(db, source, 'failure', 'Max retries exceeded');
+			return false;
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			console.error('[Scheduler] CE SCI scrape error:', errorMessage);
+
+			if (db) {
+				this.updateSyncStatus(db, source, 'failure', errorMessage);
+			}
+
+			await this.telegram.notifyScraperFailure(source, errorMessage, 1, 1);
+			return false;
+		} finally {
+			db?.close();
+		}
+	}
+
+	/**
+	 * Type guard for CE data with 2FA requirement
+	 */
+	private isCEDataWith2FA(data: unknown): data is CEScraperData & { requires2FA: true } {
+		return (
+			typeof data === 'object' &&
+			data !== null &&
+			'requires2FA' in data &&
+			(data as Record<string, unknown>).requires2FA === true
+		);
+	}
+
+	/**
 	 * Manually trigger a sync for a specific source
 	 */
 	async triggerSync(source: string): Promise<boolean> {
 		switch (source.toLowerCase()) {
 			case 'binance':
 				return this.runBinanceScrapeWithRetry();
+			case 'ce-perso':
+			case 'ce_perso':
+				return this.runCEPersoScrapeWithRetry();
+			case 'ce-sci':
+			case 'ce_sci':
+				return this.runCESCIScrapeWithRetry();
 			default:
 				console.error(`[Scheduler] Unknown source: ${source}`);
 				return false;
