@@ -14,14 +14,16 @@ const DB_PATH = process.env.DATABASE_PATH || './data/imanisa.db';
 
 interface RetryConfig {
 	maxAttempts: number;
-	baseDelayMs: number;
-	maxDelayMs: number;
+	delaysMs: number[];
 }
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
 	maxAttempts: 3,
-	baseDelayMs: 5 * 60 * 1000, // 5 minutes
-	maxDelayMs: 30 * 60 * 1000 // 30 minutes
+	delaysMs: [
+		5 * 60 * 1000, // 5 minutes after 1st failure
+		15 * 60 * 1000, // 15 minutes after 2nd failure
+		30 * 60 * 1000 // 30 minutes after 3rd failure (not used, but kept for consistency)
+	]
 };
 
 interface SchedulerConfig {
@@ -118,6 +120,7 @@ export class ScraperScheduler {
 			await this.telegram.notifyScraperStart(source);
 
 			// Attempt with retries
+			const errors: string[] = [];
 			for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
 				console.log(`[Scheduler] Binance scrape attempt ${attempt}/${config.maxAttempts}`);
 
@@ -148,17 +151,23 @@ export class ScraperScheduler {
 					return true;
 				}
 
-				// Failed - notify and maybe retry
+				// Failed - log error for debugging
 				const error = result.error || 'Unknown error';
-				await this.telegram.notifyScraperFailure(source, error, attempt, config.maxAttempts);
+				errors.push(`Tentative ${attempt}: ${error}`);
+				console.error(`[Scheduler] Binance scrape failed (attempt ${attempt}/${config.maxAttempts}): ${error}`);
 
 				if (attempt < config.maxAttempts) {
-					// Calculate exponential backoff delay
-					const delay = Math.min(config.baseDelayMs * Math.pow(2, attempt - 1), config.maxDelayMs);
-					console.log(`[Scheduler] Waiting ${delay / 1000}s before retry...`);
+					// Use progressive delays: 5min, 15min, 30min
+					const delay = config.delaysMs[attempt - 1];
+					console.log(`[Scheduler] Waiting ${delay / 1000 / 60} minutes before retry...`);
 					await this.sleep(delay);
 				}
 			}
+
+			// All retries exhausted - notify Telegram only after final failure
+			const errorSummary = errors.join('\n');
+			console.error(`[Scheduler] Binance scrape failed after ${config.maxAttempts} attempts:\n${errorSummary}`);
+			await this.telegram.notifyScraperFailure(source, errorSummary, config.maxAttempts, config.maxAttempts);
 
 			// All retries exhausted
 			this.updateSyncStatus(db, source, 'failure', 'Max retries exceeded');
