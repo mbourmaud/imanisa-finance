@@ -31,6 +31,9 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 	]
 };
 
+// 2FA retry configuration
+const TWO_FA_RETRY_DELAY_MS = 2.5 * 60 * 1000; // 2.5 minutes after mobile validation detection
+
 interface SchedulerConfig {
 	binanceCron: string;
 	ceCron: string;
@@ -270,11 +273,16 @@ export class ScraperScheduler {
 					return true;
 				}
 
-				// Check for 2FA requirement - no point retrying
+				// Check for 2FA requirement - schedule automatic retry
 				if (result.data && this.isCEDataWith2FA(result.data)) {
 					console.log('[Scheduler] CE Perso requires mobile validation');
 					this.updateSyncStatus(db, source, 'pending_2fa', 'Validation mobile requise');
-					await this.telegram.notify2FARequired(source);
+
+					// Schedule automatic retry after 2FA delay
+					const delayMinutes = TWO_FA_RETRY_DELAY_MS / 1000 / 60;
+					await this.telegram.notify2FARequired(source, true, delayMinutes);
+					this.schedule2FARetry('CE Perso', () => this.executeCEPersoScrapeOnce());
+
 					return false;
 				}
 
@@ -364,11 +372,16 @@ export class ScraperScheduler {
 					return true;
 				}
 
-				// Check for 2FA requirement - no point retrying
+				// Check for 2FA requirement - schedule automatic retry
 				if (result.data && this.isCEDataWith2FA(result.data)) {
 					console.log('[Scheduler] CE SCI requires mobile validation');
 					this.updateSyncStatus(db, source, 'pending_2fa', 'Validation mobile requise');
-					await this.telegram.notify2FARequired(source);
+
+					// Schedule automatic retry after 2FA delay
+					const delayMinutes = TWO_FA_RETRY_DELAY_MS / 1000 / 60;
+					await this.telegram.notify2FARequired(source, true, delayMinutes);
+					this.schedule2FARetry('CE SCI', () => this.executeCESCIScrapeOnce());
+
 					return false;
 				}
 
@@ -495,6 +508,142 @@ export class ScraperScheduler {
 
 	private sleep(ms: number): Promise<void> {
 		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
+	/**
+	 * Schedule a 2FA retry after mobile validation
+	 * This is called when 2FA is detected to automatically retry after a delay
+	 */
+	private schedule2FARetry(
+		source: 'CE Perso' | 'CE SCI',
+		retryFn: () => Promise<boolean>
+	): void {
+		const delayMinutes = TWO_FA_RETRY_DELAY_MS / 1000 / 60;
+		console.log(`[Scheduler] Scheduling 2FA retry for ${source} in ${delayMinutes} minutes`);
+
+		setTimeout(async () => {
+			console.log(`[Scheduler] Executing 2FA retry for ${source}`);
+			let db: Database.Database | null = null;
+
+			try {
+				db = new Database(DB_PATH);
+				this.updateSyncStatus(db, source, 'running');
+
+				const success = await retryFn();
+
+				if (success) {
+					console.log(`[Scheduler] 2FA retry successful for ${source}`);
+				} else {
+					console.log(`[Scheduler] 2FA retry failed for ${source}`);
+				}
+			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+				console.error(`[Scheduler] 2FA retry error for ${source}:`, errorMessage);
+
+				if (db) {
+					this.updateSyncStatus(db, source, 'failure', errorMessage);
+				}
+				await this.telegram.notify2FARetryFailure(source, errorMessage);
+			} finally {
+				db?.close();
+			}
+		}, TWO_FA_RETRY_DELAY_MS);
+	}
+
+	/**
+	 * Execute a single CE Perso scrape attempt (for 2FA retry)
+	 */
+	private async executeCEPersoScrapeOnce(): Promise<boolean> {
+		const source = 'CE Perso';
+		const username = env?.CE_PERSO_USERNAME || process.env.CE_PERSO_USERNAME;
+		const password = env?.CE_PERSO_PASSWORD || process.env.CE_PERSO_PASSWORD;
+
+		if (!username || !password) {
+			console.log('[Scheduler] CE Perso not configured');
+			return false;
+		}
+
+		const ceService = createCEPersoService(username, password);
+		let db: Database.Database | null = null;
+
+		try {
+			db = new Database(DB_PATH);
+			const result = await ceService.scrape();
+
+			if (result.success && result.data && !this.isCEDataWith2FA(result.data)) {
+				this.updateSyncStatus(db, source, 'success');
+
+				const accountsSummary = result.data.accounts
+					.map((acc) => `${acc.name}: ${acc.balance.toFixed(2)} EUR`)
+					.join('\n');
+
+				const details = [
+					`Comptes: ${result.data.accounts.length}`,
+					accountsSummary,
+					`Total: ${result.data.totalBalance.toFixed(2)} EUR`
+				].join('\n');
+
+				await this.telegram.notify2FARetrySuccess(source, details);
+				console.log(`[Scheduler] CE Perso 2FA retry successful: ${result.data.totalBalance.toFixed(2)} EUR`);
+				return true;
+			}
+
+			// Still requires 2FA or failed
+			const error = result.error || 'Validation mobile toujours requise ou échec';
+			this.updateSyncStatus(db, source, 'failure', error);
+			await this.telegram.notify2FARetryFailure(source, error);
+			return false;
+		} finally {
+			db?.close();
+		}
+	}
+
+	/**
+	 * Execute a single CE SCI scrape attempt (for 2FA retry)
+	 */
+	private async executeCESCIScrapeOnce(): Promise<boolean> {
+		const source = 'CE SCI';
+		const username = env?.CE_SCI_USERNAME || process.env.CE_SCI_USERNAME;
+		const password = env?.CE_SCI_PASSWORD || process.env.CE_SCI_PASSWORD;
+
+		if (!username || !password) {
+			console.log('[Scheduler] CE SCI not configured');
+			return false;
+		}
+
+		const ceService = createCESCIService(username, password);
+		let db: Database.Database | null = null;
+
+		try {
+			db = new Database(DB_PATH);
+			const result = await ceService.scrape();
+
+			if (result.success && result.data && !this.isCEDataWith2FA(result.data)) {
+				this.updateSyncStatus(db, source, 'success');
+
+				const accountsSummary = result.data.accounts
+					.map((acc) => `${acc.name}: ${acc.balance.toFixed(2)} EUR`)
+					.join('\n');
+
+				const details = [
+					`Comptes: ${result.data.accounts.length}`,
+					accountsSummary,
+					`Total: ${result.data.totalBalance.toFixed(2)} EUR`
+				].join('\n');
+
+				await this.telegram.notify2FARetrySuccess(source, details);
+				console.log(`[Scheduler] CE SCI 2FA retry successful: ${result.data.totalBalance.toFixed(2)} EUR`);
+				return true;
+			}
+
+			// Still requires 2FA or failed
+			const error = result.error || 'Validation mobile toujours requise ou échec';
+			this.updateSyncStatus(db, source, 'failure', error);
+			await this.telegram.notify2FARetryFailure(source, error);
+			return false;
+		} finally {
+			db?.close();
+		}
 	}
 }
 

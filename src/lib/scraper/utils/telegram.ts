@@ -80,10 +80,25 @@ export class TelegramService {
 		);
 	}
 
-	async notify2FARequired(source: string): Promise<boolean> {
+	async notify2FARequired(source: string, retryScheduled: boolean = false, retryDelayMinutes?: number): Promise<boolean> {
+		const retryInfo = retryScheduled && retryDelayMinutes
+			? `\n⏰ Retry automatique dans ${retryDelayMinutes.toFixed(1)} min`
+			: '';
 		return this.sendMessage(
-			`🔐 <b>Validation manuelle requise pour ${source}</b>\n\nAction: Veuillez confirmer sur votre application mobile\nHeure: ${this.formatTime()}`,
+			`🔐 <b>Validation manuelle requise pour ${source}</b>\n\nAction: Veuillez confirmer sur votre application mobile${retryInfo}\nHeure: ${this.formatTime()}`,
 			{ disableNotification: false } // Force notification for 2FA
+		);
+	}
+
+	async notify2FARetrySuccess(source: string, details: string): Promise<boolean> {
+		return this.sendMessage(
+			`✅ <b>Retry après validation mobile réussi</b>\n\nSource: ${source}\n${details}\nHeure: ${this.formatTime()}`
+		);
+	}
+
+	async notify2FARetryFailure(source: string, error: string): Promise<boolean> {
+		return this.sendMessage(
+			`❌ <b>Retry après validation mobile échoué</b>\n\nSource: ${source}\nErreur: ${error}\nHeure: ${this.formatTime()}`
 		);
 	}
 
