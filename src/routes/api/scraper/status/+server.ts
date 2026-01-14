@@ -19,7 +19,7 @@ interface SyncStatusRow {
 interface SyncStatusResponse {
 	source: string;
 	lastSyncAt: string | null;
-	lastSyncStatus: 'success' | 'failure' | 'pending' | 'running';
+	lastSyncStatus: 'success' | 'failure' | 'pending' | 'running' | 'pending_2fa';
 	lastError: string | null;
 	totalSyncs: number;
 	successfulSyncs: number;
@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			return {
 				source: row.source,
 				lastSyncAt: row.last_sync_at,
-				lastSyncStatus: row.last_sync_status as 'success' | 'failure' | 'pending' | 'running',
+				lastSyncStatus: row.last_sync_status as 'success' | 'failure' | 'pending' | 'running' | 'pending_2fa',
 				lastError: row.last_error,
 				totalSyncs: row.total_syncs,
 				successfulSyncs: row.successful_syncs,

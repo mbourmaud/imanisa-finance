@@ -273,7 +273,7 @@ export class ScraperScheduler {
 				// Check for 2FA requirement - no point retrying
 				if (result.data && this.isCEDataWith2FA(result.data)) {
 					console.log('[Scheduler] CE Perso requires mobile validation');
-					this.updateSyncStatus(db, source, 'failure', 'Validation mobile requise');
+					this.updateSyncStatus(db, source, 'pending_2fa', 'Validation mobile requise');
 					await this.telegram.notify2FARequired(source);
 					return false;
 				}
@@ -367,7 +367,7 @@ export class ScraperScheduler {
 				// Check for 2FA requirement - no point retrying
 				if (result.data && this.isCEDataWith2FA(result.data)) {
 					console.log('[Scheduler] CE SCI requires mobile validation');
-					this.updateSyncStatus(db, source, 'failure', 'Validation mobile requise');
+					this.updateSyncStatus(db, source, 'pending_2fa', 'Validation mobile requise');
 					await this.telegram.notify2FARequired(source);
 					return false;
 				}
@@ -468,7 +468,7 @@ export class ScraperScheduler {
 	private updateSyncStatus(
 		db: Database.Database,
 		source: string,
-		status: 'success' | 'failure' | 'running',
+		status: 'success' | 'failure' | 'running' | 'pending_2fa',
 		error?: string
 	): void {
 		const now = new Date().toISOString();

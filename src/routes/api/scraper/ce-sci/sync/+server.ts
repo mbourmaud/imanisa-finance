@@ -40,7 +40,7 @@ function getOrCreateSyncStatus(db: Database.Database, source: string): SyncStatu
 function updateSyncStatus(
 	db: Database.Database,
 	source: string,
-	status: 'success' | 'failure' | 'running',
+	status: 'success' | 'failure' | 'running' | 'pending_2fa',
 	error?: string
 ): void {
 	const now = new Date().toISOString();
@@ -135,14 +135,15 @@ export const POST: RequestHandler = async () => {
 
 			if (requires2FA) {
 				// Special handling for 2FA - notify user
-				updateSyncStatus(db, SOURCE, 'failure', 'Validation mobile requise');
+				updateSyncStatus(db, SOURCE, 'pending_2fa', 'Validation mobile requise');
 				await telegram.notify2FARequired(SOURCE);
 
 				return json(
 					{
 						success: false,
 						error: 'Validation mobile requise - veuillez confirmer sur votre application',
-						requires2FA: true
+						requires2FA: true,
+						status: 'pending_2fa'
 					},
 					{ status: 202 } // Accepted but pending
 				);

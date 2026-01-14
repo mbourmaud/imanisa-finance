@@ -82,7 +82,7 @@ export class TelegramService {
 
 	async notify2FARequired(source: string): Promise<boolean> {
 		return this.sendMessage(
-			`🔐 <b>Code 2FA requis</b>\n\nSource: ${source}\nAction: Veuillez entrer le code reçu par SMS/App\nHeure: ${this.formatTime()}`,
+			`🔐 <b>Validation manuelle requise pour ${source}</b>\n\nAction: Veuillez confirmer sur votre application mobile\nHeure: ${this.formatTime()}`,
 			{ disableNotification: false } // Force notification for 2FA
 		);
 	}
