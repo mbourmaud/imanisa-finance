@@ -293,6 +293,298 @@ const BOURSO_CATEGORY_MAP: Record<string, string> = {
 };
 
 // =====================================================
+// Regex Categorization Rules (for description matching)
+// =====================================================
+// These rules match transaction descriptions (libellés) and are used
+// primarily for Crédit Mutuel (which doesn't have native categories)
+// and as fallback for other banks.
+// Priority: lower number = higher priority (checked first)
+
+interface RegexRule {
+	pattern: string; // Regex pattern (case insensitive by default)
+	categoryId: string;
+	priority: number; // Lower = higher priority
+}
+
+const REGEX_RULES: RegexRule[] = [
+	// ===== ALIMENTATION - Courses (priority 10-19) =====
+	{
+		pattern: 'carrefour|leclerc|auchan|lidl|picard|intermarche|super\\s*u|monoprix|franprix|g20|casino|cora|match|netto',
+		categoryId: 'cat-courses',
+		priority: 10
+	},
+	{
+		pattern: 'boulangerie|boucherie|primeur|fromager|epicerie|biocoop|naturalia',
+		categoryId: 'cat-courses',
+		priority: 11
+	},
+
+	// ===== ALIMENTATION - Restaurant (priority 20-29) =====
+	{
+		pattern: 'restaurant|brasserie|bistrot|trattoria|pizzeria|creperie|le\\s+comptoir|la\\s+table|chez\\s+',
+		categoryId: 'cat-restaurant',
+		priority: 20
+	},
+	{
+		pattern: 'sushi|wok|thaï|thai|chinois|japonais|indien|kebab|grec',
+		categoryId: 'cat-restaurant',
+		priority: 21
+	},
+
+	// ===== ALIMENTATION - Fast-food (priority 30-39) =====
+	{
+		pattern: 'mcdo|mcdonald|burger\\s*king|quick|kfc|subway|domino|pizza\\s*hut|five\\s*guys|starbucks',
+		categoryId: 'cat-fast-food',
+		priority: 30
+	},
+
+	// ===== ALIMENTATION - Bar/Café (priority 40-49) =====
+	{
+		pattern: 'bar\\s+|cafe\\s+|café\\s+|pub\\s+|brasserie.*biere|columbus\\s*cafe',
+		categoryId: 'cat-bar-cafe',
+		priority: 40
+	},
+
+	// ===== ALIMENTATION - Livraison (priority 50-59) =====
+	{
+		pattern: 'uber\\s*eats|deliveroo|just\\s*eat|frichti|nestor',
+		categoryId: 'cat-livraison',
+		priority: 50
+	},
+
+	// ===== TRANSPORT - Carburant (priority 60-69) =====
+	{
+		pattern: 'total\\s*energies|totalenergies|shell|bp\\s+|esso|avia|carburant|station\\s*service|essence',
+		categoryId: 'cat-carburant',
+		priority: 60
+	},
+
+	// ===== TRANSPORT - Péage (priority 70-79) =====
+	{
+		pattern: 'sanef|vinci\\s*autoroutes|aprr|area|cofiroute|peage|péage|autoroute',
+		categoryId: 'cat-peage',
+		priority: 70
+	},
+
+	// ===== TRANSPORT - Parking (priority 80-89) =====
+	{
+		pattern: 'parking|effia|indigo\\s*park|interparking|q-park|vinci\\s*park|parcmetre',
+		categoryId: 'cat-parking',
+		priority: 80
+	},
+
+	// ===== TRANSPORT - Transports en commun (priority 90-99) =====
+	{
+		pattern: 'sncf|ratp|navigo|transilien|metro|tramway|bus\\s+|ter\\s+|tgv|ouigo|eurostar|thalys',
+		categoryId: 'cat-transports-commun',
+		priority: 90
+	},
+
+	// ===== TRANSPORT - Taxi/VTC (priority 100-109) =====
+	{
+		pattern: 'uber(?!\\s*eats)|bolt|kapten|chauffeur|taxi|vtc|heetch|marcel',
+		categoryId: 'cat-taxi-vtc',
+		priority: 100
+	},
+
+	// ===== TRANSPORT - Avion (priority 110-119) =====
+	{
+		pattern: 'air\\s*france|easyjet|ryanair|vueling|transavia|volotea|lufthansa|british\\s*airways|klm|emirates',
+		categoryId: 'cat-avion',
+		priority: 110
+	},
+
+	// ===== TRANSPORT - Entretien auto (priority 120-129) =====
+	{
+		pattern: 'norauto|feu\\s*vert|speedy|midas|euromaster|controle\\s*technique|garage|carrosserie|vidange',
+		categoryId: 'cat-entretien-auto',
+		priority: 120
+	},
+
+	// ===== TRANSPORT - Location voiture (priority 130-139) =====
+	{
+		pattern: 'hertz|avis|europcar|sixt|enterprise|ada\\s+location|rent\\s*a\\s*car|getaround',
+		categoryId: 'cat-location-voiture',
+		priority: 130
+	},
+
+	// ===== LOGEMENT - Charges (priority 140-149) =====
+	{
+		pattern: 'edf|engie|enedis|grdf|veolia|suez|lyonnaise\\s*des\\s*eaux|saur',
+		categoryId: 'cat-charges',
+		priority: 140
+	},
+
+	// ===== LOGEMENT - Internet/TV (priority 150-159) =====
+	{
+		pattern: 'orange|sfr|bouygues\\s*telecom|free\\s*|sosh|red\\s*by|b&you|numericable|canal\\+|canal\\s*plus',
+		categoryId: 'cat-internet',
+		priority: 150
+	},
+
+	// ===== LOGEMENT - Assurance habitation (priority 160-169) =====
+	{
+		pattern: 'maif|matmut|macif|maaf|gmf|groupama|axa.*habitation|allianz.*habitation|mma.*habitation',
+		categoryId: 'cat-assurance-habitation',
+		priority: 160
+	},
+
+	// ===== LOGEMENT - Travaux (priority 170-179) =====
+	{
+		pattern: 'leroy\\s*merlin|castorama|brico\\s*depot|bricomarche|mr\\s*bricolage|point\\s*p|cedeo',
+		categoryId: 'cat-travaux',
+		priority: 170
+	},
+
+	// ===== LOGEMENT - Ameublement (priority 180-189) =====
+	{
+		pattern: 'ikea|conforama|but\\s+|maisons\\s*du\\s*monde|alinea|habitat|la\\s*redoute',
+		categoryId: 'cat-ameublement',
+		priority: 180
+	},
+
+	// ===== LOISIRS - Abonnements (priority 190-199) =====
+	{
+		pattern: 'netflix|spotify|disney\\+|disney\\s*plus|amazon\\s*prime|prime\\s*video|deezer|apple\\s*music|youtube\\s*premium|hbo|paramount',
+		categoryId: 'cat-abonnements',
+		priority: 190
+	},
+
+	// ===== LOISIRS - Sport (priority 200-209) =====
+	{
+		pattern: 'basic\\s*fit|fitness|gym|salle\\s*de\\s*sport|decathlon|go\\s*sport|intersport',
+		categoryId: 'cat-sport',
+		priority: 200
+	},
+
+	// ===== LOISIRS - Culture (priority 210-219) =====
+	{
+		pattern: 'fnac|cultura|cinema|ugc|pathe|gaumont|mk2|theatre|musee|concert|ticketmaster|eventbrite',
+		categoryId: 'cat-culture',
+		priority: 210
+	},
+
+	// ===== LOISIRS - Jeux (priority 220-229) =====
+	{
+		pattern: 'micromania|game|playstation|xbox|nintendo|steam|epic\\s*games',
+		categoryId: 'cat-jeux',
+		priority: 220
+	},
+
+	// ===== LOISIRS - Shopping (priority 230-239) =====
+	{
+		pattern: 'zara|h&m|uniqlo|primark|kiabi|celio|jules|mango|galeries\\s*lafayette|printemps|amazon(?!\\s*prime)',
+		categoryId: 'cat-shopping',
+		priority: 230
+	},
+
+	// ===== LOISIRS - High-tech (priority 240-249) =====
+	{
+		pattern: 'apple\\s*store|boulanger|darty|ldlc|materiel\\.net|backmarket|cdiscount',
+		categoryId: 'cat-high-tech',
+		priority: 240
+	},
+
+	// ===== SANTE - Pharmacie (priority 250-259) =====
+	{
+		pattern: 'pharmacie|parapharmacie|pharma',
+		categoryId: 'cat-pharmacie',
+		priority: 250
+	},
+
+	// ===== SANTE - Médecin (priority 260-269) =====
+	{
+		pattern: 'docteur|dr\\.?\\s+|medecin|médecin|generaliste|cabinet\\s*medical|consultation|doctolib',
+		categoryId: 'cat-medecin',
+		priority: 260
+	},
+
+	// ===== SANTE - Dentiste (priority 270-279) =====
+	{
+		pattern: 'dentiste|dentaire|orthodontiste',
+		categoryId: 'cat-dentiste',
+		priority: 270
+	},
+
+	// ===== SANTE - Opticien (priority 280-289) =====
+	{
+		pattern: 'opticien|optical\\s*center|krys|afflelou|atol|lissac|lunettes',
+		categoryId: 'cat-opticien',
+		priority: 280
+	},
+
+	// ===== SANTE - Mutuelle (priority 290-299) =====
+	{
+		pattern: 'mutuelle|harmonie|alan|mgen|malakoff\\s*humanis|ag2r',
+		categoryId: 'cat-mutuelle',
+		priority: 290
+	},
+
+	// ===== BANQUE - Frais bancaires (priority 300-309) =====
+	{
+		pattern: 'cotisation|frais\\s*bancaire|frais\\s*de\\s*tenue|agios|commission\\s*intervention',
+		categoryId: 'cat-frais-bancaires',
+		priority: 300
+	},
+
+	// ===== BANQUE - Retrait DAB (priority 310-319) =====
+	{
+		pattern: 'retrait\\s*dab|retrait\\s*carte|retrait\\s*especes|retrait\\s*espèces|distributeur',
+		categoryId: 'cat-retrait-dab',
+		priority: 310
+	},
+
+	// ===== BANQUE - Intérêts (priority 320-329) =====
+	{
+		pattern: 'interets\\s*crediteurs|interets\\s*débiteurs|intérêts|interets',
+		categoryId: 'cat-interets',
+		priority: 320
+	},
+
+	// ===== REVENUS - Salaire (priority 330-339) =====
+	{
+		pattern: 'salaire|vir\\s+salaire|paie|remuneration|rémunération',
+		categoryId: 'cat-salaire',
+		priority: 330
+	},
+
+	// ===== REVENUS - Remboursement (priority 340-349) =====
+	{
+		pattern: 'remboursement|rbst|remb\\.?\\s|cpam|ameli|secu\\s*sociale|securite\\s*sociale',
+		categoryId: 'cat-remboursement',
+		priority: 340
+	},
+
+	// ===== REVENUS - Aides (priority 350-359) =====
+	{
+		pattern: 'caf|apl|allocation|pole\\s*emploi|france\\s*travail|rsa|prime\\s*activite',
+		categoryId: 'cat-aides',
+		priority: 350
+	},
+
+	// ===== IMPOTS (priority 360-369) =====
+	{
+		pattern: 'dgfip|impot|impôt|tresor\\s*public|taxe\\s*fonciere|taxe\\s*habitation|prelevement\\s*a\\s*la\\s*source',
+		categoryId: 'cat-ir',
+		priority: 360
+	},
+
+	// ===== TRANSPORT - Assurance auto (priority 370-379) =====
+	{
+		pattern: 'maif.*auto|matmut.*auto|macif.*auto|maaf.*auto|axa.*auto|allianz.*auto|direct\\s*assurance',
+		categoryId: 'cat-assurance-auto',
+		priority: 370
+	},
+
+	// ===== EPARGNE - Virements épargne (priority 380-389) =====
+	{
+		pattern: 'livret\\s*a|ldds|ldd|pel|cel|compte\\s*epargne|placement',
+		categoryId: 'cat-livret-a',
+		priority: 380
+	}
+];
+
+// =====================================================
 // Seed Functions
 // =====================================================
 
@@ -331,7 +623,7 @@ async function seedBankCategoryMappings(): Promise<void> {
 	let ruleCount = 0;
 
 	// CE mappings (source filter: caisse_epargne)
-	console.log('  Caisse d\'Epargne mappings:');
+	console.log("  Caisse d'Epargne mappings:");
 	for (const [bankCategory, internalCategoryId] of Object.entries(CE_CATEGORY_MAP)) {
 		const ruleId = `rule-ce-${ruleCount++}`;
 		// Use exact match pattern for bank categories
@@ -362,6 +654,36 @@ async function seedBankCategoryMappings(): Promise<void> {
 	console.log(`\n  ${ruleCount} bank category mapping rules inserted`);
 }
 
+async function seedRegexRules(): Promise<void> {
+	console.log('\nInserting regex categorization rules (for description matching)...\n');
+
+	let ruleCount = 0;
+
+	// Group rules by category for cleaner output
+	const rulesByCategory = new Map<string, RegexRule[]>();
+	for (const rule of REGEX_RULES) {
+		const existing = rulesByCategory.get(rule.categoryId) || [];
+		existing.push(rule);
+		rulesByCategory.set(rule.categoryId, existing);
+	}
+
+	for (const [categoryId, rules] of rulesByCategory) {
+		console.log(`  ${categoryId}:`);
+		for (const rule of rules) {
+			const ruleId = `rule-regex-${ruleCount++}`;
+
+			await execute(
+				`INSERT OR REPLACE INTO category_rules (id, category_id, pattern, priority, source_filter, is_active, created_at)
+				VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`,
+				[ruleId, rule.categoryId, rule.pattern, rule.priority, null, 1]
+			);
+			console.log(`    [p${rule.priority}] /${rule.pattern.substring(0, 50)}${rule.pattern.length > 50 ? '...' : ''}/i`);
+		}
+	}
+
+	console.log(`\n  ${ruleCount} regex categorization rules inserted`);
+}
+
 function escapeRegex(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -380,10 +702,20 @@ async function verifySeededData(): Promise<void> {
 	console.log(`  Sub-categories: ${childCount}`);
 	console.log(`  Total categories: ${rootCount + childCount}`);
 
-	// Count rules
-	const rulesResult = await execute('SELECT COUNT(*) as count FROM category_rules');
-	const rulesCount = (rulesResult.rows[0] as unknown as { count: number }).count;
-	console.log(`  Category rules: ${rulesCount}`);
+	// Count rules by type
+	const bankRulesResult = await execute(
+		"SELECT COUNT(*) as count FROM category_rules WHERE source_filter IS NOT NULL"
+	);
+	const bankRulesCount = (bankRulesResult.rows[0] as unknown as { count: number }).count;
+
+	const regexRulesResult = await execute(
+		'SELECT COUNT(*) as count FROM category_rules WHERE source_filter IS NULL'
+	);
+	const regexRulesCount = (regexRulesResult.rows[0] as unknown as { count: number }).count;
+
+	console.log(`  Bank category mapping rules: ${bankRulesCount}`);
+	console.log(`  Regex categorization rules: ${regexRulesCount}`);
+	console.log(`  Total rules: ${bankRulesCount + regexRulesCount}`);
 
 	// Show category hierarchy
 	console.log('\n  Category hierarchy:');
@@ -416,16 +748,17 @@ async function verifySeededData(): Promise<void> {
 // =====================================================
 
 async function main(): Promise<void> {
-	console.log('Seeding categories and bank mappings...\n');
+	console.log('Seeding categories, bank mappings, and regex rules...\n');
 
 	try {
 		await seedCategories();
 		await seedBankCategoryMappings();
+		await seedRegexRules();
 		await verifySeededData();
 
-		console.log('\n Seed completed successfully!');
+		console.log('\n✓ Seed completed successfully!');
 	} catch (error) {
-		console.error('\n Seed failed:', error);
+		console.error('\n✗ Seed failed:', error);
 		throw error;
 	} finally {
 		await closeDatabase();
