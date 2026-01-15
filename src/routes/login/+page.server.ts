@@ -7,6 +7,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(302, '/');
 	}
 	return {
-		users: getAllUsers()
+		users: await getAllUsers()
 	};
 };

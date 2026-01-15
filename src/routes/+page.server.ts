@@ -1,9 +1,7 @@
 import type { PageServerLoad } from './$types';
-import Database from 'better-sqlite3';
+import { execute } from '@infrastructure/database/turso';
 import { YahooFinanceService } from '@infrastructure/prices/YahooFinanceService';
 import { CoinGeckoService } from '@infrastructure/prices/CoinGeckoService';
-
-const DB_PATH = './data/imanisa.db';
 
 interface Owner {
 	id: string;
@@ -71,30 +69,27 @@ const yahooService = new YahooFinanceService();
 const coinGeckoService = new CoinGeckoService();
 
 export const load: PageServerLoad = async ({ locals }) => {
-	let db: Database.Database | null = null;
-
 	try {
-		db = new Database(DB_PATH, { readonly: true });
-	} catch {
-		return getEmptyData(locals.user?.name);
-	}
-
-	try {
-		const owners = db.prepare('SELECT * FROM owners').all() as Owner[];
-		const ownerMap = new Map(owners.map((o) => [o.id, o]));
-
-		const accounts = db.prepare('SELECT * FROM accounts ORDER BY bank, name').all() as Account[];
-		const positions = db.prepare('SELECT * FROM positions').all() as Position[];
-		const loans = db.prepare('SELECT * FROM loans').all() as Loan[];
-		const properties = db.prepare('SELECT * FROM properties').all() as Property[];
-
 		const currentMonth = new Date().toISOString().slice(0, 7);
-		const transactions = db.prepare(`
-			SELECT * FROM transactions 
-			WHERE date LIKE ? || '%'
-			ORDER BY date DESC
-			LIMIT 100
-		`).all(currentMonth) as Transaction[];
+
+		const [ownersResult, accountsResult, positionsResult, loansResult, propertiesResult, transactionsResult, allTransactionsResult] = await Promise.all([
+			execute('SELECT * FROM owners'),
+			execute('SELECT * FROM accounts ORDER BY bank, name'),
+			execute('SELECT * FROM positions'),
+			execute('SELECT * FROM loans'),
+			execute('SELECT * FROM properties'),
+			execute(`SELECT * FROM transactions WHERE date LIKE ? || '%' ORDER BY date DESC LIMIT 100`, [currentMonth]),
+			execute(`SELECT date, SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END) as net_change FROM transactions GROUP BY date ORDER BY date DESC`)
+		]);
+
+		const owners = ownersResult.rows as unknown as Owner[];
+		const ownerMap = new Map(owners.map((o) => [o.id, o]));
+		const accounts = accountsResult.rows as unknown as Account[];
+		const positions = positionsResult.rows as unknown as Position[];
+		const loans = loansResult.rows as unknown as Loan[];
+		const properties = propertiesResult.rows as unknown as Property[];
+		const transactions = transactionsResult.rows as unknown as Transaction[];
+		const allTransactions = allTransactionsResult.rows as unknown as { date: string; net_change: number }[];
 
 		const etfTickers = positions
 			.filter((p) => p.asset_type !== 'crypto' && p.ticker)
@@ -142,24 +137,17 @@ export const load: PageServerLoad = async ({ locals }) => {
 		const totalDebts = loans.reduce((sum, l) => sum + l.remaining_amount, 0);
 		const netWorth = liquidAssets + investmentAssets + realEstateValue - totalDebts;
 
-		const allTransactions = db.prepare(`
-			SELECT date, SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END) as net_change
-			FROM transactions
-			GROUP BY date
-			ORDER BY date DESC
-		`).all() as { date: string; net_change: number }[];
-
 		const netWorthHistory: { date: string; value: number }[] = [];
 		let runningNetWorth = netWorth;
 		const today = new Date().toISOString().slice(0, 10);
-		
+
 		netWorthHistory.push({ date: today, value: runningNetWorth });
-		
+
 		for (const tx of allTransactions) {
 			runningNetWorth -= tx.net_change;
 			netWorthHistory.push({ date: tx.date, value: runningNetWorth });
 		}
-		
+
 		netWorthHistory.reverse();
 
 		const monthlyIncome = transactions
@@ -241,8 +229,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 			},
 			netWorthHistory
 		};
-	} finally {
-		db?.close();
+	} catch {
+		return getEmptyData(locals.user?.name);
 	}
 };
 

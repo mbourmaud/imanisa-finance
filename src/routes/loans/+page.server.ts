@@ -1,7 +1,5 @@
 import type { PageServerLoad } from './$types';
-import Database from 'better-sqlite3';
-
-const DB_PATH = './data/imanisa.db';
+import { execute } from '@infrastructure/database/turso';
 
 interface Owner {
 	id: string;
@@ -35,26 +33,17 @@ interface Property {
 }
 
 export const load: PageServerLoad = async ({ locals }) => {
-	let db: Database.Database | null = null;
-
 	try {
-		db = new Database(DB_PATH, { readonly: true });
-	} catch {
-		return {
-			user: locals.user,
-			loans: [],
-			properties: [],
-			totalDebt: 0,
-			totalMonthlyPayment: 0
-		};
-	}
+		const [ownersResult, loansResult, propertiesResult] = await Promise.all([
+			execute('SELECT * FROM owners'),
+			execute('SELECT * FROM loans ORDER BY remaining_amount DESC'),
+			execute('SELECT * FROM properties')
+		]);
 
-	try {
-		const owners = db.prepare('SELECT * FROM owners').all() as Owner[];
+		const owners = ownersResult.rows as unknown as Owner[];
 		const ownerMap = new Map(owners.map((o) => [o.id, o]));
-
-		const loans = db.prepare('SELECT * FROM loans ORDER BY remaining_amount DESC').all() as Loan[];
-		const properties = db.prepare('SELECT * FROM properties').all() as Property[];
+		const loans = loansResult.rows as unknown as Loan[];
+		const properties = propertiesResult.rows as unknown as Property[];
 		const propertyMap = new Map(properties.map((p) => [p.id, p]));
 
 		const loansWithDetails = loans.map((loan) => {
@@ -83,7 +72,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 			totalInitial,
 			globalProgress: totalInitial > 0 ? ((totalInitial - totalDebt) / totalInitial) * 100 : 0
 		};
-	} finally {
-		db?.close();
+	} catch {
+		return {
+			user: locals.user,
+			loans: [],
+			properties: [],
+			totalDebt: 0,
+			totalMonthlyPayment: 0
+		};
 	}
 };

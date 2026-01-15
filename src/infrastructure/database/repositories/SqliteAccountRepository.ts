@@ -4,7 +4,7 @@ import { Account as AccountEntity } from '@domain/account/Account';
 import { AccountType } from '@domain/account/AccountType';
 import { AssetCategory } from '@domain/account/AssetCategory';
 import { UniqueId } from '@domain/shared/UniqueId';
-import { getDatabase } from '../connection';
+import { execute } from '../turso';
 
 interface AccountRow {
 	id: string;
@@ -20,24 +20,27 @@ interface AccountRow {
 
 export class SqliteAccountRepository implements AccountRepository {
 	async findById(id: UniqueId): Promise<Account | null> {
-		const db = getDatabase();
-		const row = db.prepare('SELECT * FROM accounts WHERE id = ?').get(id.toString()) as AccountRow | undefined;
-		
+		const result = await execute('SELECT * FROM accounts WHERE id = ?', [id.toString()]);
+		const row = result.rows[0] as unknown as AccountRow | undefined;
+
 		if (!row) return null;
 		return this.toDomain(row);
 	}
 
 	async findByBankId(bankId: UniqueId): Promise<Account[]> {
-		const db = getDatabase();
-		const rows = db.prepare('SELECT * FROM accounts WHERE bank_id = ? ORDER BY created_at DESC').all(bankId.toString()) as AccountRow[];
-		
-		return rows.map((row) => this.toDomain(row)).filter((account): account is Account => account !== null);
+		const result = await execute(
+			'SELECT * FROM accounts WHERE bank_id = ? ORDER BY created_at DESC',
+			[bankId.toString()]
+		);
+
+		return (result.rows as unknown as AccountRow[])
+			.map((row) => this.toDomain(row))
+			.filter((account): account is Account => account !== null);
 	}
 
 	async save(account: Account): Promise<void> {
-		const db = getDatabase();
-		db.prepare(`
-			INSERT INTO accounts (id, bank_id, name, type, asset_category, balance, currency, created_at, updated_at)
+		await execute(
+			`INSERT INTO accounts (id, bank_id, name, type, asset_category, balance, currency, created_at, updated_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT(id) DO UPDATE SET
 				name = excluded.name,
@@ -45,23 +48,23 @@ export class SqliteAccountRepository implements AccountRepository {
 				asset_category = excluded.asset_category,
 				balance = excluded.balance,
 				currency = excluded.currency,
-				updated_at = excluded.updated_at
-		`).run(
-			account.id.toString(),
-			account.bankId.toString(),
-			account.name,
-			account.type,
-			account.assetCategory,
-			account.balance.amount,
-			account.balance.currency,
-			account.createdAt.toISOString(),
-			account.updatedAt.toISOString()
+				updated_at = excluded.updated_at`,
+			[
+				account.id.toString(),
+				account.bankId.toString(),
+				account.name,
+				account.type,
+				account.assetCategory,
+				account.balance.amount,
+				account.balance.currency,
+				account.createdAt.toISOString(),
+				account.updatedAt.toISOString()
+			]
 		);
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		const db = getDatabase();
-		db.prepare('DELETE FROM accounts WHERE id = ?').run(id.toString());
+		await execute('DELETE FROM accounts WHERE id = ?', [id.toString()]);
 	}
 
 	private toDomain(row: AccountRow): Account | null {

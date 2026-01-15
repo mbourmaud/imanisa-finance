@@ -1,9 +1,7 @@
 import type { PageServerLoad } from './$types';
-import Database from 'better-sqlite3';
+import { execute } from '@infrastructure/database/turso';
 import { YahooFinanceService } from '@infrastructure/prices/YahooFinanceService';
 import { CoinGeckoService } from '@infrastructure/prices/CoinGeckoService';
-
-const DB_PATH = './data/imanisa.db';
 
 interface Owner {
 	id: string;
@@ -36,26 +34,17 @@ const yahooService = new YahooFinanceService();
 const coinGeckoService = new CoinGeckoService();
 
 export const load: PageServerLoad = async ({ locals }) => {
-	let db: Database.Database | null = null;
-
 	try {
-		db = new Database(DB_PATH, { readonly: true });
-	} catch {
-		return {
-			user: locals.user,
-			positions: [],
-			totalValue: 0,
-			totalGain: 0,
-			totalGainPercent: 0
-		};
-	}
+		const [ownersResult, accountsResult, positionsResult] = await Promise.all([
+			execute('SELECT * FROM owners'),
+			execute('SELECT * FROM accounts'),
+			execute('SELECT * FROM positions')
+		]);
 
-	try {
-		const owners = db.prepare('SELECT * FROM owners').all() as Owner[];
+		const owners = ownersResult.rows as unknown as Owner[];
 		const ownerMap = new Map(owners.map((o) => [o.id, o]));
-
-		const accounts = db.prepare('SELECT * FROM accounts').all() as Account[];
-		const positions = db.prepare('SELECT * FROM positions').all() as Position[];
+		const accounts = accountsResult.rows as unknown as Account[];
+		const positions = positionsResult.rows as unknown as Position[];
 
 		const etfTickers = positions
 			.filter((p) => p.ticker && p.asset_type === 'etf')
@@ -135,7 +124,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 			totalGain,
 			totalGainPercent
 		};
-	} finally {
-		db?.close();
+	} catch {
+		return {
+			user: locals.user,
+			positions: [],
+			totalValue: 0,
+			totalGain: 0,
+			totalGainPercent: 0
+		};
 	}
 };
