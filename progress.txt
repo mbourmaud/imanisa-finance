@@ -1544,3 +1544,33 @@
 - Uncategorized filter: LEFT JOIN with WHERE NULL to find missing assignments
 
 ---
+
+## [Iteration X] 2026-01-15 - US-411: Feature suggestion de règle depuis transaction
+
+### What was implemented
+- Created `CategorySuggestion.svelte` component for post-categorization popup
+- Popup appears after manual category assignment on transactions page
+- Pre-fills pattern from transaction description (simplified/cleaned):
+  - Removes date prefixes/suffixes
+  - Removes transaction type prefixes (VIR, PRLV, CB, etc.)
+  - Extracts merchant name from long descriptions
+  - Escapes special regex characters
+- Creates rule via POST /api/budget/rules with priority 50
+- Auto-triggers recategorization after rule creation
+- "Ne plus demander" option persisted in localStorage (key: imanisa-category-suggestion-disabled)
+- Accessible with ARIA labels, keyboard support (Escape to close)
+- Success animation shows briefly before auto-closing
+
+### Files changed
+- src/lib/components/CategorySuggestion.svelte (new)
+- src/routes/transactions/+page.svelte (integrated CategorySuggestion)
+
+### Learnings for future iterations
+- Pattern extraction: escapeRegex() for special chars, split on separators for merchant name
+- localStorage check: wrap in `typeof localStorage === 'undefined'` for SSR safety
+- Popup state: separate showSuggestion and suggestionData states for clean reset
+- Auto-close: setTimeout after success animation completes
+- Category lookup: need to traverse hierarchy to find child categories
+- svelte-check error: explicit type annotation needed in find() callback `(tx: Transaction) =>`
+
+---

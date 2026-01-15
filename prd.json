@@ -1109,7 +1109,7 @@
       ],
       "files": ["src/lib/components/CategorySuggestion.svelte"],
       "priority": 411,
-      "passes": false,
+      "passes": true,
       "notes": "Apprentissage progressif: chaque catégorisation manuelle peut devenir une règle"
     },
     {
