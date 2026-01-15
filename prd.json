@@ -400,7 +400,7 @@
       ],
       "files": ["src/infrastructure/parsers/BourseDirectParser.ts"],
       "priority": 202,
-      "passes": false,
+      "passes": true,
       "notes": "Format positions PEA - URL: https://www.boursedirect.fr/fr/mon-compte/portefeuilles"
     },
     {
@@ -416,7 +416,7 @@
       ],
       "files": ["src/infrastructure/parsers/LinxeaParser.ts"],
       "priority": 203,
-      "passes": false,
+      "passes": true,
       "notes": "Format positions AV - URL: https://espaceclient.linxea.com/epargne/contrat/{id}"
     },
     {
@@ -434,7 +434,7 @@
       ],
       "files": ["src/infrastructure/parsers/BinanceParser.ts"],
       "priority": 204,
-      "passes": false,
+      "passes": true,
       "notes": "Format transactions crypto - URL: https://www.binance.com/en/my/wallet/exchange/buysell-history"
     },
     {
