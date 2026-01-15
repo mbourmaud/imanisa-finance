@@ -55,7 +55,7 @@ function toPersistence(dataSource: DataSource): typeof schema.dataSources.$infer
  */
 export class DataSourceRepositoryImpl implements DataSourceRepository {
 	async findAll(): Promise<DataSource[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.dataSources)
@@ -64,7 +64,7 @@ export class DataSourceRepositoryImpl implements DataSourceRepository {
 	}
 
 	async findById(id: UniqueId): Promise<DataSource | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.dataSources)
@@ -75,7 +75,7 @@ export class DataSourceRepositoryImpl implements DataSourceRepository {
 	}
 
 	async findByOwnerEntityId(ownerEntityId: UniqueId): Promise<DataSource[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.dataSources)
@@ -85,7 +85,7 @@ export class DataSourceRepositoryImpl implements DataSourceRepository {
 	}
 
 	async save(dataSource: DataSource): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		const data = toPersistence(dataSource);
 
 		// Check if exists
@@ -113,7 +113,7 @@ export class DataSourceRepositoryImpl implements DataSourceRepository {
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.delete(schema.dataSources)
 			.where(eq(schema.dataSources.id, id.toString()));

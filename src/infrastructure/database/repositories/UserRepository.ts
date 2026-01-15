@@ -8,7 +8,7 @@ import { getDb, schema } from '../drizzle';
 
 export class UserRepositoryImpl implements UserRepository {
 	async findById(id: UniqueId): Promise<User | null> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.users)
@@ -21,7 +21,7 @@ export class UserRepositoryImpl implements UserRepository {
 	}
 
 	async findByEmail(email: Email): Promise<User | null> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.users)
@@ -34,7 +34,7 @@ export class UserRepositoryImpl implements UserRepository {
 	}
 
 	async save(user: User): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.insert(schema.users)
 			.values({
@@ -55,7 +55,7 @@ export class UserRepositoryImpl implements UserRepository {
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db.delete(schema.users).where(eq(schema.users.id, id.toString()));
 	}
 

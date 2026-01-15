@@ -8,7 +8,7 @@ import { getDb, schema } from '../drizzle';
 
 export class BankRepositoryImpl implements BankRepository {
 	async findById(id: UniqueId): Promise<Bank | null> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.banks)
@@ -21,7 +21,7 @@ export class BankRepositoryImpl implements BankRepository {
 	}
 
 	async findByUserId(userId: UniqueId): Promise<Bank[]> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.banks)
@@ -34,7 +34,7 @@ export class BankRepositoryImpl implements BankRepository {
 	}
 
 	async save(bank: Bank): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.insert(schema.banks)
 			.values({
@@ -54,7 +54,7 @@ export class BankRepositoryImpl implements BankRepository {
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db.delete(schema.banks).where(eq(schema.banks.id, id.toString()));
 	}
 

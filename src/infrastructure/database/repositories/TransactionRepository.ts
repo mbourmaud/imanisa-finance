@@ -9,7 +9,7 @@ import { getDb, schema } from '../drizzle';
 
 export class TransactionRepositoryImpl implements TransactionRepository {
 	async findById(id: UniqueId): Promise<Transaction | null> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.transactions)
@@ -22,7 +22,7 @@ export class TransactionRepositoryImpl implements TransactionRepository {
 	}
 
 	async findByAccountId(accountId: UniqueId): Promise<Transaction[]> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.transactions)
@@ -35,7 +35,7 @@ export class TransactionRepositoryImpl implements TransactionRepository {
 	}
 
 	async findByAccountIdAndDateRange(accountId: UniqueId, startDate: Date, endDate: Date): Promise<Transaction[]> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.transactions)
@@ -56,7 +56,7 @@ export class TransactionRepositoryImpl implements TransactionRepository {
 	async saveMany(transactions: Transaction[]): Promise<void> {
 		if (transactions.length === 0) return;
 
-		const db = getDb();
+		const db = await getDb();
 		for (const tx of transactions) {
 			await db
 				.insert(schema.transactions)
@@ -90,12 +90,12 @@ export class TransactionRepositoryImpl implements TransactionRepository {
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db.delete(schema.transactions).where(eq(schema.transactions.id, id.toString()));
 	}
 
 	async deleteByAccountId(accountId: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db.delete(schema.transactions).where(eq(schema.transactions.accountId, accountId.toString()));
 	}
 

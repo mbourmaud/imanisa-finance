@@ -121,13 +121,13 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	// ========== Category CRUD ==========
 
 	async findAllCategories(): Promise<Category[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db.select().from(schema.categories).orderBy(schema.categories.name);
 		return rows.map(categoryToDomain);
 	}
 
 	async findCategoryById(id: UniqueId): Promise<Category | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.categories)
@@ -138,7 +138,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async findRootCategories(): Promise<Category[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.categories)
@@ -148,7 +148,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async findChildCategories(parentId: UniqueId): Promise<Category[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.categories)
@@ -158,7 +158,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async saveCategory(category: Category): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		const data = categoryToPersistence(category);
 
 		const existing = await this.findCategoryById(category.id);
@@ -179,14 +179,14 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async deleteCategory(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db.delete(schema.categories).where(eq(schema.categories.id, id.toString()));
 	}
 
 	// ========== CategoryRule CRUD ==========
 
 	async findAllRules(): Promise<CategoryRule[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.categoryRules)
@@ -195,7 +195,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async findActiveRulesByPriority(): Promise<CategoryRule[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.categoryRules)
@@ -205,7 +205,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async findRuleById(id: UniqueId): Promise<CategoryRule | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.categoryRules)
@@ -216,7 +216,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async findRulesByCategoryId(categoryId: UniqueId): Promise<CategoryRule[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.categoryRules)
@@ -226,7 +226,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async saveRule(rule: CategoryRule): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		const data = ruleToPersistence(rule);
 
 		const existing = await this.findRuleById(rule.id);
@@ -248,7 +248,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async deleteRule(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db.delete(schema.categoryRules).where(eq(schema.categoryRules.id, id.toString()));
 	}
 
@@ -257,7 +257,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	async findAssignmentByTransactionId(
 		transactionId: UniqueId
 	): Promise<TransactionCategoryAssignment | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.transactionCategories)
@@ -270,7 +270,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	async findAssignmentsByCategoryId(
 		categoryId: UniqueId
 	): Promise<TransactionCategoryAssignment[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.transactionCategories)
@@ -279,7 +279,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async saveAssignment(assignment: TransactionCategoryAssignment): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		const data = assignmentToPersistence(assignment);
 
 		const existing = await this.findAssignmentByTransactionId(assignment.transactionId);
@@ -300,7 +300,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	async deleteAssignment(transactionId: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.delete(schema.transactionCategories)
 			.where(eq(schema.transactionCategories.transactionId, transactionId.toString()));
