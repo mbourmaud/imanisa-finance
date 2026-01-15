@@ -21,8 +21,8 @@
 		{ href: '/', label: 'Synthèse', icon: 'dashboard' },
 		{ href: '/accounts', label: 'Comptes', icon: 'wallet' },
 		{ href: '/investissements', label: 'Invest.', icon: 'chart' },
-		{ href: '/immobilier', label: 'Immobilier', icon: 'home' },
-		{ href: '/transactions', label: 'Opérations', icon: 'list' },
+		{ href: '/immobilier', label: 'Immo.', icon: 'home' },
+		{ href: '/transactions', label: 'Opéra.', icon: 'list' },
 		{ href: '/loans', label: 'Crédits', icon: 'loan' },
 		{ href: '/import', label: 'Import', icon: 'upload' }
 	];

@@ -270,8 +270,8 @@
 
 	@media (max-width: 768px) {
 		.drop-zone {
-			padding: var(--spacing-3);
-			min-height: 72px;
+			padding: var(--spacing-4);
+			min-height: 88px;
 		}
 
 		.drop-content {
@@ -279,8 +279,24 @@
 			gap: var(--spacing-2);
 		}
 
+		.drop-text {
+			font-size: var(--font-size-base);
+		}
+
+		.drop-sub {
+			font-size: var(--font-size-sm);
+		}
+
 		.result-text {
 			align-items: center;
+		}
+
+		.result-main {
+			font-size: var(--font-size-base);
+		}
+
+		.result-sub {
+			font-size: var(--font-size-sm);
 		}
 	}
 

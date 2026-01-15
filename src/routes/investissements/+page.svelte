@@ -982,6 +982,8 @@
 		transition: background var(--transition-fast);
 		animation: fadeInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 		opacity: 0;
+		/* For horizontal scroll on mobile */
+		min-width: max-content;
 	}
 
 	.position-row:hover {
@@ -1314,16 +1316,37 @@
 			height: 40px;
 		}
 
+		.positions-list {
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: thin;
+		}
+
 		.position-row {
-			flex-wrap: wrap;
-			gap: var(--spacing-2);
-			padding: var(--spacing-4);
+			flex-wrap: nowrap;
+			gap: var(--spacing-4);
+			padding: var(--spacing-3) var(--spacing-4);
+			min-width: 480px;
+		}
+
+		.position-main {
+			position: sticky;
+			left: 0;
+			background: var(--color-bg-card);
+			z-index: 1;
+			padding-right: var(--spacing-2);
+			min-width: 140px;
+			max-width: 180px;
+		}
+
+		.position-row:hover .position-main {
+			background: var(--color-bg-card-hover);
 		}
 
 		.position-values {
-			flex: 1 1 100%;
-			align-items: flex-start;
-			margin-top: var(--spacing-1);
+			flex-shrink: 0;
+			align-items: flex-end;
+			min-width: 130px;
 		}
 
 		.import-section {
