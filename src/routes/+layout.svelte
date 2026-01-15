@@ -21,6 +21,7 @@
 
 <svelte:head>
 	<title>Imanisa Finance</title>
+	<meta name="description" content="Gérez vos finances personnelles avec Imanisa Finance" />
 </svelte:head>
 
 {#if data.user}

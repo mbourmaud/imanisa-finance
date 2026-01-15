@@ -51,6 +51,40 @@ L'app sera accessible sur http://localhost:5173
 3. Dans l'app, va dans ⚙️ Config et entre tes credentials
 4. Connecte tes banques !
 
+### Configuration Telegram
+
+Pour recevoir des notifications sur Telegram (succès/échec de synchronisation, alertes 2FA, etc.) :
+
+#### 1. Créer un bot Telegram
+
+1. Ouvre Telegram et cherche **@BotFather**
+2. Envoie `/newbot`
+3. Choisis un nom pour ton bot (ex: "Imanisa Finance Bot")
+4. Choisis un username (ex: `imanisa_finance_bot`)
+5. BotFather te donne un **token** du type `123456789:ABCdefGHI...`
+6. Copie ce token dans `TELEGRAM_BOT_TOKEN` de ton `.env`
+
+#### 2. Obtenir ton Chat ID
+
+1. Cherche **@userinfobot** sur Telegram
+2. Envoie `/start`
+3. Le bot te répond avec ton **Chat ID** (un nombre)
+4. Copie ce ID dans `TELEGRAM_CHAT_ID` de ton `.env`
+
+#### 3. Tester la configuration
+
+```bash
+# Via l'API (remplace localhost:3000 par ton URL)
+curl -X POST http://localhost:3000/api/telegram/test
+```
+
+Tu devrais recevoir un message de test sur Telegram. Les notifications incluent :
+- 🔄 Démarrage du scraper
+- ✅ Synchronisation réussie
+- ❌ Erreurs de synchronisation
+- 🔐 Demande de code 2FA
+- 📊 Résumé quotidien
+
 ### Import des positions (Bourse Direct / Linxea)
 
 1. Exporte tes positions en CSV depuis ton broker
@@ -70,6 +104,63 @@ Pour une synchro automatique, ajoute ces lignes à ton crontab (`crontab -e`) :
 ```
 
 ## Déploiement en production
+
+### Docker (recommandé)
+
+La méthode la plus simple pour déployer l'application sur VPS, Raspberry Pi, ou PC local.
+
+```bash
+# Clone le repo
+git clone git@github.com:YOUR_USERNAME/imanisa-finance.git
+cd imanisa-finance
+
+# Copie le fichier d'environnement
+cp .env.example .env
+
+# Configure tes variables d'environnement
+nano .env
+
+# Lance avec Docker Compose
+docker compose up -d
+
+# Vérifie les logs
+docker compose logs -f
+```
+
+L'app sera accessible sur http://localhost:3000
+
+#### Variables d'environnement Docker
+
+| Variable | Description | Requis |
+|----------|-------------|--------|
+| `AUTH_SECRET` | Secret pour les sessions | ✅ |
+| `PUBLIC_BASE_URL` | URL publique de l'app | ❌ (défaut: http://localhost:3000) |
+| `TELEGRAM_BOT_TOKEN` | Token du bot Telegram ([guide](#configuration-telegram)) | ❌ |
+| `TELEGRAM_CHAT_ID` | ID du chat Telegram ([guide](#configuration-telegram)) | ❌ |
+| `BINANCE_API_KEY` | Clé API Binance | ❌ |
+| `BINANCE_API_SECRET` | Secret API Binance | ❌ |
+| `SCRAPER_CRON` | Planning du scraper (cron) | ❌ (défaut: 0 8 * * 1) |
+
+#### Mise à jour
+
+```bash
+# Pull les derniers changements
+git pull
+
+# Rebuild et relance
+docker compose up -d --build
+```
+
+#### Sauvegarde
+
+Les données sont persistées dans le dossier `./data`. Pour sauvegarder :
+
+```bash
+# Sauvegarde la base de données
+cp data/imanisa.db backup/imanisa-$(date +%Y%m%d).db
+```
+
+### Node.js (sans Docker)
 
 ```bash
 # Build
@@ -134,6 +225,7 @@ imanisa-finance/
 - `POST /api/import` - Import CSV (multipart/form-data)
 - `POST /api/prices` - Mise à jour des prix
 - `GET /api/prices?action=search&q=XXX` - Recherche de symbole
+- `POST /api/telegram/test` - Envoi d'une notification de test
 
 ## Limitations
 

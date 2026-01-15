@@ -1,4 +1,8 @@
 <script lang="ts">
+	/**
+	 * PeriodFilter - Composant de sélection de période
+	 * Permet de filtrer les données par période temporelle
+	 */
 	interface Props {
 		value: string;
 		onchange: (value: string) => void;

@@ -359,6 +359,24 @@ CREATE TABLE IF NOT EXISTS recurring_expenses (
 );
 
 -- =====================================================
+-- SCRAPER SYNC STATUS
+-- =====================================================
+
+-- Track sync status for each data source
+CREATE TABLE IF NOT EXISTS sync_status (
+    id TEXT PRIMARY KEY,
+    source TEXT NOT NULL UNIQUE,
+    last_sync_at TEXT,
+    last_sync_status TEXT DEFAULT 'pending' CHECK (last_sync_status IN ('success', 'failure', 'pending', 'running')),
+    last_error TEXT,
+    next_sync_at TEXT,
+    total_syncs INTEGER DEFAULT 0,
+    successful_syncs INTEGER DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =====================================================
 -- INDEXES
 -- =====================================================
 
