@@ -691,8 +691,8 @@
       ],
       "files": ["e2e/import.test.ts"],
       "priority": 912,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 E2E tests for import page navigation and file drop zones"
     },
     {
       "id": "US-913",
