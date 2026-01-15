@@ -178,7 +178,14 @@
 		{#if user}
 			<div class="user-section" title={user.name}>
 				{#if user.avatarUrl}
-					<img src={user.avatarUrl} alt={user.name} class="user-avatar" />
+					<img
+						src={user.avatarUrl}
+						alt={user.name}
+						class="user-avatar"
+						width="36"
+						height="36"
+						loading="lazy"
+					/>
 				{:else}
 					<div class="user-avatar-placeholder" aria-label={user.name}>
 						{user.name.charAt(0)}

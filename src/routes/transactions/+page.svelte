@@ -80,6 +80,9 @@
 	const filteredCount = $derived(
 		selectedOwner === 'all' ? data.totalCount : filteredTransactions.length
 	);
+
+	// Disable staggered animations for large lists (>50 items) to improve performance
+	const useStaggeredAnimations = $derived(filteredTransactions.length <= 50);
 </script>
 
 <div class="transactions-page">
@@ -163,7 +166,7 @@
 		<div class="transactions-card">
 			<div class="transactions-list">
 				{#each filteredTransactions as tx, i}
-					<div class="transaction-row" style="animation-delay: {i * 0.02}s">
+					<div class="transaction-row" style={useStaggeredAnimations ? `animation-delay: ${i * 0.02}s` : ''}>
 						<span class="transaction-date">{formatDate(tx.date)}</span>
 						
 						<div class="transaction-details">

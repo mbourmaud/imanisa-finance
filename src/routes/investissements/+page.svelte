@@ -200,6 +200,9 @@
 	const totalPositionsCount = $derived(
 		data.groupedPositions.reduce((sum, group) => sum + group.positions.length, 0)
 	);
+
+	// Disable staggered animations for large lists (>50 items) to improve performance
+	const useStaggeredAnimations = $derived(totalPositionsCount <= 50);
 </script>
 
 <div class="investissements-page">
@@ -346,7 +349,7 @@
 			<div class="source-groups">
 				{#each data.groupedPositions as group, groupIndex}
 					{@const state = getImportState(group.source.id)}
-					<div class="source-group" style="--anim-delay: {groupIndex * 0.05}s">
+					<div class="source-group" style={useStaggeredAnimations ? `--anim-delay: ${groupIndex * 0.05}s` : '--anim-delay: 0s'}>
 						<div class="source-header">
 							<div class="source-identity">
 								<div
@@ -442,7 +445,7 @@
 								{#each group.positions as position, posIndex}
 									<div
 										class="position-row"
-										style="animation-delay: {groupIndex * 0.05 + posIndex * 0.02}s"
+										style={useStaggeredAnimations ? `animation-delay: ${groupIndex * 0.05 + posIndex * 0.02}s` : ''}
 									>
 										<div class="position-main">
 											<div class="position-identity">

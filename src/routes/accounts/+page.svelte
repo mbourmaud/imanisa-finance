@@ -125,6 +125,9 @@
 			? data.accounts.length
 			: data.accounts.filter((acc: Account) => acc.owner_id === selectedOwner).length
 	);
+
+	// Disable staggered animations for large lists (>50 items) to improve performance
+	const useStaggeredAnimations = $derived(data.accounts.length <= 50);
 </script>
 
 <div class="accounts-page">
@@ -168,11 +171,18 @@
 	{:else}
 		<div class="banks-list">
 			{#each filteredBanks as bank, bankIndex}
-				<div class="bank-section" style="animation-delay: {bankIndex * 0.05}s">
+				<div class="bank-section" style={useStaggeredAnimations ? `animation-delay: ${bankIndex * 0.05}s` : ''}>
 					<div class="bank-header">
 						<div class="bank-identity">
 							{#if getBankLogo(bank.name)}
-								<img src={getBankLogo(bank.name)} alt={bank.name} class="bank-logo" />
+								<img
+									src={getBankLogo(bank.name)}
+									alt={bank.name}
+									class="bank-logo"
+									width="40"
+									height="40"
+									loading="lazy"
+								/>
 							{:else}
 								<div class="bank-icon-placeholder">
 									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -194,7 +204,7 @@
 					<div class="accounts-list">
 						{#each bank.accounts as account, accountIndex}
 							{@const typeInfo = getAccountTypeIcon(account.type)}
-							<div class="account-row" style="animation-delay: {(bankIndex * 0.05) + (accountIndex * 0.03)}s">
+							<div class="account-row" style={useStaggeredAnimations ? `animation-delay: ${(bankIndex * 0.05) + (accountIndex * 0.03)}s` : ''}>
 								<div class="account-type-icon" class:checking={account.type === 'checking'} class:savings={account.type === 'savings'} class:investment={account.type === 'investment'} class:pea={account.type === 'pea'} class:crypto={account.type === 'crypto'} class:life_insurance={account.type === 'life_insurance'}>
 									{#if typeInfo.icon === 'card'}
 										<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
