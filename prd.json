@@ -638,8 +638,8 @@
       ],
       "files": ["src/routes/api/**/*.test.ts"],
       "priority": 905,
-      "passes": false,
-      "notes": "Tests d'intégration HTTP - vérifient le contrat API"
+      "passes": true,
+      "notes": "13 API route tests using vi.hoisted() for proper mock hoisting with module-level repository instantiation"
     },
     {
       "id": "US-910",
