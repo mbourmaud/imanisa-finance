@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { PropertyWithLoan, Loan } from '@lib/types/real-estate';
 
 // Mock the repository before importing the handler
 vi.mock('@infrastructure/repositories/RealEstateRepository', () => ({
@@ -7,6 +8,70 @@ vi.mock('@infrastructure/repositories/RealEstateRepository', () => ({
 
 import { GET } from '@routes/api/real-estate/properties/+server';
 import { getPropertiesWithLoans } from '@infrastructure/repositories/RealEstateRepository';
+
+// Helper to create a mock property with all required fields
+function createMockProperty(overrides: Partial<PropertyWithLoan> = {}): PropertyWithLoan {
+	return {
+		id: 'prop-1',
+		name: 'Test Property',
+		type: 'apartment',
+		category: 'rental_unfurnished',
+		address: '123 Test Street',
+		city: 'Paris',
+		postalCode: '75001',
+		country: 'France',
+		surfaceM2: 50,
+		rooms: 2,
+		floor: 1,
+		dpeRating: 'C',
+		coproName: null,
+		coproLots: null,
+		coproTantiemes: null,
+		syndicName: null,
+		purchaseDate: '2020-01-15',
+		purchasePrice: 200000,
+		notaryFees: 15000,
+		agencyFees: 8000,
+		renovationCosts: null,
+		estimatedValue: 250000,
+		estimatedValueDate: '2024-01-01',
+		isRented: false,
+		monthlyRent: null,
+		tenantName: null,
+		leaseStartDate: null,
+		annualCoproCharges: null,
+		annualPropertyTax: null,
+		createdAt: '2020-01-15T00:00:00.000Z',
+		updatedAt: '2024-01-01T00:00:00.000Z',
+		loan: null,
+		...overrides
+	};
+}
+
+// Helper to create a mock loan with all required fields
+function createMockLoan(overrides: Partial<Loan> = {}): Loan {
+	return {
+		id: 'loan-1',
+		name: 'Test Loan',
+		propertyId: 'prop-1',
+		bankName: 'Test Bank',
+		loanNumber: 'LN-001',
+		principalAmount: 200000,
+		interestRate: 1.5,
+		durationMonths: 240,
+		startDate: '2020-01-15',
+		endDate: '2040-01-15',
+		monthlyPayment: 950,
+		insuranceRate: 0.3,
+		insuranceMonthly: 50,
+		currentBalance: 150000,
+		currentBalanceDate: '2024-01-01',
+		linkedAccountId: null,
+		createdAt: '2020-01-15T00:00:00.000Z',
+		updatedAt: '2024-01-01T00:00:00.000Z',
+		...overrides
+	};
+}
 
 describe('GET /api/real-estate/properties', () => {
 	beforeEach(() => {
@@ -26,11 +91,11 @@ describe('GET /api/real-estate/properties', () => {
 
 	it('should return property with correct structure', async () => {
 		vi.mocked(getPropertiesWithLoans).mockResolvedValue([
-			{
+			createMockProperty({
 				id: 'prop-1',
 				name: 'Appartement Paris 11',
 				type: 'apartment',
-				category: 'rental',
+				category: 'rental_unfurnished',
 				address: '123 rue de la République',
 				city: 'Paris',
 				postalCode: '75011',
@@ -41,7 +106,7 @@ describe('GET /api/real-estate/properties', () => {
 				purchasePrice: 300000,
 				isRented: true,
 				monthlyRent: 1200,
-				loan: {
+				loan: createMockLoan({
 					id: 'loan-1',
 					name: 'Crédit immo Paris',
 					bankName: 'Crédit Mutuel',
@@ -49,8 +114,8 @@ describe('GET /api/real-estate/properties', () => {
 					interestRate: 1.5,
 					monthlyPayment: 850,
 					currentBalance: 180000
-				}
-			}
+				})
+			})
 		]);
 
 		const response = await GET({ request: new Request('http://localhost') } as Parameters<
@@ -62,7 +127,7 @@ describe('GET /api/real-estate/properties', () => {
 		expect(data[0]).toMatchInlineSnapshot(`
 			{
 			  "address": "123 rue de la République",
-			  "category": "rental",
+			  "category": "rental_unfurnished",
 			  "city": "Paris",
 			  "dpe_rating": "C",
 			  "estimated_value": 350000,
@@ -90,11 +155,11 @@ describe('GET /api/real-estate/properties', () => {
 
 	it('should handle property without loan', async () => {
 		vi.mocked(getPropertiesWithLoans).mockResolvedValue([
-			{
+			createMockProperty({
 				id: 'prop-2',
 				name: 'Maison secondaire',
 				type: 'house',
-				category: 'primary',
+				category: 'primary_residence',
 				address: '456 chemin des Vignes',
 				city: 'Bordeaux',
 				postalCode: '33000',
@@ -106,7 +171,7 @@ describe('GET /api/real-estate/properties', () => {
 				isRented: false,
 				monthlyRent: null,
 				loan: null
-			}
+			})
 		]);
 
 		const response = await GET({ request: new Request('http://localhost') } as Parameters<
@@ -121,11 +186,11 @@ describe('GET /api/real-estate/properties', () => {
 
 	it('should return multiple properties', async () => {
 		vi.mocked(getPropertiesWithLoans).mockResolvedValue([
-			{
+			createMockProperty({
 				id: 'prop-1',
 				name: 'Appartement 1',
 				type: 'apartment',
-				category: 'rental',
+				category: 'rental_unfurnished',
 				address: 'Addr 1',
 				city: 'Paris',
 				postalCode: '75001',
@@ -137,12 +202,12 @@ describe('GET /api/real-estate/properties', () => {
 				isRented: true,
 				monthlyRent: 800,
 				loan: null
-			},
-			{
+			}),
+			createMockProperty({
 				id: 'prop-2',
 				name: 'Appartement 2',
 				type: 'apartment',
-				category: 'rental',
+				category: 'rental_unfurnished',
 				address: 'Addr 2',
 				city: 'Lyon',
 				postalCode: '69001',
@@ -153,7 +218,7 @@ describe('GET /api/real-estate/properties', () => {
 				purchasePrice: 150000,
 				isRented: true,
 				monthlyRent: 700,
-				loan: {
+				loan: createMockLoan({
 					id: 'loan-2',
 					name: 'Prêt Lyon',
 					bankName: 'LCL',
@@ -161,8 +226,8 @@ describe('GET /api/real-estate/properties', () => {
 					interestRate: 2,
 					monthlyPayment: 500,
 					currentBalance: 75000
-				}
-			}
+				})
+			})
 		]);
 
 		const response = await GET({ request: new Request('http://localhost') } as Parameters<
@@ -178,25 +243,27 @@ describe('GET /api/real-estate/properties', () => {
 	});
 
 	it('should handle all DPE ratings', async () => {
-		const dpeRatings = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+		const dpeRatings = ['A', 'B', 'C', 'D', 'E', 'F', 'G'] as const;
 		vi.mocked(getPropertiesWithLoans).mockResolvedValue(
-			dpeRatings.map((dpe, idx) => ({
-				id: `prop-${idx}`,
-				name: `Property ${idx}`,
-				type: 'apartment',
-				category: 'rental',
-				address: `Address ${idx}`,
-				city: 'City',
-				postalCode: '00000',
-				surfaceM2: 50,
-				rooms: 2,
-				dpeRating: dpe,
-				estimatedValue: 100000,
-				purchasePrice: 90000,
-				isRented: false,
-				monthlyRent: null,
-				loan: null
-			}))
+			dpeRatings.map((dpe, idx) =>
+				createMockProperty({
+					id: `prop-${idx}`,
+					name: `Property ${idx}`,
+					type: 'apartment',
+					category: 'rental_unfurnished',
+					address: `Address ${idx}`,
+					city: 'City',
+					postalCode: '00000',
+					surfaceM2: 50,
+					rooms: 2,
+					dpeRating: dpe,
+					estimatedValue: 100000,
+					purchasePrice: 90000,
+					isRented: false,
+					monthlyRent: null,
+					loan: null
+				})
+			)
 		);
 
 		const response = await GET({ request: new Request('http://localhost') } as Parameters<

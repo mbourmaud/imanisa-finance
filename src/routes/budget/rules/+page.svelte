@@ -623,6 +623,7 @@
 
 	<!-- Test Results Modal -->
 	{#if testingPattern}
+		<!-- svelte-ignore a11y_click_events_have_key_events a11y_interactive_supports_focus -->
 		<div class="modal-overlay" onclick={closeTestModal} role="presentation">
 			<div
 				class="modal"

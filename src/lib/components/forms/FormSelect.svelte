@@ -48,8 +48,8 @@
 	}: Props = $props();
 
 	const hasError = $derived(!!error);
-	const errorId = `${id}-error`;
-	const hintId = hint ? `${id}-hint` : undefined;
+	const errorId = $derived(`${id}-error`);
+	const hintId = $derived(hint ? `${id}-hint` : undefined);
 </script>
 
 <div class="form-group" class:has-error={hasError}>

@@ -104,9 +104,9 @@
 	});
 
 	const hasError = $derived(!!error);
-	const inputId = id;
-	const errorId = `${id}-error`;
-	const hintId = hint ? `${id}-hint` : undefined;
+	const inputId = $derived(id);
+	const errorId = $derived(`${id}-error`);
+	const hintId = $derived(hint ? `${id}-hint` : undefined);
 </script>
 
 <div class="form-group" class:has-error={hasError}>

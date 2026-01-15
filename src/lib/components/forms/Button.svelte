@@ -191,7 +191,4 @@
 		height: 100%;
 	}
 
-	.btn-text {
-		/* Maintain original text during loading */
-	}
 </style>

@@ -6,14 +6,24 @@
 	let { form } = $props();
 
 	let isSubmitting = $state(false);
-	let nameValue = $state(form?.name ?? '');
-	let templateValue = $state(form?.template ?? '');
+	let nameValue = $state('');
+	let templateValue = $state('');
 	let nameInputRef: HTMLInputElement | null = $state(null);
 
 	const templates = Object.entries(BankTemplateLabels).map(([value, label]) => ({
 		value,
 		label
 	}));
+
+	// Initialize form values from props when form data changes
+	$effect(() => {
+		if (form?.name !== undefined) {
+			nameValue = form.name;
+		}
+		if (form?.template !== undefined) {
+			templateValue = form.template;
+		}
+	});
 
 	// Focus on first error after submit
 	$effect(() => {
