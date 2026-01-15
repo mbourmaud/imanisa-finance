@@ -674,8 +674,8 @@
       ],
       "files": ["e2e/smoke.test.ts"],
       "priority": 911,
-      "passes": false,
-      "notes": "Smoke tests = vérifier que l'app ne plante pas"
+      "passes": true,
+      "notes": "5 smoke tests verify all main pages load without JS errors"
     },
     {
       "id": "US-912",
