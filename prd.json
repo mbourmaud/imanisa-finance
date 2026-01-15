@@ -875,7 +875,7 @@
       ],
       "files": ["src/routes/", "src/lib/components/"],
       "priority": 307,
-      "passes": false,
+      "passes": true,
       "notes": "Ninon utilisera principalement sur mobile"
     },
     {
@@ -910,7 +910,7 @@
       ],
       "files": ["src/domain/budget/"],
       "priority": 400,
-      "passes": false,
+      "passes": true,
       "notes": "Source indique l'origine: 'bank' si fournie par CE/Bourso, 'auto' si matchée par règle, 'manual' si assignée par user"
     },
     {

@@ -1131,3 +1131,86 @@
 - Google Fonts URL already includes `display=swap` which is the recommended font-display strategy
 
 ---
+
+## [Iteration 35] 2026-01-15 - US-307: UI: Pages mobile-optimized
+
+### What was implemented
+- Enhanced /import page for mobile:
+  - Larger touch targets on buttons (min-height: 52px)
+  - Source links with better touch targets (min-height: 44px, padding, background)
+  - Full-width buttons on mobile
+- Improved ImportDropZone.svelte:
+  - Larger drop zones (min-height: 88px on mobile)
+  - Better spacing for touch interactions
+- Mobile-optimized /immobilier/[id] property detail page:
+  - Added collapsible sections with toggle functionality
+  - Sections start collapsed on mobile (except Info and Value)
+  - Chevron icons indicate expand/collapse state
+  - Smooth animations with prefers-reduced-motion support
+  - isMobile state management with resize listener
+- Enhanced /investissements page:
+  - Horizontal scroll for positions list on mobile
+  - Sticky first column (symbol) during horizontal scroll
+  - Touch-friendly scrolling (-webkit-overflow-scrolling: touch)
+- Improved AmortizationTable.svelte:
+  - Horizontal scroll with sticky Date column
+  - Proper background handling for sticky cell states (hover, current month)
+  - Hidden pagination page numbers on mobile (only prev/next + active)
+- Optimized Navigation.svelte:
+  - Shortened labels for mobile bottom bar: "Invest.", "Immo.", "Opéra."
+
+### Files changed
+- src/routes/import/+page.svelte (mobile button/link styles)
+- src/lib/components/import/ImportDropZone.svelte (larger drop zones)
+- src/routes/immobilier/[id]/+page.svelte (collapsible sections)
+- src/routes/investissements/+page.svelte (horizontal scroll, sticky column)
+- src/lib/components/real-estate/AmortizationTable.svelte (sticky Date column)
+- src/lib/components/Navigation.svelte (shortened labels)
+
+### Learnings for future iterations
+- Collapsible sections on mobile: use $state for expandedSections record and isMobile boolean
+- Check window.innerWidth in $effect with cleanup for resize listener
+- Sticky columns in horizontal scroll: position: sticky, left: 0, z-index for proper layering
+- Background inheritance issues with sticky cells: explicitly set background for all states (normal, hover, highlight)
+- Hidden pagination on mobile: show only prev/next arrows + active page number
+- Navigation labels: abbreviate for mobile to fit bottom bar ("Investissements" → "Invest.")
+
+---
+
+## [Iteration 36] 2026-01-15 - US-400: Domain - Category et CategoryRule
+
+### What was implemented
+- Created comprehensive budget domain layer for transaction categorization:
+  - `Category.ts` - Entity with hierarchical structure (parentId for parent/child relationships)
+    - Properties: name, parentId, icon, color, createdAt
+    - Methods: create(), reconstitute(), update(), isRoot getter
+    - Validation: name required, valid hex color, icon required
+  - `CategoryRule.ts` - Entity for regex-based auto-categorization
+    - Properties: categoryId, pattern (regex), priority, source filter, isActive, createdAt
+    - Methods: create(), reconstitute(), matches(description), update(), activate(), deactivate()
+    - Validates regex pattern on creation
+  - `TransactionCategoryAssignment.ts` - Value object linking transactions to categories
+    - CategorySource enum: BANK, AUTO, MANUAL with French labels
+    - Confidence scores: 1.0 for bank/manual, 0.8 for auto
+    - canOverwrite() helper to protect manual assignments
+  - `CategoryRepository.ts` - Interface with full CRUD operations
+    - Category methods: findAll, findById, findRoot, findChildren, save, delete
+    - Rule methods: findAll, findActive by priority, findById, findByCategory, save, delete
+    - Assignment methods: find by transaction, find by category, save, delete
+    - Aggregate queries: findUnassigned, countByCategory with date range
+
+### Files changed
+- src/domain/budget/Category.ts (new)
+- src/domain/budget/CategoryRule.ts (new)
+- src/domain/budget/TransactionCategoryAssignment.ts (new)
+- src/domain/budget/CategoryRepository.ts (new)
+- src/domain/budget/index.ts (new)
+
+### Learnings for future iterations
+- Budget domain follows same DDD patterns as import/investment domains: Entity base class, Result for validation
+- TransactionCategoryAssignment is a value object (interface), not entity - no identity needed for liaison
+- CategorySource enum determines protection: MANUAL > BANK > AUTO (manual can't be auto-overwritten)
+- Confidence score concept allows future ML integration while maintaining rule-based default
+- Import from `@domain/budget` for Category, CategoryRule, TransactionCategoryAssignment, CategorySource
+
+---
