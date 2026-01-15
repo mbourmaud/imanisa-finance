@@ -470,7 +470,7 @@
       ],
       "files": ["src/application/investment/ImportInvestmentsUseCase.ts", "src/application/investment/InvestmentParserFactory.ts"],
       "priority": 206,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -486,7 +486,7 @@
       ],
       "files": ["src/scripts/seed-data-sources.ts"],
       "priority": 207,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -503,7 +503,7 @@
       ],
       "files": ["src/routes/api/investments/"],
       "priority": 208,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {

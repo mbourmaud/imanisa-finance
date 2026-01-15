@@ -672,3 +672,176 @@
 - InvestmentRepositoryImpl is a single class handling all 3 entity types (sources, positions, transactions)
 
 ---
+
+## [Iteration 22] 2026-01-15 - US-203: Parser: Linxea XLSX (Assurance-vie)
+
+### What was implemented
+- Created `LinxeaParser.ts` implementing the `InvestmentParser` interface
+- Parser handles Linxea XLSX format with 15 columns:
+  - Placement, N° Contrat, Titulaire, Produit, Catégorie, Sous-catégorie
+  - Nom du support, ISIN, Nbre de parts, Dernière cotation, Date
+  - Somme en Compte, Plus ou Moins Value, Prix de Revient Moyen, Perf.%
+- Features:
+  - Uses xlsx library to read XLSX files (same as BourseDirectParser)
+  - Maps "Nom du support" to symbol, ISIN to isin
+  - Maps "Nbre de parts" to quantity, "Prix de Revient Moyen" to avgBuyPrice
+  - Maps "Dernière cotation" to currentPrice, "Somme en Compte" to currentValue
+  - Maps "Plus ou Moins Value" to gainLoss, "Perf.%" to gainLossPercent
+  - Builds category hierarchy from Catégorie > Sous-catégorie
+  - Handles French number format (comma decimal, space thousands separator)
+  - Skips rows with zero quantity
+
+### Files changed
+- src/infrastructure/parsers/LinxeaParser.ts (new)
+
+### Learnings for future iterations
+- Linxea format has rich metadata (Placement, N° Contrat, Titulaire, Produit) that could be useful for multi-contract tracking
+- Pattern follows BourseDirectParser closely - same xlsx library, similar structure
+- Assurance-vie positions don't have MIC (market identifier) like PEA positions
+- parseTransactions() returns empty array - Linxea export is positions-only snapshot
+
+---
+
+## [Iteration 23] 2026-01-15 - US-204: Parser: Binance XLSX (Crypto)
+
+### What was implemented
+- Created `BinanceParser.ts` implementing the `InvestmentParser` interface
+- Parser handles Binance buy history XLSX format with 8 columns:
+  - Date(UTC+1), Method, Spend Amount, Receive Amount, Fee, Price, Status, Transaction ID
+- Features:
+  - Uses xlsx library to read XLSX files (same pattern as other investment parsers)
+  - Filters only Status=Successful transactions
+  - Extracts symbol and quantity from "Receive Amount" (e.g., "0.00132001 BTC" → symbol='BTC', quantity=0.00132001)
+  - Extracts currency from "Spend Amount" (e.g., "100.00 EUR" → currency='EUR')
+  - Parses price per unit, total amount, and fees
+  - Preserves payment method and transaction ID for audit trail
+  - Handles multiple date formats (ISO, Excel serial, DD/MM/YYYY)
+- parsePositions() returns empty array - positions must be calculated from aggregated transactions
+
+### Files changed
+- src/infrastructure/parsers/BinanceParser.ts (new)
+
+### Learnings for future iterations
+- Binance export is transaction history, not positions snapshot (unlike Bourse Direct/Linxea)
+- Crypto positions need to be calculated by aggregating transactions per symbol (see US-205)
+- "Receive Amount" format: "{quantity} {symbol}" - regex pattern `^([\d,.]+)\s+([A-Za-z]+)$`
+- "Spend Amount" format: "{amount} {currency}" - same pattern for extracting currency
+- parsePositions() returns empty because Binance doesn't export positions directly
+
+---
+
+## [Iteration 24] 2026-01-15 - US-205: Service: Calcul positions crypto depuis transactions
+
+### What was implemented
+- Created `CalculateCryptoPositionsUseCase.ts` in `src/application/investment/`
+- Aggregates buy/sell transactions by symbol to calculate:
+  - Total quantity held (accounting for sells)
+  - Weighted average PRU (Prix de Revient Unitaire)
+- Integrates CoinGecko API for current EUR prices:
+  - GET /simple/price?ids=bitcoin,ethereum&vs_currencies=eur
+  - Maps 25+ popular crypto symbols to CoinGecko IDs
+- Calculates for each position:
+  - currentValue = quantity × currentPrice
+  - gainLoss = currentValue - invested
+  - gainLossPercent = (gainLoss / invested) × 100
+- FIFO-like accounting for sells: reduces cost basis proportionally
+- Returns InvestmentPosition[] domain entities ready for persistence
+- Created barrel export in `src/application/investment/index.ts`
+
+### Files changed
+- src/application/investment/CalculateCryptoPositionsUseCase.ts (new)
+- src/application/investment/index.ts (new)
+
+### Learnings for future iterations
+- Application layer use cases for investments go in `src/application/investment/`
+- PRU moyen = somme(totalSpent) / somme(quantity) for each symbol
+- CoinGecko API is free but rate-limited - consider caching for production
+- Symbol mapping needed: BTC → bitcoin, ETH → ethereum, etc. (see SYMBOL_TO_COINGECKO_ID)
+- Sell transactions reduce both quantity AND proportional cost basis
+- Crypto quantities can have up to 8 decimal places (unlike fiat 2 decimals)
+- CalculateCryptoPositionsUseCase can be used standalone (calculatePositions) or with domain entities (execute)
+
+---
+
+## [Iteration 25] 2026-01-15 - US-206: Application: ImportInvestmentsUseCase
+
+### What was implemented
+- Created `InvestmentParserFactory.ts` in `src/application/investment/`:
+  - Factory pattern to instantiate the correct parser based on InvestmentParserKey
+  - Supports BourseDirectParser, LinxeaParser, and BinanceParser
+  - Includes `isSupported()` type guard for parser key validation
+- Created `ImportInvestmentsUseCase.ts` in `src/application/investment/`:
+  - Main entry point: `execute(sourceId, content)` → `ImportInvestmentsResult`
+  - For PEA/AV sources: parses positions → deletes old → creates new (snapshot replacement)
+  - For Crypto sources: parses transactions → deduplicates → appends → recalculates positions
+  - Uses CalculateCryptoPositionsUseCase for crypto position calculation
+  - Deduplication via signature: `date|symbol|type|quantity|total`
+  - Updates source.lastSyncAt after successful import
+- Updated barrel export in `src/application/investment/index.ts`
+
+### Files changed
+- src/application/investment/InvestmentParserFactory.ts (new)
+- src/application/investment/ImportInvestmentsUseCase.ts (new)
+- src/application/investment/index.ts (updated exports)
+
+### Learnings for future iterations
+- ImportInvestmentsUseCase handles different source types differently:
+  - PEA/AV/CTO: Position snapshots (delete + replace)
+  - Crypto: Transaction history (append + recalculate)
+- Crypto transaction deduplication uses 5-part signature including rounded quantity (8 decimals) and total (2 decimals)
+- InvestmentParserFactory follows same pattern as ParserFactory from import module
+- Use InvestmentSourceType enum to determine import behavior
+- ImportInvestmentsResult returns {positions, transactions, errors} for granular feedback
+
+---
+
+## [Iteration 26] 2026-01-15 - US-207: Seed: Configurer les 3 sources investissement
+
+### What was implemented
+- Enriched `src/scripts/seed-data-sources.ts` to include investment sources for XLSX imports
+- Added 3 investment sources:
+  - PEA Bourse Direct (pea, Mathieu, bourse_direct parser) - URL: https://www.boursedirect.fr/fr/mon-compte/portefeuilles
+  - Linxea AV (assurance_vie, Mathieu, linxea parser) - URL: https://espaceclient.linxea.com/epargne/contrat/6695e318-99ab-462b-8bc2-51c083225c13
+  - Binance (crypto, Mathieu, binance parser) - URL: https://www.binance.com/en/my/wallet/exchange/buysell-history
+- Added INVESTMENT_SOURCE_IDS constants with `is-` prefix (matching `ds-` pattern from data sources)
+- Updated `verifySeededData()` to count and list investment sources grouped by owner
+- Updated `main()` to call `seedInvestmentSources()` function
+
+### Files changed
+- src/scripts/seed-data-sources.ts (enriched with investment sources)
+
+### Learnings for future iterations
+- Investment source IDs use `is-` prefix (e.g., `is-pea-bourse-direct`, `is-linxea-av`, `is-binance-crypto`)
+- Investment sources go in `investment_sources` table (not `data_sources` which is for bank CSV imports)
+- All 3 investment sources are owned by Mathieu entity
+- Investment source types: 'pea', 'assurance_vie', 'crypto' (matching InvestmentSourceType enum)
+- Investment parser keys: 'bourse_direct', 'linxea', 'binance' (matching InvestmentParserKey enum)
+- Run with: `npx tsx src/scripts/seed-data-sources.ts` or `npm run seed:data-sources`
+
+---
+
+## [Iteration 27] 2026-01-15 - US-208: API: Endpoints Investissements
+
+### What was implemented
+- Created 4 API endpoints for investment data:
+  - `POST /api/investments/import` - upload XLSX file, params: sourceId → returns {positions, transactions, errors}
+  - `GET /api/investments/positions` - returns all positions grouped by source with subtotals
+  - `GET /api/investments/summary` - returns {total_invested, current_value, total_gain_loss, total_gain_loss_percent}
+  - `GET /api/investments/sources` - lists all investment sources with full details
+- All endpoints use snake_case for JSON field names (API convention)
+- Import endpoint handles ArrayBuffer content for XLSX files (not string like CSV)
+
+### Files changed
+- src/routes/api/investments/import/+server.ts (new)
+- src/routes/api/investments/positions/+server.ts (new)
+- src/routes/api/investments/summary/+server.ts (new)
+- src/routes/api/investments/sources/+server.ts (new)
+
+### Learnings for future iterations
+- API endpoints for investments follow same pattern as /api/data-sources
+- Use `file.arrayBuffer()` for XLSX files instead of `file.text()` for CSV
+- InvestmentRepositoryImpl provides aggregate queries: getInvestmentSummary(), getPositionsGroupedBySource()
+- Positions endpoint returns grouped data with source info + positions array + subtotal calculations
+- Import endpoint reuses ImportInvestmentsUseCase from application layer
+
+---
