@@ -1574,3 +1574,54 @@
 - svelte-check error: explicit type annotation needed in find() callback `(tx: Transaction) =>`
 
 ---
+
+---
+
+## [Iteration 46] 2026-01-15 - US-901: Tests Domain Layer (unitaires)
+
+### What was implemented
+- Created comprehensive unit tests for all domain layer entities and value objects
+- 23 test files covering:
+  - Shared utilities: Result.test.ts, UniqueId.test.ts, Entity.test.ts, ValueObject.test.ts
+  - Account domain: Money.test.ts, Account.test.ts, AccountType.test.ts, AssetCategory.test.ts
+  - Bank domain: Bank.test.ts, BankTemplate.test.ts
+  - Transaction domain: Transaction.test.ts, TransactionType.test.ts, TransactionCategory.test.ts
+  - User domain: User.test.ts, Email.test.ts
+  - Import domain: DataSource.test.ts, DataSourceType.test.ts, CSVParser.test.ts (ParserKey tests)
+  - Investment domain: InvestmentPosition.test.ts, InvestmentTransaction.test.ts
+  - Budget domain: Category.test.ts, CategoryRule.test.ts, TransactionCategoryAssignment.test.ts
+- Total: 359 tests passing
+- Coverage: nominal cases, edge cases, validation errors, reconstitution from persistence
+
+### Files changed
+- src/domain/shared/Result.test.ts (new)
+- src/domain/shared/UniqueId.test.ts (new)
+- src/domain/shared/Entity.test.ts (new)
+- src/domain/shared/ValueObject.test.ts (new)
+- src/domain/account/Money.test.ts (new)
+- src/domain/account/Account.test.ts (new)
+- src/domain/account/AccountType.test.ts (new)
+- src/domain/account/AssetCategory.test.ts (new)
+- src/domain/bank/Bank.test.ts (new)
+- src/domain/bank/BankTemplate.test.ts (new)
+- src/domain/transaction/Transaction.test.ts (new)
+- src/domain/transaction/TransactionType.test.ts (new)
+- src/domain/transaction/TransactionCategory.test.ts (new)
+- src/domain/user/User.test.ts (new)
+- src/domain/user/Email.test.ts (new)
+- src/domain/import/DataSource.test.ts (new)
+- src/domain/import/DataSourceType.test.ts (new)
+- src/domain/import/CSVParser.test.ts (new)
+- src/domain/investment/InvestmentPosition.test.ts (new)
+- src/domain/investment/InvestmentTransaction.test.ts (new)
+- src/domain/budget/Category.test.ts (new)
+- src/domain/budget/CategoryRule.test.ts (new)
+- src/domain/budget/TransactionCategoryAssignment.test.ts (new)
+
+### Learnings for future iterations
+- Domain tests focus on business logic validation, not infrastructure concerns
+- Use toMatchInlineSnapshot for complex object comparison in tests
+- Entity.create() returns Result<Entity, Error> - test both success and failure paths
+- Value objects use equals() method for comparison testing
+- Entity equality is based on UniqueId, not props comparison
+- reconstitute() method skips validation - useful for loading from persistence
