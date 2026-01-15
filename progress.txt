@@ -37,6 +37,9 @@
 - **Form components**: `$lib/components/forms` exports FormInput, FormSelect, Button with barrel export
 - **Button loading state**: Use `loading` prop with SVG spinner, button shows `aria-busy="true"`
 - **Svelte 5 derived**: Use `$derived.by(() => { ... })` for computed values needing function body
+- **Test database**: Use `createTestDb()` from `@tests/utils` for in-memory SQLite test instances
+- **Test fixtures**: Use `testFixtures.entity()`, `.user()`, `.bank()`, etc. for generating test data with unique IDs
+- **Run tests**: `npm run test` (single run), `npm run test:watch` (watch mode), `npm run test:coverage` (with coverage)
 
 ---
 
@@ -1413,5 +1416,46 @@
 - Use `execute()` from turso.ts for aggregate queries with JOINs (simpler than Drizzle for complex SQL)
 - French locale for date formatting: `toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })`
 - Always return snake_case for JSON API responses (e.g., parent_id, start_date, total_amount)
+
+---
+
+## [Iteration 43] 2026-01-15 - US-900: Setup Testing (Vitest + In-Memory SQLite)
+
+### What was implemented
+- Installed testing dependencies: vitest, @testing-library/svelte, jsdom, @vitest/coverage-v8
+- Created vitest.config.ts with:
+  - Path aliases matching svelte.config.js (@domain, @application, @infrastructure, @lib, $lib)
+  - jsdom environment for component testing
+  - Coverage configuration with v8 provider
+  - Sequential test execution to avoid DB conflicts
+- Created src/tests/setup.ts for global test initialization (mock env, cleanup)
+- Created src/tests/fixtures/ directory structure for CSV/XLSX test fixtures
+- Created src/tests/utils/createTestDb.ts with:
+  - In-memory SQLite database creation via @libsql/client
+  - Schema initialization from schema.sql (with comment removal and table/index separation)
+  - testFixtures factory for generating test entities, users, banks, accounts, transactions, etc.
+- Added test scripts to package.json: test, test:watch, test:coverage, test:ui
+- Added budget module tables to schema.sql (categories, category_rules, transaction_categories)
+- Verified all tests pass with setup verification test file
+
+### Files changed
+- package.json (added test scripts and dependencies)
+- package-lock.json
+- vitest.config.ts (new)
+- src/tests/setup.ts (new)
+- src/tests/setup.test.ts (new - verification tests)
+- src/tests/utils/createTestDb.ts (new)
+- src/tests/utils/index.ts (new)
+- src/tests/fixtures/index.ts (new)
+- src/infrastructure/database/schema.sql (added budget tables)
+
+### Learnings for future iterations
+- **In-memory SQLite**: Use `:memory:` URL with @libsql/client for isolated test databases
+- **Schema parsing**: Remove comment lines before splitting by `;`, then separate CREATE TABLE from CREATE INDEX
+- **testFixtures pattern**: Factory functions with unique IDs using `Date.now()` + random suffix
+- **Vitest 4**: Don't use poolOptions (deprecated), use sequence.concurrent instead
+- **Coverage**: Use @vitest/coverage-v8 for V8-based coverage
+- **Test isolation**: Each test file should create its own testDb and cleanup in afterAll
+- Run tests with: `npm run test` (single run) or `npm run test:watch` (watch mode)
 
 ---

@@ -540,8 +540,8 @@
       ],
       "files": ["vitest.config.ts", "src/tests/", "package.json"],
       "priority": 900,
-      "passes": false,
-      "notes": "Testcontainers pour isoler les tests d'intégration avec une vraie DB. IMPORTANT: Ces US de tests servent à valider les US précédentes. Si un test échoue (bug code, UI cassée, etc.), il faut: 1) Identifier l'US source du bug, 2) Corriger le bug dans le code concerné, 3) Relancer les tests, 4) Boucler jusqu'à ce que TOUS les tests passent. Ne JAMAIS marquer une US test comme 'passes: true' tant que les tests échouent. Les tests sont le filet de sécurité final."
+      "passes": true,
+      "notes": "Using in-memory SQLite via @libsql/client instead of testcontainers (simpler for SQLite). IMPORTANT: Ces US de tests servent à valider les US précédentes. Si un test échoue (bug code, UI cassée, etc.), il faut: 1) Identifier l'US source du bug, 2) Corriger le bug dans le code concerné, 3) Relancer les tests, 4) Boucler jusqu'à ce que TOUS les tests passent. Ne JAMAIS marquer une US test comme 'passes: true' tant que les tests échouent. Les tests sont le filet de sécurité final."
     },
     {
       "id": "US-901",
