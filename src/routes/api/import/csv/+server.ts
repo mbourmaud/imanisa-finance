@@ -3,11 +3,17 @@ import type { RequestHandler } from './$types';
 import { ImportTransactionsUseCase } from '@application/import/ImportTransactionsUseCase';
 import { DataSourceRepositoryImpl } from '@infrastructure/repositories/DataSourceRepository';
 import { TransactionRepositoryImpl } from '@infrastructure/database/repositories/TransactionRepository';
+import { CategoryRepositoryImpl } from '@infrastructure/repositories/CategoryRepository';
 import { UniqueId } from '@domain/shared/UniqueId';
 
 const dataSourceRepository = new DataSourceRepositoryImpl();
 const transactionRepository = new TransactionRepositoryImpl();
-const importUseCase = new ImportTransactionsUseCase(dataSourceRepository, transactionRepository);
+const categoryRepository = new CategoryRepositoryImpl();
+const importUseCase = new ImportTransactionsUseCase(
+	dataSourceRepository,
+	transactionRepository,
+	categoryRepository
+);
 
 export const POST: RequestHandler = async ({ request }) => {
 	// Parse form data with file upload
@@ -36,6 +42,13 @@ export const POST: RequestHandler = async ({ request }) => {
 	return json({
 		imported: result.imported,
 		skipped: result.skipped,
-		errors: result.errors
+		errors: result.errors,
+		categorization: result.categorization
+			? {
+					by_bank: result.categorization.byBank,
+					by_rule: result.categorization.byRule,
+					uncategorized: result.categorization.uncategorized
+				}
+			: undefined
 	});
 };
