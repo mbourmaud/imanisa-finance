@@ -1,13 +1,26 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { BankTemplate, BankTemplateLabels } from '@domain/bank/BankTemplate';
+	import { FormInput, FormSelect, Button } from '$lib/components/forms';
 
 	let { form } = $props();
+
+	let isSubmitting = $state(false);
+	let nameValue = $state(form?.name ?? '');
+	let templateValue = $state(form?.template ?? '');
+	let nameInputRef: HTMLInputElement | null = $state(null);
 
 	const templates = Object.entries(BankTemplateLabels).map(([value, label]) => ({
 		value,
 		label
 	}));
+
+	// Focus on first error after submit
+	$effect(() => {
+		if (form?.error && nameInputRef) {
+			nameInputRef.focus();
+		}
+	});
 </script>
 
 <div class="container">
@@ -17,39 +30,46 @@
 	</div>
 
 	<div class="form-card card">
-		<form method="POST" use:enhance>
+		<form
+			method="POST"
+			use:enhance={() => {
+				isSubmitting = true;
+				return async ({ update }) => {
+					await update();
+					isSubmitting = false;
+				};
+			}}
+		>
 			{#if form?.error}
-				<div class="error-message">{form.error}</div>
+				<div class="error-message" role="alert">{form.error}</div>
 			{/if}
 
-			<div class="form-group">
-				<label for="name" class="label">Nom de la banque</label>
-				<input
-					type="text"
-					id="name"
-					name="name"
-					class="input"
-					placeholder="ex: Ma Caisse d'Épargne"
-					required
-					value={form?.name ?? ''}
-				/>
-			</div>
+			<FormInput
+				id="name"
+				name="name"
+				label="Nom de la banque"
+				bind:value={nameValue}
+				placeholder="ex: Ma Caisse d'Épargne"
+				autocomplete="organization"
+				required
+				bind:inputRef={nameInputRef}
+			/>
 
-			<div class="form-group">
-				<label for="template" class="label">Type de banque</label>
-				<select id="template" name="template" class="input" required>
-					<option value="">Sélectionnez un type</option>
-					{#each templates as template}
-						<option value={template.value} selected={form?.template === template.value}>
-							{template.label}
-						</option>
-					{/each}
-				</select>
-			</div>
+			<FormSelect
+				id="template"
+				name="template"
+				label="Type de banque"
+				bind:value={templateValue}
+				options={templates}
+				placeholder="Sélectionnez un type"
+				required
+			/>
 
 			<div class="form-actions">
 				<a href="/banks" class="btn btn-secondary">Annuler</a>
-				<button type="submit" class="btn btn-primary">Créer</button>
+				<Button type="submit" variant="primary" loading={isSubmitting}>
+					Créer
+				</Button>
 			</div>
 		</form>
 	</div>
@@ -94,10 +114,6 @@
 		opacity: 0;
 	}
 
-	.form-group {
-		margin-bottom: var(--spacing-6);
-	}
-
 	.form-actions {
 		display: flex;
 		gap: var(--spacing-3);
@@ -114,15 +130,6 @@
 		border-radius: var(--radius-xl);
 		margin-bottom: var(--spacing-5);
 		border: 1px solid rgba(239, 68, 68, 0.2);
-	}
-
-	select.input {
-		cursor: pointer;
-		appearance: none;
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-		background-repeat: no-repeat;
-		background-position: right 16px center;
-		padding-right: 40px;
 	}
 
 	@keyframes fadeInUp {

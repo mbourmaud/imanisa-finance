@@ -1,9 +1,20 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { FormInput, FormSelect, Button } from '$lib/components/forms';
 
 	let { data, form } = $props();
 	let showDeleteModal = $state(false);
 	let showAddAccountModal = $state(false);
+	let isSubmittingAccount = $state(false);
+	let isDeleting = $state(false);
+
+	// Form values
+	let accountName = $state('');
+	let accountType = $state('');
+	let initialBalance = $state('');
+
+	// Input refs for focus management
+	let accountNameRef: HTMLInputElement | null = $state(null);
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
@@ -11,6 +22,23 @@
 			if (showAddAccountModal) showAddAccountModal = false;
 		}
 	}
+
+	// Reset form when modal opens
+	function openAddAccountModal() {
+		accountName = '';
+		accountType = '';
+		initialBalance = '';
+		showAddAccountModal = true;
+		// Focus on first input after modal opens
+		setTimeout(() => accountNameRef?.focus(), 100);
+	}
+
+	// Focus on first field on error
+	$effect(() => {
+		if (form?.accountError && accountNameRef) {
+			accountNameRef.focus();
+		}
+	});
 </script>
 
 <svelte:window onkeydown={handleKeyDown} />
@@ -23,12 +51,12 @@
 			<p class="bank-template">{data.bank.templateLabel}</p>
 		</div>
 		<div class="header-actions">
-			<button class="btn btn-primary" onclick={() => showAddAccountModal = true}>
+			<Button variant="primary" onclick={openAddAccountModal}>
 				Ajouter un compte
-			</button>
-			<button class="btn btn-danger" onclick={() => showDeleteModal = true}>
+			</Button>
+			<Button variant="danger" onclick={() => showDeleteModal = true}>
 				Supprimer
-			</button>
+			</Button>
 		</div>
 	</div>
 
@@ -50,9 +78,9 @@
 			<div class="empty-icon">💳</div>
 			<h2>Aucun compte</h2>
 			<p>Ajoutez votre premier compte pour cette banque.</p>
-			<button class="btn btn-primary" onclick={() => showAddAccountModal = true}>
+			<Button variant="primary" onclick={openAddAccountModal}>
 				Ajouter un compte
-			</button>
+			</Button>
 		</div>
 	{:else}
 		<div class="accounts-grid">
@@ -76,12 +104,24 @@
 		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
 			<h2 id="delete-modal-title">Supprimer cette banque ?</h2>
 			<p>Cette action supprimera également tous les comptes et transactions associés.</p>
-			<form method="POST" action="?/deleteBank" use:enhance>
+			<form
+				method="POST"
+				action="?/deleteBank"
+				use:enhance={() => {
+					isDeleting = true;
+					return async ({ update }) => {
+						await update();
+						isDeleting = false;
+					};
+				}}
+			>
 				<div class="modal-actions">
-					<button type="button" class="btn btn-secondary" onclick={() => showDeleteModal = false}>
+					<Button type="button" variant="secondary" onclick={() => showDeleteModal = false}>
 						Annuler
-					</button>
-					<button type="submit" class="btn btn-danger">Supprimer</button>
+					</Button>
+					<Button type="submit" variant="danger" loading={isDeleting}>
+						Supprimer
+					</Button>
 				</div>
 			</form>
 		</div>
@@ -93,46 +133,61 @@
 	<div class="modal-overlay" role="presentation" onclick={() => showAddAccountModal = false}>
 		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="add-account-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
 			<h2 id="add-account-modal-title">Ajouter un compte</h2>
-			<form method="POST" action="?/addAccount" use:enhance>
+			<form
+				method="POST"
+				action="?/addAccount"
+				use:enhance={() => {
+					isSubmittingAccount = true;
+					return async ({ update }) => {
+						await update();
+						isSubmittingAccount = false;
+					};
+				}}
+			>
 				{#if form?.accountError}
-					<div class="error-message">{form.accountError}</div>
+					<div class="error-message" role="alert">{form.accountError}</div>
 				{/if}
-				<div class="form-group">
-					<label for="accountName" class="label">Nom du compte</label>
-					<input
-						type="text"
-						id="accountName"
-						name="name"
-						class="input"
-						placeholder="ex: Compte courant"
-						required
-					/>
-				</div>
-				<div class="form-group">
-					<label for="accountType" class="label">Type de compte</label>
-					<select id="accountType" name="type" class="input" required>
-						<option value="">Sélectionnez un type</option>
-						{#each data.accountTypes as type}
-							<option value={type.value}>{type.label}</option>
-						{/each}
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="initialBalance" class="label">Solde initial (optionnel)</label>
-					<input
-						type="number"
-						id="initialBalance"
-						name="initialBalance"
-						class="input"
-						placeholder="0.00"
-						step="0.01"
-					/>
-				</div>
+
+				<FormInput
+					id="accountName"
+					name="name"
+					label="Nom du compte"
+					bind:value={accountName}
+					placeholder="ex: Compte courant"
+					autocomplete="off"
+					required
+					bind:inputRef={accountNameRef}
+				/>
+
+				<FormSelect
+					id="accountType"
+					name="type"
+					label="Type de compte"
+					bind:value={accountType}
+					options={data.accountTypes}
+					placeholder="Sélectionnez un type"
+					required
+				/>
+
+				<FormInput
+					id="initialBalance"
+					name="initialBalance"
+					label="Solde initial (optionnel)"
+					type="number"
+					bind:value={initialBalance}
+					placeholder="0.00"
+					inputmode="decimal"
+					step="0.01"
+					hint="Laissez vide pour 0,00 €"
+				/>
+
 				<div class="modal-actions">
-					<button type="button" class="btn btn-secondary" onclick={() => showAddAccountModal = false}>
+					<Button type="button" variant="secondary" onclick={() => showAddAccountModal = false}>
 						Annuler
-					</button>
-					<button type="submit" class="btn btn-primary">Créer</button>
+					</Button>
+					<Button type="submit" variant="primary" loading={isSubmittingAccount}>
+						Créer
+					</Button>
 				</div>
 			</form>
 		</div>
@@ -391,10 +446,6 @@
 		margin-top: var(--spacing-8);
 	}
 
-	.form-group {
-		margin-bottom: var(--spacing-5);
-	}
-
 	.error-message {
 		background: rgba(248, 113, 113, 0.15);
 		backdrop-filter: blur(8px);
@@ -455,7 +506,7 @@
 			flex-direction: column-reverse;
 		}
 
-		.modal-actions .btn {
+		.modal-actions :global(button) {
 			width: 100%;
 		}
 	}

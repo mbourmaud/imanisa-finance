@@ -2,11 +2,13 @@
 	import { enhance } from '$app/forms';
 	import { format } from 'date-fns';
 	import { fr } from 'date-fns/locale';
+	import { Button } from '$lib/components/forms';
 
 	let { data, form } = $props();
 	let showDeleteModal = $state(false);
 	let showImportModal = $state(false);
 	let importing = $state(false);
+	let isDeleting = $state(false);
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
@@ -26,12 +28,12 @@
 			<p class="account-type">{data.account.typeLabel}</p>
 		</div>
 		<div class="header-actions">
-			<button class="btn btn-primary" onclick={() => showImportModal = true}>
+			<Button variant="primary" onclick={() => showImportModal = true}>
 				Importer CSV
-			</button>
-			<button class="btn btn-danger" onclick={() => showDeleteModal = true}>
+			</Button>
+			<Button variant="danger" onclick={() => showDeleteModal = true}>
 				Supprimer
-			</button>
+			</Button>
 		</div>
 	</div>
 
@@ -53,9 +55,9 @@
 			<div class="empty-icon">📄</div>
 			<h2>Aucune transaction</h2>
 			<p>Importez vos transactions depuis un fichier CSV.</p>
-			<button class="btn btn-primary" onclick={() => showImportModal = true}>
+			<Button variant="primary" onclick={() => showImportModal = true}>
 				Importer CSV
-			</button>
+			</Button>
 		</div>
 	{:else}
 		<div class="transactions-card card">
@@ -83,12 +85,24 @@
 		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="delete-account-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
 			<h2 id="delete-account-modal-title">Supprimer ce compte ?</h2>
 			<p>Cette action supprimera également toutes les transactions associées.</p>
-			<form method="POST" action="?/deleteAccount" use:enhance>
+			<form
+				method="POST"
+				action="?/deleteAccount"
+				use:enhance={() => {
+					isDeleting = true;
+					return async ({ update }) => {
+						await update();
+						isDeleting = false;
+					};
+				}}
+			>
 				<div class="modal-actions">
-					<button type="button" class="btn btn-secondary" onclick={() => showDeleteModal = false}>
+					<Button type="button" variant="secondary" onclick={() => showDeleteModal = false}>
 						Annuler
-					</button>
-					<button type="submit" class="btn btn-danger">Supprimer</button>
+					</Button>
+					<Button type="submit" variant="danger" loading={isDeleting}>
+						Supprimer
+					</Button>
 				</div>
 			</form>
 		</div>
@@ -101,9 +115,9 @@
 		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="import-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
 			<h2 id="import-modal-title">Importer des transactions</h2>
 			<p>Sélectionnez un fichier CSV exporté depuis {data.bank.templateLabel}.</p>
-			<form 
-				method="POST" 
-				action="?/importCsv" 
+			<form
+				method="POST"
+				action="?/importCsv"
 				enctype="multipart/form-data"
 				use:enhance={() => {
 					importing = true;
@@ -117,10 +131,10 @@
 				}}
 			>
 				{#if form?.importError}
-					<div class="error-message">{form.importError}</div>
+					<div class="error-message" role="alert">{form.importError}</div>
 				{/if}
 				{#if form?.importSuccess}
-					<div class="success-message">{form.importSuccess}</div>
+					<div class="success-message" role="status">{form.importSuccess}</div>
 				{/if}
 				<div class="form-group">
 					<label for="csvFile" class="label">Fichier CSV</label>
@@ -134,12 +148,12 @@
 					/>
 				</div>
 				<div class="modal-actions">
-					<button type="button" class="btn btn-secondary" onclick={() => showImportModal = false}>
+					<Button type="button" variant="secondary" onclick={() => showImportModal = false}>
 						Annuler
-					</button>
-					<button type="submit" class="btn btn-primary" disabled={importing}>
-						{importing ? 'Import en cours...' : 'Importer'}
-					</button>
+					</Button>
+					<Button type="submit" variant="primary" loading={importing}>
+						Importer
+					</Button>
 				</div>
 			</form>
 		</div>
@@ -465,7 +479,7 @@
 			flex-direction: column-reverse;
 		}
 
-		.modal-actions .btn {
+		.modal-actions :global(button) {
 			width: 100%;
 		}
 	}
