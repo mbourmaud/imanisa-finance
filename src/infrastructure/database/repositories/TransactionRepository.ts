@@ -7,7 +7,7 @@ import { UniqueId } from '@domain/shared/UniqueId';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 import { getDb, schema } from '../drizzle';
 
-export class SqliteTransactionRepository implements TransactionRepository {
+export class TransactionRepositoryImpl implements TransactionRepository {
 	async findById(id: UniqueId): Promise<Transaction | null> {
 		const db = getDb();
 		const result = await db

@@ -1,8 +1,8 @@
 import type { Container, ContainerMode } from './types';
-import { SqliteUserRepository } from '@infrastructure/database/repositories/SqliteUserRepository';
-import { SqliteBankRepository } from '@infrastructure/database/repositories/SqliteBankRepository';
-import { SqliteAccountRepository } from '@infrastructure/database/repositories/SqliteAccountRepository';
-import { SqliteTransactionRepository } from '@infrastructure/database/repositories/SqliteTransactionRepository';
+import { UserRepositoryImpl } from '@infrastructure/database/repositories/UserRepository';
+import { BankRepositoryImpl } from '@infrastructure/database/repositories/BankRepository';
+import { AccountRepositoryImpl } from '@infrastructure/database/repositories/AccountRepository';
+import { TransactionRepositoryImpl } from '@infrastructure/database/repositories/TransactionRepository';
 import { InMemoryUserRepository } from '@infrastructure/repositories/inmemory/InMemoryUserRepository';
 import { InMemoryBankRepository } from '@infrastructure/repositories/inmemory/InMemoryBankRepository';
 import { InMemoryAccountRepository } from '@infrastructure/repositories/inmemory/InMemoryAccountRepository';
@@ -15,10 +15,10 @@ let demoSeeded = false;
 
 function createSqliteContainer(): Container {
 	return {
-		userRepository: new SqliteUserRepository(),
-		bankRepository: new SqliteBankRepository(),
-		accountRepository: new SqliteAccountRepository(),
-		transactionRepository: new SqliteTransactionRepository()
+		userRepository: new UserRepositoryImpl(),
+		bankRepository: new BankRepositoryImpl(),
+		accountRepository: new AccountRepositoryImpl(),
+		transactionRepository: new TransactionRepositoryImpl()
 	};
 }
 

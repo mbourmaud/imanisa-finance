@@ -49,9 +49,9 @@ function toPersistence(dataSource: DataSource): typeof schema.dataSources.$infer
 }
 
 /**
- * SQLite implementation of DataSourceRepository
+ * Drizzle ORM implementation of DataSourceRepository
  */
-export class SqliteDataSourceRepository implements DataSourceRepository {
+export class DataSourceRepositoryImpl implements DataSourceRepository {
 	async findAll(): Promise<DataSource[]> {
 		const db = getDb();
 		const rows = await db

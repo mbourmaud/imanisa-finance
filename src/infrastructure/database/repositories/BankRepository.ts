@@ -6,7 +6,7 @@ import { UniqueId } from '@domain/shared/UniqueId';
 import { eq, desc } from 'drizzle-orm';
 import { getDb, schema } from '../drizzle';
 
-export class SqliteBankRepository implements BankRepository {
+export class BankRepositoryImpl implements BankRepository {
 	async findById(id: UniqueId): Promise<Bank | null> {
 		const db = getDb();
 		const result = await db

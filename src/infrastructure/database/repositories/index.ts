@@ -1,4 +1,4 @@
-export { SqliteUserRepository } from './SqliteUserRepository';
-export { SqliteBankRepository } from './SqliteBankRepository';
-export { SqliteAccountRepository } from './SqliteAccountRepository';
-export { SqliteTransactionRepository } from './SqliteTransactionRepository';
+export { UserRepositoryImpl } from './UserRepository';
+export { BankRepositoryImpl } from './BankRepository';
+export { AccountRepositoryImpl } from './AccountRepository';
+export { TransactionRepositoryImpl } from './TransactionRepository';
