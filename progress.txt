@@ -25,6 +25,12 @@
 - ImportTransactionsUseCase: Links DataSource → Account via `linkedAccountId`, deduplicates on date+amount+description
 - Investment domain module: `@domain/investment` for InvestmentSource, InvestmentPosition, InvestmentTransaction, InvestmentParser
 - InvestmentParser interface: parsePositions() and parseTransactions() methods, content can be ArrayBuffer (XLSX) or string (CSV)
+- **Mobile-first CSS**: Base styles for mobile, `@media (min-width: 769px)` for desktop
+- **Navigation component**: `src/lib/components/Navigation.svelte` - mobile bottom nav, desktop sidebar
+- **Touch optimization**: `touch-action: manipulation` on interactive elements, `min-height: 44px` for touch targets
+- **iOS zoom prevention**: `font-size: max(16px, 1rem)` on inputs prevents zoom on focus
+- **Safe areas**: Use `env(safe-area-inset-*)` with `max()` for notched device support
+- **Accessibility**: `:focus-visible` for keyboard navigation, `aria-current="page"` on active nav items
 
 ---
 
@@ -879,5 +885,46 @@
 - InvestmentRepositoryImpl provides aggregate queries: getInvestmentSummary(), getPositionsGroupedBySource()
 - Positions endpoint returns grouped data with source info + positions array + subtotal calculations
 - Import endpoint reuses ImportInvestmentsUseCase from application layer
+
+---
+
+## [Iteration 29] 2026-01-15 - US-301: UI: Layout responsive mobile-first
+
+### What was implemented
+- Refactored layout and navigation to use mobile-first CSS pattern:
+  - Base styles are now for mobile, with `@media (min-width: 769px)` for desktop
+  - Extracted Navigation component to `src/lib/components/Navigation.svelte`
+  - Simplified `+layout.svelte` to only contain layout structure
+- Mobile optimizations:
+  - Bottom navigation bar on mobile (iOS-style tab bar)
+  - Sidebar navigation on desktop
+  - Touch targets ≥44px on all interactive elements
+  - Input font-size ≥16px to prevent iOS zoom on focus
+  - `touch-action: manipulation` on all interactive elements
+  - Safe area support with `env(safe-area-inset-*)` for notched devices
+  - Dynamic viewport height with `100dvh` for mobile browsers
+- Accessibility improvements:
+  - Added `:focus-visible` styles for keyboard navigation
+  - Added `aria-label` and `aria-current` attributes to navigation
+  - Screen reader only utility class `.sr-only`
+- Animation improvements:
+  - `prefers-reduced-motion` support to disable animations
+  - Explicit transition properties (never `transition: all`)
+  - Compositor-friendly animations (transform/opacity only)
+
+### Files changed
+- src/routes/+layout.svelte (refactored, styles simplified)
+- src/lib/components/Navigation.svelte (new)
+- src/lib/styles/global.css (mobile-first, accessibility)
+
+### Learnings for future iterations
+- Mobile-first pattern: base styles for mobile, `@media (min-width: X)` for larger screens
+- Use `100dvh` instead of `100vh` for true viewport height on mobile (accounts for browser chrome)
+- `touch-action: manipulation` prevents double-tap zoom and improves touch response
+- `-webkit-tap-highlight-color: transparent` removes blue tap highlight on mobile
+- Input `font-size: max(16px, 1rem)` ensures iOS won't zoom on focus
+- Use `env(safe-area-inset-*)` with `max()` function for padding that respects both design spacing and safe areas
+- Navigation component uses `aria-current="page"` for screen reader accessibility
+- Breakpoint 769px chosen to match iPad portrait (768px) as tablet boundary
 
 ---
