@@ -764,7 +764,7 @@
       ],
       "files": ["src/routes/+layout.svelte", "src/lib/components/Navigation.svelte", "src/app.css"],
       "priority": 301,
-      "passes": false,
+      "passes": true,
       "notes": "Suivre Vercel Web Interface Guidelines - run /web-interface-guidelines sur chaque composant UI"
     },
     {
