@@ -744,7 +744,7 @@
       ],
       "files": ["static/manifest.json", "src/app.html", "static/icons/"],
       "priority": 300,
-      "passes": false,
+      "passes": true,
       "notes": "PWA permet d'installer l'app sur l'écran d'accueil mobile"
     },
     {
