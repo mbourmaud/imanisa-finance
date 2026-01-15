@@ -1,0 +1,538 @@
+# Ralph Progress Log
+# Project: Imanisa Finance
+# Location: /Users/fr162241/Projects/imanisa-finance
+# Started: Thu Jan 15 15:37:55 CET 2026
+#
+# This file is generated and maintained by Ralph.
+# See: https://github.com/thecgaigroup/ralph-cc-loop
+---
+
+## Codebase Patterns
+- **Drizzle ORM (preferred)**: Use `getDb()` from `@infrastructure/database/drizzle` for type-safe database access
+- **Raw SQL (fallback)**: Use `execute(sql, args)` from `@infrastructure/database/turso` for complex queries
+- Drizzle queries: `db.select().from(schema.table).where(eq(schema.table.column, value))`
+- Drizzle types: `schema.tableName.$inferSelect` for row type, `$inferInsert` for insert
+- All database operations are async - always await the execute calls
+- Turso client supports both cloud (TURSO_URL + TURSO_AUTH_TOKEN) and local SQLite (DATABASE_PATH)
+- Real estate module: types in `@lib/types/real-estate.ts`, repository in `@infrastructure/repositories/RealEstateRepository.ts`
+- New real estate tables use `re_` prefix (re_properties, re_loans) to avoid collision with legacy tables
+- Svelte 5 component props: `let { prop }: Props = $props()` (destructure with type annotation)
+- Real estate components: `src/lib/components/real-estate/` with barrel export in index.ts
+- Domain import module: `@domain/import` for DataSource, CSVParser, ParsedTransaction types
+- Repository naming: `XxxRepositoryImpl` for implementation class in `@infrastructure/`, `XxxRepository` interface in `@domain/`
+- CSV parsers: `src/infrastructure/parsers/` - each bank implements CSVParser interface, handles encoding/date/amount format differences
+- Application layer: Use cases go in `src/application/{module}/` with ParserFactory pattern for extensibility
+- ImportTransactionsUseCase: Links DataSource → Account via `linkedAccountId`, deduplicates on date+amount+description
+
+---
+
+## [Iteration 1] 2026-01-15 - US-000: Migration SQLite → Turso
+
+### What was implemented
+- Migrated from better-sqlite3 (synchronous) to @libsql/client (async) for Turso compatibility
+- Created new `src/infrastructure/database/turso.ts` with async database client
+- Migrated all 4 repositories (User, Bank, Account, Transaction) to async pattern
+- Updated all page.server.ts files to use async database queries
+- Updated API routes to use async database queries
+- Added Turso environment variables to .env.example
+
+### Files changed
+- package.json, package-lock.json (deps: -better-sqlite3, +@libsql/client)
+- src/infrastructure/database/turso.ts (new)
+- src/infrastructure/database/connection.ts (re-export wrapper)
+- src/infrastructure/database/repositories/*.ts (4 files)
+- src/infrastructure/auth/users.ts
+- src/routes/+page.server.ts
+- src/routes/accounts/+page.server.ts
+- src/routes/loans/+page.server.ts
+- src/routes/investments/+page.server.ts
+- src/routes/transactions/+page.server.ts
+- src/routes/api/dashboard/+server.ts
+- src/routes/api/auth/login/+server.ts
+- src/routes/login/+page.server.ts
+- .env.example
+
+### Learnings for future iterations
+- The @libsql/client returns Row objects that need double casting: `as unknown as YourType`
+- All database functions became async - be sure to `await` all calls
+- Schema initialization needs to split SQL statements and execute one at a time
+- Local SQLite fallback uses `file:` protocol: `file:./data/imanisa.db`
+- The `executeMany` function wraps libsql's `batch()` for multi-statement transactions
+- Real estate tables use `re_` prefix (re_properties, re_loans) to avoid collision with legacy tables
+- Use JSON.stringify/JSON.parse for array fields stored in TEXT columns (e.g., copro_lots)
+- RealEstateRepository follows function-based pattern (not class-based) with explicit mappers
+
+---
+
+## [Iteration 2] 2026-01-15 - US-010: Schéma BDD Immobilier
+
+### What was implemented
+- Created comprehensive real estate database schema with 7 new tables:
+  - `entities` - persons, SCI, joint ownership
+  - `entity_shares` - SCI capital distribution
+  - `re_properties` - detailed property tracking (enhanced from legacy)
+  - `property_ownership` - ownership percentages and acquisition info
+  - `re_loans` - enhanced loan tracking
+  - `loan_responsibility` - who is responsible for loan
+  - `property_charges` - recurring expenses
+- Created TypeScript types for all entities with domain and row types
+- Created RealEstateRepository with full CRUD operations and composite queries
+
+### Files changed
+- src/infrastructure/database/migrations/001_real_estate.sql (new)
+- src/infrastructure/database/schema.sql (updated with new tables)
+- src/lib/types/real-estate.ts (new)
+- src/infrastructure/repositories/RealEstateRepository.ts (new)
+
+### Learnings for future iterations
+- New real estate tables use `re_` prefix to distinguish from legacy `properties` and `loans` tables
+- The repository is at `src/infrastructure/repositories/` (not under `database/repositories/`)
+- Property types: apartment, house, parking, land, commercial
+- Property categories: primary_residence, rental_furnished, rental_unfurnished, secondary, sci
+- Acquisition types: purchase, inheritance, donation, partition
+- Charge types: copro, tax, insurance, maintenance, other
+
+---
+
+## [Iteration 3] 2026-01-15 - US-011: Import données initiales
+
+### What was implemented
+- Created seed script `src/scripts/seed-real-estate.ts` for initial real estate data
+- Inserted 3 entities:
+  - Mathieu (person, yellow)
+  - Ninon (person, pink)
+  - SCI IMANISA (sci, SIREN 989290879)
+- Inserted SCI shares: 500 parts each for Mathieu and Ninon (50%/50%)
+- Inserted Bien 1: Appartement République Rueil
+  - 63.45m², 4 pièces, 2ème étage, DPE E
+  - Copropriété "Les Nouveaux Martinets", lots 352+383
+  - Valeur: 375 000 €
+- Inserted loan: Prêt Modulimmo CM Challans
+  - Principal: 392 621 €, taux 1.09%, durée 300 mois
+  - Mensualité: 1 495.73 €, CRD: 331 994.82 €
+- Inserted ownership: 100% Mathieu (partition 13/05/2022)
+- Added npm script `seed:real-estate` to package.json
+
+### Files changed
+- src/scripts/seed-real-estate.ts (new)
+- package.json (added seed:real-estate script)
+
+### Learnings for future iterations
+- Script uses `INSERT OR REPLACE` for idempotency - can be run multiple times safely
+- Entity IDs: mathieu, ninon, sci-imanisa (lowercase, kebab-case)
+- Property ID: rueil-republique
+- Loan ID: loan-rueil
+- Database tables may need to be created manually if schema init fails (check for -wal files)
+- Run with: `npx tsx src/scripts/seed-real-estate.ts` or `bun run seed:real-estate`
+
+---
+
+## [Iteration 4] 2026-01-15 - US-012: API Patrimoine Immobilier
+
+### What was implemented
+- Created 3 API endpoints for real estate data:
+  - `GET /api/real-estate/summary` - returns total_value, total_debt, net_equity, property_count
+  - `GET /api/real-estate/properties` - returns list of properties with associated loan info
+  - `GET /api/real-estate/properties/[id]` - returns full property detail with loan, owners, charges
+
+### Files changed
+- src/routes/api/real-estate/summary/+server.ts (new)
+- src/routes/api/real-estate/properties/+server.ts (new)
+- src/routes/api/real-estate/properties/[id]/+server.ts (new)
+
+### Learnings for future iterations
+- API endpoints use snake_case for JSON field names (matching API convention)
+- Repository already provides `getRealEstateSummary()`, `getPropertiesWithLoans()`, `getPropertyWithDetails()` - no new repo methods needed
+- Follow the pattern from `src/routes/api/dashboard/+server.ts` for new API endpoints
+- Use `error(404, 'message')` from `@sveltejs/kit` for 404 responses
+
+---
+
+## [Iteration 5] 2026-01-15 - US-013: Dashboard Patrimoine Immobilier
+
+### What was implemented
+- Created `/immobilier` route with page.server.ts and page.svelte
+- Created `PropertyCard.svelte` component showing property type icon, name, address, surface, rooms, DPE badge, estimated value, and loan CRD
+- Displayed 3 KPIs: Valeur totale, Dette totale, Equity nette with appropriate icons and styling
+- Created responsive grid layout for properties list
+- PropertyCard links to `/immobilier/[id]` for detail view
+- Added Immobilier link with home icon to sidebar navigation (desktop and mobile)
+
+### Files changed
+- src/routes/immobilier/+page.server.ts (new)
+- src/routes/immobilier/+page.svelte (new)
+- src/lib/components/real-estate/PropertyCard.svelte (new)
+- src/lib/components/real-estate/index.ts (new)
+- src/routes/+layout.svelte (added nav item)
+
+### Learnings for future iterations
+- Svelte 5 props syntax: `let { prop }: Props = $props()` (not generic `$props<Props>()`)
+- Use existing components like DoughnutChart for reference on prop typing
+- Design tokens from tokens.css: --color-gold-500 for real estate icons, --color-danger-500 for debts
+- Navigation icons are inline SVGs in +layout.svelte (not imported)
+- DPE color scale: A=#319834, B=#33cc31, C=#cbfc34, D=#fbfe06, E=#fbcc05, F=#f99b03, G=#f63001
+- Real estate components are in src/lib/components/real-estate/ with barrel export
+- Use `$derived()` for computed values from `$props()` data to avoid Svelte warnings about capturing initial values
+- PropertyWithDetails type includes loan, owners[], and charges[] - use getPropertyWithDetails() from repository
+
+---
+
+## [Iteration 6] 2026-01-15 - US-014: Page Détail Bien
+
+### What was implemented
+- Created /immobilier/[id] route with page.server.ts and page.svelte
+- Section Informations: displays property type, full address, surface, rooms, floor, DPE badge with colors, and copropriété details (name, lots, tantièmes, syndic)
+- Section Valeur: shows purchase price with date, estimated value with date, and calculates gain/loss (plus-value/moins-value) with percentage
+- Section Prêt: displays loan name, bank, progress bar showing repayment percentage, and full loan details (principal, rate, duration, dates, monthly payment, insurance, CRD)
+- Section Propriétaires: lists owners with colored avatars, name, entity type, percentage, acquisition type and date
+- Back button navigates to /immobilier dashboard
+- Full responsive design for mobile devices
+
+### Files changed
+- src/routes/immobilier/[id]/+page.server.ts (new)
+- src/routes/immobilier/[id]/+page.svelte (new)
+
+### Learnings for future iterations
+- Use `$derived()` for reactive computed values from page data, not plain `const`
+- PropertyWithDetails extends Property with: loan: Loan | null, owners: Array<PropertyOwnership & { entity: Entity }>, charges: PropertyCharge[]
+- getPropertyWithDetails(id) returns null if property not found - use error(404, ...) for proper 404 handling
+- Entity colors stored in database can be used directly for avatar backgrounds
+- Acquisition types: purchase, inheritance, donation, partition
+
+---
+
+## [Iteration 7] 2026-01-15 - US-015: Tableau d'Amortissement
+
+### What was implemented
+- Created `calculateAmortizationSchedule(loan)` function in `src/lib/utils/loan-calculator.ts`
+  - Standard French amortization formula (constant payment method)
+  - Returns array of {month, date, payment, principal, interest, balance}
+  - Handles 0% interest rate edge case
+- Created `getCurrentMonthIndex()` helper to find current month in schedule
+- Created `AmortizationTable.svelte` component with:
+  - Paginated table (12 rows per page)
+  - Auto-navigates to page containing current month
+  - Current month row is highlighted with gold background
+  - Responsive pagination with ellipsis for many pages
+  - Columns: Date, Mensualité, Capital, Intérêts, Restant
+  - Accessible with aria-labels on navigation buttons
+- Integrated amortization table into property detail page
+  - Displays below the loan section when loan exists
+  - Animated with staggered delay matching other sections
+
+### Files changed
+- src/lib/utils/loan-calculator.ts (new)
+- src/lib/components/real-estate/AmortizationTable.svelte (new)
+- src/lib/components/real-estate/index.ts (added export)
+- src/routes/immobilier/[id]/+page.svelte (integrated table)
+
+### Learnings for future iterations
+- Utility functions go in `src/lib/utils/` directory
+- Use `$state()` for component-local mutable state in Svelte 5
+- Use `$effect()` for side effects when dependencies change (like auto-navigation)
+- Amortization formula: M = P * [r(1+r)^n] / [(1+r)^n - 1]
+- Round money values to 2 decimal places to avoid floating point display issues
+- AmortizationEntry type exported from loan-calculator.ts for use in components
+
+---
+
+## [Iteration 8] 2026-01-15 - US-001: Intégration Drizzle ORM
+
+### What was implemented
+- Installed drizzle-orm and drizzle-kit dependencies
+- Created comprehensive Drizzle schema in `src/infrastructure/database/schema/index.ts`:
+  - All 20+ tables with type-safe columns
+  - Proper indexes matching existing schema.sql
+  - Relations defined between tables
+- Created `src/infrastructure/database/drizzle.ts`:
+  - Singleton pattern for database connection
+  - Supports both Turso cloud and local SQLite
+  - Exports getDb() function and schema
+- Created `drizzle.config.ts` for migrations
+- Migrated all repositories to use Drizzle ORM:
+  - SqliteUserRepository
+  - SqliteBankRepository
+  - SqliteAccountRepository
+  - SqliteTransactionRepository
+  - RealEstateRepository (functional style preserved)
+- Added npm scripts: db:generate, db:migrate, db:push, db:studio
+- Updated connection.ts to re-export both turso and drizzle modules
+
+### Files changed
+- package.json (added drizzle deps and scripts)
+- package-lock.json
+- drizzle.config.ts (new)
+- src/infrastructure/database/drizzle.ts (new)
+- src/infrastructure/database/schema/index.ts (new)
+- src/infrastructure/database/connection.ts (added drizzle exports)
+- src/infrastructure/database/repositories/SqliteUserRepository.ts
+- src/infrastructure/database/repositories/SqliteBankRepository.ts
+- src/infrastructure/database/repositories/SqliteAccountRepository.ts
+- src/infrastructure/database/repositories/SqliteTransactionRepository.ts
+- src/infrastructure/repositories/RealEstateRepository.ts
+
+### Learnings for future iterations
+- Drizzle ORM: use `getDb()` singleton for database access
+- Import schema from `@infrastructure/database/drizzle` or `schema` export
+- Use `eq()`, `desc()`, `and()`, `gte()`, `lte()` from drizzle-orm for queries
+- Use `sql` template for raw SQL in updates: `sql\`datetime('now')\``
+- For dynamic updates with sql expressions, use `Record<string, unknown>` type
+- Schema types: `schema.tableName.$inferSelect` for row type, `$inferInsert` for insert
+- Raw SQL still available via turso.ts `execute()` for complex queries
+- Drizzle supports SQLite/Turso natively with dialect: 'turso' in config
+
+---
+
+## [Iteration 9] 2026-01-15 - US-100: Domain: DataSource et CSVParser abstrait
+
+### What was implemented
+- Created domain entities for data source management and CSV parsing:
+  - `DataSource.ts` - DDD entity with create/reconstitute pattern for bank data sources
+  - `DataSourceType.ts` - enum for account types (CHECKING, SAVINGS, LIVRET_A, etc.)
+  - `CSVParser.ts` - interface for CSV parsers with ParserKey enum (credit_mutuel, caisse_epargne, etc.)
+  - `ParsedTransaction.ts` - DTO for parsed CSV transactions (date, amount, description, rawCategory, balance)
+  - `DataSourceRepository.ts` - repository interface (findAll, findById, findByOwnerEntityId, save, delete)
+  - `index.ts` - barrel export for all domain types
+
+### Files changed
+- src/domain/import/DataSource.ts (new)
+- src/domain/import/DataSourceType.ts (new)
+- src/domain/import/CSVParser.ts (new)
+- src/domain/import/ParsedTransaction.ts (new)
+- src/domain/import/DataSourceRepository.ts (new)
+- src/domain/import/index.ts (new)
+
+### Learnings for future iterations
+- Domain import module follows existing DDD patterns: Entity base class, Result for creation validation
+- DataSource links to entities table via ownerEntityId (Mathieu, Ninon, SCI IMANISA, Isaac)
+- ParserKey enum maps to infrastructure parser implementations (one per bank)
+- ParsedTransaction DTO includes optional fields (rawCategory, balance, valueDate, reference, additionalInfo) for bank-specific data
+- Import from `@domain/import` for DataSource, CSVParser, ParsedTransaction types
+
+---
+
+## [Iteration 10] 2026-01-15 - US-101: Infrastructure: DataSourceRepository SQLite
+
+### What was implemented
+- Added `data_sources` table to Drizzle schema (src/infrastructure/database/schema/index.ts)
+  - Columns: id, name, type, owner_entity_id, url, format, parser_key, last_sync_at, created_at
+  - Indexes: owner_entity_id, parser_key
+  - Foreign key to entities table with ON DELETE CASCADE
+- Added `data_sources` table to schema.sql with corresponding indexes
+- Created SqliteDataSourceRepository implementing DataSourceRepository interface
+  - Class-based approach following DDD patterns
+  - toDomain() mapper: DB row → DataSource entity using reconstitute()
+  - toPersistence() mapper: DataSource entity → DB row
+  - Full CRUD: findAll, findById, findByOwnerEntityId, save, delete
+  - save() handles both insert and update (upsert pattern)
+- Added relations: entitiesRelations now includes dataSources, dataSourcesRelations links to ownerEntity
+
+### Files changed
+- src/infrastructure/database/schema/index.ts (added dataSources table and relations)
+- src/infrastructure/database/schema.sql (added data_sources table and indexes)
+- src/infrastructure/repositories/SqliteDataSourceRepository.ts (new)
+
+### Learnings for future iterations
+- DDD entity repositories use class-based pattern with toDomain/toPersistence mappers
+- Use Entity.reconstitute() to recreate domain entities from DB rows (validates invariants)
+- UniqueId.fromString() to convert string IDs from DB to UniqueId value objects
+- Save pattern: check if exists first, then update or insert accordingly
+- Drizzle relations: add many() reference in parent, one() reference in child
+
+---
+
+## [Iteration 11] 2026-01-15 - US-102: Parser: Crédit Mutuel CSV
+
+### What was implemented
+- Created `CreditMutuelParser.ts` implementing the CSVParser interface
+- Parser handles Crédit Mutuel CSV format: `Date;Date de valeur;Débit;Crédit;Libellé;Solde`
+- Features:
+  - Parses semicolon-separated CSV with proper quote handling
+  - Parses French date format DD/MM/YYYY
+  - Parses French number format (comma decimal, space thousands separator)
+  - Merges Débit/Crédit columns into single signed amount (credit positive, debit negative)
+  - Extracts balance and value date as optional fields
+  - Skips empty lines and lines with no transactions
+
+### Files changed
+- src/infrastructure/parsers/CreditMutuelParser.ts (new)
+
+### Learnings for future iterations
+- CSV parsers go in `src/infrastructure/parsers/` directory
+- Each bank has its own parser implementing the CSVParser interface from `@domain/import`
+- parseCSVLine helper handles quoted fields with escaped quotes ("" → ")
+- French amounts: remove spaces, replace comma with dot, then parseFloat
+- Crédit Mutuel uses Latin-1 encoding (handled by browser/node when reading file)
+- Debit column contains absolute values - negate when merging to signed amount
+
+---
+
+## [Iteration 12] 2026-01-15 - US-002: Refacto: Renommer repositories (supprimer préfixe Sqlite)
+
+### What was implemented
+- Renamed all Sqlite-prefixed repository implementations to remove the technical prefix
+- Updated class names to use `Impl` suffix (convention: `UserRepositoryImpl` implements `UserRepository` interface)
+- Files renamed:
+  - SqliteUserRepository.ts → UserRepository.ts (class: UserRepositoryImpl)
+  - SqliteBankRepository.ts → BankRepository.ts (class: BankRepositoryImpl)
+  - SqliteAccountRepository.ts → AccountRepository.ts (class: AccountRepositoryImpl)
+  - SqliteTransactionRepository.ts → TransactionRepository.ts (class: TransactionRepositoryImpl)
+  - SqliteDataSourceRepository.ts → DataSourceRepository.ts (class: DataSourceRepositoryImpl)
+- Updated container.ts imports and instantiation
+- Updated database/repositories/index.ts barrel exports
+- Domain interfaces (in `@domain/*/XxxRepository.ts`) kept unchanged - they define the contracts
+
+### Files changed
+- src/infrastructure/database/repositories/UserRepository.ts (renamed from SqliteUserRepository.ts)
+- src/infrastructure/database/repositories/BankRepository.ts (renamed from SqliteBankRepository.ts)
+- src/infrastructure/database/repositories/AccountRepository.ts (renamed from SqliteAccountRepository.ts)
+- src/infrastructure/database/repositories/TransactionRepository.ts (renamed from SqliteTransactionRepository.ts)
+- src/infrastructure/database/repositories/index.ts (updated exports)
+- src/infrastructure/repositories/DataSourceRepository.ts (renamed from SqliteDataSourceRepository.ts)
+- src/infrastructure/container/container.ts (updated imports)
+
+### Learnings for future iterations
+- DDD convention: Repository names should not expose implementation details
+- Use `XxxRepositoryImpl` for implementation class, `XxxRepository` for the interface in domain layer
+- Domain interfaces live in `@domain/{aggregate}/XxxRepository.ts`
+- Infrastructure implementations live in `@infrastructure/database/repositories/XxxRepository.ts` or `@infrastructure/repositories/XxxRepository.ts`
+- The InMemory* repositories in `@infrastructure/repositories/inmemory/` were not renamed (they correctly indicate in-memory storage for testing/demo)
+
+---
+
+## [Iteration 13] 2026-01-15 - US-103: Parser: Caisse d'Épargne Particulier CSV
+
+### What was implemented
+- Created `CaisseEpargneParser.ts` implementing the CSVParser interface
+- Parser handles CE Particulier CSV format: 13 columns with rich data
+- Format: `Date de comptabilisation;Libelle simplifie;Libelle operation;Reference;Informations complementaires;Type operation;Categorie;Sous categorie;Debit;Credit;Date operation;Date de valeur;Pointage operation`
+- Features:
+  - Parses semicolon-separated CSV with proper quote handling
+  - Parses French date format DD/MM/YYYY (prefers Date operation over Date de comptabilisation)
+  - Parses French number format (comma decimal, space thousands separator)
+  - Merges Débit/Crédit columns into single signed amount
+  - Extracts CE native categories (Categorie > Sous categorie) for future mapping
+  - Preserves reference, type operation, and informations complementaires
+
+### Files changed
+- src/infrastructure/parsers/CaisseEpargneParser.ts (new)
+
+### Learnings for future iterations
+- CE Particulier format has 13 columns (more than CM which has 6)
+- CE provides native categorization (Categorie + Sous categorie) - stored in rawCategory
+- Date operation is the primary date, Date de comptabilisation is fallback
+- Libelle operation is preferred over Libelle simplifie for description
+- Type operation and Informations complementaires combined into additionalInfo
+
+---
+
+## [Iteration 14] 2026-01-15 - US-104: Parser: Caisse d'Épargne Entreprise CSV
+
+### What was implemented
+- Created `CaisseEpargneEntrepriseParser.ts` implementing the CSVParser interface
+- Parser handles CE Entreprise/SCI CSV format: 10 columns
+- Format: `Date comptable;Libelle simplifie;Reference;Informations complementaires;Type operation;Debit;Credit;Date operation;Date de valeur;Pointage`
+- Key differences from Particulier format:
+  - 10 columns instead of 13
+  - No Categorie/Sous categorie columns (no native categorization)
+  - No Libelle operation column (only Libelle simplifie)
+  - Pointage uses Oui/Non format
+
+### Files changed
+- src/infrastructure/parsers/CaisseEpargneEntrepriseParser.ts (new)
+
+### Learnings for future iterations
+- CE Entreprise format has 10 columns (vs 13 for Particulier, 6 for CM)
+- Enterprise format lacks native categorization - rawCategory is undefined
+- Reuses same date/amount parsing helpers as CaisseEpargneParser
+
+---
+
+## [Iteration 15] 2026-01-15 - US-105: Parser: Boursorama CSV
+
+### What was implemented
+- Created `BoursoramaParser.ts` implementing the CSVParser interface
+- Parser handles Boursorama CSV format: 11 columns
+- Format: `dateOp;dateVal;label;category;categoryParent;supplierFound;amount;comment;accountNum;accountLabel;accountbalance`
+- Features:
+  - Removes UTF-8 BOM if present
+  - Parses ISO date format YYYY-MM-DD
+  - Parses French number format (comma decimal) with signed amounts
+  - Extracts short label from "Court | Long" format
+  - Builds category hierarchy from category and categoryParent (e.g., "Parent > Category")
+  - Preserves comment field as additionalInfo
+
+### Files changed
+- src/infrastructure/parsers/BoursoramaParser.ts (new)
+
+### Learnings for future iterations
+- Boursorama uses ISO dates (YYYY-MM-DD) unlike other French banks (DD/MM/YYYY)
+- Boursorama amounts are pre-signed (negative for debits) unlike CM which uses separate Debit/Credit columns
+- Label format "Court | Long" - extract short version for description, long version is detailed
+- Category structure: categoryParent > category (both optional)
+- UTF-8 BOM: `\uFEFF` character at start of file, remove before parsing
+
+---
+
+## [Iteration 16] 2026-01-15 - US-106: Application: ImportTransactionsUseCase
+
+### What was implemented
+- Created `ParserFactory.ts` to instantiate CSV parsers based on ParserKey enum
+  - Maps ParserKey to correct parser implementation (CreditMutuel, CaisseEpargne, etc.)
+  - Provides isSupported() method to check if a parser key is valid
+- Created `ImportTransactionsUseCase.ts` for importing CSV transactions
+  - Orchestrates the full import flow: parse CSV → deduplicate → save transactions
+  - Uses ParserFactory to get the correct parser based on DataSource.parserKey
+  - Deduplication based on signature: date+amount+description (normalized)
+  - Transforms ParsedTransaction DTO to domain Transaction entity
+  - Updates DataSource.lastSyncAt after successful import
+  - Returns ImportResult with counts: {imported, skipped, errors}
+- Added `linkedAccountId` field to DataSource entity and schema
+  - Allows linking a data source to a specific account for importing transactions
+  - Updated Drizzle schema, SQL schema, domain entity, and repository
+
+### Files changed
+- src/application/import/ParserFactory.ts (new)
+- src/application/import/ImportTransactionsUseCase.ts (new)
+- src/application/import/index.ts (new)
+- src/domain/import/DataSource.ts (added linkedAccountId)
+- src/infrastructure/database/schema/index.ts (added linkedAccountId)
+- src/infrastructure/database/schema.sql (added linked_account_id)
+- src/infrastructure/repositories/DataSourceRepository.ts (updated for linkedAccountId)
+
+### Learnings for future iterations
+- Application layer use cases go in `src/application/{module}/` directory
+- Use case pattern: constructor takes repositories, execute() takes input params
+- Deduplication signature should normalize data (lowercase, trim, round amounts)
+- DataSource now has linkedAccountId to know which account to import transactions into
+- ImportResult includes errors array for partial success reporting
+- Transaction.create takes unsigned amount, determines absolute value internally
+- API endpoints: use snake_case for JSON field names (e.g., owner_entity_id, last_sync_at)
+
+---
+
+## [Iteration 17] 2026-01-15 - US-107: API: Endpoints Import
+
+### What was implemented
+- Created 3 API endpoints for import functionality:
+  - `GET /api/data-sources` - lists all configured data sources with full details
+  - `GET /api/data-sources/[id]` - returns a single data source by ID (404 if not found)
+  - `POST /api/import/csv` - handles CSV file upload and import via ImportTransactionsUseCase
+- POST endpoint accepts multipart/form-data with `file` (CSV file) and `dataSourceId` (string)
+- Returns JSON with `{imported, skipped, errors}` from the use case
+
+### Files changed
+- src/routes/api/data-sources/+server.ts (new)
+- src/routes/api/data-sources/[id]/+server.ts (new)
+- src/routes/api/import/csv/+server.ts (new)
+
+### Learnings for future iterations
+- API endpoints use snake_case for JSON field names (e.g., owner_entity_id, last_sync_at)
+- UniqueId.fromString() to convert string params to UniqueId for repository methods
+- Use `error(404, 'message')` from @sveltejs/kit for proper HTTP 404 responses
+- DataSourceRepositoryImpl imported from `@infrastructure/repositories/DataSourceRepository`
+- TransactionRepositoryImpl imported from `@infrastructure/database/repositories/TransactionRepository`
+- File upload: use `request.formData()` then `.get('file')` to get the File object
+- File content: use `file.text()` to read CSV content as string
+
+---
