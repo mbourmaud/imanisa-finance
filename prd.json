@@ -1092,7 +1092,7 @@
       ],
       "files": ["src/routes/budget/rules/"],
       "priority": 410,
-      "passes": false,
+      "passes": true,
       "notes": "Permet d'ajouter des règles custom sans toucher au code"
     },
     {

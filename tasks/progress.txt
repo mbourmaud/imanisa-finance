@@ -13,6 +13,38 @@
 
 ---
 
+## [Iteration 5] 2026-01-15 - US-410
+
+**Story:** UI: Gestion des règles de catégorisation
+
+**What was implemented:**
+- Created `/budget/rules` page with Svelte 5 runes ($state, $derived, $props)
+- Full CRUD UI for category rules: list, create, edit, delete
+- API endpoints:
+  - `GET/POST /api/budget/rules` - list all / create rule
+  - `GET/PUT/DELETE/PATCH /api/budget/rules/[id]` - manage individual rule
+  - `POST /api/budget/rules/test` - test pattern against transactions
+- Test button shows matching transactions in modal
+- Toggle switch for activate/deactivate rules
+- Success message offers to recategorize transactions after changes
+- Responsive design with mobile-first approach
+- Follows existing UI patterns (animations, cards, badges)
+
+**Files changed:**
+- `src/routes/budget/rules/+page.server.ts` (new)
+- `src/routes/budget/rules/+page.svelte` (new)
+- `src/routes/api/budget/rules/+server.ts` (new)
+- `src/routes/api/budget/rules/[id]/+server.ts` (new)
+- `src/routes/api/budget/rules/test/+server.ts` (new)
+
+**Learnings for future iterations:**
+- Use `invalidateAll()` from `$app/navigation` to refresh page data after API mutations
+- CategoryRule entity has immutable categoryId - must delete/recreate if category changes
+- Test pattern endpoint queries 500 recent transactions and filters in JS (simpler than SQL regex)
+- SvelteKit types are auto-generated - run `svelte-kit sync` after creating new routes
+
+---
+
 ## [Iteration 4] 2026-01-15 - US-405
 
 **Story:** Service: Auto-catégorisation des transactions
