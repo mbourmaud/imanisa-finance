@@ -515,7 +515,9 @@
 		background: transparent;
 		border: none;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 		white-space: nowrap;
 		flex-shrink: 0;
 		min-height: 44px;
@@ -584,7 +586,9 @@
 		border: none;
 		background: transparent;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.view-toggle button:hover {
@@ -615,7 +619,9 @@
 		border: none;
 		background: transparent;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.period-pill:hover {
@@ -788,7 +794,10 @@
 		display: flex;
 		align-items: center;
 		gap: var(--spacing-4);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
 		text-decoration: none;
 		color: inherit;
 	}
@@ -875,7 +884,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-3);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.asset-card:hover {

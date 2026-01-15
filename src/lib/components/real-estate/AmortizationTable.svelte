@@ -345,7 +345,9 @@
 		color: var(--color-text-secondary);
 		font-size: var(--font-size-sm);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.pagination-btn:hover:not(:disabled) {

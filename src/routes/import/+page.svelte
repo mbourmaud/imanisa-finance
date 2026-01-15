@@ -266,7 +266,9 @@
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			transform var(--transition-fast),
+			box-shadow var(--transition-fast);
 		min-height: 44px;
 	}
 
@@ -400,7 +402,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-4);
-		transition: all var(--transition-fast);
+		transition: border-color var(--transition-fast);
 	}
 
 	.source-card:hover {

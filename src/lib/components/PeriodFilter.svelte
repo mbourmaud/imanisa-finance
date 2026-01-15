@@ -49,7 +49,9 @@
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-muted);
 		background: transparent;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.period-btn:hover {

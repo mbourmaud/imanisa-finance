@@ -149,7 +149,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-4);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
 		text-decoration: none;
 		color: inherit;
 	}

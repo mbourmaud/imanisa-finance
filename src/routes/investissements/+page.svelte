@@ -657,7 +657,9 @@
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			transform var(--transition-fast),
+			box-shadow var(--transition-fast);
 		min-height: 44px;
 	}
 
@@ -690,7 +692,9 @@
 		display: flex;
 		align-items: flex-start;
 		gap: var(--spacing-4);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.kpi-card:hover {
@@ -1075,7 +1079,9 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			border-color var(--transition-fast),
+			background-color var(--transition-fast);
 		background: var(--color-bg-card);
 	}
 
@@ -1146,7 +1152,9 @@
 		text-decoration: none;
 		padding: var(--spacing-1) var(--spacing-2);
 		border-radius: var(--radius-md);
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.source-link:hover {
@@ -1354,6 +1362,13 @@
 
 		.position-row {
 			padding: var(--spacing-3);
+		}
+	}
+
+	/* Respect reduced motion preference */
+	@media (prefers-reduced-motion: reduce) {
+		.spinner {
+			animation: none;
 		}
 	}
 </style>

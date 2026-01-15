@@ -334,7 +334,9 @@
 		background: transparent;
 		border: none;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 		white-space: nowrap;
 		flex-shrink: 0;
 		min-height: 44px;
@@ -407,7 +409,10 @@
 		border-radius: var(--radius-lg);
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-medium);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			transform var(--transition-fast),
+			box-shadow var(--transition-fast);
 		text-decoration: none;
 		border: none;
 		cursor: pointer;
@@ -538,7 +543,9 @@
 		justify-content: center;
 		color: var(--color-text-tertiary);
 		flex-shrink: 0;
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.account-type-icon.checking {

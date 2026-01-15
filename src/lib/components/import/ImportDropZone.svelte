@@ -149,7 +149,9 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			border-color var(--transition-fast),
+			background-color var(--transition-fast);
 		background: var(--color-bg-subtle);
 	}
 
@@ -279,6 +281,13 @@
 
 		.result-text {
 			align-items: center;
+		}
+	}
+
+	/* Respect reduced motion preference */
+	@media (prefers-reduced-motion: reduce) {
+		.spinner {
+			animation: none;
 		}
 	}
 </style>

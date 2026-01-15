@@ -333,7 +333,9 @@
 		background: transparent;
 		border: none;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 		white-space: nowrap;
 		flex-shrink: 0;
 		min-height: 44px;
@@ -482,7 +484,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-5);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.loan-card:hover {

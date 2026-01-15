@@ -224,7 +224,9 @@
 		margin-bottom: var(--spacing-3);
 		padding: var(--spacing-2) var(--spacing-3);
 		border-radius: var(--radius-lg);
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.back-link:hover {

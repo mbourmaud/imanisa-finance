@@ -200,7 +200,9 @@
 		border-radius: var(--radius-lg);
 		color: var(--color-text-secondary);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.sync-trigger:hover {
@@ -283,7 +285,9 @@
 		font-size: var(--font-size-lg);
 		cursor: pointer;
 		border-radius: var(--radius-md);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.close-btn:hover {
@@ -355,7 +359,7 @@
 		font-size: var(--font-size-xs);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition: background-color var(--transition-fast);
 		min-width: 60px;
 		display: flex;
 		align-items: center;
@@ -408,7 +412,9 @@
 		color: var(--color-text-secondary);
 		font-size: var(--font-size-sm);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.refresh-btn:hover:not(:disabled) {
@@ -434,6 +440,17 @@
 
 		.sync-time {
 			display: none;
+		}
+	}
+
+	/* Respect reduced motion preference */
+	@media (prefers-reduced-motion: reduce) {
+		.spinner {
+			animation: none;
+		}
+
+		.status-dot.running {
+			animation: none;
 		}
 	}
 </style>
