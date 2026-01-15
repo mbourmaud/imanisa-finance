@@ -1214,3 +1214,38 @@
 - Import from `@domain/budget` for Category, CategoryRule, TransactionCategoryAssignment, CategorySource
 
 ---
+
+## [Iteration 37] 2026-01-15 - US-401: Infrastructure - Tables et Repository Catégories
+
+### What was implemented
+- Added budget module tables to Drizzle schema:
+  - `categories` - hierarchical categories (id, name, parent_id with self-reference, icon, color)
+  - `category_rules` - regex rules for auto-categorization (category_id, pattern, priority, source_filter, is_active)
+  - `transaction_categories` - linking table (transaction_id as PK, category_id, source enum, confidence)
+- Added proper indexes for performance:
+  - categories: idx_categories_parent_id, idx_categories_name
+  - category_rules: idx_category_rules_category_id, idx_category_rules_priority, idx_category_rules_is_active
+  - transaction_categories: idx_transaction_categories_category_id, idx_transaction_categories_source
+- Added Drizzle relations:
+  - categoriesRelations (parent/child self-relation, rules, transactionAssignments)
+  - categoryRulesRelations (category)
+  - transactionCategoriesRelations (transaction, category)
+  - Updated transactionsRelations to include categoryAssignment
+- Created CategoryRepositoryImpl with full CRUD:
+  - Category: findAll, findById, findRoot, findChildren, save, delete
+  - CategoryRule: findAll, findActive by priority, findById, findByCategory, save, delete
+  - Assignment: findByTransaction, findByCategory, save, delete
+  - Aggregate: findUnassignedTransactionIds, countTransactionsByCategory(dateRange)
+
+### Files changed
+- src/infrastructure/database/schema/index.ts (added tables and relations)
+- src/infrastructure/repositories/CategoryRepository.ts (new)
+
+### Learnings for future iterations
+- Self-referencing foreign key in SQLite: use function returning column type to avoid circular reference
+- SQLite doesn't support proper FULL OUTER JOIN, use LEFT JOIN + WHERE IS NULL for "not in" queries
+- Raw SQL queries use execute() from turso.ts, not db.execute() from Drizzle
+- For aggregate queries with date ranges, use simple string comparison for SQLite date columns
+- Transaction-to-category is 1:1 (transactionId is primary key in transaction_categories)
+
+---

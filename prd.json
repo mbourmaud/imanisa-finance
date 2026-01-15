@@ -927,7 +927,7 @@
       ],
       "files": ["src/infrastructure/database/schema/", "src/infrastructure/repositories/CategoryRepository.ts"],
       "priority": 401,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
