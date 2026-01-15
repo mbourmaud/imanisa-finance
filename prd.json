@@ -3,7 +3,7 @@
   "mode": "feature",
   "branchName": "ralph/phase-1-immobilier",
   "baseBranch": "main",
-  "description": "Phase 0+1+2+3+4+5: Fondations, immobilier, import bancaire, investissements, tests, PWA mobile",
+  "description": "Phase 0+1+2+3+4+5+6: Fondations, immobilier, import bancaire, investissements, tests, PWA mobile, budget & catégorisation",
   "skills": [
     {
       "name": "web-interface-guidelines",
@@ -452,7 +452,7 @@
       ],
       "files": ["src/application/investment/CalculateCryptoPositionsUseCase.ts"],
       "priority": 205,
-      "passes": false,
+      "passes": true,
       "notes": "PRU moyen = somme(totalAmount) / somme(quantity) pour chaque symbol"
     },
     {
@@ -895,6 +895,240 @@
       "priority": 915,
       "passes": false,
       "notes": "Viewport iPhone SE (375x667) comme baseline"
+    },
+    {
+      "id": "US-400",
+      "title": "Domain: Category et CategoryRule",
+      "description": "Créer le domaine pour la catégorisation des transactions",
+      "dependsOn": ["US-001"],
+      "acceptanceCriteria": [
+        "Créer src/domain/budget/Category.ts - entité (id, name, parentId?, icon, color)",
+        "Créer src/domain/budget/CategoryRule.ts - entité (id, categoryId, pattern regex, priority, source?)",
+        "Créer src/domain/budget/TransactionCategory.ts - liaison transaction-category (transactionId, categoryId, source: auto|manual|bank)",
+        "Créer src/domain/budget/CategoryRepository.ts - interface",
+        "Typecheck passe"
+      ],
+      "files": ["src/domain/budget/"],
+      "priority": 400,
+      "passes": false,
+      "notes": "Source indique l'origine: 'bank' si fournie par CE/Bourso, 'auto' si matchée par règle, 'manual' si assignée par user"
+    },
+    {
+      "id": "US-401",
+      "title": "Infrastructure: Tables et Repository Catégories",
+      "description": "Créer les tables et repository pour les catégories",
+      "dependsOn": ["US-400"],
+      "acceptanceCriteria": [
+        "Ajouter table categories dans schema Drizzle (id, name, parent_id, icon, color)",
+        "Ajouter table category_rules (id, category_id, pattern, priority, source_filter)",
+        "Ajouter table transaction_categories (transaction_id, category_id, source, confidence)",
+        "Créer src/infrastructure/repositories/CategoryRepository.ts",
+        "Typecheck passe"
+      ],
+      "files": ["src/infrastructure/database/schema/", "src/infrastructure/repositories/CategoryRepository.ts"],
+      "priority": 401,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-402",
+      "title": "Seed: Catégories de base hiérarchiques",
+      "description": "Insérer les catégories de base avec hiérarchie",
+      "dependsOn": ["US-401"],
+      "acceptanceCriteria": [
+        "Créer src/scripts/seed-categories.ts",
+        "Insérer catégories parentes: Logement, Alimentation, Transport, Loisirs, Santé, Revenus, Épargne, Impôts, Banque, Autre",
+        "Insérer sous-catégories: Loyer, Charges, Restaurant, Courses, Carburant, Assurance auto, etc.",
+        "Mapper les catégories CE vers les catégories internes",
+        "Mapper les catégories Bourso vers les catégories internes"
+      ],
+      "files": ["src/scripts/seed-categories.ts"],
+      "priority": 402,
+      "passes": false,
+      "notes": "Hiérarchie à 2 niveaux max: Parent > Enfant"
+    },
+    {
+      "id": "US-403",
+      "title": "Seed: Règles de catégorisation regex",
+      "description": "Créer les règles regex pour catégoriser automatiquement les transactions sans catégorie bancaire",
+      "dependsOn": ["US-402"],
+      "acceptanceCriteria": [
+        "Enrichir seed-categories.ts avec les règles",
+        "Règles Alimentation: /carrefour|leclerc|auchan|lidl|picard/i → Courses",
+        "Règles Alimentation: /restaurant|brasserie|mcdo|burger|pizza|sushi/i → Restaurant",
+        "Règles Transport: /total|shell|bp|esso|carburant/i → Carburant",
+        "Règles Transport: /sncf|ratp|navigo|uber|bolt|taxi/i → Transport",
+        "Règles Loisirs: /netflix|spotify|disney|amazon prime|canal/i → Abonnements",
+        "Règles Santé: /pharmacie|docteur|médecin|dentiste|ophtalmo/i → Santé",
+        "Règles Banque: /cotisation|frais bancaire|agios/i → Frais bancaires",
+        "Règles Revenus: /salaire|virement|remboursement/i → Revenus",
+        "Chaque règle avec priority pour résoudre conflits"
+      ],
+      "files": ["src/scripts/seed-categories.ts"],
+      "priority": 403,
+      "passes": false,
+      "notes": "~15% des transactions seront catégorisées par regex (principalement CM qui n'a pas de catégories)"
+    },
+    {
+      "id": "US-404",
+      "title": "Service: Mapping catégories bancaires",
+      "description": "Créer le service de mapping des catégories CE/Bourso vers catégories internes",
+      "dependsOn": ["US-402"],
+      "acceptanceCriteria": [
+        "Créer src/application/budget/BankCategoryMapper.ts",
+        "Mapper catégories CE: 'Alimentation > Restaurant' → 'Alimentation > Restaurant'",
+        "Mapper catégories CE: 'Banque et assurances > Frais bancaires' → 'Banque > Frais bancaires'",
+        "Mapper catégories Bourso: categoryParent + category vers catégories internes",
+        "Retourner categoryId interne depuis catégorie bancaire",
+        "Gérer cas non mappés → retourne null (sera catégorisé par règle ou manuellement)",
+        "Typecheck passe"
+      ],
+      "files": ["src/application/budget/BankCategoryMapper.ts"],
+      "priority": 404,
+      "passes": false,
+      "notes": "~80% des transactions CE/Bourso ont une catégorie bancaire utilisable"
+    },
+    {
+      "id": "US-405",
+      "title": "Service: Auto-catégorisation des transactions",
+      "description": "Créer le service qui catégorise automatiquement les transactions",
+      "dependsOn": ["US-403", "US-404"],
+      "acceptanceCriteria": [
+        "Créer src/application/budget/AutoCategorizationService.ts",
+        "Ordre de priorité: 1) Catégorie manuelle existante (ne pas écraser), 2) Catégorie bancaire mappée, 3) Règle regex matchée, 4) null",
+        "Méthode categorizeTransaction(transaction): { categoryId, source, confidence }",
+        "Méthode categorizeAll(): { categorized: number, skipped: number, manual: number }",
+        "Confidence: 1.0 pour bank/manual, 0.8 pour regex match exact, 0.5 pour regex partiel",
+        "Typecheck passe"
+      ],
+      "files": ["src/application/budget/AutoCategorizationService.ts"],
+      "priority": 405,
+      "passes": false,
+      "notes": "Ne jamais écraser une catégorisation manuelle"
+    },
+    {
+      "id": "US-406",
+      "title": "Hook: Auto-catégorisation à l'import",
+      "description": "Catégoriser automatiquement les transactions lors de l'import",
+      "dependsOn": ["US-405", "US-106"],
+      "acceptanceCriteria": [
+        "Modifier ImportTransactionsUseCase pour appeler AutoCategorizationService après insert",
+        "Passer la catégorie bancaire brute (rawCategory) au service",
+        "Logger le résultat: X catégorisées par banque, Y par règle, Z non catégorisées",
+        "Retourner stats de catégorisation dans le résultat d'import",
+        "Typecheck passe"
+      ],
+      "files": ["src/application/import/ImportTransactionsUseCase.ts"],
+      "priority": 406,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-407",
+      "title": "API: Endpoints Catégories et Budget",
+      "description": "Créer les endpoints API pour la gestion des catégories",
+      "dependsOn": ["US-401", "US-405"],
+      "acceptanceCriteria": [
+        "GET /api/categories - liste toutes les catégories avec hiérarchie",
+        "GET /api/transactions/[id]/category - retourne la catégorie d'une transaction",
+        "PUT /api/transactions/[id]/category - assigne manuellement une catégorie (source=manual)",
+        "POST /api/budget/recategorize - relance l'auto-catégorisation sur toutes les transactions non manuelles",
+        "GET /api/budget/summary?period=month - retourne dépenses par catégorie pour la période",
+        "Typecheck passe"
+      ],
+      "files": ["src/routes/api/categories/", "src/routes/api/budget/"],
+      "priority": 407,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-408",
+      "title": "UI: Page Budget avec répartition par catégorie",
+      "description": "Créer la page de visualisation du budget",
+      "dependsOn": ["US-407"],
+      "acceptanceCriteria": [
+        "Créer route /budget avec page.svelte et page.server.ts",
+        "Sélecteur de période: mois en cours, mois précédent, 3 derniers mois, année",
+        "Afficher total dépenses et total revenus de la période",
+        "Graphique donut/pie des dépenses par catégorie parente",
+        "Liste des catégories avec montant et pourcentage du total",
+        "Clic sur catégorie → drill-down vers sous-catégories",
+        "Ajouter lien Budget dans la navigation"
+      ],
+      "files": ["src/routes/budget/", "src/lib/components/budget/"],
+      "priority": 408,
+      "passes": false,
+      "notes": "Inspiration: apps budget type Bankin, Linxo"
+    },
+    {
+      "id": "US-409",
+      "title": "UI: Catégorisation manuelle inline",
+      "description": "Permettre de catégoriser manuellement les transactions depuis la liste",
+      "dependsOn": ["US-407"],
+      "acceptanceCriteria": [
+        "Dans la liste des transactions, afficher le badge catégorie (ou '?' si non catégorisée)",
+        "Clic sur le badge → dropdown avec liste des catégories",
+        "Sélection → PUT /api/transactions/[id]/category → mise à jour instantanée",
+        "Indicateur visuel: badge couleur différente selon source (bank=bleu, auto=gris, manual=vert)",
+        "Filtrer les transactions par 'Non catégorisées' pour review rapide"
+      ],
+      "files": ["src/routes/transactions/", "src/lib/components/TransactionRow.svelte"],
+      "priority": 409,
+      "passes": false,
+      "notes": "UX rapide pour catégoriser les ~5% restants"
+    },
+    {
+      "id": "US-410",
+      "title": "UI: Gestion des règles de catégorisation",
+      "description": "Interface pour créer/modifier les règles de catégorisation",
+      "dependsOn": ["US-407"],
+      "acceptanceCriteria": [
+        "Créer route /budget/rules avec page.svelte",
+        "Liste des règles existantes avec pattern, catégorie cible, priorité",
+        "Bouton 'Ajouter règle' → formulaire: pattern (regex), catégorie (select), priorité",
+        "Bouton 'Tester' → montre les transactions qui matcheraient",
+        "Bouton 'Supprimer' sur chaque règle",
+        "Après ajout/modif, proposer de recatégoriser les transactions"
+      ],
+      "files": ["src/routes/budget/rules/"],
+      "priority": 410,
+      "passes": false,
+      "notes": "Permet d'ajouter des règles custom sans toucher au code"
+    },
+    {
+      "id": "US-411",
+      "title": "Feature: Suggestion de règle depuis transaction",
+      "description": "Proposer de créer une règle quand on catégorise manuellement",
+      "dependsOn": ["US-409", "US-410"],
+      "acceptanceCriteria": [
+        "Après catégorisation manuelle, popup: 'Créer une règle pour les transactions similaires ?'",
+        "Pré-remplir le pattern avec le libellé simplifié (échappé pour regex)",
+        "Bouton 'Créer règle' → POST /api/budget/rules + recatégorisation",
+        "Bouton 'Non merci' → ferme le popup",
+        "Option 'Ne plus demander' persistée en localStorage"
+      ],
+      "files": ["src/lib/components/CategorySuggestion.svelte"],
+      "priority": 411,
+      "passes": false,
+      "notes": "Apprentissage progressif: chaque catégorisation manuelle peut devenir une règle"
+    },
+    {
+      "id": "US-916",
+      "title": "E2E: Tests Budget et Catégorisation",
+      "description": "Tester les flows de budget et catégorisation",
+      "dependsOn": ["US-911", "US-408", "US-409"],
+      "acceptanceCriteria": [
+        "Test: aller sur /budget, vérifier graphique affiché",
+        "Test: changer la période, vérifier mise à jour des montants",
+        "Test: cliquer sur une catégorie, vérifier drill-down",
+        "Test: catégoriser manuellement une transaction depuis /transactions",
+        "Test: créer une règle depuis /budget/rules",
+        "npm run test:e2e passe"
+      ],
+      "files": ["e2e/budget.test.ts"],
+      "priority": 916,
+      "passes": false,
+      "notes": ""
     }
   ]
 }
