@@ -7,7 +7,16 @@
 	let showDeleteModal = $state(false);
 	let showImportModal = $state(false);
 	let importing = $state(false);
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			if (showDeleteModal) showDeleteModal = false;
+			if (showImportModal) showImportModal = false;
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeyDown} />
 
 <div class="container">
 	<div class="page-header">
@@ -71,8 +80,8 @@
 {#if showDeleteModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions a11y_no_noninteractive_element_interactions -->
 	<div class="modal-overlay" role="presentation" onclick={() => showDeleteModal = false}>
-		<div class="modal card" role="dialog" aria-modal="true" tabindex="-1" onclick={(e) => e.stopPropagation()}>
-			<h2>Supprimer ce compte ?</h2>
+		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="delete-account-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
+			<h2 id="delete-account-modal-title">Supprimer ce compte ?</h2>
 			<p>Cette action supprimera également toutes les transactions associées.</p>
 			<form method="POST" action="?/deleteAccount" use:enhance>
 				<div class="modal-actions">
@@ -89,8 +98,8 @@
 {#if showImportModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions a11y_no_noninteractive_element_interactions -->
 	<div class="modal-overlay" role="presentation" onclick={() => showImportModal = false}>
-		<div class="modal card" role="dialog" aria-modal="true" tabindex="-1" onclick={(e) => e.stopPropagation()}>
-			<h2>Importer des transactions</h2>
+		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="import-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
+			<h2 id="import-modal-title">Importer des transactions</h2>
 			<p>Sélectionnez un fichier CSV exporté depuis {data.bank.templateLabel}.</p>
 			<form 
 				method="POST" 

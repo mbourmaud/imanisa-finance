@@ -84,57 +84,59 @@
 		tabindex="-1"
 	/>
 
-	{#if status === 'importing'}
-		<div class="drop-content">
-			<div class="spinner"></div>
-			<span class="drop-text">Import en cours...</span>
-		</div>
-	{:else if status === 'success' && result}
-		<div class="drop-content">
-			<div class="status-icon success-icon">
-				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<polyline points="20 6 9 17 4 12"/>
-				</svg>
+	<div class="drop-status" aria-live="polite" aria-atomic="true">
+		{#if status === 'importing'}
+			<div class="drop-content">
+				<div class="spinner" aria-hidden="true"></div>
+				<span class="drop-text">Import en cours...</span>
 			</div>
-			<div class="result-text">
-				<span class="result-main">{result.imported} transaction{result.imported > 1 ? 's' : ''} importée{result.imported > 1 ? 's' : ''}</span>
-				{#if result.skipped > 0}
-					<span class="result-sub">{result.skipped} ignorée{result.skipped > 1 ? 's' : ''} (doublons)</span>
-				{/if}
+		{:else if status === 'success' && result}
+			<div class="drop-content">
+				<div class="status-icon success-icon" aria-hidden="true">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="20 6 9 17 4 12"/>
+					</svg>
+				</div>
+				<div class="result-text">
+					<span class="result-main">{result.imported} transaction{result.imported > 1 ? 's' : ''} importée{result.imported > 1 ? 's' : ''}</span>
+					{#if result.skipped > 0}
+						<span class="result-sub">{result.skipped} ignorée{result.skipped > 1 ? 's' : ''} (doublons)</span>
+					{/if}
+				</div>
 			</div>
-		</div>
-	{:else if status === 'error' && result}
-		<div class="drop-content">
-			<div class="status-icon error-icon">
-				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="12" cy="12" r="10"/>
-					<line x1="15" y1="9" x2="9" y2="15"/>
-					<line x1="9" y1="9" x2="15" y2="15"/>
-				</svg>
+		{:else if status === 'error' && result}
+			<div class="drop-content" role="alert">
+				<div class="status-icon error-icon" aria-hidden="true">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="10"/>
+						<line x1="15" y1="9" x2="9" y2="15"/>
+						<line x1="9" y1="9" x2="15" y2="15"/>
+					</svg>
+				</div>
+				<div class="result-text">
+					<span class="result-main error-text">Erreur d'import</span>
+					{#each result.errors.slice(0, 2) as error}
+						<span class="result-sub error-text">{error}</span>
+					{/each}
+					{#if result.errors.length > 2}
+						<span class="result-sub error-text">... et {result.errors.length - 2} autre{result.errors.length - 2 > 1 ? 's' : ''}</span>
+					{/if}
+				</div>
 			</div>
-			<div class="result-text">
-				<span class="result-main error-text">Erreur d'import</span>
-				{#each result.errors.slice(0, 2) as error}
-					<span class="result-sub error-text">{error}</span>
-				{/each}
-				{#if result.errors.length > 2}
-					<span class="result-sub error-text">... et {result.errors.length - 2} autre{result.errors.length - 2 > 1 ? 's' : ''}</span>
-				{/if}
+		{:else}
+			<div class="drop-content">
+				<div class="drop-icon" aria-hidden="true">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+						<polyline points="17 8 12 3 7 8"/>
+						<line x1="12" y1="3" x2="12" y2="15"/>
+					</svg>
+				</div>
+				<span class="drop-text">Glissez un fichier CSV ici</span>
+				<span class="drop-sub">ou cliquez pour parcourir</span>
 			</div>
-		</div>
-	{:else}
-		<div class="drop-content">
-			<div class="drop-icon">
-				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-					<polyline points="17 8 12 3 7 8"/>
-					<line x1="12" y1="3" x2="12" y2="15"/>
-				</svg>
-			</div>
-			<span class="drop-text">Glissez un fichier CSV ici</span>
-			<span class="drop-sub">ou cliquez pour parcourir</span>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -184,6 +186,10 @@
 
 	.file-input {
 		display: none;
+	}
+
+	.drop-status {
+		display: contents;
 	}
 
 	.drop-content {

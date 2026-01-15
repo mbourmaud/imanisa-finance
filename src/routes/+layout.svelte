@@ -12,14 +12,16 @@
 
 {#if data.user}
 	<div class="app-layout">
+		<a href="#main-content" class="skip-to-content">Aller au contenu principal</a>
 		<Navigation user={data.user} />
 
-		<main class="main-content">
+		<main id="main-content" class="main-content" tabindex="-1">
 			{@render children()}
 		</main>
 	</div>
 {:else}
-	<main class="main-content-full">
+	<a href="#main-content" class="skip-to-content">Aller au contenu principal</a>
+	<main id="main-content" class="main-content-full" tabindex="-1">
 		{@render children()}
 	</main>
 {/if}
@@ -101,5 +103,38 @@
 		.main-content-full {
 			animation: none;
 		}
+	}
+
+	/* ─────────────────────────────────────────────────────────────────────────────
+	   Skip to content link - Accessibility
+	   Visible only on focus for keyboard navigation
+	   ───────────────────────────────────────────────────────────────────────────── */
+	.skip-to-content {
+		position: fixed;
+		top: var(--spacing-4);
+		left: 50%;
+		transform: translateX(-50%) translateY(-200%);
+		z-index: 1000;
+		background: var(--color-bg-elevated);
+		color: var(--color-primary-500);
+		padding: var(--spacing-3) var(--spacing-6);
+		border-radius: var(--radius-lg);
+		border: 2px solid var(--color-primary-500);
+		font-weight: var(--font-weight-semibold);
+		font-size: var(--font-size-sm);
+		text-decoration: none;
+		box-shadow: var(--shadow-lg);
+		transition: transform var(--transition-fast);
+	}
+
+	.skip-to-content:focus {
+		transform: translateX(-50%) translateY(0);
+		outline: none;
+	}
+
+	/* Remove focus outline from main when navigated to via skip link */
+	.main-content:focus,
+	.main-content-full:focus {
+		outline: none;
 	}
 </style>

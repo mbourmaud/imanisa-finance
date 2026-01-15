@@ -4,7 +4,16 @@
 	let { data, form } = $props();
 	let showDeleteModal = $state(false);
 	let showAddAccountModal = $state(false);
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			if (showDeleteModal) showDeleteModal = false;
+			if (showAddAccountModal) showAddAccountModal = false;
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeyDown} />
 
 <div class="container">
 	<div class="page-header">
@@ -64,8 +73,8 @@
 {#if showDeleteModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions a11y_no_noninteractive_element_interactions -->
 	<div class="modal-overlay" role="presentation" onclick={() => showDeleteModal = false}>
-		<div class="modal card" role="dialog" aria-modal="true" tabindex="-1" onclick={(e) => e.stopPropagation()}>
-			<h2>Supprimer cette banque ?</h2>
+		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
+			<h2 id="delete-modal-title">Supprimer cette banque ?</h2>
 			<p>Cette action supprimera également tous les comptes et transactions associés.</p>
 			<form method="POST" action="?/deleteBank" use:enhance>
 				<div class="modal-actions">
@@ -82,8 +91,8 @@
 {#if showAddAccountModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions a11y_no_noninteractive_element_interactions -->
 	<div class="modal-overlay" role="presentation" onclick={() => showAddAccountModal = false}>
-		<div class="modal card" role="dialog" aria-modal="true" tabindex="-1" onclick={(e) => e.stopPropagation()}>
-			<h2>Ajouter un compte</h2>
+		<div class="modal card" role="dialog" aria-modal="true" aria-labelledby="add-account-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
+			<h2 id="add-account-modal-title">Ajouter un compte</h2>
 			<form method="POST" action="?/addAccount" use:enhance>
 				{#if form?.accountError}
 					<div class="error-message">{form.accountError}</div>
