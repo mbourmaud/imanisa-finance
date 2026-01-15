@@ -966,7 +966,7 @@
       ],
       "files": ["src/scripts/seed-categories.ts"],
       "priority": 403,
-      "passes": false,
+      "passes": true,
       "notes": "~15% des transactions seront catégorisées par regex (principalement CM qui n'a pas de catégories)"
     },
     {

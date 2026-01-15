@@ -1277,3 +1277,40 @@
 - Cast execute() result rows with `as unknown as Type` for TypeScript
 
 ---
+
+## [Iteration 39] 2026-01-15 - US-403: Seed - Règles de catégorisation regex
+
+### What was implemented
+- Added 32 regex categorization rules to seed-categories.ts for auto-categorization
+- Rules organized by priority (10-389) to resolve conflicts deterministically:
+  - Lower priority number = higher precedence (checked first)
+  - Categories use 10-point ranges (e.g., 10-19 for courses, 20-29 for restaurants)
+- Categories covered:
+  - **Alimentation** (p10-59): Courses (supermarkets), Restaurant, Fast-food, Bar/Café, Livraison
+  - **Transport** (p60-139): Carburant, Péage, Parking, Transports en commun, Taxi/VTC, Avion, Entretien auto, Location voiture
+  - **Logement** (p140-189): Charges (utilities), Internet/TV, Assurance habitation, Travaux, Ameublement
+  - **Loisirs** (p190-249): Abonnements (streaming), Sport, Culture, Jeux, Shopping, High-tech
+  - **Santé** (p250-299): Pharmacie, Médecin, Dentiste, Opticien, Mutuelle
+  - **Banque** (p300-329): Frais bancaires, Retrait DAB, Intérêts
+  - **Revenus** (p330-359): Salaire, Remboursement, Aides/Allocations
+  - **Impôts** (p360-369): DGFIP, taxes
+  - **Assurance auto** (p370-379)
+  - **Épargne** (p380-389): Livret A, LDDS, PEL
+- Created `seedRegexRules()` function that inserts rules with source_filter=null (applies to all banks)
+- Updated `verifySeededData()` to show bank rules vs regex rules counts separately
+- Special regex patterns:
+  - Negative lookahead `uber(?!\\s*eats)` to distinguish Uber rides from Uber Eats
+  - Pattern `amazon(?!\\s*prime)` to categorize Amazon shopping vs Amazon Prime subscription
+
+### Files changed
+- src/scripts/seed-categories.ts (added ~300 lines for regex rules and seedRegexRules function)
+
+### Learnings for future iterations
+- Regex rules use source_filter=null to apply across all banks (unlike bank mappings which use source_filter='caisse_epargne' or 'boursorama')
+- Priority system: bank category mappings have priority 100, regex rules use 10-389 range
+- Use negative lookahead `(?!pattern)` to exclude specific matches (e.g., Uber vs Uber Eats)
+- Rule ID pattern: `rule-regex-{n}` for regex rules (vs `rule-ce-{n}` and `rule-bourso-{n}` for bank mappings)
+- Regex patterns are case-insensitive by default when used in AutoCategorizationService
+- Total rules after seed: ~65 bank mappings + 32 regex rules = ~97 rules
+
+---
