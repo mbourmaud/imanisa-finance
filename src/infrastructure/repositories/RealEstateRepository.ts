@@ -152,20 +152,20 @@ function mapPropertyChargeRow(row: typeof schema.propertyCharges.$inferSelect): 
 // =====================================================
 
 export async function getAllEntities(): Promise<Entity[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db.select().from(schema.entities).orderBy(schema.entities.name);
 	return result.map(mapEntityRow);
 }
 
 export async function getEntityById(id: string): Promise<Entity | null> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db.select().from(schema.entities).where(eq(schema.entities.id, id)).limit(1);
 	const row = result[0];
 	return row ? mapEntityRow(row) : null;
 }
 
 export async function getEntitiesByType(type: EntityType): Promise<Entity[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db
 		.select()
 		.from(schema.entities)
@@ -175,7 +175,7 @@ export async function getEntitiesByType(type: EntityType): Promise<Entity[]> {
 }
 
 export async function createEntity(entity: Omit<Entity, 'createdAt'>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.insert(schema.entities).values({
 		id: entity.id,
 		name: entity.name,
@@ -193,7 +193,7 @@ export async function createEntity(entity: Omit<Entity, 'createdAt'>): Promise<v
 }
 
 export async function updateEntity(id: string, entity: Partial<Entity>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	const updates: Partial<typeof schema.entities.$inferInsert> = {};
 
 	if (entity.name !== undefined) updates.name = entity.name;
@@ -212,7 +212,7 @@ export async function updateEntity(id: string, entity: Partial<Entity>): Promise
 }
 
 export async function deleteEntity(id: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.delete(schema.entities).where(eq(schema.entities.id, id));
 }
 
@@ -221,7 +221,7 @@ export async function deleteEntity(id: string): Promise<void> {
 // =====================================================
 
 export async function getEntitySharesBySci(sciId: string): Promise<EntityShare[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db
 		.select()
 		.from(schema.entityShares)
@@ -230,7 +230,7 @@ export async function getEntitySharesBySci(sciId: string): Promise<EntityShare[]
 }
 
 export async function createEntityShare(share: Omit<EntityShare, 'createdAt'>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.insert(schema.entityShares).values({
 		id: share.id,
 		sciId: share.sciId,
@@ -241,7 +241,7 @@ export async function createEntityShare(share: Omit<EntityShare, 'createdAt'>): 
 }
 
 export async function deleteEntityShare(id: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.delete(schema.entityShares).where(eq(schema.entityShares.id, id));
 }
 
@@ -250,13 +250,13 @@ export async function deleteEntityShare(id: string): Promise<void> {
 // =====================================================
 
 export async function getAllProperties(): Promise<Property[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db.select().from(schema.reProperties).orderBy(schema.reProperties.name);
 	return result.map(mapPropertyRow);
 }
 
 export async function getPropertyById(id: string): Promise<Property | null> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db
 		.select()
 		.from(schema.reProperties)
@@ -267,7 +267,7 @@ export async function getPropertyById(id: string): Promise<Property | null> {
 }
 
 export async function createProperty(property: Omit<Property, 'createdAt' | 'updatedAt'>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.insert(schema.reProperties).values({
 		id: property.id,
 		name: property.name,
@@ -302,7 +302,7 @@ export async function createProperty(property: Omit<Property, 'createdAt' | 'upd
 }
 
 export async function updateProperty(id: string, property: Partial<Property>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	const updates: Record<string, unknown> = {};
 
 	if (property.name !== undefined) updates.name = property.name;
@@ -321,7 +321,7 @@ export async function updateProperty(id: string, property: Partial<Property>): P
 }
 
 export async function deleteProperty(id: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.delete(schema.reProperties).where(eq(schema.reProperties.id, id));
 }
 
@@ -330,7 +330,7 @@ export async function deleteProperty(id: string): Promise<void> {
 // =====================================================
 
 export async function getPropertyOwnership(propertyId: string): Promise<PropertyOwnership[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db
 		.select()
 		.from(schema.propertyOwnership)
@@ -339,7 +339,7 @@ export async function getPropertyOwnership(propertyId: string): Promise<Property
 }
 
 export async function createPropertyOwnership(ownership: Omit<PropertyOwnership, 'createdAt'>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.insert(schema.propertyOwnership).values({
 		id: ownership.id,
 		propertyId: ownership.propertyId,
@@ -352,7 +352,7 @@ export async function createPropertyOwnership(ownership: Omit<PropertyOwnership,
 }
 
 export async function deletePropertyOwnership(id: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.delete(schema.propertyOwnership).where(eq(schema.propertyOwnership.id, id));
 }
 
@@ -361,20 +361,20 @@ export async function deletePropertyOwnership(id: string): Promise<void> {
 // =====================================================
 
 export async function getAllLoans(): Promise<Loan[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db.select().from(schema.reLoans).orderBy(schema.reLoans.name);
 	return result.map(mapLoanRow);
 }
 
 export async function getLoanById(id: string): Promise<Loan | null> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db.select().from(schema.reLoans).where(eq(schema.reLoans.id, id)).limit(1);
 	const row = result[0];
 	return row ? mapLoanRow(row) : null;
 }
 
 export async function getLoanByPropertyId(propertyId: string): Promise<Loan | null> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db
 		.select()
 		.from(schema.reLoans)
@@ -385,7 +385,7 @@ export async function getLoanByPropertyId(propertyId: string): Promise<Loan | nu
 }
 
 export async function createLoan(loan: Omit<Loan, 'createdAt' | 'updatedAt'>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.insert(schema.reLoans).values({
 		id: loan.id,
 		name: loan.name,
@@ -407,7 +407,7 @@ export async function createLoan(loan: Omit<Loan, 'createdAt' | 'updatedAt'>): P
 }
 
 export async function updateLoanBalance(id: string, balance: number, date: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db
 		.update(schema.reLoans)
 		.set({
@@ -419,7 +419,7 @@ export async function updateLoanBalance(id: string, balance: number, date: strin
 }
 
 export async function deleteLoan(id: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.delete(schema.reLoans).where(eq(schema.reLoans.id, id));
 }
 
@@ -428,7 +428,7 @@ export async function deleteLoan(id: string): Promise<void> {
 // =====================================================
 
 export async function getLoanResponsibility(loanId: string): Promise<LoanResponsibility[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db
 		.select()
 		.from(schema.loanResponsibility)
@@ -437,7 +437,7 @@ export async function getLoanResponsibility(loanId: string): Promise<LoanRespons
 }
 
 export async function createLoanResponsibility(responsibility: Omit<LoanResponsibility, 'createdAt'>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.insert(schema.loanResponsibility).values({
 		id: responsibility.id,
 		loanId: responsibility.loanId,
@@ -447,7 +447,7 @@ export async function createLoanResponsibility(responsibility: Omit<LoanResponsi
 }
 
 export async function deleteLoanResponsibility(id: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.delete(schema.loanResponsibility).where(eq(schema.loanResponsibility.id, id));
 }
 
@@ -456,7 +456,7 @@ export async function deleteLoanResponsibility(id: string): Promise<void> {
 // =====================================================
 
 export async function getPropertyCharges(propertyId: string): Promise<PropertyCharge[]> {
-	const db = getDb();
+	const db = await getDb();
 	const result = await db
 		.select()
 		.from(schema.propertyCharges)
@@ -465,7 +465,7 @@ export async function getPropertyCharges(propertyId: string): Promise<PropertyCh
 }
 
 export async function createPropertyCharge(charge: Omit<PropertyCharge, 'createdAt'>): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.insert(schema.propertyCharges).values({
 		id: charge.id,
 		propertyId: charge.propertyId,
@@ -477,7 +477,7 @@ export async function createPropertyCharge(charge: Omit<PropertyCharge, 'created
 }
 
 export async function deletePropertyCharge(id: string): Promise<void> {
-	const db = getDb();
+	const db = await getDb();
 	await db.delete(schema.propertyCharges).where(eq(schema.propertyCharges.id, id));
 }
 
@@ -521,7 +521,7 @@ export async function getPropertyWithDetails(id: string): Promise<PropertyWithDe
 }
 
 export async function getRealEstateSummary(): Promise<RealEstateSummary> {
-	const db = getDb();
+	const db = await getDb();
 
 	// Total value from all properties
 	const valueResult = await db

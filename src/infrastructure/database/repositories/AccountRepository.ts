@@ -9,7 +9,7 @@ import { getDb, schema } from '../drizzle';
 
 export class AccountRepositoryImpl implements AccountRepository {
 	async findById(id: UniqueId): Promise<Account | null> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.accounts)
@@ -22,7 +22,7 @@ export class AccountRepositoryImpl implements AccountRepository {
 	}
 
 	async findByBankId(bankId: UniqueId): Promise<Account[]> {
-		const db = getDb();
+		const db = await getDb();
 		const result = await db
 			.select()
 			.from(schema.accounts)
@@ -35,7 +35,7 @@ export class AccountRepositoryImpl implements AccountRepository {
 	}
 
 	async save(account: Account): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.insert(schema.accounts)
 			.values({
@@ -63,7 +63,7 @@ export class AccountRepositoryImpl implements AccountRepository {
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db.delete(schema.accounts).where(eq(schema.accounts.id, id.toString()));
 	}
 

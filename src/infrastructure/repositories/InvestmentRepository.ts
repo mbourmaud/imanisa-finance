@@ -165,7 +165,7 @@ export class InvestmentRepositoryImpl {
 	// =====================================================
 
 	async findAllSources(): Promise<InvestmentSource[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentSources)
@@ -174,7 +174,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async findSourceById(id: UniqueId): Promise<InvestmentSource | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentSources)
@@ -185,7 +185,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async findSourcesByOwnerEntityId(ownerEntityId: UniqueId): Promise<InvestmentSource[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentSources)
@@ -195,7 +195,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async saveSource(source: InvestmentSource): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		const data = sourceDomainToPersistence(source);
 
 		const existing = await this.findSourceById(source.id);
@@ -219,7 +219,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async deleteSource(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.delete(schema.investmentSources)
 			.where(eq(schema.investmentSources.id, id.toString()));
@@ -230,7 +230,7 @@ export class InvestmentRepositoryImpl {
 	// =====================================================
 
 	async findAllPositions(): Promise<InvestmentPosition[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentPositions)
@@ -239,7 +239,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async findPositionById(id: UniqueId): Promise<InvestmentPosition | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentPositions)
@@ -250,7 +250,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async findPositionsBySourceId(sourceId: UniqueId): Promise<InvestmentPosition[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentPositions)
@@ -263,7 +263,7 @@ export class InvestmentRepositoryImpl {
 		sourceId: UniqueId,
 		symbol: string
 	): Promise<InvestmentPosition | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentPositions)
@@ -279,7 +279,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async savePosition(position: InvestmentPosition): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		const data = positionDomainToPersistence(position);
 
 		const existing = await this.findPositionById(position.id);
@@ -305,14 +305,14 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async deletePosition(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.delete(schema.investmentPositions)
 			.where(eq(schema.investmentPositions.id, id.toString()));
 	}
 
 	async deletePositionsBySourceId(sourceId: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.delete(schema.investmentPositions)
 			.where(eq(schema.investmentPositions.sourceId, sourceId.toString()));
@@ -323,7 +323,7 @@ export class InvestmentRepositoryImpl {
 	// =====================================================
 
 	async findAllTransactions(): Promise<InvestmentTransaction[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentTransactions)
@@ -332,7 +332,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async findTransactionById(id: UniqueId): Promise<InvestmentTransaction | null> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentTransactions)
@@ -343,7 +343,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async findTransactionsBySourceId(sourceId: UniqueId): Promise<InvestmentTransaction[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentTransactions)
@@ -353,7 +353,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async findTransactionsBySymbol(symbol: string): Promise<InvestmentTransaction[]> {
-		const db = getDb();
+		const db = await getDb();
 		const rows = await db
 			.select()
 			.from(schema.investmentTransactions)
@@ -363,7 +363,7 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async saveTransaction(transaction: InvestmentTransaction): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		const data = transactionDomainToPersistence(transaction);
 
 		const existing = await this.findTransactionById(transaction.id);
@@ -387,14 +387,14 @@ export class InvestmentRepositoryImpl {
 	}
 
 	async deleteTransaction(id: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.delete(schema.investmentTransactions)
 			.where(eq(schema.investmentTransactions.id, id.toString()));
 	}
 
 	async deleteTransactionsBySourceId(sourceId: UniqueId): Promise<void> {
-		const db = getDb();
+		const db = await getDb();
 		await db
 			.delete(schema.investmentTransactions)
 			.where(eq(schema.investmentTransactions.sourceId, sourceId.toString()));
