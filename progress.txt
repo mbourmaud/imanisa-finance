@@ -1698,3 +1698,28 @@
 - BankTemplate enum values: CAISSE_EPARGNE, CIC, CREDIT_MUTUEL, REVOLUT, BOURSE_DIRECT, LINXEA, BINANCE, OTHER (not BOURSORAMA)
 - TransactionType enum values: INCOME, EXPENSE, TRANSFER (not DEBIT)
 - Money amounts accessed via .amount.amount (Money wraps the numeric value)
+
+---
+
+## [Iteration 49] 2026-01-15 - US-904: Tests Use Cases (integration with mocked dependencies)
+
+### What was implemented
+- Created integration tests for 3 use cases using mocked dependencies (35 tests total):
+  - ImportTransactionsUseCase.test.ts: 8 tests (data source not found, no linked account, parse CSV, dedup, invalid CSV, save errors, batch dedup)
+  - ImportInvestmentsUseCase.test.ts: 9 tests (source not found, PEA/AV positions, crypto transactions, source type handling)
+  - CalculateCryptoPositionsUseCase.test.ts: 18 tests (PRU calculation, gain/loss, sell handling, multi-symbol, API mocking)
+- Used vi.mocked() for repository mocking
+- Mocked global.fetch for CoinGecko API testing
+- Tests verify business logic without requiring real database
+
+### Files changed
+- src/application/import/ImportTransactionsUseCase.test.ts (new)
+- src/application/investment/ImportInvestmentsUseCase.test.ts (new)
+- src/application/investment/CalculateCryptoPositionsUseCase.test.ts (new)
+
+### Learnings for future iterations
+- Use enum values (ParserKey.CREDIT_MUTUEL) not string literals ('credit_mutuel') for type safety
+- DataSource.create() takes linkedAccountId as optional param, not linkAccount() method
+- CreditMutuelParser returns empty array for invalid CSV (doesn't throw)
+- Use new Date(year, month, day) for date comparisons in dedup tests (timezone consistency)
+- global.fetch must be mocked in beforeEach and restored in afterEach for API testing
