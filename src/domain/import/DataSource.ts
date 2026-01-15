@@ -11,6 +11,8 @@ interface DataSourceProps {
 	type: DataSourceType;
 	/** Owner entity ID (references entities table - person, SCI, joint) */
 	ownerEntityId: UniqueId;
+	/** Linked account ID (references accounts table - where transactions are imported) */
+	linkedAccountId: UniqueId | null;
 	/** URL to access the bank's export page */
 	url: string;
 	/** CSV format identifier */
@@ -38,6 +40,10 @@ export class DataSource extends Entity<DataSourceProps> {
 
 	get ownerEntityId(): UniqueId {
 		return this.props.ownerEntityId;
+	}
+
+	get linkedAccountId(): UniqueId | null {
+		return this.props.linkedAccountId;
 	}
 
 	get url(): string {
@@ -72,6 +78,7 @@ export class DataSource extends Entity<DataSourceProps> {
 			name: string;
 			type: DataSourceType;
 			ownerEntityId: UniqueId;
+			linkedAccountId?: UniqueId | null;
 			url: string;
 			format: string;
 			parserKey: ParserKey;
@@ -100,6 +107,7 @@ export class DataSource extends Entity<DataSourceProps> {
 					name: props.name.trim(),
 					type: props.type,
 					ownerEntityId: props.ownerEntityId,
+					linkedAccountId: props.linkedAccountId ?? null,
 					url: props.url.trim(),
 					format: props.format,
 					parserKey: props.parserKey,
@@ -116,6 +124,7 @@ export class DataSource extends Entity<DataSourceProps> {
 			name: string;
 			type: DataSourceType;
 			ownerEntityId: UniqueId;
+			linkedAccountId: UniqueId | null;
 			url: string;
 			format: string;
 			parserKey: ParserKey;
@@ -130,6 +139,7 @@ export class DataSource extends Entity<DataSourceProps> {
 					name: props.name,
 					type: props.type,
 					ownerEntityId: props.ownerEntityId,
+					linkedAccountId: props.linkedAccountId,
 					url: props.url,
 					format: props.format,
 					parserKey: props.parserKey,

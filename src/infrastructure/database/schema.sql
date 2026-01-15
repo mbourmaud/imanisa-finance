@@ -290,12 +290,14 @@ CREATE TABLE IF NOT EXISTS data_sources (
     name TEXT NOT NULL,
     type TEXT NOT NULL,
     owner_entity_id TEXT NOT NULL,
+    linked_account_id TEXT,
     url TEXT NOT NULL,
     format TEXT NOT NULL,
     parser_key TEXT NOT NULL,
     last_sync_at TEXT,
     created_at TEXT DEFAULT (datetime('now')),
-    FOREIGN KEY (owner_entity_id) REFERENCES entities(id) ON DELETE CASCADE
+    FOREIGN KEY (owner_entity_id) REFERENCES entities(id) ON DELETE CASCADE,
+    FOREIGN KEY (linked_account_id) REFERENCES accounts(id) ON DELETE SET NULL
 );
 
 -- =====================================================
@@ -426,3 +428,4 @@ CREATE INDEX IF NOT EXISTS idx_property_charges_property_id ON property_charges(
 -- Import Module indexes
 CREATE INDEX IF NOT EXISTS idx_data_sources_owner_entity_id ON data_sources(owner_entity_id);
 CREATE INDEX IF NOT EXISTS idx_data_sources_parser_key ON data_sources(parser_key);
+CREATE INDEX IF NOT EXISTS idx_data_sources_linked_account_id ON data_sources(linked_account_id);

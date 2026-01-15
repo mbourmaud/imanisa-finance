@@ -353,6 +353,7 @@ export const dataSources = sqliteTable(
 		ownerEntityId: text('owner_entity_id')
 			.notNull()
 			.references(() => entities.id, { onDelete: 'cascade' }),
+		linkedAccountId: text('linked_account_id').references(() => accounts.id, { onDelete: 'set null' }),
 		url: text('url').notNull(),
 		format: text('format').notNull(),
 		parserKey: text('parser_key').notNull(),
@@ -361,7 +362,8 @@ export const dataSources = sqliteTable(
 	},
 	(table) => [
 		index('idx_data_sources_owner_entity_id').on(table.ownerEntityId),
-		index('idx_data_sources_parser_key').on(table.parserKey)
+		index('idx_data_sources_parser_key').on(table.parserKey),
+		index('idx_data_sources_linked_account_id').on(table.linkedAccountId)
 	]
 );
 
@@ -540,5 +542,6 @@ export const investmentOrdersRelations = relations(investmentOrders, ({ one }) =
 }));
 
 export const dataSourcesRelations = relations(dataSources, ({ one }) => ({
-	ownerEntity: one(entities, { fields: [dataSources.ownerEntityId], references: [entities.id] })
+	ownerEntity: one(entities, { fields: [dataSources.ownerEntityId], references: [entities.id] }),
+	linkedAccount: one(accounts, { fields: [dataSources.linkedAccountId], references: [accounts.id] })
 }));
