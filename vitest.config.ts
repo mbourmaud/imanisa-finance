@@ -35,7 +35,8 @@ export default defineConfig({
 			'@domain': resolve('./src/domain'),
 			'@application': resolve('./src/application'),
 			'@infrastructure': resolve('./src/infrastructure'),
-			'@lib': resolve('./src/lib')
+			'@lib': resolve('./src/lib'),
+			'@tests': resolve('./src/tests')
 		}
 	}
 });
