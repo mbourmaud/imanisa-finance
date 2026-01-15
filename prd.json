@@ -944,7 +944,7 @@
       ],
       "files": ["src/scripts/seed-categories.ts"],
       "priority": 402,
-      "passes": false,
+      "passes": true,
       "notes": "Hiérarchie à 2 niveaux max: Parent > Enfant"
     },
     {

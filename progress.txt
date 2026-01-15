@@ -1249,3 +1249,31 @@
 - Transaction-to-category is 1:1 (transactionId is primary key in transaction_categories)
 
 ---
+
+## [Iteration 38] 2026-01-15 - US-402: Seed - Catégories de base hiérarchiques
+
+### What was implemented
+- Created comprehensive seed-categories.ts script:
+  - 10 root (parent) categories: Logement, Alimentation, Transport, Loisirs, Sante, Revenus, Epargne, Impots, Banque, Autre
+  - 62 sub-categories organized by parent (e.g., Loyer, Charges, Restaurant, Courses, Carburant, etc.)
+  - Each category has: stable ID (cat-*), name, icon, color
+  - Sub-categories inherit parent's color
+- Bank category mappings stored as category_rules:
+  - ~20 Caisse d'Epargne mappings (source_filter: caisse_epargne)
+  - ~25 Boursorama mappings (source_filter: boursorama)
+  - Mappings use exact match regex pattern with escapeRegex() helper
+  - All rules have priority 100 (bank-provided categories)
+- Script includes verification function showing category hierarchy
+
+### Files changed
+- src/scripts/seed-categories.ts (new)
+
+### Learnings for future iterations
+- Bank category mappings: store as category_rules with source_filter and exact match pattern
+- Use escapeRegex() helper to escape special regex chars in bank category names
+- Stable category IDs (cat-logement, cat-courses) allow easy referencing in code
+- Sub-categories inherit parent color for visual consistency in UI
+- `INSERT OR REPLACE` allows re-running seed script safely
+- Cast execute() result rows with `as unknown as Type` for TypeScript
+
+---
