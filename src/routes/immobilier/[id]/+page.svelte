@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { PropertyWithDetails, Entity } from '@lib/types/real-estate';
+	import { AmortizationTable } from '@lib/components/real-estate';
+	import { calculateAmortizationSchedule, getCurrentMonthIndex } from '@lib/utils/loan-calculator';
 
 	interface PageData {
 		property: PropertyWithDetails;
@@ -113,6 +115,10 @@
 	const loan = $derived(data.property.loan);
 	const amountRepaid = $derived(loan ? loan.principalAmount - (loan.currentBalance ?? 0) : 0);
 	const repaidPercent = $derived(loan ? (amountRepaid / loan.principalAmount) : 0);
+
+	// Calculate amortization schedule
+	const amortizationSchedule = $derived(loan ? calculateAmortizationSchedule(loan) : []);
+	const currentMonthIndex = $derived(loan ? getCurrentMonthIndex(amortizationSchedule) : -1);
 </script>
 
 <div class="property-detail-page">
@@ -339,6 +345,13 @@
 				</div>
 			</div>
 		</section>
+
+		<!-- Section Tableau d'amortissement -->
+		{#if amortizationSchedule.length > 0}
+			<section class="card amortization-section">
+				<AmortizationTable schedule={amortizationSchedule} currentMonthIndex={currentMonthIndex} />
+			</section>
+		{/if}
 	{/if}
 
 	<!-- Section Propriétaires -->
@@ -438,7 +451,8 @@
 	.info-section { animation-delay: 0.05s; }
 	.value-section { animation-delay: 0.1s; }
 	.loan-section { animation-delay: 0.15s; }
-	.owners-section { animation-delay: 0.2s; }
+	.amortization-section { animation-delay: 0.2s; }
+	.owners-section { animation-delay: 0.25s; }
 
 	.section-title {
 		display: flex;
