@@ -1459,3 +1459,50 @@
 - Run tests with: `npm run test` (single run) or `npm run test:watch` (watch mode)
 
 ---
+
+## [Iteration 44] 2026-01-15 - US-408: UI Page Budget avec répartition par catégorie
+
+### What was implemented
+- Created `/budget` route with comprehensive budget visualization:
+  - `page.server.ts` - loads budget summary data grouped by parent categories
+  - `page.svelte` - full UI with KPIs, chart, and category breakdown
+- Period selector with 4 options:
+  - Current month (default), previous month, quarter, year
+  - URL-based navigation for bookmarkable period selection
+- KPI cards showing:
+  - Total expenses (red), total income (green), net balance (green/red)
+  - Dynamic coloring based on positive/negative values
+- DoughnutChart integration:
+  - Uses existing Chart.js component
+  - Shows top 8 categories by amount
+  - Toggle between expenses and income view
+- Category breakdown list:
+  - Categories grouped by parent with expandable drill-down
+  - Progress bar showing percentage of total
+  - Amount and percentage for each category
+  - Child categories shown when expanded
+- Uncategorized section:
+  - Shows count and total of uncategorized transactions
+  - Link to /transactions?uncategorized=true for review
+- Mobile-responsive design:
+  - Stacked layout on mobile
+  - Full-width period buttons
+  - Collapsible categories
+- Added Budget link with pie-chart icon to navigation sidebar
+
+### Files changed
+- src/routes/budget/+page.server.ts (new)
+- src/routes/budget/+page.svelte (new)
+- src/lib/components/Navigation.svelte (added Budget nav item with pie-chart icon)
+- prd.json (marked US-408 as passes: true)
+
+### Learnings for future iterations
+- Budget page uses `goto()` with `replaceState: true` for period changes (no history stack)
+- Parent category aggregation: loop through child categories, accumulate totals to parent
+- `$derived.by()` for computed values needing function body (chartData with slice/map)
+- Chart data limited to top 8 categories to keep legend readable
+- Expandable state managed with `Set<string>` for category IDs
+- View toggle between expenses/income using simple `$state<'expenses' | 'income'>()`
+- Category bar uses inline style with percentage width and category color
+
+---
