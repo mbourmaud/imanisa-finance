@@ -782,7 +782,7 @@
       ],
       "files": ["src/app.html", "src/app.css", "src/lib/stores/theme.ts"],
       "priority": 302,
-      "passes": false,
+      "passes": true,
       "notes": "Dark mode = color-scheme: dark sur html + theme-color meta"
     },
     {
