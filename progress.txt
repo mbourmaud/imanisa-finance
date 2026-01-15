@@ -820,6 +820,42 @@
 
 ---
 
+## [Iteration 28] 2026-01-15 - US-209: UI: Page Investissements
+
+### What was implemented
+- Created `/investissements` route with comprehensive investment portfolio view:
+  - `page.server.ts` - loads grouped positions and summary from InvestmentRepository
+  - `page.svelte` - full UI with KPIs, positions list, and import zones
+- Displayed 3 KPIs in card layout:
+  - Total investi - with position count
+  - Valorisation actuelle - current portfolio value
+  - Plus/Moins-value - gain/loss in € and % with dynamic coloring
+- Positions grouped by investment source (PEA, AV, Crypto):
+  - Source header shows icon, name, type, owner badge, last sync date, and subtotal
+  - Each position displays symbol, ISIN, quantity, PRU, current value, and gain/loss
+- Color coding: green for gains, red for losses (using CSS classes .positive/.negative)
+- Drag & drop import zone per source for XLSX files:
+  - Supports click-to-browse and drag-and-drop
+  - Shows importing spinner, success message, or error
+  - Link to open source URL for downloading export file
+- Updated navigation from `/investments` to `/investissements`
+- Full responsive design for mobile (stack layout, collapsible sections)
+
+### Files changed
+- src/routes/investissements/+page.server.ts (new)
+- src/routes/investissements/+page.svelte (new)
+- src/routes/+layout.svelte (updated nav link)
+
+### Learnings for future iterations
+- Investment page follows same patterns as /import page for drag & drop
+- GroupedPositions type includes source info + positions array + subtotal calculations
+- InvestmentPosition.investedAmount is a computed getter (quantity * avgBuyPrice)
+- For XLSX imports, accept both .xlsx and .xls extensions plus .csv for flexibility
+- Navigation label shortened to "Invest." to fit mobile bottom bar
+- Color coding uses both CSS classes (.positive/.negative) and inline styles for flexibility
+
+---
+
 ## [Iteration 27] 2026-01-15 - US-208: API: Endpoints Investissements
 
 ### What was implemented

@@ -522,7 +522,7 @@
       ],
       "files": ["src/routes/investissements/", "src/lib/components/investments/"],
       "priority": 209,
-      "passes": false,
+      "passes": true,
       "notes": "Afficher clairement la performance de chaque ligne et du portefeuille global"
     },
     {
