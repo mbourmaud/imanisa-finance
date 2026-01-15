@@ -1,7 +1,5 @@
 import type { PageServerLoad } from './$types';
-import Database from 'better-sqlite3';
-
-const DB_PATH = './data/imanisa.db';
+import { execute } from '@infrastructure/database/turso';
 
 interface Owner {
 	id: string;
@@ -27,57 +25,29 @@ interface Transaction {
 }
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	let db: Database.Database | null = null;
-
 	const page = parseInt(url.searchParams.get('page') || '1', 10);
 	const limit = 50;
 	const offset = (page - 1) * limit;
 
 	try {
-		db = new Database(DB_PATH, { readonly: true });
-	} catch {
-		return {
-			user: locals.user,
-			transactions: [],
-			totalCount: 0,
-			page,
-			totalPages: 0,
-			monthlyIncome: 0,
-			monthlyExpense: 0,
-			monthlyBalance: 0
-		};
-	}
-
-	try {
-		const owners = db.prepare('SELECT * FROM owners').all() as Owner[];
-		const ownerMap = new Map(owners.map((o) => [o.id, o]));
-		const accounts = db.prepare('SELECT * FROM accounts').all() as Account[];
-
-		const totalCountResult = db.prepare('SELECT COUNT(*) as count FROM transactions').get() as {
-			count: number;
-		};
-		const totalCount = totalCountResult.count;
-		const totalPages = Math.ceil(totalCount / limit);
-
-		const transactions = db
-			.prepare(
-				`
-			SELECT * FROM transactions 
-			ORDER BY date DESC
-			LIMIT ? OFFSET ?
-		`
-			)
-			.all(limit, offset) as Transaction[];
-
 		const currentMonth = new Date().toISOString().slice(0, 7);
-		const monthlyTransactions = db
-			.prepare(
-				`
-			SELECT * FROM transactions 
-			WHERE date LIKE ? || '%'
-		`
-			)
-			.all(currentMonth) as Transaction[];
+
+		const [ownersResult, accountsResult, totalCountResult, transactionsResult, monthlyTransactionsResult] = await Promise.all([
+			execute('SELECT * FROM owners'),
+			execute('SELECT * FROM accounts'),
+			execute('SELECT COUNT(*) as count FROM transactions'),
+			execute('SELECT * FROM transactions ORDER BY date DESC LIMIT ? OFFSET ?', [limit, offset]),
+			execute(`SELECT * FROM transactions WHERE date LIKE ? || '%'`, [currentMonth])
+		]);
+
+		const owners = ownersResult.rows as unknown as Owner[];
+		const ownerMap = new Map(owners.map((o) => [o.id, o]));
+		const accounts = accountsResult.rows as unknown as Account[];
+		const totalCountRow = totalCountResult.rows[0] as unknown as { count: number };
+		const totalCount = totalCountRow.count;
+		const totalPages = Math.ceil(totalCount / limit);
+		const transactions = transactionsResult.rows as unknown as Transaction[];
+		const monthlyTransactions = monthlyTransactionsResult.rows as unknown as Transaction[];
 
 		const monthlyIncome = monthlyTransactions
 			.filter((t) => t.type === 'income')
@@ -108,7 +78,16 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			monthlyExpense,
 			monthlyBalance: monthlyIncome - monthlyExpense
 		};
-	} finally {
-		db?.close();
+	} catch {
+		return {
+			user: locals.user,
+			transactions: [],
+			totalCount: 0,
+			page,
+			totalPages: 0,
+			monthlyIncome: 0,
+			monthlyExpense: 0,
+			monthlyBalance: 0
+		};
 	}
 };

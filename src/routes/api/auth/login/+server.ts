@@ -9,7 +9,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'Username et PIN requis' }, { status: 400 });
 	}
 
-	const user = validatePin(username, pin);
+	const user = await validatePin(username, pin);
 
 	if (!user) {
 		return json({ error: 'Code PIN incorrect' }, { status: 401 });

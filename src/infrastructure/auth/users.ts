@@ -1,7 +1,5 @@
 import { createHash } from 'crypto';
-import Database from 'better-sqlite3';
-
-const DB_PATH = './data/imanisa.db';
+import { execute } from '@infrastructure/database/turso';
 
 interface User {
 	id: string;
@@ -15,45 +13,30 @@ function hashPin(pin: string): string {
 	return createHash('sha256').update(pin).digest('hex');
 }
 
-export function validatePin(username: string, pin: string): Omit<User, 'pin_hash'> | null {
-	const db = new Database(DB_PATH, { readonly: true });
+export async function validatePin(username: string, pin: string): Promise<Omit<User, 'pin_hash'> | null> {
+	const result = await execute('SELECT * FROM users WHERE LOWER(username) = LOWER(?)', [username]);
+	const user = result.rows[0] as unknown as User | undefined;
 
-	try {
-		const user = db.prepare('SELECT * FROM users WHERE LOWER(username) = LOWER(?)').get(username) as User | undefined;
+	if (!user) return null;
 
-		if (!user) return null;
+	const pinHash = hashPin(pin);
+	if (user.pin_hash !== pinHash) return null;
 
-		const pinHash = hashPin(pin);
-		if (user.pin_hash !== pinHash) return null;
-
-		return {
-			id: user.id,
-			username: user.username,
-			name: user.name,
-			avatar_url: user.avatar_url
-		};
-	} finally {
-		db.close();
-	}
+	return {
+		id: user.id,
+		username: user.username,
+		name: user.name,
+		avatar_url: user.avatar_url
+	};
 }
 
-export function getUserByUsername(username: string): Omit<User, 'pin_hash'> | null {
-	const db = new Database(DB_PATH, { readonly: true });
-
-	try {
-		const user = db.prepare('SELECT id, username, name, avatar_url FROM users WHERE LOWER(username) = LOWER(?)').get(username) as Omit<User, 'pin_hash'> | undefined;
-		return user || null;
-	} finally {
-		db.close();
-	}
+export async function getUserByUsername(username: string): Promise<Omit<User, 'pin_hash'> | null> {
+	const result = await execute('SELECT id, username, name, avatar_url FROM users WHERE LOWER(username) = LOWER(?)', [username]);
+	const user = result.rows[0] as unknown as Omit<User, 'pin_hash'> | undefined;
+	return user || null;
 }
 
-export function getAllUsers(): Array<{ username: string; name: string }> {
-	const db = new Database(DB_PATH, { readonly: true });
-
-	try {
-		return db.prepare('SELECT username, name FROM users').all() as Array<{ username: string; name: string }>;
-	} finally {
-		db.close();
-	}
+export async function getAllUsers(): Promise<Array<{ username: string; name: string }>> {
+	const result = await execute('SELECT username, name FROM users');
+	return result.rows as unknown as Array<{ username: string; name: string }>;
 }
