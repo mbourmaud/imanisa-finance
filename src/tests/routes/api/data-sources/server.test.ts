@@ -19,7 +19,7 @@ vi.mock('@infrastructure/repositories/DataSourceRepository', () => {
 });
 
 // Import after mock is defined
-import { GET } from './+server';
+import { GET } from '@routes/api/data-sources/+server';
 
 describe('GET /api/data-sources', () => {
 	beforeEach(() => {

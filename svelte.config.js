@@ -14,7 +14,9 @@ const config = {
 			'@infrastructure': 'src/infrastructure',
 			'@infrastructure/*': 'src/infrastructure/*',
 			'@lib': 'src/lib',
-			'@lib/*': 'src/lib/*'
+			'@lib/*': 'src/lib/*',
+			'@routes': 'src/routes',
+			'@routes/*': 'src/routes/*'
 		}
 	}
 };

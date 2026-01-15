@@ -5,7 +5,7 @@ vi.mock('@infrastructure/repositories/RealEstateRepository', () => ({
 	getPropertiesWithLoans: vi.fn()
 }));
 
-import { GET } from './+server';
+import { GET } from '@routes/api/real-estate/properties/+server';
 import { getPropertiesWithLoans } from '@infrastructure/repositories/RealEstateRepository';
 
 describe('GET /api/real-estate/properties', () => {

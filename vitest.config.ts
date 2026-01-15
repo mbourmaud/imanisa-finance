@@ -36,7 +36,8 @@ export default defineConfig({
 			'@application': resolve('./src/application'),
 			'@infrastructure': resolve('./src/infrastructure'),
 			'@lib': resolve('./src/lib'),
-			'@tests': resolve('./src/tests')
+			'@tests': resolve('./src/tests'),
+			'@routes': resolve('./src/routes')
 		}
 	}
 });
