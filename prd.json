@@ -725,8 +725,8 @@
       ],
       "files": ["e2e/investissements.test.ts"],
       "priority": 914,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 E2E tests for investments KPIs, grouping, and styling"
     },
     {
       "id": "US-300",
