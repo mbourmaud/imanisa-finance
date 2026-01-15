@@ -1385,3 +1385,33 @@
 - CategorySource.BANK for bank categories, CategorySource.AUTO for regex rules
 
 ---
+
+## [Iteration 42] 2026-01-15 - US-407: API Endpoints Catégories et Budget
+
+### What was implemented
+- Created 5 API endpoints for category and budget management:
+  - `GET /api/categories` - returns all categories structured hierarchically (parent → children)
+  - `GET /api/transactions/[id]/category` - returns category assignment for a transaction
+  - `PUT /api/transactions/[id]/category` - manually assigns a category (source='manual', confidence=1.0)
+  - `POST /api/budget/recategorize` - re-runs auto-categorization on all uncategorized transactions
+  - `GET /api/budget/summary` - returns expenses/income by category for a period
+    - Supports period params: month, last_month, quarter, year
+    - Supports custom date range with start_date/end_date params
+    - Returns totals, expenses by category, income by category, uncategorized counts
+
+### Files changed
+- src/routes/api/categories/+server.ts (new)
+- src/routes/api/transactions/[id]/category/+server.ts (new)
+- src/routes/api/budget/recategorize/+server.ts (new)
+- src/routes/api/budget/summary/+server.ts (new)
+
+### Learnings for future iterations
+- Budget endpoints go in `src/routes/api/budget/` directory
+- Transaction sub-endpoints use nested route: `src/routes/api/transactions/[id]/category/`
+- Period calculation helper function getDateRange() returns start, end, and label
+- Hierarchical category structure: build a Map first, then link children to parents in second pass
+- Use `execute()` from turso.ts for aggregate queries with JOINs (simpler than Drizzle for complex SQL)
+- French locale for date formatting: `toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })`
+- Always return snake_case for JSON API responses (e.g., parent_id, start_date, total_amount)
+
+---

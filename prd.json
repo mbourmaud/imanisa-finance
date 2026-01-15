@@ -1038,7 +1038,7 @@
       ],
       "files": ["src/routes/api/categories/", "src/routes/api/budget/"],
       "priority": 407,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
