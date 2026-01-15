@@ -1,15 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { getSession, parseSessionFromCookies } from '@infrastructure/auth/session';
 import { getContainerMode, getUserId } from '@infrastructure/container';
-import { initScheduler } from '$lib/scraper/scheduler';
-
-// Auto-start scheduler on server boot (production only)
-const mode = getContainerMode();
-if (mode === 'sqlite') {
-	const cronExpression = process.env.SCRAPER_CRON || '0 8 * * 1';
-	console.log(`[Hooks] Starting scheduler with cron: ${cronExpression}`);
-	initScheduler({ binanceCron: cronExpression });
-}
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const mode = getContainerMode();
