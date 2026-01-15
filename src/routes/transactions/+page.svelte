@@ -2,6 +2,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import type { CategoryOption, TransactionCategoryInfo } from './+page.server';
 	import CategoryBadge from '$lib/components/CategoryBadge.svelte';
+	import CategorySuggestion from '$lib/components/CategorySuggestion.svelte';
 
 	interface Owner {
 		id: string;
@@ -24,6 +25,16 @@
 		categoryInfo: TransactionCategoryInfo;
 	}
 
+	interface SuggestionData {
+		transactionDescription: string;
+		category: {
+			id: string;
+			name: string;
+			icon: string;
+			color: string;
+		};
+	}
+
 	let { data } = $props<{
 		user: { name: string } | null;
 		transactions: Transaction[];
@@ -43,7 +54,36 @@
 	// Announcement for screen readers
 	let announcement = $state('');
 
+	// Category suggestion popup state
+	let showSuggestion = $state(false);
+	let suggestionData = $state<SuggestionData | null>(null);
+
+	// Check localStorage for "don't ask again" preference
+	const SUGGESTION_STORAGE_KEY = 'imanisa-category-suggestion-disabled';
+
+	function isSuggestionDisabled(): boolean {
+		if (typeof localStorage === 'undefined') return false;
+		return localStorage.getItem(SUGGESTION_STORAGE_KEY) === 'true';
+	}
+
+	// Find category info from categories hierarchy
+	function findCategoryById(categoryId: string): CategoryOption | null {
+		for (const cat of data.categories) {
+			if (cat.id === categoryId) return cat;
+			if (cat.children) {
+				for (const child of cat.children) {
+					if (child.id === categoryId) return child;
+				}
+			}
+		}
+		return null;
+	}
+
 	async function handleCategoryChange(transactionId: string, categoryId: string) {
+		// Find the transaction to get its description
+		const transaction = data.transactions.find((tx: Transaction) => tx.id === transactionId);
+		if (!transaction) return;
+
 		try {
 			const response = await fetch(`/api/transactions/${transactionId}/category`, {
 				method: 'PUT',
@@ -62,10 +102,37 @@
 
 			// Refresh data to update UI
 			await invalidateAll();
+
+			// Show suggestion popup if not disabled
+			if (!isSuggestionDisabled() && result.category) {
+				const category = findCategoryById(categoryId);
+				if (category) {
+					suggestionData = {
+						transactionDescription: transaction.description,
+						category: {
+							id: category.id,
+							name: category.name,
+							icon: category.icon,
+							color: category.color
+						}
+					};
+					showSuggestion = true;
+				}
+			}
 		} catch (error) {
 			console.error('Error updating category:', error);
 			announcement = 'Erreur lors de la mise à jour de la catégorie';
 		}
+	}
+
+	function closeSuggestion() {
+		showSuggestion = false;
+		suggestionData = null;
+	}
+
+	function handleRuleCreated() {
+		// Announce for screen readers
+		announcement = 'Règle de catégorisation créée';
 	}
 
 	function toggleUncategorizedFilter() {
@@ -300,6 +367,16 @@
 		</nav>
 	{/if}
 </div>
+
+<!-- Category suggestion popup -->
+{#if showSuggestion && suggestionData}
+	<CategorySuggestion
+		transactionDescription={suggestionData.transactionDescription}
+		category={suggestionData.category}
+		onClose={closeSuggestion}
+		onRuleCreated={handleRuleCreated}
+	/>
+{/if}
 
 <style>
 	.sr-only {
