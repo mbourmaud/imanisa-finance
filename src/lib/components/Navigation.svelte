@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { theme, getResolvedTheme, type Theme } from '$lib/stores/theme';
 
 	interface NavItem {
 		href: string;
@@ -10,7 +11,7 @@
 	interface Props {
 		user: {
 			name: string;
-			avatarUrl?: string;
+			avatarUrl?: string | null;
 		} | null;
 	}
 
@@ -30,6 +31,21 @@
 		if (href === '/') return currentPath === '/';
 		return currentPath.startsWith(href);
 	}
+
+	// Theme toggle
+	let currentTheme: Theme = $state('system');
+	theme.subscribe((value) => {
+		currentTheme = value;
+	});
+
+	function toggleTheme() {
+		theme.toggle();
+	}
+
+	// Get resolved theme for icon display
+	$effect(() => {
+		// This effect runs on mount and keeps icon in sync
+	});
 </script>
 
 <aside class="sidebar" role="navigation" aria-label="Navigation principale">
@@ -128,6 +144,36 @@
 				</svg>
 			</span>
 		</a>
+
+		<!-- Theme toggle button -->
+		<button
+			class="theme-toggle nav-item"
+			onclick={toggleTheme}
+			aria-label={getResolvedTheme(currentTheme) === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+			title={getResolvedTheme(currentTheme) === 'dark' ? 'Mode clair' : 'Mode sombre'}
+		>
+			<span class="nav-icon" aria-hidden="true">
+				{#if getResolvedTheme(currentTheme) === 'dark'}
+					<!-- Sun icon for switching to light mode -->
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="4"/>
+						<path d="M12 2v2"/>
+						<path d="M12 20v2"/>
+						<path d="m4.93 4.93 1.41 1.41"/>
+						<path d="m17.66 17.66 1.41 1.41"/>
+						<path d="M2 12h2"/>
+						<path d="M20 12h2"/>
+						<path d="m6.34 17.66-1.41 1.41"/>
+						<path d="m19.07 4.93-1.41 1.41"/>
+					</svg>
+				{:else}
+					<!-- Moon icon for switching to dark mode -->
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+					</svg>
+				{/if}
+			</span>
+		</button>
 
 		{#if user}
 			<div class="user-section" title={user.name}>
@@ -280,6 +326,13 @@
 
 	.sidebar-footer {
 		display: none;
+	}
+
+	/* Theme toggle button - inherits nav-item styles */
+	.theme-toggle {
+		border: none;
+		background: none;
+		cursor: pointer;
 	}
 
 	.user-section {

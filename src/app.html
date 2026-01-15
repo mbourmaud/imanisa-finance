@@ -7,8 +7,28 @@
 
 		<!-- PWA Configuration -->
 		<link rel="manifest" href="%sveltekit.assets%/manifest.json" />
-		<meta name="theme-color" content="#FA8072" media="(prefers-color-scheme: light)" />
-		<meta name="theme-color" content="#FA8072" media="(prefers-color-scheme: dark)" />
+		<!-- Theme color - updated dynamically by theme store -->
+		<meta name="theme-color" content="#FA8072" />
+
+		<!-- Inline script to prevent flash of wrong theme -->
+		<script>
+			(function() {
+				var theme = localStorage.getItem('imanisa-theme');
+				var resolved;
+				if (theme === 'light' || theme === 'dark') {
+					resolved = theme;
+				} else {
+					resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				}
+				document.documentElement.classList.add(resolved);
+				document.documentElement.style.colorScheme = resolved;
+				// Update theme-color meta
+				var meta = document.querySelector('meta[name="theme-color"]');
+				if (meta) {
+					meta.setAttribute('content', resolved === 'dark' ? '#FA8072' : '#FFFFFF');
+				}
+			})();
+		</script>
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="application-name" content="Imanisa" />
 
