@@ -4,78 +4,85 @@ import { Transaction as TransactionEntity } from '@domain/transaction/Transactio
 import { TransactionType } from '@domain/transaction/TransactionType';
 import { TransactionCategory } from '@domain/transaction/TransactionCategory';
 import { UniqueId } from '@domain/shared/UniqueId';
-import { execute, executeMany } from '../turso';
-
-interface TransactionRow {
-	id: string;
-	account_id: string;
-	type: string;
-	amount: number;
-	currency: string;
-	description: string;
-	date: string;
-	category: string | null;
-	imported_at: string;
-}
+import { eq, desc, and, gte, lte } from 'drizzle-orm';
+import { getDb, schema } from '../drizzle';
 
 export class SqliteTransactionRepository implements TransactionRepository {
 	async findById(id: UniqueId): Promise<Transaction | null> {
-		const result = await execute('SELECT * FROM transactions WHERE id = ?', [id.toString()]);
-		const row = result.rows[0] as unknown as TransactionRow | undefined;
+		const db = getDb();
+		const result = await db
+			.select()
+			.from(schema.transactions)
+			.where(eq(schema.transactions.id, id.toString()))
+			.limit(1);
 
+		const row = result[0];
 		if (!row) return null;
 		return this.toDomain(row);
 	}
 
 	async findByAccountId(accountId: UniqueId): Promise<Transaction[]> {
-		const result = await execute(
-			'SELECT * FROM transactions WHERE account_id = ? ORDER BY date DESC',
-			[accountId.toString()]
-		);
+		const db = getDb();
+		const result = await db
+			.select()
+			.from(schema.transactions)
+			.where(eq(schema.transactions.accountId, accountId.toString()))
+			.orderBy(desc(schema.transactions.date));
 
-		return (result.rows as unknown as TransactionRow[])
+		return result
 			.map((row) => this.toDomain(row))
 			.filter((tx): tx is Transaction => tx !== null);
 	}
 
 	async findByAccountIdAndDateRange(accountId: UniqueId, startDate: Date, endDate: Date): Promise<Transaction[]> {
-		const result = await execute(
-			`SELECT * FROM transactions
-			WHERE account_id = ? AND date >= ? AND date <= ?
-			ORDER BY date DESC`,
-			[accountId.toString(), startDate.toISOString(), endDate.toISOString()]
-		);
+		const db = getDb();
+		const result = await db
+			.select()
+			.from(schema.transactions)
+			.where(
+				and(
+					eq(schema.transactions.accountId, accountId.toString()),
+					gte(schema.transactions.date, startDate.toISOString()),
+					lte(schema.transactions.date, endDate.toISOString())
+				)
+			)
+			.orderBy(desc(schema.transactions.date));
 
-		return (result.rows as unknown as TransactionRow[])
+		return result
 			.map((row) => this.toDomain(row))
 			.filter((tx): tx is Transaction => tx !== null);
 	}
 
 	async saveMany(transactions: Transaction[]): Promise<void> {
-		const statements = transactions.map((tx) => ({
-			sql: `INSERT INTO transactions (id, account_id, type, amount, currency, description, date, category, imported_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-			ON CONFLICT(id) DO UPDATE SET
-				type = excluded.type,
-				amount = excluded.amount,
-				currency = excluded.currency,
-				description = excluded.description,
-				date = excluded.date,
-				category = excluded.category`,
-			args: [
-				tx.id.toString(),
-				tx.accountId.toString(),
-				tx.type,
-				tx.amount.amount,
-				tx.amount.currency,
-				tx.description,
-				tx.date.toISOString(),
-				tx.category,
-				tx.importedAt.toISOString()
-			]
-		}));
+		if (transactions.length === 0) return;
 
-		await executeMany(statements);
+		const db = getDb();
+		for (const tx of transactions) {
+			await db
+				.insert(schema.transactions)
+				.values({
+					id: tx.id.toString(),
+					accountId: tx.accountId.toString(),
+					type: tx.type,
+					amount: tx.amount.amount,
+					currency: tx.amount.currency,
+					description: tx.description,
+					date: tx.date.toISOString(),
+					category: tx.category,
+					importedAt: tx.importedAt.toISOString()
+				})
+				.onConflictDoUpdate({
+					target: schema.transactions.id,
+					set: {
+						type: tx.type,
+						amount: tx.amount.amount,
+						currency: tx.amount.currency,
+						description: tx.description,
+						date: tx.date.toISOString(),
+						category: tx.category
+					}
+				});
+		}
 	}
 
 	async save(transaction: Transaction): Promise<void> {
@@ -83,24 +90,26 @@ export class SqliteTransactionRepository implements TransactionRepository {
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		await execute('DELETE FROM transactions WHERE id = ?', [id.toString()]);
+		const db = getDb();
+		await db.delete(schema.transactions).where(eq(schema.transactions.id, id.toString()));
 	}
 
 	async deleteByAccountId(accountId: UniqueId): Promise<void> {
-		await execute('DELETE FROM transactions WHERE account_id = ?', [accountId.toString()]);
+		const db = getDb();
+		await db.delete(schema.transactions).where(eq(schema.transactions.accountId, accountId.toString()));
 	}
 
-	private toDomain(row: TransactionRow): Transaction | null {
+	private toDomain(row: typeof schema.transactions.$inferSelect): Transaction | null {
 		const result = TransactionEntity.reconstitute(
 			{
-				accountId: UniqueId.fromString(row.account_id),
+				accountId: UniqueId.fromString(row.accountId),
 				type: row.type as TransactionType,
 				amount: row.amount,
 				currency: row.currency,
 				description: row.description,
 				date: new Date(row.date),
 				category: row.category as TransactionCategory | null,
-				importedAt: new Date(row.imported_at)
+				importedAt: new Date(row.importedAt)
 			},
 			UniqueId.fromString(row.id)
 		);

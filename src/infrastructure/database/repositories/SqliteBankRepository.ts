@@ -3,64 +3,68 @@ import type { Bank } from '@domain/bank/Bank';
 import { Bank as BankEntity } from '@domain/bank/Bank';
 import { BankTemplate } from '@domain/bank/BankTemplate';
 import { UniqueId } from '@domain/shared/UniqueId';
-import { execute } from '../turso';
-
-interface BankRow {
-	id: string;
-	user_id: string;
-	name: string;
-	template: string;
-	created_at: string;
-}
+import { eq, desc } from 'drizzle-orm';
+import { getDb, schema } from '../drizzle';
 
 export class SqliteBankRepository implements BankRepository {
 	async findById(id: UniqueId): Promise<Bank | null> {
-		const result = await execute('SELECT * FROM banks WHERE id = ?', [id.toString()]);
-		const row = result.rows[0] as unknown as BankRow | undefined;
+		const db = getDb();
+		const result = await db
+			.select()
+			.from(schema.banks)
+			.where(eq(schema.banks.id, id.toString()))
+			.limit(1);
 
+		const row = result[0];
 		if (!row) return null;
 		return this.toDomain(row);
 	}
 
 	async findByUserId(userId: UniqueId): Promise<Bank[]> {
-		const result = await execute(
-			'SELECT * FROM banks WHERE user_id = ? ORDER BY created_at DESC',
-			[userId.toString()]
-		);
+		const db = getDb();
+		const result = await db
+			.select()
+			.from(schema.banks)
+			.where(eq(schema.banks.userId, userId.toString()))
+			.orderBy(desc(schema.banks.createdAt));
 
-		return (result.rows as unknown as BankRow[])
+		return result
 			.map((row) => this.toDomain(row))
 			.filter((bank): bank is Bank => bank !== null);
 	}
 
 	async save(bank: Bank): Promise<void> {
-		await execute(
-			`INSERT INTO banks (id, user_id, name, template, created_at)
-			VALUES (?, ?, ?, ?, ?)
-			ON CONFLICT(id) DO UPDATE SET
-				name = excluded.name,
-				template = excluded.template`,
-			[
-				bank.id.toString(),
-				bank.userId.toString(),
-				bank.name,
-				bank.template,
-				bank.createdAt.toISOString()
-			]
-		);
+		const db = getDb();
+		await db
+			.insert(schema.banks)
+			.values({
+				id: bank.id.toString(),
+				userId: bank.userId.toString(),
+				name: bank.name,
+				template: bank.template,
+				createdAt: bank.createdAt.toISOString()
+			})
+			.onConflictDoUpdate({
+				target: schema.banks.id,
+				set: {
+					name: bank.name,
+					template: bank.template
+				}
+			});
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		await execute('DELETE FROM banks WHERE id = ?', [id.toString()]);
+		const db = getDb();
+		await db.delete(schema.banks).where(eq(schema.banks.id, id.toString()));
 	}
 
-	private toDomain(row: BankRow): Bank | null {
+	private toDomain(row: typeof schema.banks.$inferSelect): Bank | null {
 		const result = BankEntity.reconstitute(
 			{
-				userId: UniqueId.fromString(row.user_id),
+				userId: UniqueId.fromString(row.userId),
 				name: row.name,
 				template: row.template as BankTemplate,
-				createdAt: new Date(row.created_at)
+				createdAt: new Date(row.createdAt)
 			},
 			UniqueId.fromString(row.id)
 		);

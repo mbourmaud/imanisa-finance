@@ -1,19 +1,13 @@
-import { execute } from '@infrastructure/database/turso';
+import { eq, sql } from 'drizzle-orm';
+import { getDb, schema } from '@infrastructure/database/drizzle';
 import type {
 	Entity,
-	EntityRow,
 	EntityShare,
-	EntityShareRow,
 	Property,
-	PropertyRow,
 	PropertyOwnership,
-	PropertyOwnershipRow,
 	Loan,
-	LoanRow,
 	LoanResponsibility,
-	LoanResponsibilityRow,
 	PropertyCharge,
-	PropertyChargeRow,
 	PropertyWithLoan,
 	PropertyWithDetails,
 	RealEstateSummary,
@@ -30,36 +24,36 @@ import type {
 // Row to Domain Mappers
 // =====================================================
 
-function mapEntityRow(row: EntityRow): Entity {
+function mapEntityRow(row: typeof schema.entities.$inferSelect): Entity {
 	return {
 		id: row.id,
 		name: row.name,
 		type: row.type as EntityType,
 		email: row.email,
 		color: row.color,
-		legalName: row.legal_name,
+		legalName: row.legalName,
 		siren: row.siren,
 		rcs: row.rcs,
-		shareCapital: row.share_capital,
-		creationDate: row.creation_date,
+		shareCapital: row.shareCapital,
+		creationDate: row.creationDate,
 		address: row.address,
-		taxRegime: row.tax_regime,
-		createdAt: row.created_at
+		taxRegime: row.taxRegime,
+		createdAt: row.createdAt ?? ''
 	};
 }
 
-function mapEntityShareRow(row: EntityShareRow): EntityShare {
+function mapEntityShareRow(row: typeof schema.entityShares.$inferSelect): EntityShare {
 	return {
 		id: row.id,
-		sciId: row.sci_id,
-		holderId: row.holder_id,
-		sharesCount: row.shares_count,
+		sciId: row.sciId,
+		holderId: row.holderId,
+		sharesCount: row.sharesCount,
 		percentage: row.percentage,
-		createdAt: row.created_at
+		createdAt: row.createdAt ?? ''
 	};
 }
 
-function mapPropertyRow(row: PropertyRow): Property {
+function mapPropertyRow(row: typeof schema.reProperties.$inferSelect): Property {
 	return {
 		id: row.id,
 		name: row.name,
@@ -67,89 +61,89 @@ function mapPropertyRow(row: PropertyRow): Property {
 		category: row.category as PropertyCategory,
 		address: row.address,
 		city: row.city,
-		postalCode: row.postal_code,
-		country: row.country,
-		surfaceM2: row.surface_m2,
+		postalCode: row.postalCode,
+		country: row.country ?? 'France',
+		surfaceM2: row.surfaceM2,
 		rooms: row.rooms,
 		floor: row.floor,
-		dpeRating: row.dpe_rating as DPERating | null,
-		coproName: row.copro_name,
-		coproLots: row.copro_lots ? JSON.parse(row.copro_lots) : null,
-		coproTantiemes: row.copro_tantiemes,
-		syndicName: row.syndic_name,
-		purchaseDate: row.purchase_date,
-		purchasePrice: row.purchase_price,
-		notaryFees: row.notary_fees,
-		agencyFees: row.agency_fees,
-		renovationCosts: row.renovation_costs,
-		estimatedValue: row.estimated_value,
-		estimatedValueDate: row.estimated_value_date,
-		isRented: row.is_rented === 1,
-		monthlyRent: row.monthly_rent,
-		tenantName: row.tenant_name,
-		leaseStartDate: row.lease_start_date,
-		annualCoproCharges: row.annual_copro_charges,
-		annualPropertyTax: row.annual_property_tax,
-		createdAt: row.created_at,
-		updatedAt: row.updated_at
+		dpeRating: row.dpeRating as DPERating | null,
+		coproName: row.coproName,
+		coproLots: row.coproLots ? JSON.parse(row.coproLots) : null,
+		coproTantiemes: row.coproTantiemes,
+		syndicName: row.syndicName,
+		purchaseDate: row.purchaseDate,
+		purchasePrice: row.purchasePrice,
+		notaryFees: row.notaryFees,
+		agencyFees: row.agencyFees,
+		renovationCosts: row.renovationCosts,
+		estimatedValue: row.estimatedValue,
+		estimatedValueDate: row.estimatedValueDate,
+		isRented: row.isRented === 1,
+		monthlyRent: row.monthlyRent,
+		tenantName: row.tenantName,
+		leaseStartDate: row.leaseStartDate,
+		annualCoproCharges: row.annualCoproCharges,
+		annualPropertyTax: row.annualPropertyTax,
+		createdAt: row.createdAt ?? '',
+		updatedAt: row.updatedAt ?? ''
 	};
 }
 
-function mapPropertyOwnershipRow(row: PropertyOwnershipRow): PropertyOwnership {
+function mapPropertyOwnershipRow(row: typeof schema.propertyOwnership.$inferSelect): PropertyOwnership {
 	return {
 		id: row.id,
-		propertyId: row.property_id,
-		entityId: row.entity_id,
+		propertyId: row.propertyId,
+		entityId: row.entityId,
 		percentage: row.percentage,
-		acquisitionDate: row.acquisition_date,
-		acquisitionType: row.acquisition_type as AcquisitionType | null,
+		acquisitionDate: row.acquisitionDate,
+		acquisitionType: row.acquisitionType as AcquisitionType | null,
 		contribution: row.contribution,
-		createdAt: row.created_at
+		createdAt: row.createdAt ?? ''
 	};
 }
 
-function mapLoanRow(row: LoanRow): Loan {
+function mapLoanRow(row: typeof schema.reLoans.$inferSelect): Loan {
 	return {
 		id: row.id,
 		name: row.name,
-		propertyId: row.property_id,
-		bankName: row.bank_name,
-		loanNumber: row.loan_number,
-		principalAmount: row.principal_amount,
-		interestRate: row.interest_rate,
-		durationMonths: row.duration_months,
-		startDate: row.start_date,
-		endDate: row.end_date,
-		monthlyPayment: row.monthly_payment,
-		insuranceRate: row.insurance_rate,
-		insuranceMonthly: row.insurance_monthly,
-		currentBalance: row.current_balance,
-		currentBalanceDate: row.current_balance_date,
-		linkedAccountId: row.linked_account_id,
-		createdAt: row.created_at,
-		updatedAt: row.updated_at
+		propertyId: row.propertyId,
+		bankName: row.bankName,
+		loanNumber: row.loanNumber,
+		principalAmount: row.principalAmount,
+		interestRate: row.interestRate,
+		durationMonths: row.durationMonths,
+		startDate: row.startDate,
+		endDate: row.endDate,
+		monthlyPayment: row.monthlyPayment,
+		insuranceRate: row.insuranceRate,
+		insuranceMonthly: row.insuranceMonthly,
+		currentBalance: row.currentBalance,
+		currentBalanceDate: row.currentBalanceDate,
+		linkedAccountId: row.linkedAccountId,
+		createdAt: row.createdAt ?? '',
+		updatedAt: row.updatedAt ?? ''
 	};
 }
 
-function mapLoanResponsibilityRow(row: LoanResponsibilityRow): LoanResponsibility {
+function mapLoanResponsibilityRow(row: typeof schema.loanResponsibility.$inferSelect): LoanResponsibility {
 	return {
 		id: row.id,
-		loanId: row.loan_id,
-		entityId: row.entity_id,
+		loanId: row.loanId,
+		entityId: row.entityId,
 		percentage: row.percentage,
-		createdAt: row.created_at
+		createdAt: row.createdAt ?? ''
 	};
 }
 
-function mapPropertyChargeRow(row: PropertyChargeRow): PropertyCharge {
+function mapPropertyChargeRow(row: typeof schema.propertyCharges.$inferSelect): PropertyCharge {
 	return {
 		id: row.id,
-		propertyId: row.property_id,
+		propertyId: row.propertyId,
 		type: row.type as ChargeType,
 		name: row.name,
 		amount: row.amount,
 		frequency: row.frequency as ChargeFrequency,
-		createdAt: row.created_at
+		createdAt: row.createdAt ?? ''
 	};
 }
 
@@ -158,91 +152,68 @@ function mapPropertyChargeRow(row: PropertyChargeRow): PropertyCharge {
 // =====================================================
 
 export async function getAllEntities(): Promise<Entity[]> {
-	const result = await execute('SELECT * FROM entities ORDER BY name');
-	return (result.rows as unknown as EntityRow[]).map(mapEntityRow);
+	const db = getDb();
+	const result = await db.select().from(schema.entities).orderBy(schema.entities.name);
+	return result.map(mapEntityRow);
 }
 
 export async function getEntityById(id: string): Promise<Entity | null> {
-	const result = await execute('SELECT * FROM entities WHERE id = ?', [id]);
-	const row = result.rows[0] as unknown as EntityRow | undefined;
+	const db = getDb();
+	const result = await db.select().from(schema.entities).where(eq(schema.entities.id, id)).limit(1);
+	const row = result[0];
 	return row ? mapEntityRow(row) : null;
 }
 
 export async function getEntitiesByType(type: EntityType): Promise<Entity[]> {
-	const result = await execute('SELECT * FROM entities WHERE type = ? ORDER BY name', [type]);
-	return (result.rows as unknown as EntityRow[]).map(mapEntityRow);
+	const db = getDb();
+	const result = await db
+		.select()
+		.from(schema.entities)
+		.where(eq(schema.entities.type, type))
+		.orderBy(schema.entities.name);
+	return result.map(mapEntityRow);
 }
 
 export async function createEntity(entity: Omit<Entity, 'createdAt'>): Promise<void> {
-	await execute(
-		`INSERT INTO entities (id, name, type, email, color, legal_name, siren, rcs, share_capital, creation_date, address, tax_regime)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		[
-			entity.id,
-			entity.name,
-			entity.type,
-			entity.email,
-			entity.color,
-			entity.legalName,
-			entity.siren,
-			entity.rcs,
-			entity.shareCapital,
-			entity.creationDate,
-			entity.address,
-			entity.taxRegime
-		]
-	);
+	const db = getDb();
+	await db.insert(schema.entities).values({
+		id: entity.id,
+		name: entity.name,
+		type: entity.type,
+		email: entity.email,
+		color: entity.color,
+		legalName: entity.legalName,
+		siren: entity.siren,
+		rcs: entity.rcs,
+		shareCapital: entity.shareCapital,
+		creationDate: entity.creationDate,
+		address: entity.address,
+		taxRegime: entity.taxRegime
+	});
 }
 
 export async function updateEntity(id: string, entity: Partial<Entity>): Promise<void> {
-	const fields: string[] = [];
-	const values: (string | number | null)[] = [];
+	const db = getDb();
+	const updates: Partial<typeof schema.entities.$inferInsert> = {};
 
-	if (entity.name !== undefined) {
-		fields.push('name = ?');
-		values.push(entity.name);
-	}
-	if (entity.email !== undefined) {
-		fields.push('email = ?');
-		values.push(entity.email);
-	}
-	if (entity.color !== undefined) {
-		fields.push('color = ?');
-		values.push(entity.color);
-	}
-	if (entity.legalName !== undefined) {
-		fields.push('legal_name = ?');
-		values.push(entity.legalName);
-	}
-	if (entity.siren !== undefined) {
-		fields.push('siren = ?');
-		values.push(entity.siren);
-	}
-	if (entity.rcs !== undefined) {
-		fields.push('rcs = ?');
-		values.push(entity.rcs);
-	}
-	if (entity.shareCapital !== undefined) {
-		fields.push('share_capital = ?');
-		values.push(entity.shareCapital);
-	}
-	if (entity.address !== undefined) {
-		fields.push('address = ?');
-		values.push(entity.address);
-	}
-	if (entity.taxRegime !== undefined) {
-		fields.push('tax_regime = ?');
-		values.push(entity.taxRegime);
-	}
+	if (entity.name !== undefined) updates.name = entity.name;
+	if (entity.email !== undefined) updates.email = entity.email;
+	if (entity.color !== undefined) updates.color = entity.color;
+	if (entity.legalName !== undefined) updates.legalName = entity.legalName;
+	if (entity.siren !== undefined) updates.siren = entity.siren;
+	if (entity.rcs !== undefined) updates.rcs = entity.rcs;
+	if (entity.shareCapital !== undefined) updates.shareCapital = entity.shareCapital;
+	if (entity.address !== undefined) updates.address = entity.address;
+	if (entity.taxRegime !== undefined) updates.taxRegime = entity.taxRegime;
 
-	if (fields.length === 0) return;
+	if (Object.keys(updates).length === 0) return;
 
-	values.push(id);
-	await execute(`UPDATE entities SET ${fields.join(', ')} WHERE id = ?`, values);
+	await db.update(schema.entities).set(updates).where(eq(schema.entities.id, id));
 }
 
 export async function deleteEntity(id: string): Promise<void> {
-	await execute('DELETE FROM entities WHERE id = ?', [id]);
+	const db = getDb();
+	await db.delete(schema.entities).where(eq(schema.entities.id, id));
 }
 
 // =====================================================
@@ -250,20 +221,28 @@ export async function deleteEntity(id: string): Promise<void> {
 // =====================================================
 
 export async function getEntitySharesBySci(sciId: string): Promise<EntityShare[]> {
-	const result = await execute('SELECT * FROM entity_shares WHERE sci_id = ?', [sciId]);
-	return (result.rows as unknown as EntityShareRow[]).map(mapEntityShareRow);
+	const db = getDb();
+	const result = await db
+		.select()
+		.from(schema.entityShares)
+		.where(eq(schema.entityShares.sciId, sciId));
+	return result.map(mapEntityShareRow);
 }
 
 export async function createEntityShare(share: Omit<EntityShare, 'createdAt'>): Promise<void> {
-	await execute(
-		`INSERT INTO entity_shares (id, sci_id, holder_id, shares_count, percentage)
-		VALUES (?, ?, ?, ?, ?)`,
-		[share.id, share.sciId, share.holderId, share.sharesCount, share.percentage]
-	);
+	const db = getDb();
+	await db.insert(schema.entityShares).values({
+		id: share.id,
+		sciId: share.sciId,
+		holderId: share.holderId,
+		sharesCount: share.sharesCount,
+		percentage: share.percentage
+	});
 }
 
 export async function deleteEntityShare(id: string): Promise<void> {
-	await execute('DELETE FROM entity_shares WHERE id = ?', [id]);
+	const db = getDb();
+	await db.delete(schema.entityShares).where(eq(schema.entityShares.id, id));
 }
 
 // =====================================================
@@ -271,105 +250,79 @@ export async function deleteEntityShare(id: string): Promise<void> {
 // =====================================================
 
 export async function getAllProperties(): Promise<Property[]> {
-	const result = await execute('SELECT * FROM re_properties ORDER BY name');
-	return (result.rows as unknown as PropertyRow[]).map(mapPropertyRow);
+	const db = getDb();
+	const result = await db.select().from(schema.reProperties).orderBy(schema.reProperties.name);
+	return result.map(mapPropertyRow);
 }
 
 export async function getPropertyById(id: string): Promise<Property | null> {
-	const result = await execute('SELECT * FROM re_properties WHERE id = ?', [id]);
-	const row = result.rows[0] as unknown as PropertyRow | undefined;
+	const db = getDb();
+	const result = await db
+		.select()
+		.from(schema.reProperties)
+		.where(eq(schema.reProperties.id, id))
+		.limit(1);
+	const row = result[0];
 	return row ? mapPropertyRow(row) : null;
 }
 
 export async function createProperty(property: Omit<Property, 'createdAt' | 'updatedAt'>): Promise<void> {
-	await execute(
-		`INSERT INTO re_properties (
-			id, name, type, category, address, city, postal_code, country,
-			surface_m2, rooms, floor, dpe_rating, copro_name, copro_lots, copro_tantiemes, syndic_name,
-			purchase_date, purchase_price, notary_fees, agency_fees, renovation_costs,
-			estimated_value, estimated_value_date, is_rented, monthly_rent, tenant_name, lease_start_date,
-			annual_copro_charges, annual_property_tax
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		[
-			property.id,
-			property.name,
-			property.type,
-			property.category,
-			property.address,
-			property.city,
-			property.postalCode,
-			property.country,
-			property.surfaceM2,
-			property.rooms,
-			property.floor,
-			property.dpeRating,
-			property.coproName,
-			property.coproLots ? JSON.stringify(property.coproLots) : null,
-			property.coproTantiemes,
-			property.syndicName,
-			property.purchaseDate,
-			property.purchasePrice,
-			property.notaryFees,
-			property.agencyFees,
-			property.renovationCosts,
-			property.estimatedValue,
-			property.estimatedValueDate,
-			property.isRented ? 1 : 0,
-			property.monthlyRent,
-			property.tenantName,
-			property.leaseStartDate,
-			property.annualCoproCharges,
-			property.annualPropertyTax
-		]
-	);
+	const db = getDb();
+	await db.insert(schema.reProperties).values({
+		id: property.id,
+		name: property.name,
+		type: property.type,
+		category: property.category,
+		address: property.address,
+		city: property.city,
+		postalCode: property.postalCode,
+		country: property.country,
+		surfaceM2: property.surfaceM2,
+		rooms: property.rooms,
+		floor: property.floor,
+		dpeRating: property.dpeRating,
+		coproName: property.coproName,
+		coproLots: property.coproLots ? JSON.stringify(property.coproLots) : null,
+		coproTantiemes: property.coproTantiemes,
+		syndicName: property.syndicName,
+		purchaseDate: property.purchaseDate,
+		purchasePrice: property.purchasePrice,
+		notaryFees: property.notaryFees,
+		agencyFees: property.agencyFees,
+		renovationCosts: property.renovationCosts,
+		estimatedValue: property.estimatedValue,
+		estimatedValueDate: property.estimatedValueDate,
+		isRented: property.isRented ? 1 : 0,
+		monthlyRent: property.monthlyRent,
+		tenantName: property.tenantName,
+		leaseStartDate: property.leaseStartDate,
+		annualCoproCharges: property.annualCoproCharges,
+		annualPropertyTax: property.annualPropertyTax
+	});
 }
 
 export async function updateProperty(id: string, property: Partial<Property>): Promise<void> {
-	const fields: string[] = [];
-	const values: (string | number | null)[] = [];
+	const db = getDb();
+	const updates: Record<string, unknown> = {};
 
-	if (property.name !== undefined) {
-		fields.push('name = ?');
-		values.push(property.name);
-	}
-	if (property.estimatedValue !== undefined) {
-		fields.push('estimated_value = ?');
-		values.push(property.estimatedValue);
-	}
-	if (property.estimatedValueDate !== undefined) {
-		fields.push('estimated_value_date = ?');
-		values.push(property.estimatedValueDate);
-	}
-	if (property.isRented !== undefined) {
-		fields.push('is_rented = ?');
-		values.push(property.isRented ? 1 : 0);
-	}
-	if (property.monthlyRent !== undefined) {
-		fields.push('monthly_rent = ?');
-		values.push(property.monthlyRent);
-	}
-	if (property.tenantName !== undefined) {
-		fields.push('tenant_name = ?');
-		values.push(property.tenantName);
-	}
-	if (property.annualCoproCharges !== undefined) {
-		fields.push('annual_copro_charges = ?');
-		values.push(property.annualCoproCharges);
-	}
-	if (property.annualPropertyTax !== undefined) {
-		fields.push('annual_property_tax = ?');
-		values.push(property.annualPropertyTax);
-	}
+	if (property.name !== undefined) updates.name = property.name;
+	if (property.estimatedValue !== undefined) updates.estimatedValue = property.estimatedValue;
+	if (property.estimatedValueDate !== undefined) updates.estimatedValueDate = property.estimatedValueDate;
+	if (property.isRented !== undefined) updates.isRented = property.isRented ? 1 : 0;
+	if (property.monthlyRent !== undefined) updates.monthlyRent = property.monthlyRent;
+	if (property.tenantName !== undefined) updates.tenantName = property.tenantName;
+	if (property.annualCoproCharges !== undefined) updates.annualCoproCharges = property.annualCoproCharges;
+	if (property.annualPropertyTax !== undefined) updates.annualPropertyTax = property.annualPropertyTax;
 
-	if (fields.length === 0) return;
+	if (Object.keys(updates).length === 0) return;
 
-	fields.push('updated_at = datetime("now")');
-	values.push(id);
-	await execute(`UPDATE re_properties SET ${fields.join(', ')} WHERE id = ?`, values);
+	updates.updatedAt = sql`datetime('now')`;
+	await db.update(schema.reProperties).set(updates).where(eq(schema.reProperties.id, id));
 }
 
 export async function deleteProperty(id: string): Promise<void> {
-	await execute('DELETE FROM re_properties WHERE id = ?', [id]);
+	const db = getDb();
+	await db.delete(schema.reProperties).where(eq(schema.reProperties.id, id));
 }
 
 // =====================================================
@@ -377,28 +330,30 @@ export async function deleteProperty(id: string): Promise<void> {
 // =====================================================
 
 export async function getPropertyOwnership(propertyId: string): Promise<PropertyOwnership[]> {
-	const result = await execute('SELECT * FROM property_ownership WHERE property_id = ?', [propertyId]);
-	return (result.rows as unknown as PropertyOwnershipRow[]).map(mapPropertyOwnershipRow);
+	const db = getDb();
+	const result = await db
+		.select()
+		.from(schema.propertyOwnership)
+		.where(eq(schema.propertyOwnership.propertyId, propertyId));
+	return result.map(mapPropertyOwnershipRow);
 }
 
 export async function createPropertyOwnership(ownership: Omit<PropertyOwnership, 'createdAt'>): Promise<void> {
-	await execute(
-		`INSERT INTO property_ownership (id, property_id, entity_id, percentage, acquisition_date, acquisition_type, contribution)
-		VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		[
-			ownership.id,
-			ownership.propertyId,
-			ownership.entityId,
-			ownership.percentage,
-			ownership.acquisitionDate,
-			ownership.acquisitionType,
-			ownership.contribution
-		]
-	);
+	const db = getDb();
+	await db.insert(schema.propertyOwnership).values({
+		id: ownership.id,
+		propertyId: ownership.propertyId,
+		entityId: ownership.entityId,
+		percentage: ownership.percentage,
+		acquisitionDate: ownership.acquisitionDate,
+		acquisitionType: ownership.acquisitionType,
+		contribution: ownership.contribution
+	});
 }
 
 export async function deletePropertyOwnership(id: string): Promise<void> {
-	await execute('DELETE FROM property_ownership WHERE id = ?', [id]);
+	const db = getDb();
+	await db.delete(schema.propertyOwnership).where(eq(schema.propertyOwnership.id, id));
 }
 
 // =====================================================
@@ -406,59 +361,66 @@ export async function deletePropertyOwnership(id: string): Promise<void> {
 // =====================================================
 
 export async function getAllLoans(): Promise<Loan[]> {
-	const result = await execute('SELECT * FROM re_loans ORDER BY name');
-	return (result.rows as unknown as LoanRow[]).map(mapLoanRow);
+	const db = getDb();
+	const result = await db.select().from(schema.reLoans).orderBy(schema.reLoans.name);
+	return result.map(mapLoanRow);
 }
 
 export async function getLoanById(id: string): Promise<Loan | null> {
-	const result = await execute('SELECT * FROM re_loans WHERE id = ?', [id]);
-	const row = result.rows[0] as unknown as LoanRow | undefined;
+	const db = getDb();
+	const result = await db.select().from(schema.reLoans).where(eq(schema.reLoans.id, id)).limit(1);
+	const row = result[0];
 	return row ? mapLoanRow(row) : null;
 }
 
 export async function getLoanByPropertyId(propertyId: string): Promise<Loan | null> {
-	const result = await execute('SELECT * FROM re_loans WHERE property_id = ?', [propertyId]);
-	const row = result.rows[0] as unknown as LoanRow | undefined;
+	const db = getDb();
+	const result = await db
+		.select()
+		.from(schema.reLoans)
+		.where(eq(schema.reLoans.propertyId, propertyId))
+		.limit(1);
+	const row = result[0];
 	return row ? mapLoanRow(row) : null;
 }
 
 export async function createLoan(loan: Omit<Loan, 'createdAt' | 'updatedAt'>): Promise<void> {
-	await execute(
-		`INSERT INTO re_loans (
-			id, name, property_id, bank_name, loan_number,
-			principal_amount, interest_rate, duration_months, start_date, end_date, monthly_payment,
-			insurance_rate, insurance_monthly, current_balance, current_balance_date, linked_account_id
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		[
-			loan.id,
-			loan.name,
-			loan.propertyId,
-			loan.bankName,
-			loan.loanNumber,
-			loan.principalAmount,
-			loan.interestRate,
-			loan.durationMonths,
-			loan.startDate,
-			loan.endDate,
-			loan.monthlyPayment,
-			loan.insuranceRate,
-			loan.insuranceMonthly,
-			loan.currentBalance,
-			loan.currentBalanceDate,
-			loan.linkedAccountId
-		]
-	);
+	const db = getDb();
+	await db.insert(schema.reLoans).values({
+		id: loan.id,
+		name: loan.name,
+		propertyId: loan.propertyId,
+		bankName: loan.bankName,
+		loanNumber: loan.loanNumber,
+		principalAmount: loan.principalAmount,
+		interestRate: loan.interestRate,
+		durationMonths: loan.durationMonths,
+		startDate: loan.startDate,
+		endDate: loan.endDate,
+		monthlyPayment: loan.monthlyPayment,
+		insuranceRate: loan.insuranceRate,
+		insuranceMonthly: loan.insuranceMonthly,
+		currentBalance: loan.currentBalance,
+		currentBalanceDate: loan.currentBalanceDate,
+		linkedAccountId: loan.linkedAccountId
+	});
 }
 
 export async function updateLoanBalance(id: string, balance: number, date: string): Promise<void> {
-	await execute(
-		`UPDATE re_loans SET current_balance = ?, current_balance_date = ?, updated_at = datetime("now") WHERE id = ?`,
-		[balance, date, id]
-	);
+	const db = getDb();
+	await db
+		.update(schema.reLoans)
+		.set({
+			currentBalance: balance,
+			currentBalanceDate: date,
+			updatedAt: sql`datetime('now')`
+		})
+		.where(eq(schema.reLoans.id, id));
 }
 
 export async function deleteLoan(id: string): Promise<void> {
-	await execute('DELETE FROM re_loans WHERE id = ?', [id]);
+	const db = getDb();
+	await db.delete(schema.reLoans).where(eq(schema.reLoans.id, id));
 }
 
 // =====================================================
@@ -466,20 +428,27 @@ export async function deleteLoan(id: string): Promise<void> {
 // =====================================================
 
 export async function getLoanResponsibility(loanId: string): Promise<LoanResponsibility[]> {
-	const result = await execute('SELECT * FROM loan_responsibility WHERE loan_id = ?', [loanId]);
-	return (result.rows as unknown as LoanResponsibilityRow[]).map(mapLoanResponsibilityRow);
+	const db = getDb();
+	const result = await db
+		.select()
+		.from(schema.loanResponsibility)
+		.where(eq(schema.loanResponsibility.loanId, loanId));
+	return result.map(mapLoanResponsibilityRow);
 }
 
 export async function createLoanResponsibility(responsibility: Omit<LoanResponsibility, 'createdAt'>): Promise<void> {
-	await execute(
-		`INSERT INTO loan_responsibility (id, loan_id, entity_id, percentage)
-		VALUES (?, ?, ?, ?)`,
-		[responsibility.id, responsibility.loanId, responsibility.entityId, responsibility.percentage]
-	);
+	const db = getDb();
+	await db.insert(schema.loanResponsibility).values({
+		id: responsibility.id,
+		loanId: responsibility.loanId,
+		entityId: responsibility.entityId,
+		percentage: responsibility.percentage
+	});
 }
 
 export async function deleteLoanResponsibility(id: string): Promise<void> {
-	await execute('DELETE FROM loan_responsibility WHERE id = ?', [id]);
+	const db = getDb();
+	await db.delete(schema.loanResponsibility).where(eq(schema.loanResponsibility.id, id));
 }
 
 // =====================================================
@@ -487,20 +456,29 @@ export async function deleteLoanResponsibility(id: string): Promise<void> {
 // =====================================================
 
 export async function getPropertyCharges(propertyId: string): Promise<PropertyCharge[]> {
-	const result = await execute('SELECT * FROM property_charges WHERE property_id = ?', [propertyId]);
-	return (result.rows as unknown as PropertyChargeRow[]).map(mapPropertyChargeRow);
+	const db = getDb();
+	const result = await db
+		.select()
+		.from(schema.propertyCharges)
+		.where(eq(schema.propertyCharges.propertyId, propertyId));
+	return result.map(mapPropertyChargeRow);
 }
 
 export async function createPropertyCharge(charge: Omit<PropertyCharge, 'createdAt'>): Promise<void> {
-	await execute(
-		`INSERT INTO property_charges (id, property_id, type, name, amount, frequency)
-		VALUES (?, ?, ?, ?, ?, ?)`,
-		[charge.id, charge.propertyId, charge.type, charge.name, charge.amount, charge.frequency]
-	);
+	const db = getDb();
+	await db.insert(schema.propertyCharges).values({
+		id: charge.id,
+		propertyId: charge.propertyId,
+		type: charge.type,
+		name: charge.name,
+		amount: charge.amount,
+		frequency: charge.frequency
+	});
 }
 
 export async function deletePropertyCharge(id: string): Promise<void> {
-	await execute('DELETE FROM property_charges WHERE id = ?', [id]);
+	const db = getDb();
+	await db.delete(schema.propertyCharges).where(eq(schema.propertyCharges.id, id));
 }
 
 // =====================================================
@@ -543,21 +521,25 @@ export async function getPropertyWithDetails(id: string): Promise<PropertyWithDe
 }
 
 export async function getRealEstateSummary(): Promise<RealEstateSummary> {
+	const db = getDb();
+
 	// Total value from all properties
-	const valueResult = await execute(
-		'SELECT COALESCE(SUM(estimated_value), 0) as total FROM re_properties'
-	);
-	const totalValue = (valueResult.rows[0] as unknown as { total: number }).total;
+	const valueResult = await db
+		.select({ total: sql<number>`COALESCE(SUM(${schema.reProperties.estimatedValue}), 0)` })
+		.from(schema.reProperties);
+	const totalValue = valueResult[0]?.total ?? 0;
 
 	// Total debt from all loans
-	const debtResult = await execute(
-		'SELECT COALESCE(SUM(current_balance), 0) as total FROM re_loans'
-	);
-	const totalDebt = (debtResult.rows[0] as unknown as { total: number }).total;
+	const debtResult = await db
+		.select({ total: sql<number>`COALESCE(SUM(${schema.reLoans.currentBalance}), 0)` })
+		.from(schema.reLoans);
+	const totalDebt = debtResult[0]?.total ?? 0;
 
 	// Property count
-	const countResult = await execute('SELECT COUNT(*) as count FROM re_properties');
-	const propertyCount = (countResult.rows[0] as unknown as { count: number }).count;
+	const countResult = await db
+		.select({ count: sql<number>`COUNT(*)` })
+		.from(schema.reProperties);
+	const propertyCount = countResult[0]?.count ?? 0;
 
 	return {
 		totalValue,

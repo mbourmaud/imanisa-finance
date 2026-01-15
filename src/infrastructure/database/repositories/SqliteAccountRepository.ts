@@ -4,80 +4,80 @@ import { Account as AccountEntity } from '@domain/account/Account';
 import { AccountType } from '@domain/account/AccountType';
 import { AssetCategory } from '@domain/account/AssetCategory';
 import { UniqueId } from '@domain/shared/UniqueId';
-import { execute } from '../turso';
-
-interface AccountRow {
-	id: string;
-	bank_id: string;
-	name: string;
-	type: string;
-	asset_category: string;
-	balance: number;
-	currency: string;
-	created_at: string;
-	updated_at: string;
-}
+import { eq, desc } from 'drizzle-orm';
+import { getDb, schema } from '../drizzle';
 
 export class SqliteAccountRepository implements AccountRepository {
 	async findById(id: UniqueId): Promise<Account | null> {
-		const result = await execute('SELECT * FROM accounts WHERE id = ?', [id.toString()]);
-		const row = result.rows[0] as unknown as AccountRow | undefined;
+		const db = getDb();
+		const result = await db
+			.select()
+			.from(schema.accounts)
+			.where(eq(schema.accounts.id, id.toString()))
+			.limit(1);
 
+		const row = result[0];
 		if (!row) return null;
 		return this.toDomain(row);
 	}
 
 	async findByBankId(bankId: UniqueId): Promise<Account[]> {
-		const result = await execute(
-			'SELECT * FROM accounts WHERE bank_id = ? ORDER BY created_at DESC',
-			[bankId.toString()]
-		);
+		const db = getDb();
+		const result = await db
+			.select()
+			.from(schema.accounts)
+			.where(eq(schema.accounts.bankId, bankId.toString()))
+			.orderBy(desc(schema.accounts.createdAt));
 
-		return (result.rows as unknown as AccountRow[])
+		return result
 			.map((row) => this.toDomain(row))
 			.filter((account): account is Account => account !== null);
 	}
 
 	async save(account: Account): Promise<void> {
-		await execute(
-			`INSERT INTO accounts (id, bank_id, name, type, asset_category, balance, currency, created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-			ON CONFLICT(id) DO UPDATE SET
-				name = excluded.name,
-				type = excluded.type,
-				asset_category = excluded.asset_category,
-				balance = excluded.balance,
-				currency = excluded.currency,
-				updated_at = excluded.updated_at`,
-			[
-				account.id.toString(),
-				account.bankId.toString(),
-				account.name,
-				account.type,
-				account.assetCategory,
-				account.balance.amount,
-				account.balance.currency,
-				account.createdAt.toISOString(),
-				account.updatedAt.toISOString()
-			]
-		);
+		const db = getDb();
+		await db
+			.insert(schema.accounts)
+			.values({
+				id: account.id.toString(),
+				bankId: account.bankId.toString(),
+				name: account.name,
+				type: account.type,
+				assetCategory: account.assetCategory,
+				balance: account.balance.amount,
+				currency: account.balance.currency,
+				createdAt: account.createdAt.toISOString(),
+				updatedAt: account.updatedAt.toISOString()
+			})
+			.onConflictDoUpdate({
+				target: schema.accounts.id,
+				set: {
+					name: account.name,
+					type: account.type,
+					assetCategory: account.assetCategory,
+					balance: account.balance.amount,
+					currency: account.balance.currency,
+					updatedAt: account.updatedAt.toISOString()
+				}
+			});
 	}
 
 	async delete(id: UniqueId): Promise<void> {
-		await execute('DELETE FROM accounts WHERE id = ?', [id.toString()]);
+		const db = getDb();
+		await db.delete(schema.accounts).where(eq(schema.accounts.id, id.toString()));
 	}
 
-	private toDomain(row: AccountRow): Account | null {
+	private toDomain(row: typeof schema.accounts.$inferSelect): Account | null {
 		const result = AccountEntity.reconstitute(
 			{
-				bankId: UniqueId.fromString(row.bank_id),
+				bankId: UniqueId.fromString(row.bankId),
 				name: row.name,
 				type: row.type as AccountType,
-				assetCategory: (row.asset_category as AssetCategory) ?? AccountEntity.getDefaultAssetCategory(row.type as AccountType),
+				assetCategory: (row.assetCategory as AssetCategory) ?? AccountEntity.getDefaultAssetCategory(row.type as AccountType),
 				balance: row.balance,
 				currency: row.currency,
-				createdAt: new Date(row.created_at),
-				updatedAt: new Date(row.updated_at)
+				createdAt: new Date(row.createdAt),
+				updatedAt: new Date(row.updatedAt)
 			},
 			UniqueId.fromString(row.id)
 		);
