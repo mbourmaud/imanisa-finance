@@ -1100,3 +1100,34 @@
 - The pulse animation in login used `border-color` which isn't compositor-friendly - replaced with opacity/transform
 
 ---
+
+## [Iteration 34] 2026-01-15 - US-306: UI: Performance mobile
+
+### What was implemented
+- Added lazy loading and explicit dimensions to all images:
+  - Navigation.svelte avatar: `loading="lazy" width="36" height="36"`
+  - Accounts page bank logos: `loading="lazy" width="40" height="40"`
+- Optimized list animations for large datasets (>50 items):
+  - Added `useStaggeredAnimations` derived state in transactions, accounts, and investissements pages
+  - Staggered animation-delay is now conditional: enabled for ≤50 items, disabled for >50
+  - This prevents animation jank on mobile when rendering many items
+- Added preconnect hint for CoinGecko API in app.html:
+  - `<link rel="preconnect" href="https://api.coingecko.com">`
+- Verified font-display: swap already in use via Google Fonts URL parameter
+
+### Files changed
+- src/lib/components/Navigation.svelte (added lazy loading and dimensions to avatar)
+- src/routes/accounts/+page.svelte (added lazy loading, dimensions, staggered animation optimization)
+- src/routes/investissements/+page.svelte (staggered animation optimization)
+- src/routes/transactions/+page.svelte (staggered animation optimization)
+- src/app.html (added preconnect for CoinGecko API)
+
+### Learnings for future iterations
+- Explicit image dimensions prevent CLS (Cumulative Layout Shift) on mobile
+- Lazy loading images below the fold saves bandwidth on initial page load
+- Staggered animations with many items (>50) cause jank on low-powered mobile devices
+- Use `$derived()` for computed boolean flags to conditionally apply inline styles
+- Preconnect hints help establish early connections to known API endpoints
+- Google Fonts URL already includes `display=swap` which is the recommended font-display strategy
+
+---

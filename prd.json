@@ -857,7 +857,7 @@
       ],
       "files": ["src/lib/components/", "src/app.html"],
       "priority": 306,
-      "passes": false,
+      "passes": true,
       "notes": "Tester sur iOS Low Power Mode"
     },
     {
