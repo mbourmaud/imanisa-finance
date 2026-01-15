@@ -1314,3 +1314,40 @@
 - Total rules after seed: ~65 bank mappings + 32 regex rules = ~97 rules
 
 ---
+
+## [Iteration 40] 2026-01-15 - US-404: Service: Mapping catégories bancaires
+
+### What was implemented
+- Created BankCategoryMapper service in `src/application/budget/BankCategoryMapper.ts`
+- Maps Caisse d'Épargne bank categories to internal category IDs:
+  - Handles formats like "Categorie" and "Categorie > Sous categorie"
+  - ~20+ CE category mappings including accented variants
+- Maps Boursorama bank categories to internal category IDs:
+  - Handles formats like "category" and "categoryParent > category"
+  - ~25+ Boursorama category mappings
+- Matching strategy (in order of priority):
+  1. Exact match on full category string
+  2. Match on child part (most specific) from "Parent > Child"
+  3. Match on parent part as fallback
+  4. Returns null if no match found
+- Case-insensitive matching for robustness
+- Helper functions:
+  - `mapBankCategory(rawCategory, parserKey)` - main mapping function
+  - `parserProvidesCategories(parserKey)` - checks if bank provides native categories
+  - `getSupportedBankParsers()` - returns list of parsers with category support
+- Created barrel export in `src/application/budget/index.ts`
+
+### Files changed
+- src/application/budget/BankCategoryMapper.ts (new)
+- src/application/budget/index.ts (new)
+
+### Learnings for future iterations
+- Application layer services for budget go in `src/application/budget/`
+- Bank category mapping uses ParserKey enum from `@domain/import/CSVParser`
+- CE parser produces rawCategory as "Categorie > Sous categorie" format
+- Boursorama parser produces rawCategory as "categoryParent > category" format
+- Credit Mutuel has no native categories - returns null (will use regex rules)
+- Case-insensitive matching helps with accent variations (Santé vs Sante, Électricité vs Electricite)
+- Import from `@application/budget` for mapBankCategory, CategoryMappingResult
+
+---

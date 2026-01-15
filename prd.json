@@ -985,7 +985,7 @@
       ],
       "files": ["src/application/budget/BankCategoryMapper.ts"],
       "priority": 404,
-      "passes": false,
+      "passes": true,
       "notes": "~80% des transactions CE/Bourso ont une catégorie bancaire utilisable"
     },
     {
