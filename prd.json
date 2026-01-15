@@ -1127,8 +1127,8 @@
       ],
       "files": ["e2e/budget.test.ts"],
       "priority": 916,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "6 E2E tests for budget charts, periods, and category rules"
     }
   ]
 }
