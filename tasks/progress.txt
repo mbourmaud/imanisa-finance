@@ -8,6 +8,36 @@
 - Use xlsx library's `utils.sheet_to_json<RowType>()` for typed XLSX parsing
 - PWA icons should include both regular and maskable versions (192x192, 512x512)
 - Static assets go in /static/ and are referenced via %sveltekit.assets%
+- Auto-categorization priority: manual (never overwrite) > bank category > regex rules
+- Application services in `src/application/` take repositories as constructor dependencies
+
+---
+
+## [Iteration 4] 2026-01-15 - US-405
+
+**Story:** Service: Auto-catégorisation des transactions
+
+**What was implemented:**
+- Created `AutoCategorizationService.ts` in `src/application/budget/`
+- Implements `categorizeTransaction()` method returning `{ categoryId, source, confidence }`
+- Implements `categorizeAll()` method returning `{ categorized, skipped, manual, bySource }`
+- Priority order: manual (never overwrite) > bank category mapping > regex rules
+- Confidence scoring: 1.0 for bank/manual, 0.8 for exact regex match, 0.5 for partial
+- Rules cache with `clearRulesCache()` for invalidation after rule changes
+- Uses dependency injection: `CategoryRepository` (required) and `TransactionRepository` (optional for re-categorization)
+- Integrates with `BankCategoryMapper` for CE/Boursorama category mapping
+- Uses `canOverwrite()` from domain to respect category source priority
+
+**Files changed:**
+- `src/application/budget/AutoCategorizationService.ts` (new)
+- `src/application/budget/index.ts` (modified - exports)
+
+**Learnings for future iterations:**
+- Application services should use dependency injection for repositories
+- Use `canOverwrite()` helper from `TransactionCategoryAssignment` to check if we can replace existing category
+- `CategoryRule.matches()` method handles regex matching with case-insensitivity
+- Bank categories are only available at import time via `ParsedTransaction.rawCategory`
+- For re-categorization of existing transactions, only regex rules can be applied (rawCategory not stored)
 
 ---
 

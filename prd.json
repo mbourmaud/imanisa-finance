@@ -1003,7 +1003,7 @@
       ],
       "files": ["src/application/budget/AutoCategorizationService.ts"],
       "priority": 405,
-      "passes": false,
+      "passes": true,
       "notes": "Ne jamais écraser une catégorisation manuelle"
     },
     {
