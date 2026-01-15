@@ -1057,7 +1057,7 @@
       ],
       "files": ["src/routes/budget/", "src/lib/components/budget/"],
       "priority": 408,
-      "passes": false,
+      "passes": true,
       "notes": "Inspiration: apps budget type Bankin, Linxo"
     },
     {

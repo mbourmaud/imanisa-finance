@@ -20,6 +20,7 @@
 	const navItems: NavItem[] = [
 		{ href: '/', label: 'Synthèse', icon: 'dashboard' },
 		{ href: '/accounts', label: 'Comptes', icon: 'wallet' },
+		{ href: '/budget', label: 'Budget', icon: 'pie-chart' },
 		{ href: '/investissements', label: 'Invest.', icon: 'chart' },
 		{ href: '/immobilier', label: 'Immo.', icon: 'home' },
 		{ href: '/transactions', label: 'Opéra.', icon: 'list' },
@@ -88,6 +89,11 @@
 						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 							<rect x="2" y="4" width="20" height="16" rx="2"/>
 							<path d="M2 10h20"/>
+						</svg>
+					{:else if item.icon === 'pie-chart'}
+						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+							<path d="M22 12A10 10 0 0 0 12 2v10z"/>
 						</svg>
 					{:else if item.icon === 'chart'}
 						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
