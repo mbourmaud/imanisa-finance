@@ -1625,3 +1625,47 @@
 - Value objects use equals() method for comparison testing
 - Entity equality is based on UniqueId, not props comparison
 - reconstitute() method skips validation - useful for loading from persistence
+
+---
+
+## [Iteration 47] 2026-01-15 - US-902: Tests Parsers (unitaires avec fixtures)
+
+### What was implemented
+- Created CSV fixtures for 4 banks (realistic test data):
+  - credit_mutuel.csv: 6 transactions with debit/credit, French format
+  - boursorama.csv: 5 transactions with ISO dates, category hierarchy
+  - caisse_epargne.csv: 5 transactions with 13 columns, native categories
+  - caisse_epargne_entreprise.csv: 5 transactions with 10 columns, Oui/Non pointage
+- Created XLSX fixture generators (programmatic):
+  - Bourse Direct: PEA positions with PRU, +/- value, market info
+  - Linxea: Life insurance positions with category hierarchy
+  - Binance: Crypto buy transactions with amount/symbol extraction
+- Created 7 parser test files with 91 tests total:
+  - CreditMutuelParser.test.ts: 13 tests
+  - BoursoramaParser.test.ts: 15 tests
+  - CaisseEpargneParser.test.ts: 17 tests
+  - CaisseEpargneEntrepriseParser.test.ts: 17 tests
+  - BourseDirectParser.test.ts: 8 tests
+  - LinxeaParser.test.ts: 9 tests
+  - BinanceParser.test.ts: 12 tests
+
+### Files changed
+- src/tests/fixtures/csv/credit_mutuel.csv (new)
+- src/tests/fixtures/csv/boursorama.csv (new)
+- src/tests/fixtures/csv/caisse_epargne.csv (new)
+- src/tests/fixtures/csv/caisse_epargne_entreprise.csv (new)
+- src/tests/fixtures/xlsx/index.ts (new)
+- src/infrastructure/parsers/CreditMutuelParser.test.ts (new)
+- src/infrastructure/parsers/BoursoramaParser.test.ts (new)
+- src/infrastructure/parsers/CaisseEpargneParser.test.ts (new)
+- src/infrastructure/parsers/CaisseEpargneEntrepriseParser.test.ts (new)
+- src/infrastructure/parsers/BourseDirectParser.test.ts (new)
+- src/infrastructure/parsers/LinxeaParser.test.ts (new)
+- src/infrastructure/parsers/BinanceParser.test.ts (new)
+
+### Learnings for future iterations
+- CSV fixtures need exact column count matching parser expectations
+- XLSX fixtures can be generated programmatically using xlsx library utilities
+- Test both fixture file parsing and inline data parsing
+- Include edge cases: empty files, missing fields, zero quantities (should skip)
+- InvestmentParsers implement both parsePositions() and parseTransactions() with one returning []

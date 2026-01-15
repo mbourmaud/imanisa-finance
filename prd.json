@@ -559,7 +559,7 @@
       ],
       "files": ["src/domain/**/*.test.ts"],
       "priority": 901,
-      "passes": false,
+      "passes": true,
       "notes": "Le domaine doit être testé au maximum - c'est la logique métier pure"
     },
     {
@@ -582,7 +582,7 @@
       ],
       "files": ["src/infrastructure/parsers/*.test.ts", "src/tests/fixtures/"],
       "priority": 902,
-      "passes": false,
+      "passes": true,
       "notes": "Fixtures basées sur les formats réels fournis par l'utilisateur"
     },
     {
