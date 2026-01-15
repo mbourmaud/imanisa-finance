@@ -447,6 +447,44 @@ CREATE TABLE IF NOT EXISTS sync_status (
 );
 
 -- =====================================================
+-- BUDGET MODULE - Categories & Rules
+-- =====================================================
+
+-- Categories (hierarchical)
+CREATE TABLE IF NOT EXISTS categories (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    parent_id TEXT,
+    icon TEXT NOT NULL,
+    color TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+-- Category rules for auto-categorization
+CREATE TABLE IF NOT EXISTS category_rules (
+    id TEXT PRIMARY KEY,
+    category_id TEXT NOT NULL,
+    pattern TEXT NOT NULL,
+    priority INTEGER NOT NULL DEFAULT 100,
+    source_filter TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+-- Transaction to category assignments
+CREATE TABLE IF NOT EXISTS transaction_categories (
+    transaction_id TEXT PRIMARY KEY,
+    category_id TEXT NOT NULL,
+    source TEXT NOT NULL CHECK (source IN ('bank', 'auto', 'manual')),
+    confidence REAL NOT NULL DEFAULT 1.0,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+-- =====================================================
 -- INDEXES
 -- =====================================================
 
@@ -488,3 +526,12 @@ CREATE INDEX IF NOT EXISTS idx_investment_positions_symbol ON investment_positio
 CREATE INDEX IF NOT EXISTS idx_investment_transactions_source_id ON investment_transactions(source_id);
 CREATE INDEX IF NOT EXISTS idx_investment_transactions_date ON investment_transactions(date);
 CREATE INDEX IF NOT EXISTS idx_investment_transactions_symbol ON investment_transactions(symbol);
+
+-- Budget Module indexes
+CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id);
+CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name);
+CREATE INDEX IF NOT EXISTS idx_category_rules_category_id ON category_rules(category_id);
+CREATE INDEX IF NOT EXISTS idx_category_rules_priority ON category_rules(priority);
+CREATE INDEX IF NOT EXISTS idx_category_rules_is_active ON category_rules(is_active);
+CREATE INDEX IF NOT EXISTS idx_transaction_categories_category_id ON transaction_categories(category_id);
+CREATE INDEX IF NOT EXISTS idx_transaction_categories_source ON transaction_categories(source);
