@@ -1020,7 +1020,7 @@
       ],
       "files": ["src/application/import/ImportTransactionsUseCase.ts"],
       "priority": 406,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {

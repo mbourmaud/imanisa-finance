@@ -1351,3 +1351,37 @@
 - Import from `@application/budget` for mapBankCategory, CategoryMappingResult
 
 ---
+
+## [Iteration 41] 2026-01-15 - US-406: Hook Auto-catégorisation à l'import
+
+### What was implemented
+- Integrated AutoCategorizationService into ImportTransactionsUseCase
+- Modified execute() method to:
+  - Store parsed transaction data (including rawCategory) alongside domain transaction
+  - Call categorizeTransactions() after saving transactions to database
+  - Return categorization stats in ImportResult
+- Created new CategorizationStats interface with byBank, byRule, uncategorized counts
+- Updated /api/import/csv endpoint to:
+  - Inject CategoryRepository into ImportTransactionsUseCase
+  - Return categorization stats in JSON response (snake_case: by_bank, by_rule, uncategorized)
+- Categorization flow at import:
+  1. Parse CSV and create transactions
+  2. Save transactions to database
+  3. For each transaction, call AutoCategorizationService.categorizeAndSave()
+  4. Count results by source (BANK vs AUTO) and uncategorized
+  5. Return stats in import result
+
+### Files changed
+- src/application/import/ImportTransactionsUseCase.ts (major changes)
+- src/application/import/index.ts (added CategorizationStats export)
+- src/routes/api/import/csv/+server.ts (added CategoryRepository, categorization response)
+
+### Learnings for future iterations
+- ImportTransactionsUseCase now accepts optional CategoryRepository (3rd constructor param)
+- Categorization happens automatically when CategoryRepository is provided
+- API response includes categorization object with snake_case fields
+- rawCategory from ParsedTransaction is preserved through import for bank category mapping
+- TransactionForCategorization interface requires: id, description, rawCategory?, parserKey?
+- CategorySource.BANK for bank categories, CategorySource.AUTO for regex rules
+
+---
