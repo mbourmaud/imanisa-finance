@@ -7,7 +7,7 @@
 	const navItems = [
 		{ href: '/', label: 'Synthèse', icon: 'dashboard' },
 		{ href: '/accounts', label: 'Comptes', icon: 'wallet' },
-		{ href: '/investments', label: 'Investissements', icon: 'chart' },
+		{ href: '/investissements', label: 'Invest.', icon: 'chart' },
 		{ href: '/immobilier', label: 'Immobilier', icon: 'home' },
 		{ href: '/transactions', label: 'Transactions', icon: 'list' },
 		{ href: '/loans', label: 'Crédits', icon: 'loan' },
