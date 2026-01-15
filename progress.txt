@@ -1506,3 +1506,41 @@
 - Category bar uses inline style with percentage width and category color
 
 ---
+
+## [Iteration 45] 2026-01-15 - US-409: UI Catégorisation manuelle inline
+
+### What was implemented
+- Created `CategoryBadge.svelte` component for inline category editing:
+  - Displays category name with icon and color
+  - Source indicator dot: blue (bank), gray (auto), green (manual)
+  - Question mark badge for uncategorized transactions (warning style)
+  - Dropdown with hierarchical category selection (parent > child)
+  - Mobile-responsive: bottom sheet dropdown on mobile
+  - Loading spinner during API call
+  - Click outside or Escape key to close dropdown
+- Updated `/transactions` page with inline categorization:
+  - CategoryBadge replaces static category text in transaction rows
+  - Added "Non catégorisées" filter button with count badge
+  - URL-based filter: `?uncategorized=true` for bookmarkable view
+  - aria-live region for screen reader announcements on category change
+- Updated `page.server.ts` to load categories and assignments:
+  - Query all categories with hierarchical structure
+  - Query transaction_categories for assignments with source info
+  - Load uncategorized count for filter badge
+  - Support `?uncategorized=true` filter parameter
+
+### Files changed
+- src/lib/components/CategoryBadge.svelte (new)
+- src/routes/transactions/+page.server.ts (enhanced with categories)
+- src/routes/transactions/+page.svelte (CategoryBadge integration, filter)
+
+### Learnings for future iterations
+- CategoryBadge component uses `$state()` for isOpen, isLoading, dropdownRef
+- Click outside detection: document.addEventListener in $effect with cleanup
+- Screen reader announcements: aria-live="polite" region with $state message
+- invalidateAll() from $app/navigation refreshes page data after mutation
+- Mobile dropdown: use position: fixed with left/right/bottom instead of absolute
+- Category source colors: bank=primary, auto=muted, manual=success
+- Uncategorized filter: LEFT JOIN with WHERE NULL to find missing assignments
+
+---

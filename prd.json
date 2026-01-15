@@ -1072,9 +1072,9 @@
         "Indicateur visuel: badge couleur différente selon source (bank=bleu, auto=gris, manual=vert)",
         "Filtrer les transactions par 'Non catégorisées' pour review rapide"
       ],
-      "files": ["src/routes/transactions/", "src/lib/components/TransactionRow.svelte"],
+      "files": ["src/routes/transactions/", "src/lib/components/CategoryBadge.svelte"],
       "priority": 409,
-      "passes": false,
+      "passes": true,
       "notes": "UX rapide pour catégoriser les ~5% restants"
     },
     {
