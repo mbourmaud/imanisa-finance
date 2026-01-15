@@ -8,3 +8,10 @@ export {
 	getSupportedBankParsers,
 	type CategoryMappingResult
 } from './BankCategoryMapper';
+
+export {
+	AutoCategorizationService,
+	type CategorizationResult,
+	type CategorizeAllResult,
+	type TransactionForCategorization
+} from './AutoCategorizationService';
