@@ -341,6 +341,31 @@ export const propertyCharges = sqliteTable(
 );
 
 // =====================================================
+// IMPORT MODULE - Data Sources
+// =====================================================
+
+export const dataSources = sqliteTable(
+	'data_sources',
+	{
+		id: text('id').primaryKey(),
+		name: text('name').notNull(),
+		type: text('type').notNull(),
+		ownerEntityId: text('owner_entity_id')
+			.notNull()
+			.references(() => entities.id, { onDelete: 'cascade' }),
+		url: text('url').notNull(),
+		format: text('format').notNull(),
+		parserKey: text('parser_key').notNull(),
+		lastSyncAt: text('last_sync_at'),
+		createdAt: text('created_at').default("datetime('now')")
+	},
+	(table) => [
+		index('idx_data_sources_owner_entity_id').on(table.ownerEntityId),
+		index('idx_data_sources_parser_key').on(table.parserKey)
+	]
+);
+
+// =====================================================
 // INVESTMENTS
 // =====================================================
 
@@ -463,7 +488,8 @@ export const entitiesRelations = relations(entities, ({ many }) => ({
 	ownedShares: many(entityShares, { relationName: 'holder' }),
 	sciShares: many(entityShares, { relationName: 'sci' }),
 	propertyOwnerships: many(propertyOwnership),
-	loanResponsibilities: many(loanResponsibility)
+	loanResponsibilities: many(loanResponsibility),
+	dataSources: many(dataSources)
 }));
 
 export const entitySharesRelations = relations(entityShares, ({ one }) => ({
@@ -511,4 +537,8 @@ export const positionsRelations = relations(positions, ({ one, many }) => ({
 
 export const investmentOrdersRelations = relations(investmentOrders, ({ one }) => ({
 	position: one(positions, { fields: [investmentOrders.positionId], references: [positions.id] })
+}));
+
+export const dataSourcesRelations = relations(dataSources, ({ one }) => ({
+	ownerEntity: one(entities, { fields: [dataSources.ownerEntityId], references: [entities.id] })
 }));

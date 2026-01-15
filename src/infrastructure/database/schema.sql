@@ -281,6 +281,24 @@ CREATE TABLE IF NOT EXISTS property_charges (
 );
 
 -- =====================================================
+-- IMPORT MODULE - Data Sources
+-- =====================================================
+
+-- Data sources (bank accounts for CSV import)
+CREATE TABLE IF NOT EXISTS data_sources (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL,
+    owner_entity_id TEXT NOT NULL,
+    url TEXT NOT NULL,
+    format TEXT NOT NULL,
+    parser_key TEXT NOT NULL,
+    last_sync_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (owner_entity_id) REFERENCES entities(id) ON DELETE CASCADE
+);
+
+-- =====================================================
 -- INVESTMENTS
 -- =====================================================
 
@@ -404,3 +422,7 @@ CREATE INDEX IF NOT EXISTS idx_re_loans_property_id ON re_loans(property_id);
 CREATE INDEX IF NOT EXISTS idx_loan_responsibility_loan_id ON loan_responsibility(loan_id);
 CREATE INDEX IF NOT EXISTS idx_loan_responsibility_entity_id ON loan_responsibility(entity_id);
 CREATE INDEX IF NOT EXISTS idx_property_charges_property_id ON property_charges(property_id);
+
+-- Import Module indexes
+CREATE INDEX IF NOT EXISTS idx_data_sources_owner_entity_id ON data_sources(owner_entity_id);
+CREATE INDEX IF NOT EXISTS idx_data_sources_parser_key ON data_sources(parser_key);
