@@ -301,7 +301,57 @@ CREATE TABLE IF NOT EXISTS data_sources (
 );
 
 -- =====================================================
--- INVESTMENTS
+-- INVESTMENT MODULE (Enhanced) - Sources, Positions, Transactions
+-- =====================================================
+
+-- Investment sources (brokers: Bourse Direct, Linxea, Binance, etc.)
+CREATE TABLE IF NOT EXISTS investment_sources (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('pea', 'assurance_vie', 'crypto', 'cto')),
+    owner_entity_id TEXT NOT NULL,
+    url TEXT NOT NULL,
+    format TEXT NOT NULL,
+    parser_key TEXT NOT NULL CHECK (parser_key IN ('bourse_direct', 'linxea', 'binance')),
+    last_sync_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (owner_entity_id) REFERENCES entities(id) ON DELETE CASCADE
+);
+
+-- Investment positions (portfolio snapshot)
+CREATE TABLE IF NOT EXISTS investment_positions (
+    id TEXT PRIMARY KEY,
+    source_id TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    isin TEXT,
+    quantity REAL NOT NULL,
+    avg_buy_price REAL NOT NULL,
+    current_price REAL NOT NULL,
+    current_value REAL NOT NULL,
+    gain_loss REAL NOT NULL,
+    gain_loss_percent REAL NOT NULL,
+    last_updated TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (source_id) REFERENCES investment_sources(id) ON DELETE CASCADE
+);
+
+-- Investment transactions (buy/sell history)
+CREATE TABLE IF NOT EXISTS investment_transactions (
+    id TEXT PRIMARY KEY,
+    source_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('buy', 'sell')),
+    quantity REAL NOT NULL,
+    price_per_unit REAL NOT NULL,
+    total_amount REAL NOT NULL,
+    fee REAL NOT NULL DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (source_id) REFERENCES investment_sources(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- INVESTMENTS (Legacy - kept for compatibility)
 -- =====================================================
 
 -- Positions (ETF, actions, crypto, fonds)
@@ -429,3 +479,12 @@ CREATE INDEX IF NOT EXISTS idx_property_charges_property_id ON property_charges(
 CREATE INDEX IF NOT EXISTS idx_data_sources_owner_entity_id ON data_sources(owner_entity_id);
 CREATE INDEX IF NOT EXISTS idx_data_sources_parser_key ON data_sources(parser_key);
 CREATE INDEX IF NOT EXISTS idx_data_sources_linked_account_id ON data_sources(linked_account_id);
+
+-- Investment Module indexes
+CREATE INDEX IF NOT EXISTS idx_investment_sources_owner_entity_id ON investment_sources(owner_entity_id);
+CREATE INDEX IF NOT EXISTS idx_investment_sources_parser_key ON investment_sources(parser_key);
+CREATE INDEX IF NOT EXISTS idx_investment_positions_source_id ON investment_positions(source_id);
+CREATE INDEX IF NOT EXISTS idx_investment_positions_symbol ON investment_positions(symbol);
+CREATE INDEX IF NOT EXISTS idx_investment_transactions_source_id ON investment_transactions(source_id);
+CREATE INDEX IF NOT EXISTS idx_investment_transactions_date ON investment_transactions(date);
+CREATE INDEX IF NOT EXISTS idx_investment_transactions_symbol ON investment_transactions(symbol);

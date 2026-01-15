@@ -23,6 +23,8 @@
 - CSV parsers: `src/infrastructure/parsers/` - each bank implements CSVParser interface, handles encoding/date/amount format differences
 - Application layer: Use cases go in `src/application/{module}/` with ParserFactory pattern for extensibility
 - ImportTransactionsUseCase: Links DataSource → Account via `linkedAccountId`, deduplicates on date+amount+description
+- Investment domain module: `@domain/investment` for InvestmentSource, InvestmentPosition, InvestmentTransaction, InvestmentParser
+- InvestmentParser interface: parsePositions() and parseTransactions() methods, content can be ArrayBuffer (XLSX) or string (CSV)
 
 ---
 
@@ -534,5 +536,139 @@
 - TransactionRepositoryImpl imported from `@infrastructure/database/repositories/TransactionRepository`
 - File upload: use `request.formData()` then `.get('file')` to get the File object
 - File content: use `file.text()` to read CSV content as string
+
+---
+
+## [Iteration 18] 2026-01-15 - US-108: Seed: Configurer les 7 sources bancaires
+
+### What was implemented
+- Created Isaac entity (person, blue color) for child accounts
+- Created Joint Mathieu+Ninon entity (joint, green color) for joint CE account
+- Created seed script `src/scripts/seed-data-sources.ts` that inserts:
+  - 2 new entities (Isaac, Joint Mathieu+Ninon)
+  - 7 data sources for CSV import:
+    - CM Mathieu (credit_mutuel parser)
+    - CE Perso (caisse_epargne parser, Mathieu)
+    - CE Joint (caisse_epargne parser, Joint)
+    - CE Livret A (caisse_epargne parser, Mathieu)
+    - CE SCI IMANISA (caisse_epargne_entreprise parser, SCI)
+    - Boursorama Isaac CC (boursorama parser)
+    - Boursorama Isaac Livret A (boursorama parser)
+- Added npm script `seed:data-sources` to package.json
+
+### Files changed
+- src/scripts/seed-data-sources.ts (new)
+- package.json (added seed:data-sources script)
+
+### Learnings for future iterations
+- Entity IDs follow kebab-case: isaac, joint-mathieu-ninon
+- Data source IDs use ds- prefix: ds-cm-mathieu, ds-ce-perso, etc.
+- Data sources table may need to be created manually if schema init fails (use sqlite3 CLI)
+- Data sources link to entities via owner_entity_id FK
+- Run with: `npx tsx src/scripts/seed-data-sources.ts` or `npm run seed:data-sources`
+
+---
+
+## [Iteration 19] 2026-01-15 - US-109: UI: Page Import avec Sync Manuel
+
+### What was implemented
+- Created `/import` route with page.server.ts and page.svelte
+- Page displays data sources grouped by owner entity (Mathieu, Ninon, SCI IMANISA, Isaac, Joint)
+- Each owner group shows:
+  - Owner avatar with color from entities table
+  - Owner name and account count
+  - List of data sources with name, type, last sync date, and link to bank
+- Created "Ouvrir tous les liens" button that opens all bank export URLs in new tabs
+- Created `ImportDropZone.svelte` component with:
+  - Drag & drop functionality for CSV files
+  - Click to browse file functionality
+  - Visual states: idle, importing (spinner), success, error
+  - Shows import result: number imported, number skipped (duplicates), errors
+- Added Import link with upload icon to navigation sidebar (both desktop and mobile)
+- Info banner explains the import workflow to users
+
+### Files changed
+- src/routes/import/+page.server.ts (new)
+- src/routes/import/+page.svelte (new)
+- src/lib/components/import/ImportDropZone.svelte (new)
+- src/lib/components/import/index.ts (new)
+- src/routes/+layout.svelte (added Import nav item)
+
+### Learnings for future iterations
+- Import components go in `src/lib/components/import/` with barrel export in index.ts
+- Page server loads both data sources and entities to join owner info
+- GroupedDataSources interface groups sources by ownerEntityId
+- ImportDropZone accepts onUpload callback and manages its own drag/drop state with $state()
+- Navigation items array in +layout.svelte defines all nav links, with icon SVG conditionals below
+- Import states tracked per source using a Record<sourceId, state> pattern with $state()
+
+---
+
+
+## [Iteration 20] 2026-01-15 - US-200: Domain: InvestmentPosition et InvestmentTransaction
+
+### What was implemented
+- Created comprehensive domain layer for investment tracking:
+  - `InvestmentSourceType.ts` - enum (PEA, ASSURANCE_VIE, CRYPTO, CTO) with labels
+  - `InvestmentSource.ts` - entity representing broker sources (name, type, owner, url, format, parserKey)
+  - `InvestmentPosition.ts` - entity for portfolio positions (sourceId, symbol, isin, quantity, avgBuyPrice, currentPrice, currentValue, gainLoss, gainLossPercent)
+  - `InvestmentTransaction.ts` - entity for buy/sell transactions (sourceId, date, symbol, type, quantity, pricePerUnit, totalAmount, fee)
+  - `InvestmentParser.ts` - interface with parsePositions() and parseTransactions() methods
+  - `ParsedPosition.ts` - DTO for parsed position data from broker files
+  - `ParsedInvestmentTransaction.ts` - DTO for parsed transaction data from broker files
+  - Updated `index.ts` barrel export with all new types
+
+### Files changed
+- src/domain/investment/InvestmentSourceType.ts (new)
+- src/domain/investment/InvestmentSource.ts (new)
+- src/domain/investment/InvestmentPosition.ts (new)
+- src/domain/investment/InvestmentTransaction.ts (new)
+- src/domain/investment/InvestmentParser.ts (new)
+- src/domain/investment/ParsedPosition.ts (new)
+- src/domain/investment/ParsedInvestmentTransaction.ts (new)
+- src/domain/investment/index.ts (updated)
+
+### Learnings for future iterations
+- Investment domain follows same DDD patterns as import domain (Entity, Result, create/reconstitute)
+- InvestmentParserKey enum maps to infrastructure parser implementations (bourse_direct, linxea, binance)
+- InvestmentParser interface uses ArrayBuffer | string for content to support both XLSX and CSV formats
+- ParsedPosition includes all fields needed for display: currentValue, gainLoss, gainLossPercent already calculated by parser
+- InvestmentTransaction normalizes symbol to uppercase for consistency
+- InvestmentPosition has updateFromParsed() method for easy updates from parser output
+- Import from `@domain/investment` for InvestmentSource, InvestmentPosition, InvestmentTransaction types
+
+---
+
+## [Iteration 21] 2026-01-15 - US-201: Infrastructure: Tables et Repository Investissements
+
+### What was implemented
+- Added 3 new tables to Drizzle schema (src/infrastructure/database/schema/index.ts):
+  - `investment_sources` - broker sources (Bourse Direct, Linxea, Binance)
+  - `investment_positions` - portfolio positions snapshot
+  - `investment_transactions` - buy/sell transaction history
+- Added corresponding tables to schema.sql for manual DB creation
+- Added Drizzle relations for the new tables:
+  - investmentSourcesRelations: links to ownerEntity, has many positions and transactions
+  - investmentPositionsRelations: links to source
+  - investmentTransactionsRelations: links to source
+  - Added investmentSources to entitiesRelations
+- Created `InvestmentRepository.ts` with full CRUD operations:
+  - Source methods: findAllSources, findSourceById, findSourcesByOwnerEntityId, saveSource, deleteSource
+  - Position methods: findAllPositions, findPositionById, findPositionsBySourceId, findPositionBySourceAndSymbol, savePosition, deletePosition, deletePositionsBySourceId
+  - Transaction methods: findAllTransactions, findTransactionById, findTransactionsBySourceId, findTransactionsBySymbol, saveTransaction, deleteTransaction, deleteTransactionsBySourceId
+  - Aggregate queries: getInvestmentSummary, getPositionsGroupedBySource
+
+### Files changed
+- src/infrastructure/database/schema/index.ts (added 3 tables + relations)
+- src/infrastructure/database/schema.sql (added 3 tables + 7 indexes)
+- src/infrastructure/repositories/InvestmentRepository.ts (new)
+
+### Learnings for future iterations
+- Investment tables follow same pattern as data_sources: FK to entities via owner_entity_id
+- InvestmentSourceType enum values: 'pea', 'assurance_vie', 'crypto', 'cto'
+- InvestmentParserKey enum values: 'bourse_direct', 'linxea', 'binance'
+- Repository follows same pattern as DataSourceRepository: toDomain/toPersistence mappers
+- Aggregate queries calculate totals from positions: investedAmount = quantity * avgBuyPrice
+- InvestmentRepositoryImpl is a single class handling all 3 entity types (sources, positions, transactions)
 
 ---

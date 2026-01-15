@@ -368,7 +368,79 @@ export const dataSources = sqliteTable(
 );
 
 // =====================================================
-// INVESTMENTS
+// INVESTMENT MODULE (Enhanced) - Sources, Positions, Transactions
+// =====================================================
+
+export const investmentSources = sqliteTable(
+	'investment_sources',
+	{
+		id: text('id').primaryKey(),
+		name: text('name').notNull(),
+		type: text('type', { enum: ['pea', 'assurance_vie', 'crypto', 'cto'] }).notNull(),
+		ownerEntityId: text('owner_entity_id')
+			.notNull()
+			.references(() => entities.id, { onDelete: 'cascade' }),
+		url: text('url').notNull(),
+		format: text('format').notNull(),
+		parserKey: text('parser_key', { enum: ['bourse_direct', 'linxea', 'binance'] }).notNull(),
+		lastSyncAt: text('last_sync_at'),
+		createdAt: text('created_at').default("datetime('now')")
+	},
+	(table) => [
+		index('idx_investment_sources_owner_entity_id').on(table.ownerEntityId),
+		index('idx_investment_sources_parser_key').on(table.parserKey)
+	]
+);
+
+export const investmentPositions = sqliteTable(
+	'investment_positions',
+	{
+		id: text('id').primaryKey(),
+		sourceId: text('source_id')
+			.notNull()
+			.references(() => investmentSources.id, { onDelete: 'cascade' }),
+		symbol: text('symbol').notNull(),
+		isin: text('isin'),
+		quantity: real('quantity').notNull(),
+		avgBuyPrice: real('avg_buy_price').notNull(),
+		currentPrice: real('current_price').notNull(),
+		currentValue: real('current_value').notNull(),
+		gainLoss: real('gain_loss').notNull(),
+		gainLossPercent: real('gain_loss_percent').notNull(),
+		lastUpdated: text('last_updated').notNull(),
+		createdAt: text('created_at').default("datetime('now')")
+	},
+	(table) => [
+		index('idx_investment_positions_source_id').on(table.sourceId),
+		index('idx_investment_positions_symbol').on(table.symbol)
+	]
+);
+
+export const investmentTransactions = sqliteTable(
+	'investment_transactions',
+	{
+		id: text('id').primaryKey(),
+		sourceId: text('source_id')
+			.notNull()
+			.references(() => investmentSources.id, { onDelete: 'cascade' }),
+		date: text('date').notNull(),
+		symbol: text('symbol').notNull(),
+		type: text('type', { enum: ['buy', 'sell'] }).notNull(),
+		quantity: real('quantity').notNull(),
+		pricePerUnit: real('price_per_unit').notNull(),
+		totalAmount: real('total_amount').notNull(),
+		fee: real('fee').notNull().default(0),
+		createdAt: text('created_at').default("datetime('now')")
+	},
+	(table) => [
+		index('idx_investment_transactions_source_id').on(table.sourceId),
+		index('idx_investment_transactions_date').on(table.date),
+		index('idx_investment_transactions_symbol').on(table.symbol)
+	]
+);
+
+// =====================================================
+// INVESTMENTS (Legacy - kept for compatibility)
 // =====================================================
 
 export const positions = sqliteTable(
@@ -491,7 +563,8 @@ export const entitiesRelations = relations(entities, ({ many }) => ({
 	sciShares: many(entityShares, { relationName: 'sci' }),
 	propertyOwnerships: many(propertyOwnership),
 	loanResponsibilities: many(loanResponsibility),
-	dataSources: many(dataSources)
+	dataSources: many(dataSources),
+	investmentSources: many(investmentSources)
 }));
 
 export const entitySharesRelations = relations(entityShares, ({ one }) => ({
@@ -544,4 +617,19 @@ export const investmentOrdersRelations = relations(investmentOrders, ({ one }) =
 export const dataSourcesRelations = relations(dataSources, ({ one }) => ({
 	ownerEntity: one(entities, { fields: [dataSources.ownerEntityId], references: [entities.id] }),
 	linkedAccount: one(accounts, { fields: [dataSources.linkedAccountId], references: [accounts.id] })
+}));
+
+// Investment Module Relations
+export const investmentSourcesRelations = relations(investmentSources, ({ one, many }) => ({
+	ownerEntity: one(entities, { fields: [investmentSources.ownerEntityId], references: [entities.id] }),
+	positions: many(investmentPositions),
+	transactions: many(investmentTransactions)
+}));
+
+export const investmentPositionsRelations = relations(investmentPositions, ({ one }) => ({
+	source: one(investmentSources, { fields: [investmentPositions.sourceId], references: [investmentSources.id] })
+}));
+
+export const investmentTransactionsRelations = relations(investmentTransactions, ({ one }) => ({
+	source: one(investmentSources, { fields: [investmentTransactions.sourceId], references: [investmentSources.id] })
 }));

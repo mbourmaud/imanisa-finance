@@ -310,7 +310,7 @@
       ],
       "files": ["src/scripts/seed-data-sources.ts"],
       "priority": 108,
-      "passes": false,
+      "passes": true,
       "notes": "Isaac = enfant, créer entité Isaac (person, blue?) avant"
     },
     {
@@ -328,7 +328,7 @@
       ],
       "files": ["src/routes/import/", "src/lib/components/import/"],
       "priority": 109,
-      "passes": false,
+      "passes": true,
       "notes": "Flow: clic sync → onglets s'ouvrent → user télécharge → drop fichiers → import"
     },
     {
@@ -366,7 +366,7 @@
       ],
       "files": ["src/domain/investment/"],
       "priority": 200,
-      "passes": false,
+      "passes": true,
       "notes": "Positions = snapshot valorisation, Transactions = historique achats/ventes"
     },
     {
@@ -383,7 +383,7 @@
       ],
       "files": ["src/infrastructure/database/schema/", "src/infrastructure/repositories/InvestmentRepository.ts"],
       "priority": 201,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
