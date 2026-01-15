@@ -708,8 +708,8 @@
       ],
       "files": ["e2e/immobilier.test.ts"],
       "priority": 913,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 E2E tests for real estate KPIs, property details, and amortization"
     },
     {
       "id": "US-914",
