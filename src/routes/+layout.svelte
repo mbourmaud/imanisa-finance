@@ -10,7 +10,8 @@
 		{ href: '/investments', label: 'Investissements', icon: 'chart' },
 		{ href: '/immobilier', label: 'Immobilier', icon: 'home' },
 		{ href: '/transactions', label: 'Transactions', icon: 'list' },
-		{ href: '/loans', label: 'Crédits', icon: 'loan' }
+		{ href: '/loans', label: 'Crédits', icon: 'loan' },
+		{ href: '/import', label: 'Import', icon: 'upload' }
 	];
 
 	function isActive(href: string, currentPath: string): boolean {
@@ -88,6 +89,12 @@
 						{:else if item.icon === 'loan'}
 							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 								<path d="M12 2v20M2 12h20"/>
+							</svg>
+						{:else if item.icon === 'upload'}
+							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+								<polyline points="17 8 12 3 7 8"/>
+								<line x1="12" y1="3" x2="12" y2="15"/>
 							</svg>
 						{/if}
 					</span>
