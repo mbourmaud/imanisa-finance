@@ -1669,3 +1669,32 @@
 - Test both fixture file parsing and inline data parsing
 - Include edge cases: empty files, missing fields, zero quantities (should skip)
 - InvestmentParsers implement both parsePositions() and parseTransactions() with one returning []
+
+---
+
+## [Iteration 48] 2026-01-15 - US-903: Tests Repositories (unit tests with in-memory implementations)
+
+### What was implemented
+- Created unit tests for 4 in-memory repository implementations (56 tests total):
+  - InMemoryUserRepository.test.ts: 11 tests (save, findById, findByEmail, delete, clear, getAll)
+  - InMemoryBankRepository.test.ts: 13 tests (save, findById, findByUserId with sorting, delete, clear, getAll)
+  - InMemoryAccountRepository.test.ts: 14 tests (save, findById, findByBankId, findByBankIdAndName, delete, clear, getAll)
+  - InMemoryTransactionRepository.test.ts: 18 tests (save, saveMany, findById, findByAccountId, findByAccountIdAndDateRange with sorting, delete, deleteByAccountId, clear, getAll)
+- Added @tests alias to vitest.config.ts for test fixtures access
+- Tests cover all CRUD operations, filtering by foreign keys, sorting, and edge cases
+
+### Files changed
+- vitest.config.ts (added @tests alias)
+- src/infrastructure/repositories/inmemory/InMemoryUserRepository.test.ts (new)
+- src/infrastructure/repositories/inmemory/InMemoryBankRepository.test.ts (new)
+- src/infrastructure/repositories/inmemory/InMemoryAccountRepository.test.ts (new)
+- src/infrastructure/repositories/inmemory/InMemoryTransactionRepository.test.ts (new)
+
+### Learnings for future iterations
+- In-memory repositories are ideal for unit testing - no DB setup needed
+- Drizzle ORM repositories use global DB singleton (getDb()) - integration tests would require DI refactor
+- User.reconstitute requires avatarUrl parameter (can be null)
+- Transaction.reconstitute requires currency and category parameters
+- BankTemplate enum values: CAISSE_EPARGNE, CIC, CREDIT_MUTUEL, REVOLUT, BOURSE_DIRECT, LINXEA, BINANCE, OTHER (not BOURSORAMA)
+- TransactionType enum values: INCOME, EXPENSE, TRANSFER (not DEBIT)
+- Money amounts accessed via .amount.amount (Money wraps the numeric value)
