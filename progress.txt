@@ -1059,3 +1059,44 @@
 - Form values: use `$state()` to capture initial form values for re-population on error
 
 ---
+
+## [Iteration 33] 2026-01-15 - US-305: UI: Animations respectueuses
+
+### What was implemented
+- Replaced all `transition: all` usages with explicit property lists (39 occurrences across 17 files)
+- Added `@media (prefers-reduced-motion: reduce)` support to components with local animations:
+  - Login page: disabled spinner, shake, pulse, and scaleIn animations
+  - ImportDropZone: disabled spinner animation
+  - SyncStatus: disabled spinner and status-dot pulse animations
+  - Investissements page: disabled spinner animation
+- Made pulse animation compositor-friendly by replacing `border-color` with `opacity + transform`
+- Verified all @keyframes use only compositor-friendly properties (transform, opacity)
+- Confirmed transform-origin defaults are correct for all scale/rotate animations
+
+### Files changed
+- src/lib/components/PeriodFilter.svelte
+- src/lib/components/SyncStatus.svelte
+- src/lib/components/import/ImportDropZone.svelte
+- src/lib/components/real-estate/AmortizationTable.svelte
+- src/lib/components/real-estate/PropertyCard.svelte
+- src/routes/+page.svelte
+- src/routes/accounts/+page.svelte
+- src/routes/banks/[bankId]/+page.svelte
+- src/routes/banks/[bankId]/accounts/[accountId]/+page.svelte
+- src/routes/banks/new/+page.svelte
+- src/routes/immobilier/+page.svelte
+- src/routes/import/+page.svelte
+- src/routes/investissements/+page.svelte
+- src/routes/investments/+page.svelte
+- src/routes/loans/+page.svelte
+- src/routes/login/+page.svelte
+- src/routes/transactions/+page.svelte
+
+### Learnings for future iterations
+- Never use `transition: all` - always list explicit properties for performance and predictability
+- Compositor-friendly animations use only `transform` and `opacity` (run on GPU without layout/paint)
+- Global `prefers-reduced-motion` in global.css covers most animations, but local spinners need explicit handling
+- Spinners can be stopped with `animation: none` - they're still visible but static
+- The pulse animation in login used `border-color` which isn't compositor-friendly - replaced with opacity/transform
+
+---

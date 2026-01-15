@@ -838,7 +838,7 @@
       ],
       "files": ["src/app.css", "src/lib/components/"],
       "priority": 305,
-      "passes": false,
+      "passes": true,
       "notes": "Préférer CSS > Web Animations API > JS libraries"
     },
     {
