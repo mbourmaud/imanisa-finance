@@ -893,8 +893,8 @@
       ],
       "files": ["e2e/mobile.test.ts"],
       "priority": 915,
-      "passes": false,
-      "notes": "Viewport iPhone SE (375x667) comme baseline"
+      "passes": true,
+      "notes": "6 E2E tests on iPhone SE viewport (375x667)"
     },
     {
       "id": "US-400",
