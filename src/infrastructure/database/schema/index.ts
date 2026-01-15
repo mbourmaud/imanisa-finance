@@ -440,6 +440,67 @@ export const investmentTransactions = sqliteTable(
 );
 
 // =====================================================
+// BUDGET MODULE - Categories, Rules, Assignments
+// =====================================================
+
+export const categories = sqliteTable(
+	'categories',
+	{
+		id: text('id').primaryKey(),
+		name: text('name').notNull(),
+		parentId: text('parent_id').references((): ReturnType<typeof text> => categories.id, {
+			onDelete: 'set null'
+		}),
+		icon: text('icon').notNull(),
+		color: text('color').notNull(),
+		createdAt: text('created_at').default("datetime('now')")
+	},
+	(table) => [
+		index('idx_categories_parent_id').on(table.parentId),
+		index('idx_categories_name').on(table.name)
+	]
+);
+
+export const categoryRules = sqliteTable(
+	'category_rules',
+	{
+		id: text('id').primaryKey(),
+		categoryId: text('category_id')
+			.notNull()
+			.references(() => categories.id, { onDelete: 'cascade' }),
+		pattern: text('pattern').notNull(),
+		priority: integer('priority').notNull().default(0),
+		sourceFilter: text('source_filter'),
+		isActive: integer('is_active').notNull().default(1),
+		createdAt: text('created_at').default("datetime('now')")
+	},
+	(table) => [
+		index('idx_category_rules_category_id').on(table.categoryId),
+		index('idx_category_rules_priority').on(table.priority),
+		index('idx_category_rules_is_active').on(table.isActive)
+	]
+);
+
+export const transactionCategories = sqliteTable(
+	'transaction_categories',
+	{
+		transactionId: text('transaction_id')
+			.primaryKey()
+			.references(() => transactions.id, { onDelete: 'cascade' }),
+		categoryId: text('category_id')
+			.notNull()
+			.references(() => categories.id, { onDelete: 'cascade' }),
+		source: text('source', { enum: ['bank', 'auto', 'manual'] }).notNull(),
+		confidence: real('confidence').notNull().default(1.0),
+		assignedAt: text('assigned_at').default("datetime('now')")
+	},
+	(table) => [
+		index('idx_transaction_categories_category_id').on(table.categoryId),
+		index('idx_transaction_categories_source').on(table.source)
+	]
+);
+
+// =====================================================
 // INVESTMENTS (Legacy - kept for compatibility)
 // =====================================================
 
@@ -555,7 +616,8 @@ export const accountsRelations = relations(accounts, ({ one, many }) => ({
 }));
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
-	account: one(accounts, { fields: [transactions.accountId], references: [accounts.id] })
+	account: one(accounts, { fields: [transactions.accountId], references: [accounts.id] }),
+	categoryAssignment: one(transactionCategories, { fields: [transactions.id], references: [transactionCategories.transactionId] })
 }));
 
 export const entitiesRelations = relations(entities, ({ many }) => ({
@@ -632,4 +694,21 @@ export const investmentPositionsRelations = relations(investmentPositions, ({ on
 
 export const investmentTransactionsRelations = relations(investmentTransactions, ({ one }) => ({
 	source: one(investmentSources, { fields: [investmentTransactions.sourceId], references: [investmentSources.id] })
+}));
+
+// Budget Module Relations
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+	parent: one(categories, { fields: [categories.parentId], references: [categories.id], relationName: 'parentChild' }),
+	children: many(categories, { relationName: 'parentChild' }),
+	rules: many(categoryRules),
+	transactionAssignments: many(transactionCategories)
+}));
+
+export const categoryRulesRelations = relations(categoryRules, ({ one }) => ({
+	category: one(categories, { fields: [categoryRules.categoryId], references: [categories.id] })
+}));
+
+export const transactionCategoriesRelations = relations(transactionCategories, ({ one }) => ({
+	transaction: one(transactions, { fields: [transactionCategories.transactionId], references: [transactions.id] }),
+	category: one(categories, { fields: [transactionCategories.categoryId], references: [categories.id] })
 }));

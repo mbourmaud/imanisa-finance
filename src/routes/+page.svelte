@@ -265,8 +265,10 @@
 					class:active={selectedOwner === option.id}
 					onclick={() => selectedOwner = option.id}
 					style="--owner-color: {option.color}"
+					aria-label="Filtrer par {option.label}"
+					aria-pressed={selectedOwner === option.id}
 				>
-					<span class="owner-dot"></span>
+					<span class="owner-dot" aria-hidden="true"></span>
 					<span class="owner-label">{option.label}</span>
 				</button>
 			{/each}
@@ -276,16 +278,17 @@
 	<section class="hero-section">
 		<div class="chart-container">
 			<div class="chart-header">
-				<div class="view-toggle">
-					<button class:active={patrimoineView === 'net'} onclick={() => patrimoineView = 'net'}>Net</button>
-					<button class:active={patrimoineView === 'brut'} onclick={() => patrimoineView = 'brut'}>Brut</button>
+				<div class="view-toggle" role="group" aria-label="Vue du patrimoine">
+					<button class:active={patrimoineView === 'net'} onclick={() => patrimoineView = 'net'} aria-pressed={patrimoineView === 'net'}>Net</button>
+					<button class:active={patrimoineView === 'brut'} onclick={() => patrimoineView = 'brut'} aria-pressed={patrimoineView === 'brut'}>Brut</button>
 				</div>
-				<div class="period-pills">
+				<div class="period-pills" role="group" aria-label="Période d'affichage">
 					{#each periodOptions as period}
 						<button
 							class="period-pill"
 							class:active={selectedPeriod === period.value}
 							onclick={() => selectedPeriod = period.value}
+							aria-pressed={selectedPeriod === period.value}
 						>
 							{period.label}
 						</button>
@@ -512,7 +515,9 @@
 		background: transparent;
 		border: none;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 		white-space: nowrap;
 		flex-shrink: 0;
 		min-height: 44px;
@@ -521,6 +526,11 @@
 	.owner-pill:hover {
 		color: var(--color-text-secondary);
 		background: var(--color-bg-subtle);
+	}
+
+	.owner-pill:focus-visible {
+		outline: 2px solid var(--color-primary-500);
+		outline-offset: 2px;
 	}
 
 	.owner-pill.active {
@@ -576,11 +586,18 @@
 		border: none;
 		background: transparent;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.view-toggle button:hover {
 		color: var(--color-text-secondary);
+	}
+
+	.view-toggle button:focus-visible {
+		outline: 2px solid var(--color-primary-500);
+		outline-offset: 2px;
 	}
 
 	.view-toggle button.active {
@@ -602,12 +619,19 @@
 		border: none;
 		background: transparent;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.period-pill:hover {
 		color: var(--color-text-secondary);
 		background: var(--color-bg-subtle);
+	}
+
+	.period-pill:focus-visible {
+		outline: 2px solid var(--color-primary-500);
+		outline-offset: 2px;
 	}
 
 	.period-pill.active {
@@ -770,7 +794,10 @@
 		display: flex;
 		align-items: center;
 		gap: var(--spacing-4);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
 		text-decoration: none;
 		color: inherit;
 	}
@@ -857,7 +884,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-3);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.asset-card:hover {

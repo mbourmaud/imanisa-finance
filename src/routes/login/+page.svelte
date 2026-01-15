@@ -178,8 +178,9 @@
 								class="pin-key pin-key-action"
 								onclick={deleteDigit}
 								disabled={loading || pin.length === 0}
+								aria-label="Supprimer le dernier chiffre"
 							>
-								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 									<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
 									<line x1="18" y1="9" x2="12" y2="15"/>
 									<line x1="12" y1="9" x2="18" y2="15"/>
@@ -192,11 +193,12 @@
 								onclick={submitPin}
 								disabled={loading || pin.length !== PIN_LENGTH}
 								class:ready={pin.length === PIN_LENGTH}
+								aria-label="Valider le code PIN"
 							>
 								{#if loading}
-									<div class="spinner"></div>
+									<div class="spinner" aria-hidden="true"></div>
 								{:else}
-									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 										<polyline points="20 6 9 17 4 12"/>
 									</svg>
 								{/if}
@@ -298,7 +300,9 @@
 		cursor: pointer;
 		padding: var(--spacing-2) var(--spacing-3);
 		border-radius: var(--radius-lg);
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 		margin-top: var(--spacing-2);
 	}
 
@@ -324,7 +328,9 @@
 		cursor: pointer;
 		padding: var(--spacing-4);
 		border-radius: var(--radius-2xl);
-		transition: all var(--transition-normal);
+		transition:
+			background-color var(--transition-normal),
+			transform var(--transition-normal);
 	}
 
 	.user-avatar-btn:hover {
@@ -351,7 +357,9 @@
 			0 8px 32px -8px var(--avatar-color),
 			0 4px 16px -4px rgba(0, 0, 0, 0.1),
 			inset 0 2px 4px rgba(255, 255, 255, 0.25);
-		transition: all var(--transition-normal);
+		transition:
+			transform var(--transition-normal),
+			box-shadow var(--transition-normal);
 		position: relative;
 		overflow: hidden;
 	}
@@ -436,7 +444,10 @@
 		border-radius: 50%;
 		border: 2px solid var(--color-gray-300);
 		background: transparent;
-		transition: all 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			border-color 0.15s ease,
+			transform 0.15s ease;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -488,11 +499,14 @@
 		font-size: 28px;
 		font-weight: var(--font-weight-semibold);
 		cursor: pointer;
-		transition: all 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			transform 0.15s ease,
+			box-shadow 0.15s ease;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 
+		box-shadow:
 			0 4px 12px -2px rgba(0, 0, 0, 0.08),
 			0 2px 4px rgba(0, 0, 0, 0.04),
 			inset 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -600,12 +614,12 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% { 
-			border-color: var(--color-gray-300);
+		0%, 100% {
+			opacity: 1;
 			transform: scale(1);
 		}
-		50% { 
-			border-color: var(--color-gray-500);
+		50% {
+			opacity: 0.6;
 			transform: scale(1.1);
 		}
 	}
@@ -691,6 +705,43 @@
 
 		.pin-pad {
 			max-width: 180px;
+		}
+	}
+
+	/* Respect reduced motion preference */
+	@media (prefers-reduced-motion: reduce) {
+		.spinner {
+			animation: none;
+		}
+
+		.shake {
+			animation: none;
+		}
+
+		.pin-dot.current {
+			animation: none;
+		}
+
+		.login-card {
+			animation: none;
+			opacity: 1;
+			transform: none;
+		}
+
+		.user-avatar-btn:hover {
+			transform: none;
+		}
+
+		.user-avatar-btn:active {
+			transform: none;
+		}
+
+		.user-avatar-btn:hover .user-avatar {
+			transform: none;
+		}
+
+		.pin-dot.filled {
+			transform: none;
 		}
 	}
 </style>

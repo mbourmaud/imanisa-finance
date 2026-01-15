@@ -1,11 +1,28 @@
-import type { DataSource } from '@domain/import/DataSource';
 import type { DataSourceRepository } from '@domain/import/DataSourceRepository';
 import type { ParsedTransaction } from '@domain/import/ParsedTransaction';
 import type { TransactionRepository } from '@domain/transaction/TransactionRepository';
+import type { CategoryRepository } from '@domain/budget/CategoryRepository';
 import { Transaction } from '@domain/transaction/Transaction';
 import { TransactionType } from '@domain/transaction/TransactionType';
 import { UniqueId } from '@domain/shared/UniqueId';
 import { ParserFactory } from './ParserFactory';
+import {
+	AutoCategorizationService,
+	type TransactionForCategorization
+} from '@application/budget/AutoCategorizationService';
+import { CategorySource } from '@domain/budget/TransactionCategoryAssignment';
+
+/**
+ * Categorization statistics for import result
+ */
+export interface CategorizationStats {
+	/** Number of transactions categorized by bank category */
+	byBank: number;
+	/** Number of transactions categorized by auto rules */
+	byRule: number;
+	/** Number of transactions that could not be categorized */
+	uncategorized: number;
+}
 
 /**
  * Result of an import operation
@@ -17,6 +34,8 @@ export interface ImportResult {
 	skipped: number;
 	/** Error messages encountered during import */
 	errors: string[];
+	/** Categorization statistics (if categorization was performed) */
+	categorization?: CategorizationStats;
 }
 
 /**
@@ -30,10 +49,21 @@ export interface ImportResult {
  * - Update DataSource.lastSyncAt timestamp
  */
 export class ImportTransactionsUseCase {
+	private categorizationService: AutoCategorizationService | null = null;
+
 	constructor(
 		private readonly dataSourceRepository: DataSourceRepository,
-		private readonly transactionRepository: TransactionRepository
-	) {}
+		private readonly transactionRepository: TransactionRepository,
+		private readonly categoryRepository?: CategoryRepository
+	) {
+		// Initialize categorization service if category repository is provided
+		if (categoryRepository) {
+			this.categorizationService = new AutoCategorizationService(
+				categoryRepository,
+				transactionRepository
+			);
+		}
+	}
 
 	/**
 	 * Import transactions from CSV content for a given data source
@@ -82,7 +112,8 @@ export class ImportTransactionsUseCase {
 		const existingSignatures = this.buildSignatureSet(existingTransactions);
 
 		// 5. Filter duplicates and transform to domain entities
-		const newTransactions: Transaction[] = [];
+		// Store parsed data alongside transaction for categorization
+		const newTransactions: Array<{ transaction: Transaction; parsed: ParsedTransaction }> = [];
 		let skippedCount = 0;
 
 		for (const parsed of parsedTransactions) {
@@ -101,7 +132,7 @@ export class ImportTransactionsUseCase {
 			const transactionResult = this.createTransaction(parsed, dataSource.linkedAccountId);
 
 			if (transactionResult.isSuccess) {
-				newTransactions.push(transactionResult.value);
+				newTransactions.push({ transaction: transactionResult.value, parsed });
 				// Add to existing signatures to avoid duplicates within the same import
 				existingSignatures.add(signature);
 			} else {
@@ -110,9 +141,10 @@ export class ImportTransactionsUseCase {
 		}
 
 		// 6. Save new transactions
-		if (newTransactions.length > 0) {
+		const transactionsToSave = newTransactions.map((t) => t.transaction);
+		if (transactionsToSave.length > 0) {
 			try {
-				await this.transactionRepository.saveMany(newTransactions);
+				await this.transactionRepository.saveMany(transactionsToSave);
 			} catch (error) {
 				const message = error instanceof Error ? error.message : 'Unknown database error';
 				return {
@@ -123,7 +155,26 @@ export class ImportTransactionsUseCase {
 			}
 		}
 
-		// 7. Update last sync timestamp on data source
+		// 7. Auto-categorize imported transactions
+		let categorizationStats: CategorizationStats | undefined;
+		if (this.categorizationService && newTransactions.length > 0) {
+			categorizationStats = await this.categorizeTransactions(
+				newTransactions,
+				dataSource.parserKey
+			);
+			// Log categorization results
+			const totalCategorized = categorizationStats.byBank + categorizationStats.byRule;
+			if (totalCategorized > 0 || categorizationStats.uncategorized > 0) {
+				const summary = [
+					`Categorization: ${totalCategorized} categorized`,
+					`(${categorizationStats.byBank} by bank, ${categorizationStats.byRule} by rule)`,
+					`${categorizationStats.uncategorized} uncategorized`
+				].join(' ');
+				errors.push(`Info: ${summary}`);
+			}
+		}
+
+		// 8. Update last sync timestamp on data source
 		dataSource.markSynced();
 		try {
 			await this.dataSourceRepository.save(dataSource);
@@ -136,8 +187,60 @@ export class ImportTransactionsUseCase {
 		return {
 			imported: newTransactions.length,
 			skipped: skippedCount,
-			errors
+			errors,
+			categorization: categorizationStats
 		};
+	}
+
+	/**
+	 * Categorize newly imported transactions using the AutoCategorizationService.
+	 * Passes rawCategory (if available) and parserKey for bank category mapping.
+	 *
+	 * @param transactions List of transactions with their parsed data
+	 * @param parserKey The parser key (bank identifier) for category mapping
+	 * @returns Categorization statistics
+	 */
+	private async categorizeTransactions(
+		transactions: Array<{ transaction: Transaction; parsed: ParsedTransaction }>,
+		parserKey: import('@domain/import/CSVParser').ParserKey
+	): Promise<CategorizationStats> {
+		const stats: CategorizationStats = {
+			byBank: 0,
+			byRule: 0,
+			uncategorized: 0
+		};
+
+		if (!this.categorizationService) {
+			stats.uncategorized = transactions.length;
+			return stats;
+		}
+
+		for (const { transaction, parsed } of transactions) {
+			const txForCategorization: TransactionForCategorization = {
+				id: transaction.id,
+				description: transaction.description,
+				rawCategory: parsed.rawCategory,
+				parserKey
+			};
+
+			try {
+				const assignment = await this.categorizationService.categorizeAndSave(txForCategorization);
+				if (assignment) {
+					if (assignment.source === CategorySource.BANK) {
+						stats.byBank++;
+					} else if (assignment.source === CategorySource.AUTO) {
+						stats.byRule++;
+					}
+				} else {
+					stats.uncategorized++;
+				}
+			} catch (error) {
+				// Non-fatal: log error but continue with next transaction
+				stats.uncategorized++;
+			}
+		}
+
+		return stats;
 	}
 
 	/**

@@ -345,7 +345,9 @@
 		color: var(--color-text-secondary);
 		font-size: var(--font-size-sm);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.pagination-btn:hover:not(:disabled) {
@@ -381,13 +383,45 @@
 
 	/* Mobile responsiveness */
 	@media (max-width: 640px) {
+		.table-wrapper {
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: thin;
+		}
+
+		.amortization-table {
+			font-size: var(--font-size-xs);
+			min-width: 500px;
+		}
+
 		.amortization-table th,
 		.amortization-table td {
 			padding: var(--spacing-2) var(--spacing-3);
 		}
 
-		.amortization-table {
-			font-size: var(--font-size-xs);
+		/* Sticky first column (Date) */
+		.amortization-table th.col-date,
+		.amortization-table td.col-date {
+			position: sticky;
+			left: 0;
+			z-index: 2;
+			background: var(--color-bg-subtle);
+			min-width: 80px;
+		}
+
+		.amortization-table th.col-date {
+			z-index: 3;
+		}
+
+		.amortization-table tbody tr td.col-date {
+			background: var(--color-bg-card);
+		}
+
+		.amortization-table tbody tr:hover td.col-date {
+			background: var(--color-bg-subtle);
+		}
+
+		.amortization-table tbody tr.current-month td.col-date {
+			background: rgba(212, 168, 83, 0.15);
 		}
 
 		.current-badge {
@@ -401,6 +435,17 @@
 		.pagination-btn.page-number.active,
 		.pagination-btn:not(.page-number) {
 			display: inline-flex;
+		}
+
+		.table-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: var(--spacing-2);
+		}
+
+		.go-to-current {
+			width: 100%;
+			justify-content: center;
 		}
 	}
 </style>

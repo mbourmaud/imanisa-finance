@@ -1,2 +1,6 @@
 export { ParserFactory } from './ParserFactory';
-export { ImportTransactionsUseCase, type ImportResult } from './ImportTransactionsUseCase';
+export {
+	ImportTransactionsUseCase,
+	type ImportResult,
+	type CategorizationStats
+} from './ImportTransactionsUseCase';

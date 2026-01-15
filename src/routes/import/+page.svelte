@@ -266,7 +266,9 @@
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			transform var(--transition-fast),
+			box-shadow var(--transition-fast);
 		min-height: 44px;
 	}
 
@@ -400,7 +402,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-4);
-		transition: all var(--transition-fast);
+		transition: border-color var(--transition-fast);
 	}
 
 	.source-card:hover {
@@ -506,6 +508,9 @@
 		.btn-primary {
 			width: 100%;
 			justify-content: center;
+			padding: var(--spacing-4);
+			font-size: var(--font-size-base);
+			min-height: 52px;
 		}
 
 		.info-banner {
@@ -533,6 +538,20 @@
 			font-size: var(--font-size-base);
 		}
 
+		.source-card {
+			padding: var(--spacing-4);
+			gap: var(--spacing-4);
+		}
+
+		.source-link {
+			padding: var(--spacing-2) var(--spacing-3);
+			min-height: 44px;
+			display: inline-flex;
+			align-items: center;
+			background: var(--color-bg-subtle);
+			border-radius: var(--radius-md);
+		}
+
 		.empty-state {
 			padding: var(--spacing-8);
 		}
@@ -547,6 +566,14 @@
 
 		.owner-name {
 			font-size: var(--font-size-sm);
+		}
+
+		.source-name {
+			font-size: var(--font-size-sm);
+		}
+
+		.source-type {
+			font-size: 10px;
 		}
 	}
 </style>

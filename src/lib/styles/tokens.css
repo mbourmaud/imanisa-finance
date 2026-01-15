@@ -1,19 +1,10 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   IMANISA FINANCE DESIGN SYSTEM
+   Supports both light and dark modes with coral accents
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-	/* ═══════════════════════════════════════════════════════════════════════════
-	   FINARY-INSPIRED DARK MODE DESIGN SYSTEM
-	   Clean, sophisticated dark interface with coral accents
-	   ═══════════════════════════════════════════════════════════════════════════ */
-
-	/* Background Hierarchy - Dark to Light */
-	--color-bg-deep: #0D0D0D;
-	--color-bg-base: #141414;
-	--color-bg-elevated: #1A1A1A;
-	--color-bg-card: #1F1F1F;
-	--color-bg-card-hover: #252525;
-	--color-bg-subtle: #2D2D2D;
-	--color-bg-muted: #333333;
-
-	/* Primary - Coral/Salmon Accent */
+	/* Primary - Coral/Salmon Accent (same for both modes) */
 	--color-primary-50: #FFF5F3;
 	--color-primary-100: #FFE8E4;
 	--color-primary-200: #FFD4CC;
@@ -25,42 +16,13 @@
 	--color-primary-800: #A94238;
 	--color-primary-900: #8A382F;
 
-	/* Gold Highlight - Premium accents */
+	/* Gold Highlight - Premium accents (same for both modes) */
 	--color-gold-300: #F5D485;
 	--color-gold-400: #EFC75E;
 	--color-gold-500: #D4A853;
 	--color-gold-600: #B8903D;
 
-	/* Text Hierarchy */
-	--color-text-primary: #FFFFFF;
-	--color-text-secondary: #B0B0B0;
-	--color-text-tertiary: #808080;
-	--color-text-muted: #6B6B6B;
-	--color-text-disabled: #4A4A4A;
-
-	/* Semantic Colors */
-	--color-success-50: rgba(16, 185, 129, 0.1);
-	--color-success-400: #34D399;
-	--color-success-500: #10B981;
-	--color-success-600: #059669;
-
-	--color-danger-50: rgba(239, 68, 68, 0.1);
-	--color-danger-400: #F87171;
-	--color-danger-500: #EF4444;
-	--color-danger-600: #DC2626;
-
-	--color-warning-50: rgba(245, 158, 11, 0.1);
-	--color-warning-400: #FBBF24;
-	--color-warning-500: #F59E0B;
-	--color-warning-600: #D97706;
-
-	/* Border Colors */
-	--color-border: rgba(255, 255, 255, 0.05);
-	--color-border-subtle: rgba(255, 255, 255, 0.03);
-	--color-border-hover: rgba(255, 255, 255, 0.1);
-	--color-border-active: rgba(250, 128, 114, 0.3);
-
-	/* Owner Colors */
+	/* Owner Colors (same for both modes) */
 	--color-owner-mathieu: #3B82F6;
 	--color-owner-ninon: #EC4899;
 	--color-owner-joint: #8B5CF6;
@@ -125,38 +87,11 @@
 	--radius-3xl: 1.5rem;
 	--radius-full: 9999px;
 
-	/* Shadows - Subtle for dark mode */
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
-	--shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
-
-	/* Glow Effects */
-	--glow-coral: 0 0 20px rgba(250, 128, 114, 0.15);
-	--glow-coral-intense: 0 0 30px rgba(250, 128, 114, 0.25);
-	--glow-success: 0 0 20px rgba(16, 185, 129, 0.15);
-	--glow-gold: 0 0 20px rgba(212, 168, 83, 0.15);
-
-	/* Glass Effect - Subtle for dark mode */
-	--glass-blur: 12px;
-	--glass-bg: rgba(26, 26, 26, 0.8);
-	--glass-bg-hover: rgba(37, 37, 37, 0.9);
-	--glass-border: rgba(255, 255, 255, 0.05);
-	--glass-border-light: rgba(255, 255, 255, 0.03);
-
 	/* Transitions */
 	--transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
 	--transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 	--transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
 	--transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-
-	/* Gradients */
-	--gradient-main: linear-gradient(180deg, #0D0D0D 0%, #141414 100%);
-	--gradient-accent: linear-gradient(135deg, #FF8F7D 0%, #FA8072 50%, #E86B5D 100%);
-	--gradient-accent-soft: linear-gradient(135deg, rgba(250, 128, 114, 0.15) 0%, rgba(232, 107, 93, 0.1) 100%);
-	--gradient-gold: linear-gradient(135deg, #EFC75E 0%, #D4A853 100%);
-	--gradient-success: linear-gradient(135deg, #34D399 0%, #10B981 100%);
-	--gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
 
 	/* Layout */
 	--sidebar-width-collapsed: 72px;
@@ -171,6 +106,156 @@
 	/* Touch Target Sizes */
 	--touch-target-min: 44px;
 	--touch-target-comfortable: 48px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE (default)
+   Applied when html has class="dark" or no class (fallback)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root,
+html.dark {
+	/* Background Hierarchy - Dark to Light */
+	--color-bg-deep: #0D0D0D;
+	--color-bg-base: #141414;
+	--color-bg-elevated: #1A1A1A;
+	--color-bg-card: #1F1F1F;
+	--color-bg-card-hover: #252525;
+	--color-bg-subtle: #2D2D2D;
+	--color-bg-muted: #333333;
+
+	/* Text Hierarchy */
+	--color-text-primary: #FFFFFF;
+	--color-text-secondary: #B0B0B0;
+	--color-text-tertiary: #808080;
+	--color-text-muted: #6B6B6B;
+	--color-text-disabled: #4A4A4A;
+
+	/* Semantic Colors */
+	--color-success-50: rgba(16, 185, 129, 0.1);
+	--color-success-400: #34D399;
+	--color-success-500: #10B981;
+	--color-success-600: #059669;
+
+	--color-danger-50: rgba(239, 68, 68, 0.1);
+	--color-danger-400: #F87171;
+	--color-danger-500: #EF4444;
+	--color-danger-600: #DC2626;
+
+	--color-warning-50: rgba(245, 158, 11, 0.1);
+	--color-warning-400: #FBBF24;
+	--color-warning-500: #F59E0B;
+	--color-warning-600: #D97706;
+
+	/* Border Colors */
+	--color-border: rgba(255, 255, 255, 0.05);
+	--color-border-subtle: rgba(255, 255, 255, 0.03);
+	--color-border-hover: rgba(255, 255, 255, 0.1);
+	--color-border-active: rgba(250, 128, 114, 0.3);
+
+	/* Shadows - Subtle for dark mode */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+	--shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+	/* Glow Effects */
+	--glow-coral: 0 0 20px rgba(250, 128, 114, 0.15);
+	--glow-coral-intense: 0 0 30px rgba(250, 128, 114, 0.25);
+	--glow-success: 0 0 20px rgba(16, 185, 129, 0.15);
+	--glow-gold: 0 0 20px rgba(212, 168, 83, 0.15);
+
+	/* Glass Effect - For dark mode */
+	--glass-blur: 12px;
+	--glass-bg: rgba(26, 26, 26, 0.8);
+	--glass-bg-hover: rgba(37, 37, 37, 0.9);
+	--glass-border: rgba(255, 255, 255, 0.05);
+	--glass-border-light: rgba(255, 255, 255, 0.03);
+
+	/* Gradients */
+	--gradient-main: linear-gradient(180deg, #0D0D0D 0%, #141414 100%);
+	--gradient-accent: linear-gradient(135deg, #FF8F7D 0%, #FA8072 50%, #E86B5D 100%);
+	--gradient-accent-soft: linear-gradient(135deg, rgba(250, 128, 114, 0.15) 0%, rgba(232, 107, 93, 0.1) 100%);
+	--gradient-gold: linear-gradient(135deg, #EFC75E 0%, #D4A853 100%);
+	--gradient-success: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+	--gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+
+	/* Selection */
+	--color-selection: rgba(250, 128, 114, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT MODE
+   Applied when html has class="light"
+   APCA-compliant contrast ratios for accessibility
+   ═══════════════════════════════════════════════════════════════════════════ */
+html.light {
+	/* Background Hierarchy - Light to Dark */
+	--color-bg-deep: #FAFAFA;
+	--color-bg-base: #FFFFFF;
+	--color-bg-elevated: #FFFFFF;
+	--color-bg-card: #FFFFFF;
+	--color-bg-card-hover: #F9FAFB;
+	--color-bg-subtle: #F3F4F6;
+	--color-bg-muted: #E5E7EB;
+
+	/* Text Hierarchy - APCA compliant */
+	--color-text-primary: #111827;
+	--color-text-secondary: #374151;
+	--color-text-tertiary: #6B7280;
+	--color-text-muted: #9CA3AF;
+	--color-text-disabled: #D1D5DB;
+
+	/* Semantic Colors - Darker for light mode */
+	--color-success-50: rgba(16, 185, 129, 0.08);
+	--color-success-400: #059669;
+	--color-success-500: #047857;
+	--color-success-600: #065F46;
+
+	--color-danger-50: rgba(239, 68, 68, 0.08);
+	--color-danger-400: #DC2626;
+	--color-danger-500: #B91C1C;
+	--color-danger-600: #991B1B;
+
+	--color-warning-50: rgba(245, 158, 11, 0.08);
+	--color-warning-400: #D97706;
+	--color-warning-500: #B45309;
+	--color-warning-600: #92400E;
+
+	/* Border Colors */
+	--color-border: rgba(0, 0, 0, 0.08);
+	--color-border-subtle: rgba(0, 0, 0, 0.04);
+	--color-border-hover: rgba(0, 0, 0, 0.12);
+	--color-border-active: rgba(250, 128, 114, 0.4);
+
+	/* Shadows - More visible for light mode */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+	--shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15);
+
+	/* Glow Effects - Subtle for light mode */
+	--glow-coral: 0 0 20px rgba(250, 128, 114, 0.2);
+	--glow-coral-intense: 0 0 30px rgba(250, 128, 114, 0.35);
+	--glow-success: 0 0 20px rgba(16, 185, 129, 0.2);
+	--glow-gold: 0 0 20px rgba(212, 168, 83, 0.2);
+
+	/* Glass Effect - For light mode */
+	--glass-blur: 12px;
+	--glass-bg: rgba(255, 255, 255, 0.8);
+	--glass-bg-hover: rgba(255, 255, 255, 0.9);
+	--glass-border: rgba(0, 0, 0, 0.05);
+	--glass-border-light: rgba(0, 0, 0, 0.03);
+
+	/* Gradients */
+	--gradient-main: linear-gradient(180deg, #FAFAFA 0%, #FFFFFF 100%);
+	--gradient-accent: linear-gradient(135deg, #FF8F7D 0%, #FA8072 50%, #E86B5D 100%);
+	--gradient-accent-soft: linear-gradient(135deg, rgba(250, 128, 114, 0.1) 0%, rgba(232, 107, 93, 0.05) 100%);
+	--gradient-gold: linear-gradient(135deg, #EFC75E 0%, #D4A853 100%);
+	--gradient-success: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+	--gradient-card: linear-gradient(180deg, rgba(0, 0, 0, 0.01) 0%, transparent 100%);
+
+	/* Selection */
+	--color-selection: rgba(250, 128, 114, 0.25);
 }
 
 /* Mobile-specific adjustments */

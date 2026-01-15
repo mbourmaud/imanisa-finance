@@ -1,8 +1,9 @@
 /**
- * Seed script for data sources (bank accounts for CSV import)
+ * Seed script for data sources (bank accounts for CSV import) and investment sources (XLSX import)
  *
  * This script inserts:
  * - Isaac entity (person, child)
+ * - Joint Mathieu+Ninon entity
  * - 7 data sources for bank CSV imports:
  *   - CM Mathieu (Crédit Mutuel)
  *   - CE Perso (Caisse d'Épargne Particulier - Mathieu)
@@ -11,6 +12,10 @@
  *   - CE SCI (Caisse d'Épargne Entreprise - SCI IMANISA)
  *   - Boursorama Isaac CC (Compte courant Isaac)
  *   - Boursorama Isaac Livret A (Isaac)
+ * - 3 investment sources for XLSX imports:
+ *   - PEA Bourse Direct (Mathieu)
+ *   - Linxea AV (Mathieu)
+ *   - Binance Crypto (Mathieu)
  *
  * Run with: npx tsx src/scripts/seed-data-sources.ts
  *
@@ -43,6 +48,16 @@ const DATA_SOURCE_IDS = {
 	CE_SCI: 'ds-ce-sci',
 	BOURSO_ISAAC_CC: 'ds-bourso-isaac-cc',
 	BOURSO_ISAAC_LIVRET_A: 'ds-bourso-isaac-livret-a'
+} as const;
+
+// =====================================================
+// Investment Source IDs
+// =====================================================
+
+const INVESTMENT_SOURCE_IDS = {
+	PEA_BOURSE_DIRECT: 'is-pea-bourse-direct',
+	LINXEA_AV: 'is-linxea-av',
+	BINANCE_CRYPTO: 'is-binance-crypto'
 } as const;
 
 // =====================================================
@@ -231,6 +246,63 @@ async function seedDataSources(): Promise<void> {
 	console.log('\n  7 data sources inserted');
 }
 
+async function seedInvestmentSources(): Promise<void> {
+	console.log('\nInserting investment sources...');
+
+	// PEA Bourse Direct - Mathieu
+	await execute(
+		`INSERT OR REPLACE INTO investment_sources (id, name, type, owner_entity_id, url, format, parser_key, last_sync_at, created_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+		[
+			INVESTMENT_SOURCE_IDS.PEA_BOURSE_DIRECT,
+			'PEA Bourse Direct',
+			'pea',
+			ENTITY_IDS.MATHIEU,
+			'https://www.boursedirect.fr/fr/mon-compte/portefeuilles',
+			'XLSX',
+			'bourse_direct',
+			null
+		]
+	);
+	console.log('  PEA Bourse Direct (bourse_direct)');
+
+	// Linxea AV - Mathieu
+	await execute(
+		`INSERT OR REPLACE INTO investment_sources (id, name, type, owner_entity_id, url, format, parser_key, last_sync_at, created_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+		[
+			INVESTMENT_SOURCE_IDS.LINXEA_AV,
+			'Linxea AV',
+			'assurance_vie',
+			ENTITY_IDS.MATHIEU,
+			'https://espaceclient.linxea.com/epargne/contrat/6695e318-99ab-462b-8bc2-51c083225c13',
+			'XLSX',
+			'linxea',
+			null
+		]
+	);
+	console.log('  Linxea AV (linxea)');
+
+	// Binance Crypto - Mathieu
+	await execute(
+		`INSERT OR REPLACE INTO investment_sources (id, name, type, owner_entity_id, url, format, parser_key, last_sync_at, created_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+		[
+			INVESTMENT_SOURCE_IDS.BINANCE_CRYPTO,
+			'Binance',
+			'crypto',
+			ENTITY_IDS.MATHIEU,
+			'https://www.binance.com/en/my/wallet/exchange/buysell-history',
+			'XLSX',
+			'binance',
+			null
+		]
+	);
+	console.log('  Binance (binance)');
+
+	console.log('\n  3 investment sources inserted');
+}
+
 async function verifySeededData(): Promise<void> {
 	console.log('\nVerification...\n');
 
@@ -242,7 +314,12 @@ async function verifySeededData(): Promise<void> {
 	// Count data sources
 	const dataSourcesResult = await execute('SELECT COUNT(*) as count FROM data_sources');
 	const dataSourceCount = (dataSourcesResult.rows[0] as unknown as { count: number }).count;
-	console.log(`  Data sources: ${dataSourceCount}`);
+	console.log(`  Data sources (CSV): ${dataSourceCount}`);
+
+	// Count investment sources
+	const investmentSourcesResult = await execute('SELECT COUNT(*) as count FROM investment_sources');
+	const investmentSourceCount = (investmentSourcesResult.rows[0] as unknown as { count: number }).count;
+	console.log(`  Investment sources (XLSX): ${investmentSourceCount}`);
 
 	// List all data sources grouped by owner
 	const listResult = await execute(`
@@ -262,6 +339,25 @@ async function verifySeededData(): Promise<void> {
 		}
 		console.log(`      - ${r.name} (${r.type}, ${r.parser_key})`);
 	}
+
+	// List all investment sources grouped by owner
+	const investmentListResult = await execute(`
+		SELECT isrc.name, isrc.type, isrc.parser_key, e.name as owner_name
+		FROM investment_sources isrc
+		JOIN entities e ON isrc.owner_entity_id = e.id
+		ORDER BY e.name, isrc.name
+	`);
+
+	console.log('\n  Investment sources by owner:');
+	currentOwner = '';
+	for (const row of investmentListResult.rows) {
+		const r = row as unknown as { name: string; type: string; parser_key: string; owner_name: string };
+		if (r.owner_name !== currentOwner) {
+			currentOwner = r.owner_name;
+			console.log(`\n    ${currentOwner}:`);
+		}
+		console.log(`      - ${r.name} (${r.type}, ${r.parser_key})`);
+	}
 }
 
 // =====================================================
@@ -269,12 +365,13 @@ async function verifySeededData(): Promise<void> {
 // =====================================================
 
 async function main(): Promise<void> {
-	console.log('Seeding data sources...\n');
+	console.log('Seeding data sources and investment sources...\n');
 
 	try {
 		await seedIsaacEntity();
 		await seedJointEntity();
 		await seedDataSources();
+		await seedInvestmentSources();
 		await verifySeededData();
 
 		console.log('\n Seed completed successfully!');

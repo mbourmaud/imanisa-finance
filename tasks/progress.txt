@@ -1,0 +1,159 @@
+# Ralph Progress Log
+# Project: imanisa-finance-self-hosting
+# Started: 2026-01-14
+
+## Codebase Patterns
+- Use `sql<Type>` template for typed SQL queries
+- Investment parsers implement `InvestmentParser` interface: `parsePositions()` and `parseTransactions()`
+- Use xlsx library's `utils.sheet_to_json<RowType>()` for typed XLSX parsing
+- PWA icons should include both regular and maskable versions (192x192, 512x512)
+- Static assets go in /static/ and are referenced via %sveltekit.assets%
+- Auto-categorization priority: manual (never overwrite) > bank category > regex rules
+- Application services in `src/application/` take repositories as constructor dependencies
+
+---
+
+## [Iteration 5] 2026-01-15 - US-410
+
+**Story:** UI: Gestion des règles de catégorisation
+
+**What was implemented:**
+- Created `/budget/rules` page with Svelte 5 runes ($state, $derived, $props)
+- Full CRUD UI for category rules: list, create, edit, delete
+- API endpoints:
+  - `GET/POST /api/budget/rules` - list all / create rule
+  - `GET/PUT/DELETE/PATCH /api/budget/rules/[id]` - manage individual rule
+  - `POST /api/budget/rules/test` - test pattern against transactions
+- Test button shows matching transactions in modal
+- Toggle switch for activate/deactivate rules
+- Success message offers to recategorize transactions after changes
+- Responsive design with mobile-first approach
+- Follows existing UI patterns (animations, cards, badges)
+
+**Files changed:**
+- `src/routes/budget/rules/+page.server.ts` (new)
+- `src/routes/budget/rules/+page.svelte` (new)
+- `src/routes/api/budget/rules/+server.ts` (new)
+- `src/routes/api/budget/rules/[id]/+server.ts` (new)
+- `src/routes/api/budget/rules/test/+server.ts` (new)
+
+**Learnings for future iterations:**
+- Use `invalidateAll()` from `$app/navigation` to refresh page data after API mutations
+- CategoryRule entity has immutable categoryId - must delete/recreate if category changes
+- Test pattern endpoint queries 500 recent transactions and filters in JS (simpler than SQL regex)
+- SvelteKit types are auto-generated - run `svelte-kit sync` after creating new routes
+
+---
+
+## [Iteration 4] 2026-01-15 - US-405
+
+**Story:** Service: Auto-catégorisation des transactions
+
+**What was implemented:**
+- Created `AutoCategorizationService.ts` in `src/application/budget/`
+- Implements `categorizeTransaction()` method returning `{ categoryId, source, confidence }`
+- Implements `categorizeAll()` method returning `{ categorized, skipped, manual, bySource }`
+- Priority order: manual (never overwrite) > bank category mapping > regex rules
+- Confidence scoring: 1.0 for bank/manual, 0.8 for exact regex match, 0.5 for partial
+- Rules cache with `clearRulesCache()` for invalidation after rule changes
+- Uses dependency injection: `CategoryRepository` (required) and `TransactionRepository` (optional for re-categorization)
+- Integrates with `BankCategoryMapper` for CE/Boursorama category mapping
+- Uses `canOverwrite()` from domain to respect category source priority
+
+**Files changed:**
+- `src/application/budget/AutoCategorizationService.ts` (new)
+- `src/application/budget/index.ts` (modified - exports)
+
+**Learnings for future iterations:**
+- Application services should use dependency injection for repositories
+- Use `canOverwrite()` helper from `TransactionCategoryAssignment` to check if we can replace existing category
+- `CategoryRule.matches()` method handles regex matching with case-insensitivity
+- Bank categories are only available at import time via `ParsedTransaction.rawCategory`
+- For re-categorization of existing transactions, only regex rules can be applied (rawCategory not stored)
+
+---
+
+## [Iteration 3] 2026-01-15 - US-300
+
+**Story:** PWA: Configuration Progressive Web App
+
+**What was implemented:**
+- Created `static/manifest.json` with PWA configuration (name, icons, theme, display: standalone)
+- Created PWA icons in multiple sizes:
+  - icon-192x192.png / icon-192x192-maskable.png
+  - icon-512x512.png / icon-512x512-maskable.png
+  - apple-touch-icon.png for iOS
+- Updated `src/app.html` with:
+  - `<link rel="manifest">` for PWA manifest
+  - `<meta name="theme-color">` for both light/dark modes (#FA8072 coral)
+  - `<meta name="apple-mobile-web-app-capable">` for iOS PWA support
+  - `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`
+  - `viewport-fit=cover` for safe area handling
+- Removed legacy scraper files that were blocking build (using deprecated better-sqlite3)
+
+**Files changed:**
+- `static/manifest.json` (new)
+- `static/icons/*.png` (new - 5 files)
+- `static/icons/*.svg` (new - 4 source files)
+- `src/app.html` (modified)
+- `src/hooks.server.ts` (modified - removed scheduler)
+- Deleted legacy: `src/lib/scraper/`, `src/routes/api/scraper/`, `src/routes/api/health/`, `src/routes/api/telegram/`
+
+**Learnings for future iterations:**
+- Legacy scraper files using better-sqlite3 were removed (migrated to Turso/Drizzle in US-000/US-001)
+- PWA manifest must use absolute paths starting with `/` for icons
+- Include both `any` and `maskable` purpose icons for best compatibility
+- Use `display: standalone` for app-like experience, `viewport-fit: cover` for safe areas
+- Theme color #FA8072 (coral) matches the app's accent color from tokens.css
+
+---
+
+## [Iteration 2] 2026-01-15 - US-202
+
+**Story:** Parser: Bourse Direct XLSX (PEA)
+
+**What was implemented:**
+- Created `BourseDirectParser.ts` implementing `InvestmentParser` interface
+- Parses XLSX format with columns: Nom, ISIN, Cours, Devise, Variation Veille %, Quantité, PRU (EUR), +/- value (EUR), +/- value %, Valorisation (EUR), Réglement, MIC, Marché
+- Returns `ParsedPosition[]` with all required fields (symbol, isin, quantity, avgBuyPrice, currentPrice, currentValue, gainLoss, gainLossPercent)
+- Handles French number format (comma as decimal separator)
+- Uses SheetJS xlsx library for XLSX parsing
+
+**Files changed:**
+- `src/infrastructure/parsers/BourseDirectParser.ts` (new)
+
+**Learnings for future iterations:**
+- Investment parsers implement `InvestmentParser` interface from `@domain/investment/InvestmentParser`
+- Return `ParsedPosition[]` for positions (portfolio snapshot), `ParsedInvestmentTransaction[]` for transactions
+- xlsx library converts to JSON with `utils.sheet_to_json()` - can type rows with interface
+- Numbers in XLSX might already be parsed as numbers by xlsx library, handle both string and number types
+
+---
+
+## [Iteration 1] 2026-01-15 - PRD COMPLETE
+
+All 13 user stories have been completed:
+- US-001: Docker configuration ✓
+- US-002: Telegram bot setup ✓
+- US-003: Binance API scraper ✓
+- US-004: Manual Binance sync ✓
+- US-005: Cron job scheduler ✓
+- US-006: Data freshness indicators ✓
+- US-007: Retry system ✓
+- US-008: Health check endpoint ✓
+- US-009: agent-browser setup ✓
+- US-010: Vercel design guidelines ✓
+- US-011: CE Perso and SCI sync ✓
+- US-012: Mobile validation notification ✓
+- US-013: Retry after mobile validation ✓
+
+**Action taken:**
+- Created PR #2 for the completed work on `feature/test-demo-changes` branch
+- PR URL: https://github.com/mbourmaud/imanisa-finance/pull/2
+
+**Learnings for future iterations:**
+- The branch name in PRD may differ from actual working branch
+- Always verify branch-to-work mapping before creating PRs
+- Check existing PRs before creating new ones
+
+---

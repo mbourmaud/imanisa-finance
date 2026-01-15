@@ -1,4 +1,9 @@
 <script lang="ts">
+	import { goto, invalidateAll } from '$app/navigation';
+	import type { CategoryOption, TransactionCategoryInfo } from './+page.server';
+	import CategoryBadge from '$lib/components/CategoryBadge.svelte';
+	import CategorySuggestion from '$lib/components/CategorySuggestion.svelte';
+
 	interface Owner {
 		id: string;
 		name: string;
@@ -17,6 +22,17 @@
 		owner?: Owner;
 		accountName?: string;
 		bank?: string;
+		categoryInfo: TransactionCategoryInfo;
+	}
+
+	interface SuggestionData {
+		transactionDescription: string;
+		category: {
+			id: string;
+			name: string;
+			icon: string;
+			color: string;
+		};
 	}
 
 	let { data } = $props<{
@@ -28,9 +44,108 @@
 		monthlyIncome: number;
 		monthlyExpense: number;
 		monthlyBalance: number;
+		categories: CategoryOption[];
+		uncategorizedOnly: boolean;
+		uncategorizedCount: number;
 	}>();
 
 	let selectedOwner = $state<'all' | 'owner-mathieu' | 'owner-ninon' | 'owner-joint' | 'owner-isaac'>('all');
+
+	// Announcement for screen readers
+	let announcement = $state('');
+
+	// Category suggestion popup state
+	let showSuggestion = $state(false);
+	let suggestionData = $state<SuggestionData | null>(null);
+
+	// Check localStorage for "don't ask again" preference
+	const SUGGESTION_STORAGE_KEY = 'imanisa-category-suggestion-disabled';
+
+	function isSuggestionDisabled(): boolean {
+		if (typeof localStorage === 'undefined') return false;
+		return localStorage.getItem(SUGGESTION_STORAGE_KEY) === 'true';
+	}
+
+	// Find category info from categories hierarchy
+	function findCategoryById(categoryId: string): CategoryOption | null {
+		for (const cat of data.categories) {
+			if (cat.id === categoryId) return cat;
+			if (cat.children) {
+				for (const child of cat.children) {
+					if (child.id === categoryId) return child;
+				}
+			}
+		}
+		return null;
+	}
+
+	async function handleCategoryChange(transactionId: string, categoryId: string) {
+		// Find the transaction to get its description
+		const transaction = data.transactions.find((tx: Transaction) => tx.id === transactionId);
+		if (!transaction) return;
+
+		try {
+			const response = await fetch(`/api/transactions/${transactionId}/category`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ category_id: categoryId })
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to update category');
+			}
+
+			const result = await response.json();
+
+			// Announce success for screen readers
+			announcement = `Catégorie mise à jour: ${result.category?.name ?? 'inconnu'}`;
+
+			// Refresh data to update UI
+			await invalidateAll();
+
+			// Show suggestion popup if not disabled
+			if (!isSuggestionDisabled() && result.category) {
+				const category = findCategoryById(categoryId);
+				if (category) {
+					suggestionData = {
+						transactionDescription: transaction.description,
+						category: {
+							id: category.id,
+							name: category.name,
+							icon: category.icon,
+							color: category.color
+						}
+					};
+					showSuggestion = true;
+				}
+			}
+		} catch (error) {
+			console.error('Error updating category:', error);
+			announcement = 'Erreur lors de la mise à jour de la catégorie';
+		}
+	}
+
+	function closeSuggestion() {
+		showSuggestion = false;
+		suggestionData = null;
+	}
+
+	function handleRuleCreated() {
+		// Announce for screen readers
+		announcement = 'Règle de catégorisation créée';
+	}
+
+	function toggleUncategorizedFilter() {
+		const newValue = !data.uncategorizedOnly;
+		const url = new URL(window.location.href);
+		if (newValue) {
+			url.searchParams.set('uncategorized', 'true');
+			url.searchParams.set('page', '1'); // Reset to page 1
+		} else {
+			url.searchParams.delete('uncategorized');
+		}
+		goto(url.pathname + url.search, { replaceState: true });
+	}
 
 	const ownerOptions = [
 		{ id: 'all' as const, label: 'Tous', color: 'var(--color-text-muted)' },
@@ -80,7 +195,15 @@
 	const filteredCount = $derived(
 		selectedOwner === 'all' ? data.totalCount : filteredTransactions.length
 	);
+
+	// Disable staggered animations for large lists (>50 items) to improve performance
+	const useStaggeredAnimations = $derived(filteredTransactions.length <= 50);
 </script>
+
+<!-- Screen reader announcements -->
+<div class="sr-only" aria-live="polite" aria-atomic="true">
+	{announcement}
+</div>
 
 <div class="transactions-page">
 	<header class="page-header">
@@ -93,18 +216,33 @@
 				<span class="stat-label">Page {data.page} sur {data.totalPages}</span>
 			</div>
 		</div>
-		<div class="owner-filter">
-			{#each ownerOptions as option}
-				<button
-					class="owner-pill"
-					class:active={selectedOwner === option.id}
-					onclick={() => selectedOwner = option.id}
-					style="--owner-color: {option.color}"
-				>
-					<span class="owner-dot"></span>
-					<span class="owner-label">{option.label}</span>
-				</button>
-			{/each}
+		<div class="filters-row">
+			<div class="owner-filter" role="group" aria-label="Filtrer par propriétaire">
+				{#each ownerOptions as option}
+					<button
+						class="owner-pill"
+						class:active={selectedOwner === option.id}
+						onclick={() => selectedOwner = option.id}
+						style="--owner-color: {option.color}"
+						aria-pressed={selectedOwner === option.id}
+					>
+						<span class="owner-dot" aria-hidden="true"></span>
+						<span class="owner-label">{option.label}</span>
+					</button>
+				{/each}
+			</div>
+			<button
+				class="uncategorized-filter"
+				class:active={data.uncategorizedOnly}
+				onclick={toggleUncategorizedFilter}
+				aria-pressed={data.uncategorizedOnly}
+			>
+				<span class="filter-icon" aria-hidden="true">?</span>
+				<span class="filter-label">Non catégorisées</span>
+				{#if data.uncategorizedCount > 0}
+					<span class="filter-count">{data.uncategorizedCount}</span>
+				{/if}
+			</button>
 		</div>
 	</header>
 
@@ -163,20 +301,27 @@
 		<div class="transactions-card">
 			<div class="transactions-list">
 				{#each filteredTransactions as tx, i}
-					<div class="transaction-row" style="animation-delay: {i * 0.02}s">
+					<div class="transaction-row" style={useStaggeredAnimations ? `animation-delay: ${i * 0.02}s` : ''}>
 						<span class="transaction-date">{formatDate(tx.date)}</span>
-						
+
 						<div class="transaction-details">
 							<span class="transaction-description">{tx.description}</span>
-							{#if tx.category}
-								<span class="transaction-category">{tx.category}</span>
-							{/if}
 						</div>
-						
+
+						<div class="transaction-category-cell">
+							<CategoryBadge
+								transactionId={tx.id}
+								category={tx.categoryInfo.category}
+								source={tx.categoryInfo.source}
+								categories={data.categories}
+								onCategoryChange={(categoryId: string) => handleCategoryChange(tx.id, categoryId)}
+							/>
+						</div>
+
 						<span class="owner-badge" style="background: {getOwnerColor(tx.owner_id)}" title={tx.owner?.name}>
 							{getOwnerInitial(tx.owner_id)}
 						</span>
-						
+
 						<span class="transaction-amount" class:income={tx.type === 'income'} class:expense={tx.type === 'expense'}>
 							{tx.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(tx.amount))}
 						</span>
@@ -223,7 +368,29 @@
 	{/if}
 </div>
 
+<!-- Category suggestion popup -->
+{#if showSuggestion && suggestionData}
+	<CategorySuggestion
+		transactionDescription={suggestionData.transactionDescription}
+		category={suggestionData.category}
+		onClose={closeSuggestion}
+		onRuleCreated={handleRuleCreated}
+	/>
+{/if}
+
 <style>
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
 	.transactions-page {
 		max-width: var(--content-max-width);
 		margin: 0 auto;
@@ -239,6 +406,13 @@
 		flex-wrap: wrap;
 		gap: var(--spacing-4);
 		animation: fadeInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+	}
+
+	.filters-row {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-3);
+		flex-wrap: wrap;
 	}
 
 	.header-left {
@@ -297,7 +471,9 @@
 		background: transparent;
 		border: none;
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 		white-space: nowrap;
 		flex-shrink: 0;
 		min-height: 44px;
@@ -319,6 +495,71 @@
 		border-radius: var(--radius-full);
 		background: var(--owner-color);
 		flex-shrink: 0;
+	}
+
+	.uncategorized-filter {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-2);
+		padding: var(--spacing-2) var(--spacing-4);
+		border-radius: var(--radius-full);
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-medium);
+		color: var(--color-text-tertiary);
+		background: var(--color-bg-elevated);
+		border: 1px solid var(--color-border);
+		cursor: pointer;
+		transition: color var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
+		white-space: nowrap;
+		min-height: 44px;
+	}
+
+	.uncategorized-filter:hover {
+		color: var(--color-text-secondary);
+		background: var(--color-bg-subtle);
+		border-color: var(--color-border-hover);
+	}
+
+	.uncategorized-filter.active {
+		color: var(--color-warning-700);
+		background: var(--color-warning-50);
+		border-color: var(--color-warning-200);
+	}
+
+	.uncategorized-filter:focus-visible {
+		outline: 2px solid var(--color-primary-500);
+		outline-offset: 2px;
+	}
+
+	.filter-icon {
+		width: 20px;
+		height: 20px;
+		border-radius: var(--radius-full);
+		background: var(--color-warning-100);
+		color: var(--color-warning-600);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: var(--font-size-xs);
+		font-weight: var(--font-weight-bold);
+	}
+
+	.uncategorized-filter.active .filter-icon {
+		background: var(--color-warning-200);
+		color: var(--color-warning-700);
+	}
+
+	.filter-count {
+		padding: var(--spacing-0-5) var(--spacing-2);
+		border-radius: var(--radius-full);
+		background: var(--color-warning-100);
+		color: var(--color-warning-700);
+		font-size: var(--font-size-xs);
+		font-weight: var(--font-weight-semibold);
+	}
+
+	.uncategorized-filter.active .filter-count {
+		background: var(--color-warning-200);
 	}
 
 	.summary-cards {
@@ -506,12 +747,7 @@
 		text-overflow: ellipsis;
 	}
 
-	.transaction-category {
-		font-size: var(--font-size-xs);
-		color: var(--color-text-muted);
-		background: var(--color-bg-subtle);
-		padding: var(--spacing-0-5) var(--spacing-2);
-		border-radius: var(--radius-sm);
+	.transaction-category-cell {
 		flex-shrink: 0;
 	}
 
@@ -565,7 +801,10 @@
 		background: var(--color-bg-card);
 		border: 1px solid var(--color-border);
 		text-decoration: none;
-		transition: all var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.pagination-btn:hover:not(.disabled) {
@@ -607,6 +846,12 @@
 			gap: var(--spacing-3);
 		}
 
+		.filters-row {
+			flex-direction: column;
+			align-items: stretch;
+			gap: var(--spacing-2);
+		}
+
 		.owner-filter {
 			width: calc(100% + var(--spacing-4) * 2);
 			margin: 0 calc(var(--spacing-4) * -1);
@@ -624,6 +869,10 @@
 
 		.owner-filter::-webkit-scrollbar {
 			display: none;
+		}
+
+		.uncategorized-filter {
+			justify-content: center;
 		}
 
 		.page-header h1 {
@@ -661,16 +910,22 @@
 			flex: 1 1 calc(100% - 80px);
 		}
 
+		.transaction-category-cell {
+			order: 4;
+			flex: 1 1 100%;
+			margin-left: 34px;
+			margin-top: var(--spacing-1);
+		}
+
 		.owner-badge {
 			order: 0;
 		}
 
 		.transaction-amount {
 			order: 3;
-			flex: 1 1 100%;
-			text-align: left;
-			margin-left: 34px;
-			margin-top: calc(var(--spacing-1) * -1);
+			flex: 0 0 auto;
+			text-align: right;
+			margin-left: auto;
 		}
 
 		.pagination {
@@ -703,7 +958,7 @@
 			display: none;
 		}
 
-		.transaction-category {
+		.filter-label {
 			display: none;
 		}
 

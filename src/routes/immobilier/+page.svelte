@@ -162,7 +162,9 @@
 		display: flex;
 		align-items: flex-start;
 		gap: var(--spacing-4);
-		transition: all var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.kpi-card:hover {

@@ -9,6 +9,33 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// Collapsible section states for mobile
+	let expandedSections = $state<Record<string, boolean>>({
+		info: true,
+		value: true,
+		loan: false,
+		amortization: false,
+		owners: false
+	});
+
+	function toggleSection(section: string) {
+		expandedSections[section] = !expandedSections[section];
+	}
+
+	// Check if on mobile (for conditional rendering)
+	let isMobile = $state(false);
+
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			const checkMobile = () => {
+				isMobile = window.innerWidth < 769;
+			};
+			checkMobile();
+			window.addEventListener('resize', checkMobile);
+			return () => window.removeEventListener('resize', checkMobile);
+		}
+	});
+
 	function formatCurrency(value: number | null): string {
 		if (value === null) return '-';
 		return value.toLocaleString('fr-FR', {
@@ -136,15 +163,26 @@
 	</header>
 
 	<!-- Section Informations -->
-	<section class="card info-section">
-		<h2 class="section-title">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	<section class="card info-section" class:collapsed={isMobile && !expandedSections.info}>
+		<button
+			class="section-title"
+			class:collapsible={isMobile}
+			onclick={() => isMobile && toggleSection('info')}
+			aria-expanded={!isMobile || expandedSections.info}
+		>
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<circle cx="12" cy="12" r="10"/>
 				<path d="M12 16v-4"/>
 				<path d="M12 8h.01"/>
 			</svg>
-			Informations
-		</h2>
+			<span>Informations</span>
+			{#if isMobile}
+				<svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="m6 9 6 6 6-6"/>
+				</svg>
+			{/if}
+		</button>
+		<div class="section-content" class:hidden={isMobile && !expandedSections.info}>
 		<div class="info-grid">
 			<div class="info-item">
 				<span class="info-label">Type</span>
@@ -211,17 +249,29 @@
 				</div>
 			</div>
 		{/if}
+		</div>
 	</section>
 
 	<!-- Section Valeur -->
-	<section class="card value-section">
-		<h2 class="section-title">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	<section class="card value-section" class:collapsed={isMobile && !expandedSections.value}>
+		<button
+			class="section-title"
+			class:collapsible={isMobile}
+			onclick={() => isMobile && toggleSection('value')}
+			aria-expanded={!isMobile || expandedSections.value}
+		>
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<line x1="12" y1="1" x2="12" y2="23"/>
 				<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
 			</svg>
-			Valeur
-		</h2>
+			<span>Valeur</span>
+			{#if isMobile}
+				<svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="m6 9 6 6 6-6"/>
+				</svg>
+			{/if}
+		</button>
+		<div class="section-content" class:hidden={isMobile && !expandedSections.value}>
 		<div class="value-cards">
 			<div class="value-card">
 				<span class="value-label">Prix d'achat</span>
@@ -273,18 +323,30 @@
 				</div>
 			</div>
 		{/if}
+		</div>
 	</section>
 
 	<!-- Section Prêt -->
 	{#if loan}
-		<section class="card loan-section">
-			<h2 class="section-title">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<section class="card loan-section" class:collapsed={isMobile && !expandedSections.loan}>
+			<button
+				class="section-title"
+				class:collapsible={isMobile}
+				onclick={() => isMobile && toggleSection('loan')}
+				aria-expanded={!isMobile || expandedSections.loan}
+			>
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 					<rect x="2" y="4" width="20" height="16" rx="2"/>
 					<path d="M12 12h.01"/>
 				</svg>
-				Prêt immobilier
-			</h2>
+				<span>Prêt immobilier</span>
+				{#if isMobile}
+					<svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="m6 9 6 6 6-6"/>
+					</svg>
+				{/if}
+			</button>
+			<div class="section-content" class:hidden={isMobile && !expandedSections.loan}>
 			<div class="loan-header">
 				<div class="loan-name">{loan.name}</div>
 				<div class="loan-bank">{loan.bankName}</div>
@@ -344,27 +406,60 @@
 					</div>
 				</div>
 			</div>
+			</div>
 		</section>
 
 		<!-- Section Tableau d'amortissement -->
 		{#if amortizationSchedule.length > 0}
-			<section class="card amortization-section">
-				<AmortizationTable schedule={amortizationSchedule} currentMonthIndex={currentMonthIndex} />
+			<section class="card amortization-section" class:collapsed={isMobile && !expandedSections.amortization}>
+				<button
+					class="section-title"
+					class:collapsible={isMobile}
+					onclick={() => isMobile && toggleSection('amortization')}
+					aria-expanded={!isMobile || expandedSections.amortization}
+				>
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+						<line x1="16" y1="2" x2="16" y2="6"/>
+						<line x1="8" y1="2" x2="8" y2="6"/>
+						<line x1="3" y1="10" x2="21" y2="10"/>
+					</svg>
+					<span>Tableau d'amortissement</span>
+					{#if isMobile}
+						<svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="m6 9 6 6 6-6"/>
+						</svg>
+					{/if}
+				</button>
+				<div class="section-content" class:hidden={isMobile && !expandedSections.amortization}>
+					<AmortizationTable schedule={amortizationSchedule} currentMonthIndex={currentMonthIndex} />
+				</div>
 			</section>
 		{/if}
 	{/if}
 
 	<!-- Section Propriétaires -->
-	<section class="card owners-section">
-		<h2 class="section-title">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	<section class="card owners-section" class:collapsed={isMobile && !expandedSections.owners}>
+		<button
+			class="section-title"
+			class:collapsible={isMobile}
+			onclick={() => isMobile && toggleSection('owners')}
+			aria-expanded={!isMobile || expandedSections.owners}
+		>
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
 				<circle cx="9" cy="7" r="4"/>
 				<path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
 				<path d="M16 3.13a4 4 0 0 1 0 7.75"/>
 			</svg>
-			Propriétaires
-		</h2>
+			<span>Propriétaires</span>
+			{#if isMobile}
+				<svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="m6 9 6 6 6-6"/>
+				</svg>
+			{/if}
+		</button>
+		<div class="section-content" class:hidden={isMobile && !expandedSections.owners}>
 		<div class="owners-list">
 			{#each data.property.owners as owner}
 				<div class="owner-card">
@@ -385,6 +480,7 @@
 					</div>
 				</div>
 			{/each}
+		</div>
 		</div>
 	</section>
 </div>
@@ -462,10 +558,71 @@
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-text-primary);
 		margin-bottom: var(--spacing-5);
+		/* Button reset for collapsible */
+		width: 100%;
+		background: none;
+		border: none;
+		padding: 0;
+		text-align: left;
+		cursor: default;
 	}
 
-	.section-title svg {
+	.section-title svg:first-of-type {
 		color: var(--color-gold-500);
+		flex-shrink: 0;
+	}
+
+	.section-title span {
+		flex: 1;
+	}
+
+	/* Collapsible section styles */
+	.section-title.collapsible {
+		cursor: pointer;
+		padding: var(--spacing-4);
+		margin: calc(var(--spacing-4) * -1);
+		margin-bottom: var(--spacing-4);
+		border-radius: var(--radius-lg);
+		transition: background-color var(--transition-fast);
+	}
+
+	.section-title.collapsible:hover {
+		background: var(--color-bg-subtle);
+	}
+
+	.section-title.collapsible:focus-visible {
+		outline: 2px solid var(--color-primary-500);
+		outline-offset: -2px;
+	}
+
+	.section-title .chevron {
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+		transition: transform var(--transition-fast);
+	}
+
+	.section-title[aria-expanded="true"] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.section-content {
+		/* Smooth collapse animation */
+		overflow: hidden;
+		transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+	}
+
+	.section-content.hidden {
+		max-height: 0;
+		opacity: 0;
+		overflow: hidden;
+	}
+
+	.card.collapsed {
+		padding-bottom: var(--spacing-4);
+	}
+
+	.card.collapsed .section-title {
+		margin-bottom: 0;
 	}
 
 	.subsection-title {
@@ -824,6 +981,17 @@
 		.costs-grid {
 			flex-direction: column;
 			gap: var(--spacing-3);
+		}
+	}
+
+	/* Reduced motion preference */
+	@media (prefers-reduced-motion: reduce) {
+		.section-content {
+			transition: none;
+		}
+
+		.section-title .chevron {
+			transition: none;
 		}
 	}
 </style>
