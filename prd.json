@@ -801,7 +801,7 @@
       ],
       "files": ["src/app.css", "src/lib/components/"],
       "priority": 303,
-      "passes": false,
+      "passes": true,
       "notes": "Suivre WAI-ARIA APG patterns"
     },
     {
@@ -821,7 +821,7 @@
       ],
       "files": ["src/lib/components/forms/"],
       "priority": 304,
-      "passes": false,
+      "passes": true,
       "notes": "Hydration-safe inputs, password manager compatible"
     },
     {

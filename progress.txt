@@ -31,6 +31,12 @@
 - **iOS zoom prevention**: `font-size: max(16px, 1rem)` on inputs prevents zoom on focus
 - **Safe areas**: Use `env(safe-area-inset-*)` with `max()` for notched device support
 - **Accessibility**: `:focus-visible` for keyboard navigation, `aria-current="page"` on active nav items
+- **Theme store**: `$lib/stores/theme` exports `theme` store with `toggle()`, `setTheme()`, `reset()` methods
+- **Theme persistence**: localStorage key `imanisa-theme`, values: 'light', 'dark', 'system'
+- **Theme CSS**: `:root, html.dark` for dark mode, `html.light` for light mode in tokens.css
+- **Form components**: `$lib/components/forms` exports FormInput, FormSelect, Button with barrel export
+- **Button loading state**: Use `loading` prop with SVG spinner, button shows `aria-busy="true"`
+- **Svelte 5 derived**: Use `$derived.by(() => { ... })` for computed values needing function body
 
 ---
 
@@ -888,6 +894,81 @@
 
 ---
 
+## [Iteration 30] 2026-01-15 - US-302: UI: Dark mode avec color-scheme
+
+### What was implemented
+- Created comprehensive theme system with light/dark mode support:
+  - `src/lib/stores/theme.ts` - Svelte store for theme management
+  - Supports 'light', 'dark', and 'system' modes
+  - Persists user preference in localStorage ('imanisa-theme' key)
+  - Listens for system preference changes (prefers-color-scheme)
+  - Updates color-scheme CSS property on html element
+  - Dynamically updates theme-color meta tag
+- Updated CSS design tokens for dual-mode support:
+  - Shared tokens (colors, typography, spacing) in :root
+  - Dark mode variables in `:root, html.dark`
+  - Light mode variables in `html.light`
+  - APCA-compliant contrast ratios for light mode text
+- Inline script in app.html prevents flash of wrong theme on page load
+- Theme toggle button added to Navigation component (sidebar footer)
+  - Sun icon for switching to light mode
+  - Moon icon for switching to dark mode
+  - Proper aria-label for accessibility
+- Fixed native select styling for Windows (explicit background-color and color)
+- Selection color now uses CSS variable for theme consistency
+
+### Files changed
+- src/lib/stores/theme.ts (new)
+- src/app.html (added inline theme script, simplified theme-color meta)
+- src/lib/styles/tokens.css (refactored for light/dark modes)
+- src/lib/styles/global.css (select styling, selection color)
+- src/lib/components/Navigation.svelte (added theme toggle, fixed user type)
+
+### Learnings for future iterations
+- Theme store pattern: writable store with setTheme(), toggle(), reset() methods
+- Use inline script in app.html for theme initialization to prevent FOUC (Flash Of Unstyled Content)
+- CSS color-scheme property enables native element styling (scrollbars, form elements)
+- APCA (Advanced Perceptual Contrast Algorithm) for accessible color contrast
+- Light mode needs darker semantic colors (success, danger, warning) for good contrast
+- Theme toggle should show icon for the mode it will switch TO, not current mode
+
+---
+
+## [Iteration 31] 2026-01-15 - US-303: UI: Accessibilité et focus management
+
+### What was implemented
+- Added comprehensive accessibility features across the application:
+  - Skip-to-content link in +layout.svelte for keyboard users
+  - :focus-visible styles already present in global.css (verified)
+  - aria-label on icon-only buttons (login page PIN pad, owner filter dots)
+  - aria-pressed for toggle buttons (owner filter pills)
+  - aria-live="polite" region in ImportDropZone for status announcements
+  - role="alert" for error states in import component
+  - aria-hidden="true" on decorative elements (icons, spinners, dots)
+  - Escape key handler for modal dialogs (bank detail, account detail pages)
+  - aria-labelledby on modal dialogs linking to their titles
+  - role="group" with aria-label for button groups (view toggle, period pills)
+
+### Files changed
+- src/routes/+layout.svelte (added skip-to-content link with styling)
+- src/routes/+page.svelte (aria-label, aria-pressed on buttons, role/aria-label on groups)
+- src/lib/components/import/ImportDropZone.svelte (aria-live region, role="alert", aria-hidden)
+- src/routes/banks/[bankId]/+page.svelte (Escape key handler, aria-labelledby on modal)
+- src/routes/banks/[bankId]/accounts/[accountId]/+page.svelte (Escape key handler, aria-labelledby)
+- src/routes/login/+page.svelte (aria-label on PIN pad icon buttons)
+
+### Learnings for future iterations
+- Skip-to-content link uses transform for show/hide animation (compositor-friendly)
+- Focus the target element with tabindex="-1" for skip link to work properly
+- aria-live="polite" announces changes without interrupting current speech
+- aria-pressed="true/false" indicates toggle button state for screen readers
+- Escape key handling via svelte:window onkeydown for modal dismissal
+- aria-labelledby references the modal title's id for proper labeling
+- Decorative elements (icons, dots) should have aria-hidden="true"
+- role="group" with aria-label helps screen readers understand related controls
+
+---
+
 ## [Iteration 29] 2026-01-15 - US-301: UI: Layout responsive mobile-first
 
 ### What was implemented
@@ -926,5 +1007,55 @@
 - Use `env(safe-area-inset-*)` with `max()` function for padding that respects both design spacing and safe areas
 - Navigation component uses `aria-current="page"` for screen reader accessibility
 - Breakpoint 769px chosen to match iPad portrait (768px) as tablet boundary
+
+---
+
+## [Iteration 32] 2026-01-15 - US-304: UI: Formulaires selon guidelines
+
+### What was implemented
+- Created reusable form components in `src/lib/components/forms/`:
+  - **FormInput.svelte**: Text input with autocomplete, inputmode, inline validation
+    - Auto-detects autocomplete value based on field name (email, phone, password, etc.)
+    - Auto-detects inputmode based on type (email → email, number → decimal, etc.)
+    - Displays inline error with icon next to field
+    - Supports hint text for additional context
+    - Required field indicator (*)
+    - Touch-friendly (44px min height, 16px font)
+  - **FormSelect.svelte**: Styled select with same patterns
+    - Custom dropdown arrow
+    - Inline error display
+    - Proper ARIA attributes
+  - **Button.svelte**: Button with loading state
+    - SVG spinner animation during loading
+    - Maintains button text during loading
+    - Supports primary, secondary, danger, ghost variants
+    - Disabled state during loading
+    - aria-busy attribute for screen readers
+- Updated existing forms to use new components:
+  - `/banks/new/+page.svelte`: Bank creation form
+  - `/banks/[bankId]/+page.svelte`: Add account modal
+  - `/banks/[bankId]/accounts/[accountId]/+page.svelte`: Delete and import modals
+- Added focus management: focus first field on error after submit
+- Added loading states with spinner to all submit buttons
+- Placeholders now end with ellipsis (…) per guidelines
+
+### Files changed
+- src/lib/components/forms/FormInput.svelte (new)
+- src/lib/components/forms/FormSelect.svelte (new)
+- src/lib/components/forms/Button.svelte (new)
+- src/lib/components/forms/index.ts (new)
+- src/routes/banks/new/+page.svelte
+- src/routes/banks/[bankId]/+page.svelte
+- src/routes/banks/[bankId]/accounts/[accountId]/+page.svelte
+
+### Learnings for future iterations
+- Form components go in `src/lib/components/forms/` with barrel export in index.ts
+- Use `$derived.by()` for computed values that need a function body in Svelte 5
+- Use `AutocompleteValue` type from `HTMLInputAttributes['autocomplete']` for type-safe autocomplete
+- Button loading state: disable button and show spinner with `aria-busy="true"`
+- To target component children in scoped CSS, use `:global(button)` selector
+- SVG spinner animation: use `<animate>` for stroke-dasharray and `<animateTransform>` for rotation
+- Focus management: use `$effect()` to focus input when form error changes
+- Form values: use `$state()` to capture initial form values for re-population on error
 
 ---
