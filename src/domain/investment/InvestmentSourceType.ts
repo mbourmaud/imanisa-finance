@@ -4,17 +4,26 @@
 export enum InvestmentSourceType {
 	/** Plan d'Épargne en Actions */
 	PEA = 'pea',
-	/** Assurance-vie */
-	ASSURANCE_VIE = 'assurance_vie',
-	/** Crypto wallet/exchange */
-	CRYPTO = 'crypto',
 	/** Compte-Titres Ordinaire */
 	CTO = 'cto',
+	/** Assurance-vie */
+	ASSURANCE_VIE = 'assurance_vie',
+	/** Plan d'Épargne Retraite */
+	PER = 'per',
+	/** Crypto wallet/exchange */
+	CRYPTO = 'crypto',
+	/** Crowdfunding */
+	CROWDFUNDING = 'crowdfunding',
+	/** Other */
+	OTHER = 'other',
 }
 
 export const InvestmentSourceTypeLabels: Record<InvestmentSourceType, string> = {
 	[InvestmentSourceType.PEA]: 'PEA',
-	[InvestmentSourceType.ASSURANCE_VIE]: 'Assurance-vie',
-	[InvestmentSourceType.CRYPTO]: 'Crypto',
 	[InvestmentSourceType.CTO]: 'Compte-Titres',
+	[InvestmentSourceType.ASSURANCE_VIE]: 'Assurance-vie',
+	[InvestmentSourceType.PER]: 'PER',
+	[InvestmentSourceType.CRYPTO]: 'Crypto',
+	[InvestmentSourceType.CROWDFUNDING]: 'Crowdfunding',
+	[InvestmentSourceType.OTHER]: 'Autre',
 };

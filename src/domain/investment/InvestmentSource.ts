@@ -1,7 +1,6 @@
 import { Entity } from '@domain/shared/Entity';
 import { Result } from '@domain/shared/Result';
 import type { UniqueId } from '@domain/shared/UniqueId';
-import { InvestmentParserKey } from './InvestmentParser';
 import { InvestmentSourceType } from './InvestmentSourceType';
 
 interface InvestmentSourceProps {
@@ -9,18 +8,16 @@ interface InvestmentSourceProps {
 	name: string;
 	/** Type of investment source */
 	type: InvestmentSourceType;
-	/** Owner entity ID (references entities table - person, SCI, joint) */
-	ownerEntityId: UniqueId;
-	/** URL to access the broker's export page */
-	url: string;
-	/** File format (xlsx, csv, etc.) */
-	format: string;
-	/** Parser key to use for this source */
-	parserKey: InvestmentParserKey;
-	/** Last successful sync date */
-	lastSyncAt: Date | null;
+	/** Owner ID */
+	ownerId: UniqueId;
+	/** Bank/Broker name */
+	bank: string | null;
+	/** Additional notes */
+	notes: string | null;
 	/** Creation date */
 	createdAt: Date;
+	/** Last update date */
+	updatedAt: Date;
 }
 
 export class InvestmentSource extends Entity<InvestmentSourceProps> {
@@ -36,45 +33,33 @@ export class InvestmentSource extends Entity<InvestmentSourceProps> {
 		return this.props.type;
 	}
 
-	get ownerEntityId(): UniqueId {
-		return this.props.ownerEntityId;
+	get ownerId(): UniqueId {
+		return this.props.ownerId;
 	}
 
-	get url(): string {
-		return this.props.url;
+	get bank(): string | null {
+		return this.props.bank;
 	}
 
-	get format(): string {
-		return this.props.format;
-	}
-
-	get parserKey(): InvestmentParserKey {
-		return this.props.parserKey;
-	}
-
-	get lastSyncAt(): Date | null {
-		return this.props.lastSyncAt;
+	get notes(): string | null {
+		return this.props.notes;
 	}
 
 	get createdAt(): Date {
 		return this.props.createdAt;
 	}
 
-	/**
-	 * Update the last sync timestamp
-	 */
-	markSynced(): void {
-		this.props.lastSyncAt = new Date();
+	get updatedAt(): Date {
+		return this.props.updatedAt;
 	}
 
 	static create(
 		props: {
 			name: string;
 			type: InvestmentSourceType;
-			ownerEntityId: UniqueId;
-			url: string;
-			format: string;
-			parserKey: InvestmentParserKey;
+			ownerId: UniqueId;
+			bank?: string | null;
+			notes?: string | null;
 		},
 		id?: UniqueId,
 	): Result<InvestmentSource> {
@@ -86,25 +71,17 @@ export class InvestmentSource extends Entity<InvestmentSourceProps> {
 			return Result.fail('Invalid investment source type');
 		}
 
-		if (!Object.values(InvestmentParserKey).includes(props.parserKey)) {
-			return Result.fail('Invalid parser key');
-		}
-
-		if (!props.url || props.url.trim().length === 0) {
-			return Result.fail('InvestmentSource URL is required');
-		}
-
+		const now = new Date();
 		return Result.ok(
 			new InvestmentSource(
 				{
 					name: props.name.trim(),
 					type: props.type,
-					ownerEntityId: props.ownerEntityId,
-					url: props.url.trim(),
-					format: props.format,
-					parserKey: props.parserKey,
-					lastSyncAt: null,
-					createdAt: new Date(),
+					ownerId: props.ownerId,
+					bank: props.bank ?? null,
+					notes: props.notes ?? null,
+					createdAt: now,
+					updatedAt: now,
 				},
 				id,
 			),
@@ -115,12 +92,11 @@ export class InvestmentSource extends Entity<InvestmentSourceProps> {
 		props: {
 			name: string;
 			type: InvestmentSourceType;
-			ownerEntityId: UniqueId;
-			url: string;
-			format: string;
-			parserKey: InvestmentParserKey;
-			lastSyncAt: Date | null;
+			ownerId: UniqueId;
+			bank: string | null;
+			notes: string | null;
 			createdAt: Date;
+			updatedAt: Date;
 		},
 		id: UniqueId,
 	): Result<InvestmentSource> {
@@ -129,12 +105,11 @@ export class InvestmentSource extends Entity<InvestmentSourceProps> {
 				{
 					name: props.name,
 					type: props.type,
-					ownerEntityId: props.ownerEntityId,
-					url: props.url,
-					format: props.format,
-					parserKey: props.parserKey,
-					lastSyncAt: props.lastSyncAt,
+					ownerId: props.ownerId,
+					bank: props.bank,
+					notes: props.notes,
 					createdAt: props.createdAt,
+					updatedAt: props.updatedAt,
 				},
 				id,
 			),
