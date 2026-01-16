@@ -28,5 +28,18 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Claude/Hive
+.claude/
+.hive/
+.last-branch
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Temp files
+*.png
+docker/
 *.swp
 *.swo

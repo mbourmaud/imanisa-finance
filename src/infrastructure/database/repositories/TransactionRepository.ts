@@ -58,13 +58,17 @@ export class TransactionRepositoryImpl implements TransactionRepository {
 
 		const db = await getDb();
 		for (const tx of transactions) {
+			// Store amount with sign: negative for expenses, positive for income
+			const signedAmount =
+				tx.type === TransactionType.EXPENSE ? -tx.amount.amount : tx.amount.amount;
+
 			await db
 				.insert(schema.transactions)
 				.values({
 					id: tx.id.toString(),
 					accountId: tx.accountId.toString(),
 					type: tx.type,
-					amount: tx.amount.amount,
+					amount: signedAmount,
 					currency: tx.amount.currency,
 					description: tx.description,
 					date: tx.date.toISOString(),
@@ -75,7 +79,7 @@ export class TransactionRepositoryImpl implements TransactionRepository {
 					target: schema.transactions.id,
 					set: {
 						type: tx.type,
-						amount: tx.amount.amount,
+						amount: signedAmount,
 						currency: tx.amount.currency,
 						description: tx.description,
 						date: tx.date.toISOString(),
@@ -100,11 +104,21 @@ export class TransactionRepositoryImpl implements TransactionRepository {
 	}
 
 	private toDomain(row: typeof schema.transactions.$inferSelect): Transaction | null {
+		// Determine type from sign if not stored, otherwise use stored type
+		const type = row.type
+			? (row.type as TransactionType)
+			: row.amount >= 0
+				? TransactionType.INCOME
+				: TransactionType.EXPENSE;
+
+		// Amount in domain is always positive (absolute value)
+		const absoluteAmount = Math.abs(row.amount);
+
 		const result = TransactionEntity.reconstitute(
 			{
 				accountId: UniqueId.fromString(row.accountId),
-				type: row.type as TransactionType,
-				amount: row.amount,
+				type,
+				amount: absoluteAmount,
 				currency: row.currency,
 				description: row.description,
 				date: new Date(row.date),

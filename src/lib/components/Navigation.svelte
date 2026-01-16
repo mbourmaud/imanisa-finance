@@ -223,7 +223,7 @@
 	}
 
 	/* ─────────────────────────────────────────────────────────────────────────────
-	   MOBILE: Bottom Navigation Bar
+	   MOBILE: Bottom Navigation Bar - Apple Liquid Glass Style
 	   ───────────────────────────────────────────────────────────────────────────── */
 	.sidebar {
 		position: fixed;
@@ -232,15 +232,29 @@
 		bottom: 0;
 		width: 100%;
 		height: auto;
-		background: var(--color-bg-base);
-		border-top: 1px solid var(--color-border);
+		background: var(--glass-bg);
+		border-top: 1px solid var(--glass-border);
 		display: flex;
 		flex-direction: row;
 		padding: 0;
 		padding-bottom: env(safe-area-inset-bottom, 0);
 		z-index: 100;
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+		-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+		box-shadow: var(--glass-shadow);
+	}
+
+	/* Glass highlight overlay for depth - frosted edge effect */
+	.sidebar::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 100%;
+		background: var(--glass-highlight);
+		pointer-events: none;
+		border-radius: inherit;
 	}
 
 	.sidebar-header {
@@ -278,16 +292,19 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: var(--spacing-1);
-		padding: var(--spacing-2) var(--spacing-1);
-		border-radius: var(--radius-lg);
+		gap: var(--spacing-0-5);
+		padding: var(--spacing-1-5) var(--spacing-1);
+		border-radius: var(--radius-2xl);
 		color: var(--color-text-tertiary);
 		text-decoration: none;
 		position: relative;
 		min-height: var(--touch-target-min, 44px);
-		max-width: 80px;
+		max-width: 72px;
 		touch-action: manipulation;
-		transition: color var(--transition-fast), background-color var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast),
+			transform var(--transition-fast);
 		-webkit-user-select: none;
 		user-select: none;
 		-webkit-tap-highlight-color: transparent;
@@ -299,17 +316,20 @@
 	}
 
 	.nav-item:hover {
-		color: var(--color-text-primary);
-		background: var(--color-bg-subtle);
+		color: var(--color-text-secondary);
 	}
 
 	.nav-item:active {
-		transform: scale(0.95);
+		transform: scale(0.92);
 	}
 
+	/* Pill-style active state with glass background */
 	.nav-item.active {
 		color: var(--color-primary-500);
-		background: transparent;
+		background: var(--glass-bg-active);
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.06),
+			0 1px 3px rgba(0, 0, 0, 0.1);
 	}
 
 	.nav-icon {
@@ -416,12 +436,17 @@
 			right: auto;
 			width: var(--sidebar-width-collapsed);
 			height: auto;
+			background: var(--color-bg-base);
 			border-right: 1px solid var(--color-border);
 			border-top: none;
 			flex-direction: column;
 			padding: 0;
 			backdrop-filter: none;
 			-webkit-backdrop-filter: none;
+		}
+
+		.sidebar::before {
+			display: none;
 		}
 
 		.sidebar-header {
@@ -457,6 +482,7 @@
 
 		.nav-item.active {
 			background: var(--gradient-accent-soft);
+			box-shadow: none;
 		}
 
 		.nav-icon {

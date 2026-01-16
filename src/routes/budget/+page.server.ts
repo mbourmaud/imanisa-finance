@@ -158,7 +158,17 @@ export const load: PageServerLoad = async ({ url }) => {
 	}
 	rootCategories.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
 
-	// Query expenses by category (negative amounts = expenses)
+	// Get excluded category IDs for filtering (Transaction exclue and its children)
+	const excludedCatResult = await execute(
+		`SELECT id FROM categories
+		 WHERE name = 'Transaction exclue'
+		    OR parent_id = (SELECT id FROM categories WHERE name = 'Transaction exclue')`,
+		[]
+	);
+	const excludedIds = excludedCatResult.rows.map((r) => r.id as string);
+	const excludePlaceholders = excludedIds.length > 0 ? excludedIds.map(() => '?').join(',') : "'__none__'";
+
+	// Query expenses by category (negative amounts = expenses, excluding internal transfers)
 	const expenseResult = await execute(
 		`SELECT
 			tc.category_id,
@@ -167,12 +177,13 @@ export const load: PageServerLoad = async ({ url }) => {
 		FROM transactions t
 		INNER JOIN transaction_categories tc ON t.id = tc.transaction_id
 		WHERE t.date >= ? AND t.date <= ? AND t.amount < 0
+		  AND tc.category_id NOT IN (${excludePlaceholders})
 		GROUP BY tc.category_id
 		ORDER BY total_amount DESC`,
-		[startDateStr, endDateStr]
+		[startDateStr, endDateStr, ...excludedIds]
 	);
 
-	// Query income by category (positive amounts = income)
+	// Query income by category (positive amounts = income, excluding internal transfers)
 	const incomeResult = await execute(
 		`SELECT
 			tc.category_id,
@@ -181,9 +192,10 @@ export const load: PageServerLoad = async ({ url }) => {
 		FROM transactions t
 		INNER JOIN transaction_categories tc ON t.id = tc.transaction_id
 		WHERE t.date >= ? AND t.date <= ? AND t.amount > 0
+		  AND tc.category_id NOT IN (${excludePlaceholders})
 		GROUP BY tc.category_id
 		ORDER BY total_amount DESC`,
-		[startDateStr, endDateStr]
+		[startDateStr, endDateStr, ...excludedIds]
 	);
 
 	// Query uncategorized transactions
@@ -198,14 +210,16 @@ export const load: PageServerLoad = async ({ url }) => {
 		[startDateStr, endDateStr]
 	);
 
-	// Query totals
+	// Query totals (excluding internal transfers and excluded transactions)
 	const totalsResult = await execute(
 		`SELECT
-			SUM(CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END) as total_expenses,
-			SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) as total_income
-		FROM transactions
-		WHERE date >= ? AND date <= ?`,
-		[startDateStr, endDateStr]
+			SUM(CASE WHEN t.amount < 0 THEN ABS(t.amount) ELSE 0 END) as total_expenses,
+			SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END) as total_income
+		FROM transactions t
+		LEFT JOIN transaction_categories tc ON t.id = tc.transaction_id
+		WHERE t.date >= ? AND t.date <= ?
+		  AND (tc.category_id IS NULL OR tc.category_id NOT IN (${excludePlaceholders}))`,
+		[startDateStr, endDateStr, ...excludedIds]
 	);
 
 	const totalExpenses = (totalsResult.rows[0]?.total_expenses as number) ?? 0;

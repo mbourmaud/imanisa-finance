@@ -32,15 +32,6 @@ function getLibSQLClient(): Client {
 }
 
 async function initializeSchema(db: Client): Promise<void> {
-	// Check if schema is already initialized by checking for a core table
-	try {
-		await db.execute('SELECT 1 FROM users LIMIT 1');
-		// Schema already exists
-		return;
-	} catch {
-		// Table doesn't exist, need to initialize schema
-	}
-
 	const schemaPath = join(__dirname, 'schema.sql');
 	const schemaSql = readFileSync(schemaPath, 'utf-8');
 
@@ -59,7 +50,7 @@ async function initializeSchema(db: Client): Promise<void> {
 		try {
 			await db.execute(stmt);
 		} catch (error) {
-			// Ignore "table already exists" or "index already exists" errors
+			// Ignore "already exists" errors (tables use IF NOT EXISTS but indexes may not)
 			const errorMessage = String(error);
 			if (errorMessage.includes('already exists')) {
 				continue;
