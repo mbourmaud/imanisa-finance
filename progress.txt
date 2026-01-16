@@ -1723,3 +1723,37 @@
 - CreditMutuelParser returns empty array for invalid CSV (doesn't throw)
 - Use new Date(year, month, day) for date comparisons in dedup tests (timezone consistency)
 - global.fetch must be mocked in beforeEach and restored in afterEach for API testing
+
+---
+
+## [Iteration Final] 2026-01-15 - PR Created
+
+### What was done
+- All 47 user stories completed with `passes: true`
+- Fixed type errors in API test fixtures (PropertyCategory and Loan types)
+- Fixed Svelte 5 state_referenced_locally warnings in form components
+- Added createMockProperty/createMockLoan helpers for complete test fixtures
+- All tests passing (550 unit tests, 0 errors in svelte-check)
+- Pushed branch and created Pull Request #3
+
+### Files changed in final iteration
+- src/lib/components/CategorySuggestion.svelte (a11y warning suppression)
+- src/lib/components/forms/Button.svelte (removed empty CSS ruleset)
+- src/lib/components/forms/FormInput.svelte (use $derived for id-based values)
+- src/lib/components/forms/FormSelect.svelte (use $derived for id-based values)
+- src/routes/banks/new/+page.svelte (fix $effect initialization from props)
+- src/routes/budget/rules/+page.svelte (a11y warning suppression)
+- src/tests/routes/api/real-estate/properties/server.test.ts (type-safe mock helpers)
+
+### Pull Request
+- PR #3: https://github.com/mbourmaud/imanisa-finance/pull/3
+- Branch: ralph/phase-1-immobilier
+- 75 commits total
+
+### Learnings for future iterations
+- Svelte 5 `$derived()` should be used for any computed value that depends on props
+- When initializing state from props, use `$effect()` rather than direct assignment to avoid state_referenced_locally warnings
+- Modal overlay divs with `role="presentation"` and `onclick` generate a11y warnings - use svelte-ignore comments when appropriate
+- Test fixtures should use helper functions to create complete mock objects matching full interface types
+
+---

@@ -523,7 +523,7 @@
       "files": ["src/routes/investissements/", "src/lib/components/investments/"],
       "priority": 209,
       "passes": true,
-      "notes": "Afficher clairement la performance de chaque ligne et du portefeuille global"
+      "notes": "Fixed by PR #4 - Schema initialization added to getDb()"
     },
     {
       "id": "US-900",
@@ -1058,7 +1058,7 @@
       "files": ["src/routes/budget/", "src/lib/components/budget/"],
       "priority": 408,
       "passes": true,
-      "notes": "Inspiration: apps budget type Bankin, Linxo"
+      "notes": "Fixed by PR #4 - Schema initialization added to getDb()"
     },
     {
       "id": "US-409",
@@ -1093,7 +1093,7 @@
       "files": ["src/routes/budget/rules/"],
       "priority": 410,
       "passes": true,
-      "notes": "Permet d'ajouter des règles custom sans toucher au code"
+      "notes": "Fixed by PR #4 - Schema initialization added to getDb()"
     },
     {
       "id": "US-411",
