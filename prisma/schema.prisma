@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// === ENUMS ===
+enum OwnerType {
+  PERSON
+  JOINT
+  SCI
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  INVESTMENT
+  LOAN
+  CREDIT_CARD
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum CategorySource {
+  BANK
+  AUTO
+  MANUAL
+}
+
+// === CORE MODELS ===
+model Owner {
+  id        String    @id @default(uuid())
+  name      String
+  type      OwnerType @default(PERSON)
+  createdAt DateTime  @default(now())
+  
+  users    User[]
+  accounts Account[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  ownerId   String
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  
+  owner Owner  @relation(fields: [ownerId], references: [id])
+  banks Bank[]
+}
+
+model Bank {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  template  String?
+  createdAt DateTime @default(now())
+  
+  user     User      @relation(fields: [userId], references: [id])
+  accounts Account[]
+}
+
+model Account {
+  id            String      @id @default(uuid())
+  bankId        String
+  ownerId       String?
+  name          String
+  accountNumber String?
+  type          AccountType @default(CHECKING)
+  assetCategory String?
+  balance       Float       @default(0)
+  currency      String      @default("EUR")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  bank         Bank          @relation(fields: [bankId], references: [id])
+  owner        Owner?        @relation(fields: [ownerId], references: [id])
+  transactions Transaction[]
+  
+  @@index([bankId])
+  @@index([ownerId])
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  accountId   String
+  type        TransactionType
+  amount      Float
+  currency    String          @default("EUR")
+  description String
+  date        DateTime
+  category    String?
+  importedAt  DateTime        @default(now())
+  
+  account            Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  transactionCategory TransactionCategory?
+  
+  @@index([accountId])
+  @@index([date])
+  @@index([category])
+}
+
+model Category {
+  id       String  @id @default(uuid())
+  name     String
+  parentId String?
+  icon     String  @default("📁")
+  color    String  @default("#808080")
+  
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  
+  rules               CategoryRule[]
+  transactionCategories TransactionCategory[]
+  
+  @@index([parentId])
+}
+
+model CategoryRule {
+  id           String  @id @default(uuid())
+  categoryId   String
+  pattern      String
+  priority     Int     @default(0)
+  sourceFilter String?
+  isActive     Boolean @default(true)
+  
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  @@index([categoryId])
+}
+
+model TransactionCategory {
+  transactionId String         @id
+  categoryId    String
+  source        CategorySource @default(MANUAL)
+  confidence    Float          @default(1.0)
+  
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  category    Category    @relation(fields: [categoryId], references: [id])
+  
+  @@index([categoryId])
+}

@@ -1,6 +1,0 @@
-Date comptable;Libelle simplifie;Reference;Informations complementaires;Type operation;Debit;Credit;Date operation;Date de valeur;Pointage
-15/01/2024;LOYER SCI;REF-LOYER-001;Loyer mensuel local commercial;Virement;;3500,00;15/01/2024;15/01/2024;Oui
-14/01/2024;CHARGES COPRO;COPRO-Q1;Charges copropriété T1 2024;Prélèvement;1250,00;;14/01/2024;14/01/2024;Oui
-12/01/2024;TAXE FONCIERE;TF2024;Prélèvement mensuel;Prélèvement;450,00;;12/01/2024;12/01/2024;Non
-10/01/2024;ASSURANCE IMMEUBLE;ASS-IMM-001;Prime annuelle;Prélèvement;850,00;;10/01/2024;10/01/2024;Oui
-08/01/2024;TRAVAUX PLOMBERIE;FACTURE-PLB;Réparation fuite;Paiement;380,00;;08/01/2024;08/01/2024;Non

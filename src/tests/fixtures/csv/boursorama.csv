@@ -1,6 +1,0 @@
-dateOp;dateVal;label;category;categoryParent;supplierFound;amount;comment;accountNum;accountLabel;accountbalance
-2024-01-15;2024-01-15;SALAIRE JANVIER | Virement de l'employeur;Salaires;Revenus;true;2500,00;Virement mensuel;12345;Compte courant;5000,00
-2024-01-14;2024-01-14;CARREFOUR | Achats alimentaires;Courses;Alimentation;true;-89,50;Courses semaine;12345;Compte courant;2500,00
-2024-01-13;2024-01-13;NETFLIX | Abonnement streaming;Abonnements;Loisirs;true;-17,99;;12345;Compte courant;2589,50
-2024-01-12;2024-01-12;PHARMACIE CENTRALE;Pharmacie;Santé;true;-25,00;;12345;Compte courant;2607,49
-2024-01-10;2024-01-11;UBER;Transport;Transport;true;-15,40;Course taxi;12345;Compte courant;2632,49

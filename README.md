@@ -1,247 +1,36 @@
-# 💰 Imanisa Finance
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Un tracker de patrimoine personnel, sans fioritures. Auto-hébergé, open source, respectueux de ta vie privée.
+## Getting Started
 
-## Fonctionnalités
-
-- **Synchro bancaire automatique** via GoCardless (Caisse d'Épargne, CIC, Revolut)
-- **Import CSV** pour Bourse Direct et Linxea
-- **Prix en temps réel** via Yahoo Finance
-- **Dashboard simple** avec vue globale du patrimoine
-- **Historique** du patrimoine dans le temps
-
-## Stack
-
-- **Frontend**: SvelteKit 5
-- **Backend**: SvelteKit (API routes)
-- **Base de données**: SQLite (better-sqlite3)
-- **Synchro bancaire**: GoCardless Bank Account Data API
-- **Prix**: Yahoo Finance API (non officielle)
-
-## Installation
-
-### Prérequis
-
-- Node.js 20+
-- npm ou pnpm
-
-### Setup
+First, run the development server:
 
 ```bash
-# Clone le repo
-git clone git@github.com:YOUR_USERNAME/imanisa-finance.git
-cd imanisa-finance
-
-# Installe les dépendances
-npm install
-
-# Crée le dossier data
-mkdir -p data
-
-# Lance en dev
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-L'app sera accessible sur http://localhost:5173
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Configuration GoCardless
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-1. Crée un compte sur [GoCardless Bank Account Data](https://bankaccountdata.gocardless.com/) (gratuit, 50 connexions)
-2. Va dans "User secrets" et génère une clé
-3. Dans l'app, va dans ⚙️ Config et entre tes credentials
-4. Connecte tes banques !
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### Configuration Telegram
+## Learn More
 
-Pour recevoir des notifications sur Telegram (succès/échec de synchronisation, alertes 2FA, etc.) :
+To learn more about Next.js, take a look at the following resources:
 
-#### 1. Créer un bot Telegram
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-1. Ouvre Telegram et cherche **@BotFather**
-2. Envoie `/newbot`
-3. Choisis un nom pour ton bot (ex: "Imanisa Finance Bot")
-4. Choisis un username (ex: `imanisa_finance_bot`)
-5. BotFather te donne un **token** du type `123456789:ABCdefGHI...`
-6. Copie ce token dans `TELEGRAM_BOT_TOKEN` de ton `.env`
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-#### 2. Obtenir ton Chat ID
+## Deploy on Vercel
 
-1. Cherche **@userinfobot** sur Telegram
-2. Envoie `/start`
-3. Le bot te répond avec ton **Chat ID** (un nombre)
-4. Copie ce ID dans `TELEGRAM_CHAT_ID` de ton `.env`
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-#### 3. Tester la configuration
-
-```bash
-# Via l'API (remplace localhost:3000 par ton URL)
-curl -X POST http://localhost:3000/api/telegram/test
-```
-
-Tu devrais recevoir un message de test sur Telegram. Les notifications incluent :
-- 🔄 Démarrage du scraper
-- ✅ Synchronisation réussie
-- ❌ Erreurs de synchronisation
-- 🔐 Demande de code 2FA
-- 📊 Résumé quotidien
-
-### Import des positions (Bourse Direct / Linxea)
-
-1. Exporte tes positions en CSV depuis ton broker
-2. Dans l'app, va dans 📥 Import CSV
-3. Upload ton fichier, les positions sont importées automatiquement
-
-## Synchronisation automatique (Cron)
-
-Pour une synchro automatique, ajoute ces lignes à ton crontab (`crontab -e`) :
-
-```cron
-# Synchro bancaire tous les jours à 7h
-0 7 * * * cd /path/to/imanisa-finance && node scripts/sync-banks.js >> /var/log/imanisa-sync.log 2>&1
-
-# Mise à jour des prix tous les jours à 18h (après clôture)
-0 18 * * 1-5 cd /path/to/imanisa-finance && node scripts/sync-prices.js >> /var/log/imanisa-prices.log 2>&1
-```
-
-## Déploiement en production
-
-### Docker (recommandé)
-
-La méthode la plus simple pour déployer l'application sur VPS, Raspberry Pi, ou PC local.
-
-```bash
-# Clone le repo
-git clone git@github.com:YOUR_USERNAME/imanisa-finance.git
-cd imanisa-finance
-
-# Copie le fichier d'environnement
-cp .env.example .env
-
-# Configure tes variables d'environnement
-nano .env
-
-# Lance avec Docker Compose
-docker compose up -d
-
-# Vérifie les logs
-docker compose logs -f
-```
-
-L'app sera accessible sur http://localhost:3000
-
-#### Variables d'environnement Docker
-
-| Variable | Description | Requis |
-|----------|-------------|--------|
-| `AUTH_SECRET` | Secret pour les sessions | ✅ |
-| `PUBLIC_BASE_URL` | URL publique de l'app | ❌ (défaut: http://localhost:3000) |
-| `TELEGRAM_BOT_TOKEN` | Token du bot Telegram ([guide](#configuration-telegram)) | ❌ |
-| `TELEGRAM_CHAT_ID` | ID du chat Telegram ([guide](#configuration-telegram)) | ❌ |
-| `BINANCE_API_KEY` | Clé API Binance | ❌ |
-| `BINANCE_API_SECRET` | Secret API Binance | ❌ |
-| `SCRAPER_CRON` | Planning du scraper (cron) | ❌ (défaut: 0 8 * * 1) |
-
-#### Mise à jour
-
-```bash
-# Pull les derniers changements
-git pull
-
-# Rebuild et relance
-docker compose up -d --build
-```
-
-#### Sauvegarde
-
-Les données sont persistées dans le dossier `./data`. Pour sauvegarder :
-
-```bash
-# Sauvegarde la base de données
-cp data/imanisa.db backup/imanisa-$(date +%Y%m%d).db
-```
-
-### Node.js (sans Docker)
-
-```bash
-# Build
-npm run build
-
-# Lance avec Node
-node build
-
-# Ou avec PM2
-pm2 start build/index.js --name imanisa-finance
-```
-
-### Variables d'environnement
-
-```bash
-# Port (défaut: 3000)
-PORT=3000
-
-# Chemin de la base de données (défaut: ./data/imanisa.db)
-DB_PATH=/path/to/imanisa.db
-```
-
-## Banques supportées
-
-| Banque | Support | Historique |
-|--------|---------|------------|
-| Caisse d'Épargne Bretagne-Pays de Loire | ✅ GoCardless | 90 jours |
-| CIC | ✅ GoCardless | 90 jours |
-| Revolut | ✅ GoCardless | 730 jours |
-| Bourse Direct | 📥 Import CSV | - |
-| Linxea | 📥 Import CSV | - |
-
-## Structure du projet
-
-```
-imanisa-finance/
-├── src/
-│   ├── lib/
-│   │   ├── db.js           # Database utilities
-│   │   ├── schema.sql      # SQLite schema
-│   │   ├── gocardless.js   # GoCardless API client
-│   │   ├── prices.js       # Yahoo Finance price fetching
-│   │   └── csv-import.js   # CSV parsing for brokers
-│   └── routes/
-│       ├── +page.svelte    # Dashboard
-│       ├── import/         # CSV import page
-│       ├── settings/       # GoCardless config
-│       └── api/            # API endpoints
-├── scripts/
-│   ├── sync-banks.js       # Cron script for bank sync
-│   └── sync-prices.js      # Cron script for price updates
-└── data/
-    └── imanisa.db          # SQLite database
-```
-
-## API Endpoints
-
-- `GET /api/dashboard` - Données complètes du dashboard
-- `POST /api/sync` - Synchro manuelle des banques
-- `GET /api/gocardless?action=institutions` - Liste des banques
-- `GET /api/gocardless?action=connect&institution_id=XXX` - Lien de connexion
-- `POST /api/import` - Import CSV (multipart/form-data)
-- `POST /api/prices` - Mise à jour des prix
-- `GET /api/prices?action=search&q=XXX` - Recherche de symbole
-- `POST /api/telegram/test` - Envoi d'une notification de test
-
-## Limitations
-
-- Pas d'agrégation automatique pour Bourse Direct et Linxea (pas d'API disponible)
-- GoCardless gratuit limité à 50 connexions
-- Rafraîchissement GoCardless tous les 90 jours (il faut se reconnecter)
-- Pas de multi-utilisateurs (c'est un outil perso !)
-
-## Sécurité
-
-- Toutes les données restent en local (SQLite)
-- Les credentials GoCardless sont stockés dans la base
-- **Ne pas exposer l'app sur Internet** sans authentification !
-
-Pour ajouter une auth basique, tu peux utiliser un reverse proxy (nginx/Caddy) avec HTTP Basic Auth.
-
-## Licence
-
-MIT - Fais-en ce que tu veux !
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
