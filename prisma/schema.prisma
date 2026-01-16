@@ -7,7 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// === ENUMS ===
+// ============================================================================
+// ENUMS
+// ============================================================================
+
 enum OwnerType {
   PERSON
   JOINT
@@ -33,15 +36,57 @@ enum CategorySource {
   MANUAL
 }
 
-// === CORE MODELS ===
+enum LoanType {
+  MORTGAGE
+  CONSUMER
+  STUDENT
+  AUTO
+  OTHER
+}
+
+enum InvestmentSourceType {
+  PEA
+  CTO
+  ASSURANCE_VIE
+  PER
+  CRYPTO
+  CROWDFUNDING
+  OTHER
+}
+
+enum AssetType {
+  STOCK
+  ETF
+  BOND
+  FUND
+  CRYPTO
+  CASH
+  REAL_ESTATE
+  OTHER
+}
+
+enum DataSourceType {
+  BANK_EXPORT
+  INVESTMENT_EXPORT
+  MANUAL
+  API
+}
+
+// ============================================================================
+// CORE MODELS
+// ============================================================================
+
 model Owner {
   id        String    @id @default(uuid())
   name      String
   type      OwnerType @default(PERSON)
   createdAt DateTime  @default(now())
-  
-  users    User[]
-  accounts Account[]
+
+  users               User[]
+  accounts            Account[]
+  properties          Property[]
+  loans               Loan[]
+  investmentSources   InvestmentSource[]
 }
 
 model User {
@@ -51,9 +96,10 @@ model User {
   name      String?
   avatarUrl String?
   createdAt DateTime @default(now())
-  
-  owner Owner  @relation(fields: [ownerId], references: [id])
-  banks Bank[]
+
+  owner       Owner        @relation(fields: [ownerId], references: [id])
+  banks       Bank[]
+  dataSources DataSource[]
 }
 
 model Bank {
@@ -62,7 +108,7 @@ model Bank {
   name      String
   template  String?
   createdAt DateTime @default(now())
-  
+
   user     User      @relation(fields: [userId], references: [id])
   accounts Account[]
 }
@@ -79,33 +125,38 @@ model Account {
   currency      String      @default("EUR")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  
+
   bank         Bank          @relation(fields: [bankId], references: [id])
   owner        Owner?        @relation(fields: [ownerId], references: [id])
   transactions Transaction[]
-  
+
   @@index([bankId])
   @@index([ownerId])
 }
 
 model Transaction {
-  id          String          @id @default(uuid())
-  accountId   String
-  type        TransactionType
-  amount      Float
-  currency    String          @default("EUR")
-  description String
-  date        DateTime
-  category    String?
-  importedAt  DateTime        @default(now())
-  
-  account            Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  id            String          @id @default(uuid())
+  accountId     String
+  type          TransactionType
+  amount        Float
+  currency      String          @default("EUR")
+  description   String
+  date          DateTime
+  bankCategory  String?         // Catégorie originale de la banque
+  isInternal    Boolean         @default(false) // Virement interne
+  importedAt    DateTime        @default(now())
+
+  account             Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
   transactionCategory TransactionCategory?
-  
+
   @@index([accountId])
   @@index([date])
-  @@index([category])
+  @@index([isInternal])
 }
+
+// ============================================================================
+// BUDGET & CATEGORIES
+// ============================================================================
 
 model Category {
   id       String  @id @default(uuid())
@@ -113,13 +164,13 @@ model Category {
   parentId String?
   icon     String  @default("📁")
   color    String  @default("#808080")
-  
+
   parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children Category[] @relation("CategoryHierarchy")
-  
-  rules               CategoryRule[]
+
+  rules                 CategoryRule[]
   transactionCategories TransactionCategory[]
-  
+
   @@index([parentId])
 }
 
@@ -128,12 +179,13 @@ model CategoryRule {
   categoryId   String
   pattern      String
   priority     Int     @default(0)
-  sourceFilter String?
+  sourceFilter String? // Filtre par banque/source
   isActive     Boolean @default(true)
-  
+
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
+
   @@index([categoryId])
+  @@index([priority])
 }
 
 model TransactionCategory {
@@ -141,9 +193,198 @@ model TransactionCategory {
   categoryId    String
   source        CategorySource @default(MANUAL)
   confidence    Float          @default(1.0)
-  
+
   transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   category    Category    @relation(fields: [categoryId], references: [id])
-  
+
   @@index([categoryId])
+}
+
+// ============================================================================
+// INVESTMENTS
+// ============================================================================
+
+model InvestmentSource {
+  id        String               @id @default(uuid())
+  ownerId   String
+  name      String
+  type      InvestmentSourceType
+  bank      String?
+  notes     String?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  owner        Owner                   @relation(fields: [ownerId], references: [id])
+  positions    InvestmentPosition[]
+  transactions InvestmentTransaction[]
+
+  @@index([ownerId])
+}
+
+model InvestmentPosition {
+  id              String    @id @default(uuid())
+  sourceId        String
+  symbol          String    // Ticker (e.g., "CW8", "BTC")
+  isin            String?   // Code ISIN si disponible
+  name            String?   // Nom complet de l'actif
+  assetType       AssetType @default(OTHER)
+  quantity        Float
+  avgBuyPrice     Float     // Prix de revient unitaire
+  currentPrice    Float
+  currentValue    Float
+  gainLoss        Float
+  gainLossPercent Float
+  lastUpdated     DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+
+  source InvestmentSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, symbol])
+  @@index([sourceId])
+  @@index([assetType])
+}
+
+model InvestmentTransaction {
+  id          String   @id @default(uuid())
+  sourceId    String
+  symbol      String
+  type        String   // BUY, SELL, DIVIDEND, FEE
+  quantity    Float
+  unitPrice   Float
+  totalAmount Float
+  fees        Float    @default(0)
+  date        DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  source InvestmentSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+  @@index([date])
+  @@index([symbol])
+}
+
+// ============================================================================
+// REAL ESTATE
+// ============================================================================
+
+model Property {
+  id            String    @id @default(uuid())
+  ownerId       String
+  name          String
+  address       String?
+  city          String?
+  postalCode    String?
+  surfaceM2     Float?
+  purchasePrice Float?
+  purchaseDate  DateTime?
+  notaryFees    Float?
+  currentValue  Float?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  owner   Owner            @relation(fields: [ownerId], references: [id])
+  charges PropertyCharge[]
+  loans   Loan[]
+
+  @@index([ownerId])
+}
+
+model PropertyCharge {
+  id          String   @id @default(uuid())
+  propertyId  String
+  name        String
+  amount      Float
+  frequency   String   // MONTHLY, QUARTERLY, YEARLY
+  startDate   DateTime
+  endDate     DateTime?
+  notes       String?
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}
+
+// ============================================================================
+// LOANS
+// ============================================================================
+
+model Loan {
+  id               String    @id @default(uuid())
+  ownerId          String
+  propertyId       String?
+  name             String
+  bank             String
+  loanNumber       String?
+  type             LoanType  @default(MORTGAGE)
+  initialAmount    Float
+  remainingAmount  Float
+  rate             Float     // Taux en pourcentage (ex: 1.5 = 1.5%)
+  monthlyPayment   Float
+  insuranceMonthly Float     @default(0)
+  startDate        DateTime?
+  endDate          DateTime?
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  owner    Owner     @relation(fields: [ownerId], references: [id])
+  property Property? @relation(fields: [propertyId], references: [id])
+
+  @@index([ownerId])
+  @@index([propertyId])
+}
+
+// ============================================================================
+// DATA IMPORT
+// ============================================================================
+
+model DataSource {
+  id          String         @id @default(uuid())
+  userId      String
+  name        String
+  type        DataSourceType
+  bankId      String?        // Lié à une banque
+  config      Json?          // Configuration spécifique (colonnes, format)
+  lastSyncAt  DateTime?
+  createdAt   DateTime       @default(now())
+
+  user       User         @relation(fields: [userId], references: [id])
+  syncStatus SyncStatus[]
+
+  @@index([userId])
+}
+
+model SyncStatus {
+  id           String   @id @default(uuid())
+  dataSourceId String
+  status       String   // PENDING, IN_PROGRESS, SUCCESS, FAILED
+  recordsCount Int      @default(0)
+  errorMessage String?
+  startedAt    DateTime @default(now())
+  finishedAt   DateTime?
+
+  dataSource DataSource @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+
+  @@index([dataSourceId])
+  @@index([startedAt])
+}
+
+// ============================================================================
+// NET WORTH TRACKING
+// ============================================================================
+
+model NetWorthSnapshot {
+  id             String   @id @default(uuid())
+  ownerId        String
+  date           DateTime
+  totalAssets    Float
+  totalLiabilities Float
+  netWorth       Float
+  breakdown      Json     // Détail par catégorie d'actif
+
+  @@unique([ownerId, date])
+  @@index([ownerId])
+  @@index([date])
 }
