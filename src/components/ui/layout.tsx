@@ -72,30 +72,32 @@ const sectionSpacingClasses: Record<SectionSpacing, string> = {
 	xl: 'py-12',
 };
 
-const Section = forwardRef<HTMLElement, SectionProps>(
-	({ className, spacing = 'md', title, description, as = 'section', children, ...props }, ref) => {
-		const Component = as;
-
-		return (
-			<Component
-				ref={ref as React.Ref<HTMLElement>}
-				className={cn(sectionSpacingClasses[spacing], className)}
-				{...props}
-			>
-				{(title || description) && (
-					<div className="mb-4">
-						{title && <h2 className="text-lg font-semibold tracking-tight">{title}</h2>}
-						{description && (
-							<p className="mt-1 text-sm text-muted-foreground">{description}</p>
-						)}
-					</div>
-				)}
-				{children}
-			</Component>
-		);
-	}
-);
-Section.displayName = 'Section';
+function Section({
+	className,
+	spacing = 'md',
+	title,
+	description,
+	as: Component = 'section',
+	children,
+	...props
+}: SectionProps) {
+	return (
+		<Component
+			className={cn(sectionSpacingClasses[spacing], className)}
+			{...props}
+		>
+			{(title || description) && (
+				<div className="mb-4">
+					{title && <h2 className="text-lg font-semibold tracking-tight">{title}</h2>}
+					{description && (
+						<p className="mt-1 text-sm text-muted-foreground">{description}</p>
+					)}
+				</div>
+			)}
+			{children}
+		</Component>
+	);
+}
 
 // =============================================================================
 // PAGE COMPONENT
@@ -111,11 +113,11 @@ interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
 	padded?: boolean;
 }
 
-const Page = forwardRef<HTMLElement, PageProps>(
+const Page = forwardRef<HTMLDivElement, PageProps>(
 	({ className, title, scrollable = true, padded = true, children, ...props }, ref) => {
 		return (
 			<main
-				ref={ref}
+				ref={ref as React.Ref<HTMLElement>}
 				className={cn(
 					'flex-1',
 					scrollable && 'overflow-y-auto scrollbar-thin',
