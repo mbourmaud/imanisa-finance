@@ -54,7 +54,7 @@
       "files": ["prisma/schema.prisma"],
       "dependsOn": [],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": "Remove old Property/PropertyCharge models if they exist. Clean slate."
     },
     {
@@ -72,7 +72,7 @@
       "files": ["prisma/schema.prisma"],
       "dependsOn": ["IMMO-001"],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "lender is nullable (empty = family loan). insuranceMonthly removed, handled by LoanInsurance."
     },
     {
@@ -89,7 +89,7 @@
       "files": ["prisma/schema.prisma"],
       "dependsOn": ["IMMO-002"],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "Each member (Mathieu, Ninon) can have separate insurance with different coverage %."
     },
     {
@@ -110,7 +110,7 @@
       "files": ["prisma/schema.prisma"],
       "dependsOn": ["IMMO-001"],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "Delete old PropertyCharge model if it exists."
     },
     {
@@ -129,7 +129,7 @@
       "files": ["src/server/repositories/property-repository.ts", "src/server/repositories/index.ts"],
       "dependsOn": ["IMMO-004"],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": "Follow existing repository patterns (account-repository.ts as reference)."
     },
     {
@@ -148,7 +148,7 @@
       "files": ["src/server/repositories/loan-repository.ts", "src/server/repositories/index.ts"],
       "dependsOn": ["IMMO-005"],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -166,7 +166,7 @@
       "files": ["src/server/repositories/loan-insurance-repository.ts", "src/server/repositories/index.ts"],
       "dependsOn": ["IMMO-006"],
       "priority": 7,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -189,7 +189,7 @@
       ],
       "dependsOn": ["IMMO-005"],
       "priority": 8,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -208,7 +208,7 @@
       "files": ["src/app/api/properties/route.ts", "src/app/api/properties/[id]/route.ts"],
       "dependsOn": ["IMMO-005"],
       "priority": 9,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -227,7 +227,7 @@
       "files": ["src/app/api/properties/[id]/loans/route.ts", "src/app/api/loans/[id]/route.ts"],
       "dependsOn": ["IMMO-006", "IMMO-009"],
       "priority": 10,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -245,7 +245,7 @@
       "files": ["src/app/api/loans/[id]/insurances/route.ts", "src/app/api/loan-insurances/[id]/route.ts"],
       "dependsOn": ["IMMO-007", "IMMO-010"],
       "priority": 11,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -268,7 +268,7 @@
       ],
       "dependsOn": ["IMMO-008", "IMMO-009"],
       "priority": 12,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -290,7 +290,7 @@
       "files": ["src/app/dashboard/real-estate/page.tsx"],
       "dependsOn": ["IMMO-009"],
       "priority": 13,
-      "passes": false,
+      "passes": true,
       "notes": "IMPORTANT: Test with mcp__chrome-devtools__take_screenshot on desktop AND mobile (375px)."
     },
     {
@@ -313,7 +313,7 @@
       "files": ["src/app/dashboard/real-estate/page.tsx"],
       "dependsOn": ["IMMO-013"],
       "priority": 14,
-      "passes": false,
+      "passes": true,
       "notes": "Use Chrome DevTools MCP to test the full flow: open dialog, fill form, submit, verify property appears."
     },
     {
@@ -339,7 +339,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-014"],
       "priority": 15,
-      "passes": false,
+      "passes": true,
       "notes": "Use Chrome DevTools MCP to navigate from list to detail page."
     },
     {
@@ -361,7 +361,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-015", "IMMO-010"],
       "priority": 16,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -382,7 +382,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-016", "IMMO-011"],
       "priority": 17,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -402,7 +402,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-015", "IMMO-012"],
       "priority": 18,
-      "passes": false,
+      "passes": true,
       "notes": "1:1 relationship - only one insurance per property."
     },
     {
@@ -422,7 +422,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-015", "IMMO-012"],
       "priority": 19,
-      "passes": false,
+      "passes": true,
       "notes": "1:1 relationship - only one co-ownership per property."
     },
     {
@@ -443,7 +443,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-015", "IMMO-012"],
       "priority": 20,
-      "passes": false,
+      "passes": true,
       "notes": "1:N relationship - multiple contracts per property."
     },
     {
@@ -461,7 +461,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-015"],
       "priority": 21,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -478,7 +478,7 @@
       "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
       "dependsOn": ["IMMO-021"],
       "priority": 22,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -498,7 +498,7 @@
       "files": ["src/app/dashboard/loans/page.tsx", "src/app/api/loans/route.ts"],
       "dependsOn": ["IMMO-016"],
       "priority": 23,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -519,7 +519,7 @@
       "files": [],
       "dependsOn": ["IMMO-015"],
       "priority": 24,
-      "passes": false,
+      "passes": true,
       "notes": "IMPORTANT: Use mcp__chrome-devtools__* tools for ALL browser interactions. App runs on http://localhost:3000"
     },
     {
@@ -539,7 +539,7 @@
       "files": [],
       "dependsOn": ["IMMO-024", "IMMO-017"],
       "priority": 25,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -559,7 +559,7 @@
       "files": [],
       "dependsOn": ["IMMO-025", "IMMO-020"],
       "priority": 26,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -578,8 +578,127 @@
       "files": ["src/app/dashboard/real-estate/page.tsx", "src/app/dashboard/loans/page.tsx"],
       "dependsOn": ["IMMO-026"],
       "priority": 27,
-      "passes": false,
+      "passes": true,
       "notes": "Final cleanup before PR."
+    },
+    {
+      "id": "IMMO-028",
+      "title": "Sync avec main - Mise à jour infrastructure TanStack",
+      "description": "As a developer, I want to sync with main branch to get the new TanStack Query, Form and Table infrastructure.",
+      "acceptanceCriteria": [
+        "git fetch origin && git rebase origin/main",
+        "Resolve any merge conflicts properly",
+        "Verify new files are present: src/components/providers.tsx, src/lib/query-client.ts",
+        "Verify TanStack Query hooks exist in src/features/accounts/hooks/use-accounts-query.ts",
+        "Verify TanStack Query hooks exist in src/features/imports/hooks/use-imports-query.ts",
+        "Verify TanStack Query hooks exist in src/features/members/hooks/use-members-query.ts",
+        "Verify src/components/ui/data-table.tsx exists (TanStack Table)",
+        "npm install to get new dependencies (@tanstack/react-query, @tanstack/react-table, @tanstack/react-query-devtools)",
+        "npm run build - must pass",
+        "Typecheck passes"
+      ],
+      "files": [],
+      "dependsOn": ["IMMO-027"],
+      "priority": 28,
+      "passes": true,
+      "notes": "IMPORTANT: Main branch now has TanStack Query infrastructure. Rebase to get all new features before refactoring immobilier pages."
+    },
+    {
+      "id": "IMMO-029",
+      "title": "Refactoring Immobilier - TanStack Query hooks et UI",
+      "description": "As a developer, I want to refactor all immobilier pages to use TanStack Query, Form and Table patterns from main.",
+      "acceptanceCriteria": [
+        "Create src/features/properties/hooks/use-properties-query.ts following pattern from use-accounts-query.ts",
+        "Create src/features/properties/index.ts barrel export",
+        "Hooks to create: usePropertiesQuery, usePropertyQuery, useCreatePropertyMutation, useUpdatePropertyMutation, useDeletePropertyMutation",
+        "Create src/features/loans/hooks/use-loans-query.ts with: useLoansQuery, useLoanQuery, useCreateLoanMutation, useUpdateLoanMutation, useDeleteLoanMutation",
+        "Create src/features/loans/hooks/use-loan-insurances-query.ts with: useLoanInsurancesQuery, useCreateLoanInsuranceMutation, useUpdateLoanInsuranceMutation, useDeleteLoanInsuranceMutation",
+        "Create src/features/properties/hooks/use-property-insurance-query.ts with: usePropertyInsuranceQuery, useCreatePropertyInsuranceMutation, useUpdatePropertyInsuranceMutation, useDeletePropertyInsuranceMutation",
+        "Create src/features/properties/hooks/use-co-ownership-query.ts with: useCoOwnershipQuery, useCreateCoOwnershipMutation, useUpdateCoOwnershipMutation, useDeleteCoOwnershipMutation",
+        "Create src/features/properties/hooks/use-utility-contracts-query.ts with: useUtilityContractsQuery, useCreateUtilityContractMutation, useUpdateUtilityContractMutation, useDeleteUtilityContractMutation",
+        "Refactor /dashboard/real-estate/page.tsx to use usePropertiesQuery instead of manual fetch",
+        "Refactor /dashboard/real-estate/[id]/page.tsx to use TanStack Query hooks for all data and mutations",
+        "Refactor /dashboard/loans/page.tsx to use useLoansQuery",
+        "Replace all useState loading/error states with query.isLoading, query.isError patterns",
+        "Replace all manual refetch with mutation.onSuccess cache invalidation",
+        "Use proper query key factory pattern (propertyKeys, loanKeys, etc.)",
+        "Test all CRUD operations work correctly",
+        "Typecheck passes",
+        "Test on desktop and mobile with Chrome DevTools MCP"
+      ],
+      "files": [
+        "src/features/properties/hooks/use-properties-query.ts",
+        "src/features/properties/hooks/use-property-insurance-query.ts",
+        "src/features/properties/hooks/use-co-ownership-query.ts",
+        "src/features/properties/hooks/use-utility-contracts-query.ts",
+        "src/features/properties/index.ts",
+        "src/features/loans/hooks/use-loans-query.ts",
+        "src/features/loans/hooks/use-loan-insurances-query.ts",
+        "src/features/loans/index.ts",
+        "src/app/dashboard/real-estate/page.tsx",
+        "src/app/dashboard/real-estate/[id]/page.tsx",
+        "src/app/dashboard/loans/page.tsx"
+      ],
+      "dependsOn": ["IMMO-028"],
+      "priority": 29,
+      "passes": true,
+      "notes": "Follow exact patterns from src/features/accounts/hooks/use-accounts-query.ts. Use Query Key Factory pattern. Mutations should invalidate related queries on success."
+    },
+    {
+      "id": "IMMO-030",
+      "title": "Review E2E complète post-migration TanStack",
+      "description": "As a developer, I want to perform a comprehensive E2E review of all immobilier features after the TanStack migration to ensure everything is 100% compliant with our guidelines.",
+      "acceptanceCriteria": [
+        "CODE REVIEW - Read and review ALL immobilier-related files:",
+        "  - src/features/properties/**/*.ts",
+        "  - src/features/loans/**/*.ts",
+        "  - src/app/dashboard/real-estate/**/*.tsx",
+        "  - src/app/dashboard/loans/**/*.tsx",
+        "  - src/app/api/properties/**/*.ts",
+        "  - src/app/api/loans/**/*.ts",
+        "  - src/server/repositories/*-repository.ts (property, loan, insurance related)",
+        "Verify NO manual fetch() calls remain - all should use TanStack Query hooks",
+        "Verify NO useState for loading/error states - use query.isLoading, query.isError",
+        "Verify ALL mutations invalidate correct query keys on success",
+        "Verify Query Key Factory pattern is used consistently (propertyKeys, loanKeys, etc.)",
+        "Verify NO duplicate code - extract shared logic into hooks/utils",
+        "Verify NO 'any' types in TypeScript",
+        "Verify Clean Architecture: Domain > Application > Infrastructure",
+        "Verify NO dead code, unused imports, console.logs",
+        "DESIGN REVIEW - Check ALL pages with Chrome DevTools MCP:",
+        "  - /dashboard/real-estate (list page)",
+        "  - /dashboard/real-estate/[id] (detail page with all sections)",
+        "  - /dashboard/loans (loans list page)",
+        "Take desktop screenshots (1280px) for each page",
+        "Take mobile screenshots (375px) for each page",
+        "Verify Vercel Web Interface Guidelines compliance:",
+        "  - Minimalist and clean - no visual clutter",
+        "  - Generous whitespace and breathing room",
+        "  - Subtle borders (border-border/60) and shadows",
+        "  - Muted colors for secondary elements",
+        "  - Clear visual hierarchy with typography",
+        "  - Mobile-first responsive design",
+        "E2E FUNCTIONAL TEST - Test ALL CRUD operations:",
+        "  - Create a new property with members",
+        "  - Edit the property",
+        "  - Add a loan to the property",
+        "  - Add loan insurances for multiple members",
+        "  - Add property insurance (PNO/MRH)",
+        "  - Add co-ownership info",
+        "  - Add utility contracts",
+        "  - Delete items and verify cascade behavior",
+        "  - Verify all mutations update UI immediately (optimistic or via cache invalidation)",
+        "Fix ANY issues found during review",
+        "npm run typecheck - must pass with zero errors",
+        "npm run lint - must pass with zero errors",
+        "npm run build - must pass",
+        "Document any architectural decisions or improvements made"
+      ],
+      "files": [],
+      "dependsOn": ["IMMO-029"],
+      "priority": 30,
+      "passes": true,
+      "notes": "CRITICAL: This is the final quality gate before PR. Take your time, be thorough. Quality over speed. Every file must be reviewed, every page must be tested. No shortcuts."
     }
   ]
 }
