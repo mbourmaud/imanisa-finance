@@ -6,14 +6,14 @@ import { useParams, useRouter } from 'next/navigation'
 import {
 	ArrowLeft,
 	Building2,
-	Calendar,
 	CreditCard,
-	FileText,
 	Home,
 	Landmark,
+	Loader2,
 	MapPin,
 	MoreHorizontal,
 	Pencil,
+	Plus,
 	Shield,
 	Users,
 	Wallet,
@@ -22,14 +22,26 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
+import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { PropertyType, PropertyUsage, Loan, PropertyInsurance, CoOwnership, UtilityContract } from '@prisma/client'
+import type { PropertyType, PropertyUsage, Loan, PropertyInsurance, CoOwnership, UtilityContract, LoanInsurance } from '@prisma/client'
 
 // Type for property with members and related data
 interface PropertyMemberWithDetails {
@@ -41,6 +53,56 @@ interface PropertyMemberWithDetails {
 		name: string
 		color: string | null
 	}
+}
+
+interface LoanInsuranceWithMember extends LoanInsurance {
+	member: {
+		id: string
+		name: string
+		color: string | null
+	}
+}
+
+interface LoanWithDetails extends Loan {
+	property: {
+		id: string
+		name: string
+		type: PropertyType
+		address: string
+		city: string
+	}
+	member: {
+		id: string
+		name: string
+		color: string | null
+	} | null
+	loanInsurances: LoanInsuranceWithMember[]
+}
+
+interface LoanFormData {
+	name: string
+	lender: string
+	loanNumber: string
+	initialAmount: string
+	remainingAmount: string
+	rate: string
+	monthlyPayment: string
+	startDate: string
+	endDate: string
+	notes: string
+}
+
+const initialLoanFormData: LoanFormData = {
+	name: '',
+	lender: '',
+	loanNumber: '',
+	initialAmount: '',
+	remainingAmount: '',
+	rate: '',
+	monthlyPayment: '',
+	startDate: '',
+	endDate: '',
+	notes: '',
 }
 
 interface PropertyWithDetails {
@@ -66,7 +128,7 @@ interface PropertyWithDetails {
 	createdAt: string
 	updatedAt: string
 	propertyMembers: PropertyMemberWithDetails[]
-	loans: Loan[]
+	loans: LoanWithDetails[]
 	insurance: PropertyInsurance | null
 	coOwnership: CoOwnership | null
 	utilityContracts: UtilityContract[]
@@ -158,6 +220,76 @@ function PlaceholderSection({ title, icon: Icon, description }: { title: string;
 	)
 }
 
+function LoanCard({ loan }: { loan: LoanWithDetails }) {
+	const paidPercent = loan.initialAmount > 0
+		? ((loan.initialAmount - loan.remainingAmount) / loan.initialAmount) * 100
+		: 0
+
+	return (
+		<div className="rounded-xl border border-border/60 p-4 space-y-4">
+			<div className="flex items-start justify-between gap-4">
+				<div className="min-w-0">
+					<h4 className="font-medium truncate">{loan.name}</h4>
+					{loan.lender && (
+						<p className="text-sm text-muted-foreground">{loan.lender}</p>
+					)}
+				</div>
+				<div className="text-right shrink-0">
+					<p className="text-lg font-semibold number-display">{formatCurrency(loan.remainingAmount)}</p>
+					<p className="text-xs text-muted-foreground">restant</p>
+				</div>
+			</div>
+
+			<div className="space-y-1.5">
+				<div className="flex justify-between text-xs">
+					<span className="text-muted-foreground">Progression du remboursement</span>
+					<span className="number-display">{paidPercent.toFixed(0)}%</span>
+				</div>
+				<Progress value={paidPercent} className="h-2" />
+			</div>
+
+			<div className="grid grid-cols-3 gap-4 pt-2 text-sm">
+				<div>
+					<p className="text-xs text-muted-foreground">Mensualité</p>
+					<p className="font-medium number-display">{formatCurrency(loan.monthlyPayment)}</p>
+				</div>
+				<div>
+					<p className="text-xs text-muted-foreground">Taux</p>
+					<p className="font-medium number-display">{loan.rate}%</p>
+				</div>
+				<div>
+					<p className="text-xs text-muted-foreground">Montant initial</p>
+					<p className="font-medium number-display">{formatCurrency(loan.initialAmount)}</p>
+				</div>
+			</div>
+
+			{loan.loanNumber && (
+				<p className="text-xs text-muted-foreground pt-2 border-t border-border/40">
+					N° contrat: {loan.loanNumber}
+				</p>
+			)}
+		</div>
+	)
+}
+
+function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
+	return (
+		<div className="flex flex-col items-center justify-center py-8 text-center">
+			<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
+				<CreditCard className="h-6 w-6 text-muted-foreground" />
+			</div>
+			<h4 className="font-medium mb-1">Aucun prêt</h4>
+			<p className="text-sm text-muted-foreground mb-4">
+				Ajoutez les crédits immobiliers associés à ce bien.
+			</p>
+			<Button variant="outline" size="sm" className="gap-2" onClick={onAddClick}>
+				<Plus className="h-4 w-4" />
+				Ajouter un prêt
+			</Button>
+		</div>
+	)
+}
+
 function DetailItem({ label, value }: { label: string; value: string | number | null | undefined }) {
 	if (value === null || value === undefined) return null
 	return (
@@ -187,6 +319,12 @@ export default function PropertyDetailPage() {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 
+	// Loan dialog state
+	const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false)
+	const [loanFormData, setLoanFormData] = useState<LoanFormData>(initialLoanFormData)
+	const [isSubmittingLoan, setIsSubmittingLoan] = useState(false)
+	const [loanFormError, setLoanFormError] = useState<string | null>(null)
+
 	const fetchProperty = useCallback(async () => {
 		try {
 			setLoading(true)
@@ -210,6 +348,89 @@ export default function PropertyDetailPage() {
 	useEffect(() => {
 		fetchProperty()
 	}, [fetchProperty])
+
+	// Loan form handlers
+	const handleLoanInputChange = (field: keyof LoanFormData, value: string) => {
+		setLoanFormData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const resetLoanForm = () => {
+		setLoanFormData(initialLoanFormData)
+		setLoanFormError(null)
+	}
+
+	const handleLoanSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setLoanFormError(null)
+		setIsSubmittingLoan(true)
+
+		try {
+			// Validate required fields
+			if (!loanFormData.name.trim()) {
+				throw new Error('Le nom du prêt est requis')
+			}
+			if (!loanFormData.initialAmount) {
+				throw new Error('Le montant initial est requis')
+			}
+			if (!loanFormData.remainingAmount) {
+				throw new Error('Le capital restant est requis')
+			}
+			if (!loanFormData.rate) {
+				throw new Error('Le taux est requis')
+			}
+			if (!loanFormData.monthlyPayment) {
+				throw new Error('La mensualité est requise')
+			}
+			if (!loanFormData.startDate) {
+				throw new Error('La date de début est requise')
+			}
+
+			const initialAmount = Number.parseFloat(loanFormData.initialAmount)
+			const remainingAmount = Number.parseFloat(loanFormData.remainingAmount)
+			const rate = Number.parseFloat(loanFormData.rate)
+			const monthlyPayment = Number.parseFloat(loanFormData.monthlyPayment)
+
+			if (remainingAmount > initialAmount) {
+				throw new Error('Le capital restant ne peut pas dépasser le montant initial')
+			}
+			if (rate < 0 || rate > 100) {
+				throw new Error('Le taux doit être entre 0 et 100')
+			}
+
+			const payload = {
+				name: loanFormData.name.trim(),
+				lender: loanFormData.lender.trim() || null,
+				loanNumber: loanFormData.loanNumber.trim() || null,
+				initialAmount,
+				remainingAmount,
+				rate,
+				monthlyPayment,
+				startDate: loanFormData.startDate,
+				endDate: loanFormData.endDate || null,
+				notes: loanFormData.notes.trim() || null,
+			}
+
+			const response = await fetch(`/api/properties/${propertyId}/loans`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la création du prêt')
+			}
+
+			// Success - close dialog and refresh data
+			setIsLoanDialogOpen(false)
+			resetLoanForm()
+			await fetchProperty()
+		} catch (err) {
+			setLoanFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsSubmittingLoan(false)
+		}
+	}
 
 	// Loading state
 	if (loading) {
@@ -475,12 +696,228 @@ export default function PropertyDetailPage() {
 				</CardContent>
 			</Card>
 
-			{/* Prêts Section - Placeholder */}
-			<PlaceholderSection
-				title="Prêts"
-				icon={CreditCard}
-				description="Gérez les crédits associés à ce bien"
-			/>
+			{/* Prêts Section */}
+			<Card className="border-border/60">
+				<CardHeader className="pb-4">
+					<div className="flex items-center justify-between">
+						<CardTitle className="text-base font-medium flex items-center gap-2">
+							<CreditCard className="h-4 w-4 text-muted-foreground" />
+							Prêts
+						</CardTitle>
+						<Dialog open={isLoanDialogOpen} onOpenChange={(open) => {
+							setIsLoanDialogOpen(open)
+							if (!open) resetLoanForm()
+						}}>
+							<DialogTrigger asChild>
+								<Button variant="outline" size="sm" className="gap-2">
+									<Plus className="h-4 w-4" />
+									Ajouter un prêt
+								</Button>
+							</DialogTrigger>
+							<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+								<DialogHeader>
+									<DialogTitle>Ajouter un prêt</DialogTitle>
+									<DialogDescription>
+										Renseignez les informations du crédit immobilier.
+									</DialogDescription>
+								</DialogHeader>
+								<form onSubmit={handleLoanSubmit} className="space-y-4">
+									{/* Error message */}
+									{loanFormError && (
+										<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+											<p className="text-sm text-destructive">{loanFormError}</p>
+										</div>
+									)}
+
+									{/* Basic info */}
+									<div className="space-y-4">
+										<div className="space-y-2">
+											<Label htmlFor="loan-name">Nom du prêt *</Label>
+											<Input
+												id="loan-name"
+												placeholder="Crédit Immo Principal"
+												value={loanFormData.name}
+												onChange={(e) => handleLoanInputChange('name', e.target.value)}
+											/>
+										</div>
+
+										<div className="grid gap-4 sm:grid-cols-2">
+											<div className="space-y-2">
+												<Label htmlFor="loan-lender">Organisme prêteur</Label>
+												<Input
+													id="loan-lender"
+													placeholder="Crédit Mutuel"
+													value={loanFormData.lender}
+													onChange={(e) => handleLoanInputChange('lender', e.target.value)}
+												/>
+											</div>
+											<div className="space-y-2">
+												<Label htmlFor="loan-number">N° de contrat</Label>
+												<Input
+													id="loan-number"
+													placeholder="PRE-2024-001"
+													value={loanFormData.loanNumber}
+													onChange={(e) => handleLoanInputChange('loanNumber', e.target.value)}
+												/>
+											</div>
+										</div>
+									</div>
+
+									{/* Amounts */}
+									<div className="space-y-4">
+										<h3 className="text-sm font-medium text-muted-foreground">Montants</h3>
+										<div className="grid gap-4 sm:grid-cols-2">
+											<div className="space-y-2">
+												<Label htmlFor="loan-initial">Montant initial (€) *</Label>
+												<Input
+													id="loan-initial"
+													type="number"
+													min="0"
+													step="0.01"
+													placeholder="280000"
+													value={loanFormData.initialAmount}
+													onChange={(e) => handleLoanInputChange('initialAmount', e.target.value)}
+												/>
+											</div>
+											<div className="space-y-2">
+												<Label htmlFor="loan-remaining">Capital restant (€) *</Label>
+												<Input
+													id="loan-remaining"
+													type="number"
+													min="0"
+													step="0.01"
+													placeholder="250000"
+													value={loanFormData.remainingAmount}
+													onChange={(e) => handleLoanInputChange('remainingAmount', e.target.value)}
+												/>
+											</div>
+										</div>
+									</div>
+
+									{/* Rate and payment */}
+									<div className="grid gap-4 sm:grid-cols-2">
+										<div className="space-y-2">
+											<Label htmlFor="loan-rate">Taux (%) *</Label>
+											<Input
+												id="loan-rate"
+												type="number"
+												min="0"
+												max="100"
+												step="0.01"
+												placeholder="1.5"
+												value={loanFormData.rate}
+												onChange={(e) => handleLoanInputChange('rate', e.target.value)}
+											/>
+										</div>
+										<div className="space-y-2">
+											<Label htmlFor="loan-monthly">Mensualité (€) *</Label>
+											<Input
+												id="loan-monthly"
+												type="number"
+												min="0"
+												step="0.01"
+												placeholder="1200"
+												value={loanFormData.monthlyPayment}
+												onChange={(e) => handleLoanInputChange('monthlyPayment', e.target.value)}
+											/>
+										</div>
+									</div>
+
+									{/* Dates */}
+									<div className="grid gap-4 sm:grid-cols-2">
+										<div className="space-y-2">
+											<Label htmlFor="loan-start">Date de début *</Label>
+											<Input
+												id="loan-start"
+												type="date"
+												value={loanFormData.startDate}
+												onChange={(e) => handleLoanInputChange('startDate', e.target.value)}
+											/>
+										</div>
+										<div className="space-y-2">
+											<Label htmlFor="loan-end">Date de fin</Label>
+											<Input
+												id="loan-end"
+												type="date"
+												value={loanFormData.endDate}
+												onChange={(e) => handleLoanInputChange('endDate', e.target.value)}
+											/>
+										</div>
+									</div>
+
+									{/* Notes */}
+									<div className="space-y-2">
+										<Label htmlFor="loan-notes">Notes</Label>
+										<Input
+											id="loan-notes"
+											placeholder="Notes additionnelles..."
+											value={loanFormData.notes}
+											onChange={(e) => handleLoanInputChange('notes', e.target.value)}
+										/>
+									</div>
+
+									<DialogFooter className="pt-4">
+										<Button
+											type="button"
+											variant="outline"
+											onClick={() => setIsLoanDialogOpen(false)}
+											disabled={isSubmittingLoan}
+										>
+											Annuler
+										</Button>
+										<Button type="submit" disabled={isSubmittingLoan}>
+											{isSubmittingLoan ? (
+												<>
+													<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+													Création...
+												</>
+											) : (
+												'Créer le prêt'
+											)}
+										</Button>
+									</DialogFooter>
+								</form>
+							</DialogContent>
+						</Dialog>
+					</div>
+				</CardHeader>
+				<CardContent>
+					{property.loans.length === 0 ? (
+						<LoansEmptyState onAddClick={() => setIsLoanDialogOpen(true)} />
+					) : (
+						<div className="space-y-4">
+							{/* Summary stats */}
+							<div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-muted/30">
+								<div className="text-center">
+									<p className="text-xs text-muted-foreground">Capital restant</p>
+									<p className="text-lg font-semibold number-display">{formatCurrency(totalLoansRemaining)}</p>
+								</div>
+								<div className="text-center">
+									<p className="text-xs text-muted-foreground">Mensualités</p>
+									<p className="text-lg font-semibold number-display">
+										{formatCurrency(property.loans.reduce((sum, l) => sum + l.monthlyPayment, 0))}
+									</p>
+								</div>
+								<div className="text-center">
+									<p className="text-xs text-muted-foreground">Taux moyen</p>
+									<p className="text-lg font-semibold number-display">
+										{property.loans.length > 0
+											? (property.loans.reduce((sum, l) => sum + l.rate, 0) / property.loans.length).toFixed(2)
+											: 0}%
+									</p>
+								</div>
+							</div>
+
+							{/* Loan cards */}
+							<div className="space-y-3">
+								{property.loans.map((loan) => (
+									<LoanCard key={loan.id} loan={loan} />
+								))}
+							</div>
+						</div>
+					)}
+				</CardContent>
+			</Card>
 
 			{/* Assurance Section - Placeholder */}
 			<PlaceholderSection
