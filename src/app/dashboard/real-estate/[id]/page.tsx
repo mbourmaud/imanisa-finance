@@ -9,6 +9,7 @@ import {
 	ChevronDown,
 	ChevronUp,
 	CreditCard,
+	ExternalLink,
 	Home,
 	Landmark,
 	Loader2,
@@ -17,6 +18,7 @@ import {
 	Pencil,
 	Plus,
 	Shield,
+	Trash2,
 	Users,
 	Wallet,
 	Zap,
@@ -50,7 +52,18 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { PropertyType, PropertyUsage, Loan, PropertyInsurance, CoOwnership, UtilityContract, LoanInsurance } from '@prisma/client'
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import type { PropertyType, PropertyUsage, InsuranceType, Loan, PropertyInsurance, CoOwnership, UtilityContract, LoanInsurance } from '@prisma/client'
 
 // Type for property with members and related data
 interface PropertyMemberWithDetails {
@@ -137,6 +150,31 @@ const initialInsuranceFormData: InsuranceFormData = {
 	notes: '',
 }
 
+// Property insurance form data (PNO/MRH)
+interface PropertyInsuranceFormData {
+	type: InsuranceType | ''
+	provider: string
+	contractNumber: string
+	monthlyPremium: string
+	startDate: string
+	endDate: string
+	coverage: string
+	link: string
+	notes: string
+}
+
+const initialPropertyInsuranceFormData: PropertyInsuranceFormData = {
+	type: '',
+	provider: '',
+	contractNumber: '',
+	monthlyPremium: '',
+	startDate: '',
+	endDate: '',
+	coverage: '',
+	link: '',
+	notes: '',
+}
+
 // Member type for dropdown
 interface Member {
 	id: string
@@ -214,6 +252,28 @@ function getPropertyUsageLabel(usage: PropertyUsage): string {
 			return 'Locatif'
 		default:
 			return usage
+	}
+}
+
+function getInsuranceTypeLabel(type: InsuranceType): string {
+	switch (type) {
+		case 'PNO':
+			return 'Propriétaire Non-Occupant'
+		case 'MRH':
+			return 'Multirisque Habitation'
+		default:
+			return type
+	}
+}
+
+function getInsuranceTypeBadge(type: InsuranceType): string {
+	switch (type) {
+		case 'PNO':
+			return 'PNO'
+		case 'MRH':
+			return 'MRH'
+		default:
+			return type
 	}
 }
 
@@ -467,6 +527,14 @@ export default function PropertyDetailPage() {
 	const [members, setMembers] = useState<Member[]>([])
 	const [loadingMembers, setLoadingMembers] = useState(false)
 
+	// Property insurance dialog state
+	const [isPropertyInsuranceDialogOpen, setIsPropertyInsuranceDialogOpen] = useState(false)
+	const [isEditingPropertyInsurance, setIsEditingPropertyInsurance] = useState(false)
+	const [propertyInsuranceFormData, setPropertyInsuranceFormData] = useState<PropertyInsuranceFormData>(initialPropertyInsuranceFormData)
+	const [isSubmittingPropertyInsurance, setIsSubmittingPropertyInsurance] = useState(false)
+	const [propertyInsuranceFormError, setPropertyInsuranceFormError] = useState<string | null>(null)
+	const [isDeletingPropertyInsurance, setIsDeletingPropertyInsurance] = useState(false)
+
 	const fetchProperty = useCallback(async () => {
 		try {
 			setLoading(true)
@@ -670,6 +738,118 @@ export default function PropertyDetailPage() {
 			setInsuranceFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
 		} finally {
 			setIsSubmittingInsurance(false)
+		}
+	}
+
+	// Property insurance form handlers
+	const handlePropertyInsuranceInputChange = (field: keyof PropertyInsuranceFormData, value: string) => {
+		setPropertyInsuranceFormData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const resetPropertyInsuranceForm = () => {
+		setPropertyInsuranceFormData(initialPropertyInsuranceFormData)
+		setPropertyInsuranceFormError(null)
+		setIsEditingPropertyInsurance(false)
+	}
+
+	const openPropertyInsuranceDialog = (editMode: boolean) => {
+		if (editMode && property?.insurance) {
+			// Pre-fill form with existing data
+			setPropertyInsuranceFormData({
+				type: property.insurance.type,
+				provider: property.insurance.provider,
+				contractNumber: property.insurance.contractNumber || '',
+				monthlyPremium: property.insurance.monthlyPremium.toString(),
+				startDate: property.insurance.startDate ? new Date(property.insurance.startDate).toISOString().split('T')[0] : '',
+				endDate: property.insurance.endDate ? new Date(property.insurance.endDate).toISOString().split('T')[0] : '',
+				coverage: property.insurance.coverage || '',
+				link: property.insurance.link || '',
+				notes: property.insurance.notes || '',
+			})
+			setIsEditingPropertyInsurance(true)
+		} else {
+			resetPropertyInsuranceForm()
+		}
+		setIsPropertyInsuranceDialogOpen(true)
+	}
+
+	const handlePropertyInsuranceSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setPropertyInsuranceFormError(null)
+		setIsSubmittingPropertyInsurance(true)
+
+		try {
+			// Validate required fields
+			if (!propertyInsuranceFormData.type) {
+				throw new Error('Le type d\'assurance est requis')
+			}
+			if (!propertyInsuranceFormData.provider.trim()) {
+				throw new Error('L\'assureur est requis')
+			}
+			if (!propertyInsuranceFormData.monthlyPremium) {
+				throw new Error('La prime mensuelle est requise')
+			}
+			if (!propertyInsuranceFormData.startDate) {
+				throw new Error('La date de début est requise')
+			}
+
+			const monthlyPremium = Number.parseFloat(propertyInsuranceFormData.monthlyPremium)
+			if (monthlyPremium < 0) {
+				throw new Error('La prime mensuelle ne peut pas être négative')
+			}
+
+			const payload = {
+				type: propertyInsuranceFormData.type,
+				provider: propertyInsuranceFormData.provider.trim(),
+				contractNumber: propertyInsuranceFormData.contractNumber.trim() || null,
+				monthlyPremium,
+				startDate: propertyInsuranceFormData.startDate,
+				endDate: propertyInsuranceFormData.endDate || null,
+				coverage: propertyInsuranceFormData.coverage.trim() || null,
+				link: propertyInsuranceFormData.link.trim() || null,
+				notes: propertyInsuranceFormData.notes.trim() || null,
+			}
+
+			const method = isEditingPropertyInsurance ? 'PATCH' : 'POST'
+			const response = await fetch(`/api/properties/${propertyId}/insurance`, {
+				method,
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de l\'enregistrement de l\'assurance')
+			}
+
+			// Success - close dialog and refresh data
+			setIsPropertyInsuranceDialogOpen(false)
+			resetPropertyInsuranceForm()
+			await fetchProperty()
+		} catch (err) {
+			setPropertyInsuranceFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsSubmittingPropertyInsurance(false)
+		}
+	}
+
+	const handleDeletePropertyInsurance = async () => {
+		setIsDeletingPropertyInsurance(true)
+		try {
+			const response = await fetch(`/api/properties/${propertyId}/insurance`, {
+				method: 'DELETE',
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la suppression')
+			}
+
+			await fetchProperty()
+		} catch (err) {
+			console.error('Error deleting property insurance:', err)
+		} finally {
+			setIsDeletingPropertyInsurance(false)
 		}
 	}
 
@@ -1164,12 +1344,173 @@ export default function PropertyDetailPage() {
 				</CardContent>
 			</Card>
 
-			{/* Assurance Section - Placeholder */}
-			<PlaceholderSection
-				title="Assurance"
-				icon={Shield}
-				description="Assurance habitation (MRH) ou propriétaire non-occupant (PNO)"
-			/>
+			{/* Assurance Section */}
+			<Card className="border-border/60">
+				<CardHeader className="pb-4">
+					<div className="flex items-center justify-between">
+						<CardTitle className="text-base font-medium flex items-center gap-2">
+							<Shield className="h-4 w-4 text-muted-foreground" />
+							Assurance habitation
+						</CardTitle>
+						{!property.insurance && (
+							<Button
+								variant="outline"
+								size="sm"
+								className="gap-2"
+								onClick={() => openPropertyInsuranceDialog(false)}
+							>
+								<Plus className="h-4 w-4" />
+								Ajouter une assurance
+							</Button>
+						)}
+					</div>
+				</CardHeader>
+				<CardContent>
+					{property.insurance ? (
+						<div className="rounded-xl border border-border/60 p-4 space-y-4">
+							{/* Header with type badge and actions */}
+							<div className="flex items-start justify-between gap-4">
+								<div className="flex items-center gap-3">
+									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
+										<Shield className="h-5 w-5 text-primary" />
+									</div>
+									<div>
+										<div className="flex items-center gap-2">
+											<h4 className="font-medium">{property.insurance.provider}</h4>
+											<span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+												{getInsuranceTypeBadge(property.insurance.type)}
+											</span>
+										</div>
+										<p className="text-sm text-muted-foreground">
+											{getInsuranceTypeLabel(property.insurance.type)}
+										</p>
+									</div>
+								</div>
+								<div className="flex items-center gap-2 shrink-0">
+									<Button
+										variant="ghost"
+										size="icon"
+										className="h-8 w-8"
+										onClick={() => openPropertyInsuranceDialog(true)}
+									>
+										<Pencil className="h-4 w-4" />
+									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-destructive hover:text-destructive"
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>Supprimer l'assurance ?</AlertDialogTitle>
+												<AlertDialogDescription>
+													Cette action est irréversible. L'assurance habitation sera définitivement supprimée.
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Annuler</AlertDialogCancel>
+												<AlertDialogAction
+													onClick={handleDeletePropertyInsurance}
+													disabled={isDeletingPropertyInsurance}
+													className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+												>
+													{isDeletingPropertyInsurance ? (
+														<>
+															<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+															Suppression...
+														</>
+													) : (
+														'Supprimer'
+													)}
+												</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
+								</div>
+							</div>
+
+							{/* Insurance details */}
+							<div className="grid gap-4 sm:grid-cols-3 pt-2 border-t border-border/40">
+								<div>
+									<p className="text-xs text-muted-foreground">Prime mensuelle</p>
+									<p className="font-medium number-display">{formatCurrency(property.insurance.monthlyPremium)}</p>
+									<p className="text-xs text-muted-foreground mt-0.5">
+										{formatCurrency(property.insurance.monthlyPremium * 12)}/an
+									</p>
+								</div>
+								<div>
+									<p className="text-xs text-muted-foreground">Date de début</p>
+									<p className="font-medium">{formatDate(property.insurance.startDate.toString())}</p>
+								</div>
+								{property.insurance.endDate && (
+									<div>
+										<p className="text-xs text-muted-foreground">Date de fin</p>
+										<p className="font-medium">{formatDate(property.insurance.endDate.toString())}</p>
+									</div>
+								)}
+							</div>
+
+							{/* Additional info */}
+							{(property.insurance.contractNumber || property.insurance.coverage || property.insurance.link) && (
+								<div className="space-y-2 pt-2 border-t border-border/40">
+									{property.insurance.contractNumber && (
+										<p className="text-xs text-muted-foreground">
+											N° contrat: <span className="text-foreground">{property.insurance.contractNumber}</span>
+										</p>
+									)}
+									{property.insurance.coverage && (
+										<p className="text-xs text-muted-foreground">
+											Couverture: <span className="text-foreground">{property.insurance.coverage}</span>
+										</p>
+									)}
+									{property.insurance.link && (
+										<a
+											href={property.insurance.link}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+										>
+											<ExternalLink className="h-3 w-3" />
+											Voir le contrat
+										</a>
+									)}
+								</div>
+							)}
+
+							{property.insurance.notes && (
+								<div className="pt-2 border-t border-border/40">
+									<p className="text-xs text-muted-foreground">Notes</p>
+									<p className="text-sm text-muted-foreground mt-0.5">{property.insurance.notes}</p>
+								</div>
+							)}
+						</div>
+					) : (
+						<div className="flex flex-col items-center justify-center py-8 text-center">
+							<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
+								<Shield className="h-6 w-6 text-muted-foreground" />
+							</div>
+							<h4 className="font-medium mb-1">Aucune assurance</h4>
+							<p className="text-sm text-muted-foreground mb-4">
+								Ajoutez l'assurance habitation de ce bien (MRH ou PNO).
+							</p>
+							<Button
+								variant="outline"
+								size="sm"
+								className="gap-2"
+								onClick={() => openPropertyInsuranceDialog(false)}
+							>
+								<Plus className="h-4 w-4" />
+								Ajouter une assurance
+							</Button>
+						</div>
+					)}
+				</CardContent>
+			</Card>
 
 			{/* Copropriété Section - Placeholder */}
 			<PlaceholderSection
@@ -1342,6 +1683,178 @@ export default function PropertyDetailPage() {
 									</>
 								) : (
 									'Ajouter l\'assurance'
+								)}
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+
+			{/* Property Insurance Dialog */}
+			<Dialog
+				open={isPropertyInsuranceDialogOpen}
+				onOpenChange={(open) => {
+					setIsPropertyInsuranceDialogOpen(open)
+					if (!open) resetPropertyInsuranceForm()
+				}}
+			>
+				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>
+							{isEditingPropertyInsurance ? 'Modifier l\'assurance' : 'Ajouter une assurance'}
+						</DialogTitle>
+						<DialogDescription>
+							Renseignez les informations de l'assurance habitation (MRH ou PNO).
+						</DialogDescription>
+					</DialogHeader>
+					<form onSubmit={handlePropertyInsuranceSubmit} className="space-y-4">
+						{/* Error message */}
+						{propertyInsuranceFormError && (
+							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+								<p className="text-sm text-destructive">{propertyInsuranceFormError}</p>
+							</div>
+						)}
+
+						{/* Type selection */}
+						<div className="space-y-2">
+							<Label htmlFor="property-insurance-type">Type d'assurance *</Label>
+							<Select
+								value={propertyInsuranceFormData.type}
+								onValueChange={(value) => handlePropertyInsuranceInputChange('type', value)}
+							>
+								<SelectTrigger id="property-insurance-type">
+									<SelectValue placeholder="Sélectionner le type" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="MRH">
+										<div className="flex flex-col">
+											<span>MRH - Multirisque Habitation</span>
+											<span className="text-xs text-muted-foreground">Pour les occupants du bien</span>
+										</div>
+									</SelectItem>
+									<SelectItem value="PNO">
+										<div className="flex flex-col">
+											<span>PNO - Propriétaire Non-Occupant</span>
+											<span className="text-xs text-muted-foreground">Pour les biens locatifs</span>
+										</div>
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Provider and contract */}
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-2">
+								<Label htmlFor="property-insurance-provider">Assureur *</Label>
+								<Input
+									id="property-insurance-provider"
+									placeholder="MAIF, AXA, Groupama..."
+									value={propertyInsuranceFormData.provider}
+									onChange={(e) => handlePropertyInsuranceInputChange('provider', e.target.value)}
+								/>
+							</div>
+							<div className="space-y-2">
+								<Label htmlFor="property-insurance-contract">N° de contrat</Label>
+								<Input
+									id="property-insurance-contract"
+									placeholder="HAB-2024-001"
+									value={propertyInsuranceFormData.contractNumber}
+									onChange={(e) => handlePropertyInsuranceInputChange('contractNumber', e.target.value)}
+								/>
+							</div>
+						</div>
+
+						{/* Premium */}
+						<div className="space-y-2">
+							<Label htmlFor="property-insurance-premium">Prime mensuelle (€) *</Label>
+							<Input
+								id="property-insurance-premium"
+								type="number"
+								min="0"
+								step="0.01"
+								placeholder="35"
+								value={propertyInsuranceFormData.monthlyPremium}
+								onChange={(e) => handlePropertyInsuranceInputChange('monthlyPremium', e.target.value)}
+							/>
+							{propertyInsuranceFormData.monthlyPremium && (
+								<p className="text-xs text-muted-foreground">
+									Soit {formatCurrency(Number.parseFloat(propertyInsuranceFormData.monthlyPremium) * 12)}/an
+								</p>
+							)}
+						</div>
+
+						{/* Dates */}
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-2">
+								<Label htmlFor="property-insurance-start">Date de début *</Label>
+								<Input
+									id="property-insurance-start"
+									type="date"
+									value={propertyInsuranceFormData.startDate}
+									onChange={(e) => handlePropertyInsuranceInputChange('startDate', e.target.value)}
+								/>
+							</div>
+							<div className="space-y-2">
+								<Label htmlFor="property-insurance-end">Date de fin</Label>
+								<Input
+									id="property-insurance-end"
+									type="date"
+									value={propertyInsuranceFormData.endDate}
+									onChange={(e) => handlePropertyInsuranceInputChange('endDate', e.target.value)}
+								/>
+							</div>
+						</div>
+
+						{/* Coverage */}
+						<div className="space-y-2">
+							<Label htmlFor="property-insurance-coverage">Couverture</Label>
+							<Input
+								id="property-insurance-coverage"
+								placeholder="Dégâts des eaux, incendie, vol..."
+								value={propertyInsuranceFormData.coverage}
+								onChange={(e) => handlePropertyInsuranceInputChange('coverage', e.target.value)}
+							/>
+						</div>
+
+						{/* Link */}
+						<div className="space-y-2">
+							<Label htmlFor="property-insurance-link">Lien vers le contrat</Label>
+							<Input
+								id="property-insurance-link"
+								placeholder="https://..."
+								value={propertyInsuranceFormData.link}
+								onChange={(e) => handlePropertyInsuranceInputChange('link', e.target.value)}
+							/>
+						</div>
+
+						{/* Notes */}
+						<div className="space-y-2">
+							<Label htmlFor="property-insurance-notes">Notes</Label>
+							<Input
+								id="property-insurance-notes"
+								placeholder="Notes additionnelles..."
+								value={propertyInsuranceFormData.notes}
+								onChange={(e) => handlePropertyInsuranceInputChange('notes', e.target.value)}
+							/>
+						</div>
+
+						<DialogFooter className="pt-4">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setIsPropertyInsuranceDialogOpen(false)}
+								disabled={isSubmittingPropertyInsurance}
+							>
+								Annuler
+							</Button>
+							<Button type="submit" disabled={isSubmittingPropertyInsurance}>
+								{isSubmittingPropertyInsurance ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										{isEditingPropertyInsurance ? 'Modification...' : 'Création...'}
+									</>
+								) : (
+									isEditingPropertyInsurance ? 'Modifier' : 'Ajouter'
 								)}
 							</Button>
 						</DialogFooter>
