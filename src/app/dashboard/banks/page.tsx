@@ -30,6 +30,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { BankLogo } from '@/components/banks/BankLogo';
 
 interface AccountMember {
 	id: string;
@@ -86,16 +87,6 @@ function formatCurrency(amount: number): string {
 	}).format(amount);
 }
 
-// Get short name from bank name (first letters of each word)
-function getShortName(name: string): string {
-	return name
-		.split(' ')
-		.map((word) => word[0])
-		.join('')
-		.toUpperCase()
-		.slice(0, 3);
-}
-
 // Skeleton for the stats row
 function StatsRowSkeleton() {
 	return (
@@ -148,6 +139,14 @@ export default function BanksPage() {
 	const [newAccountMembers, setNewAccountMembers] = useState<string[]>([]);
 	const [savingAccount, setSavingAccount] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
+
+	// Track bank logos separately so we can update them after upload
+	const [bankLogos, setBankLogos] = useState<Record<string, string | null>>({});
+
+	// Handler for when a bank logo is updated
+	const handleLogoChange = (bankId: string, newLogoUrl: string) => {
+		setBankLogos((prev) => ({ ...prev, [bankId]: newLogoUrl }));
+	};
 
 	useEffect(() => {
 		async function fetchData() {
@@ -295,15 +294,14 @@ export default function BanksPage() {
 							<div key={bank.id} className="p-4">
 								{/* Bank header */}
 								<div className="flex items-center gap-4">
-									<div
-										className="flex h-10 w-10 items-center justify-center rounded-lg text-xs font-semibold"
-										style={{
-											backgroundColor: bank.color,
-											color: '#fff',
-										}}
-									>
-										{getShortName(bank.name)}
-									</div>
+									<BankLogo
+										bankId={bank.id}
+										bankName={bank.name}
+										bankColor={bank.color}
+										logo={bankLogos[bank.id] ?? bank.logo}
+										size="md"
+										onLogoChange={(url) => handleLogoChange(bank.id, url)}
+									/>
 									<div className="flex-1 min-w-0">
 										<div className="flex items-center gap-2">
 											<p className="font-medium">{bank.name}</p>
@@ -397,15 +395,14 @@ export default function BanksPage() {
 							<div key={bank.id} className="p-4">
 								{/* Bank header */}
 								<div className="flex items-center gap-4">
-									<div
-										className="flex h-10 w-10 items-center justify-center rounded-lg text-xs font-semibold"
-										style={{
-											backgroundColor: bank.color,
-											color: '#fff',
-										}}
-									>
-										{getShortName(bank.name)}
-									</div>
+									<BankLogo
+										bankId={bank.id}
+										bankName={bank.name}
+										bankColor={bank.color}
+										logo={bankLogos[bank.id] ?? bank.logo}
+										size="md"
+										onLogoChange={(url) => handleLogoChange(bank.id, url)}
+									/>
 									<div className="flex-1 min-w-0">
 										<div className="flex items-center gap-2">
 											<p className="font-medium">{bank.name}</p>
