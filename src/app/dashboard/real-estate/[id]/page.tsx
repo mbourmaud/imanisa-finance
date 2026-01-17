@@ -9,7 +9,9 @@ import {
 	ChevronDown,
 	ChevronUp,
 	CreditCard,
+	Droplets,
 	ExternalLink,
+	Flame,
 	Home,
 	Landmark,
 	Loader2,
@@ -21,6 +23,7 @@ import {
 	Trash2,
 	Users,
 	Wallet,
+	Wifi,
 	Zap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -63,7 +66,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import type { PropertyType, PropertyUsage, InsuranceType, Loan, PropertyInsurance, CoOwnership, UtilityContract, LoanInsurance } from '@prisma/client'
+import type { PropertyType, PropertyUsage, InsuranceType, UtilityType, Loan, PropertyInsurance, CoOwnership, UtilityContract, LoanInsurance } from '@prisma/client'
 
 // Type for property with members and related data
 interface PropertyMemberWithDetails {
@@ -190,6 +193,25 @@ const initialCoOwnershipFormData: CoOwnershipFormData = {
 	notes: '',
 }
 
+// Utility contract form data
+interface UtilityContractFormData {
+	type: UtilityType | ''
+	provider: string
+	contractNumber: string
+	monthlyAmount: string
+	link: string
+	notes: string
+}
+
+const initialUtilityContractFormData: UtilityContractFormData = {
+	type: '',
+	provider: '',
+	contractNumber: '',
+	monthlyAmount: '',
+	link: '',
+	notes: '',
+}
+
 // Member type for dropdown
 interface Member {
 	id: string
@@ -289,6 +311,39 @@ function getInsuranceTypeBadge(type: InsuranceType): string {
 			return 'MRH'
 		default:
 			return type
+	}
+}
+
+function getUtilityTypeLabel(type: UtilityType): string {
+	switch (type) {
+		case 'ELECTRICITY':
+			return 'Électricité'
+		case 'GAS':
+			return 'Gaz'
+		case 'WATER':
+			return 'Eau'
+		case 'INTERNET':
+			return 'Internet'
+		case 'OTHER':
+			return 'Autre'
+		default:
+			return type
+	}
+}
+
+function getUtilityTypeIcon(type: UtilityType): React.ElementType {
+	switch (type) {
+		case 'ELECTRICITY':
+			return Zap
+		case 'GAS':
+			return Flame
+		case 'WATER':
+			return Droplets
+		case 'INTERNET':
+			return Wifi
+		case 'OTHER':
+		default:
+			return Zap
 	}
 }
 
@@ -557,6 +612,14 @@ export default function PropertyDetailPage() {
 	const [isSubmittingCoOwnership, setIsSubmittingCoOwnership] = useState(false)
 	const [coOwnershipFormError, setCoOwnershipFormError] = useState<string | null>(null)
 	const [isDeletingCoOwnership, setIsDeletingCoOwnership] = useState(false)
+
+	// Utility contract dialog state
+	const [isUtilityContractDialogOpen, setIsUtilityContractDialogOpen] = useState(false)
+	const [editingUtilityContractId, setEditingUtilityContractId] = useState<string | null>(null)
+	const [utilityContractFormData, setUtilityContractFormData] = useState<UtilityContractFormData>(initialUtilityContractFormData)
+	const [isSubmittingUtilityContract, setIsSubmittingUtilityContract] = useState(false)
+	const [utilityContractFormError, setUtilityContractFormError] = useState<string | null>(null)
+	const [deletingUtilityContractId, setDeletingUtilityContractId] = useState<string | null>(null)
 
 	const fetchProperty = useCallback(async () => {
 		try {
@@ -969,6 +1032,114 @@ export default function PropertyDetailPage() {
 			console.error('Error deleting co-ownership:', err)
 		} finally {
 			setIsDeletingCoOwnership(false)
+		}
+	}
+
+	// Utility contract form handlers
+	const handleUtilityContractInputChange = (field: keyof UtilityContractFormData, value: string) => {
+		setUtilityContractFormData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const resetUtilityContractForm = () => {
+		setUtilityContractFormData(initialUtilityContractFormData)
+		setUtilityContractFormError(null)
+		setEditingUtilityContractId(null)
+	}
+
+	const openUtilityContractDialog = (contract?: UtilityContract) => {
+		if (contract) {
+			// Pre-fill form with existing data
+			setUtilityContractFormData({
+				type: contract.type,
+				provider: contract.provider,
+				contractNumber: contract.contractNumber || '',
+				monthlyAmount: contract.monthlyAmount.toString(),
+				link: contract.link || '',
+				notes: contract.notes || '',
+			})
+			setEditingUtilityContractId(contract.id)
+		} else {
+			resetUtilityContractForm()
+		}
+		setIsUtilityContractDialogOpen(true)
+	}
+
+	const handleUtilityContractSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setUtilityContractFormError(null)
+		setIsSubmittingUtilityContract(true)
+
+		try {
+			// Validate required fields
+			if (!utilityContractFormData.type) {
+				throw new Error('Le type de contrat est requis')
+			}
+			if (!utilityContractFormData.provider.trim()) {
+				throw new Error('Le fournisseur est requis')
+			}
+			if (!utilityContractFormData.monthlyAmount) {
+				throw new Error('Le montant mensuel est requis')
+			}
+
+			const monthlyAmount = Number.parseFloat(utilityContractFormData.monthlyAmount)
+			if (monthlyAmount < 0) {
+				throw new Error('Le montant mensuel ne peut pas être négatif')
+			}
+
+			const payload = {
+				type: utilityContractFormData.type,
+				provider: utilityContractFormData.provider.trim(),
+				contractNumber: utilityContractFormData.contractNumber.trim() || null,
+				monthlyAmount,
+				link: utilityContractFormData.link.trim() || null,
+				notes: utilityContractFormData.notes.trim() || null,
+			}
+
+			const isEditing = editingUtilityContractId !== null
+			const url = isEditing
+				? `/api/utility-contracts/${editingUtilityContractId}`
+				: `/api/properties/${propertyId}/utility-contracts`
+			const method = isEditing ? 'PATCH' : 'POST'
+
+			const response = await fetch(url, {
+				method,
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de l\'enregistrement')
+			}
+
+			// Success - close dialog and refresh data
+			setIsUtilityContractDialogOpen(false)
+			resetUtilityContractForm()
+			await fetchProperty()
+		} catch (err) {
+			setUtilityContractFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsSubmittingUtilityContract(false)
+		}
+	}
+
+	const handleDeleteUtilityContract = async (contractId: string) => {
+		setDeletingUtilityContractId(contractId)
+		try {
+			const response = await fetch(`/api/utility-contracts/${contractId}`, {
+				method: 'DELETE',
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la suppression')
+			}
+
+			await fetchProperty()
+		} catch (err) {
+			console.error('Error deleting utility contract:', err)
+		} finally {
+			setDeletingUtilityContractId(null)
 		}
 	}
 
@@ -1771,12 +1942,173 @@ export default function PropertyDetailPage() {
 				</CardContent>
 			</Card>
 
-			{/* Contrats Section - Placeholder */}
-			<PlaceholderSection
-				title="Contrats & Abonnements"
-				icon={Zap}
-				description="Électricité, gaz, eau, internet et autres contrats"
-			/>
+			{/* Contrats Section */}
+			<Card className="border-border/60">
+				<CardHeader className="pb-4">
+					<div className="flex items-center justify-between">
+						<CardTitle className="text-base font-medium flex items-center gap-2">
+							<Zap className="h-4 w-4 text-muted-foreground" />
+							Contrats & Abonnements
+						</CardTitle>
+						<Button
+							variant="outline"
+							size="sm"
+							className="gap-2"
+							onClick={() => openUtilityContractDialog()}
+						>
+							<Plus className="h-4 w-4" />
+							Ajouter un contrat
+						</Button>
+					</div>
+				</CardHeader>
+				<CardContent>
+					{property.utilityContracts.length === 0 ? (
+						<div className="flex flex-col items-center justify-center py-8 text-center">
+							<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
+								<Zap className="h-6 w-6 text-muted-foreground" />
+							</div>
+							<h4 className="font-medium mb-1">Aucun contrat</h4>
+							<p className="text-sm text-muted-foreground mb-4">
+								Ajoutez les contrats d'énergie et abonnements liés à ce bien.
+							</p>
+							<Button
+								variant="outline"
+								size="sm"
+								className="gap-2"
+								onClick={() => openUtilityContractDialog()}
+							>
+								<Plus className="h-4 w-4" />
+								Ajouter un contrat
+							</Button>
+						</div>
+					) : (
+						<div className="space-y-4">
+							{/* Summary stats */}
+							<div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-muted/30">
+								<div className="text-center">
+									<p className="text-xs text-muted-foreground">Nombre de contrats</p>
+									<p className="text-lg font-semibold">{property.utilityContracts.length}</p>
+								</div>
+								<div className="text-center">
+									<p className="text-xs text-muted-foreground">Total mensuel</p>
+									<p className="text-lg font-semibold number-display">
+										{formatCurrency(property.utilityContracts.reduce((sum, c) => sum + c.monthlyAmount, 0))}
+									</p>
+								</div>
+							</div>
+
+							{/* Contract list */}
+							<div className="space-y-3">
+								{property.utilityContracts.map((contract) => {
+									const IconComponent = getUtilityTypeIcon(contract.type)
+									return (
+										<div
+											key={contract.id}
+											className="rounded-xl border border-border/60 p-4"
+										>
+											<div className="flex items-start justify-between gap-4">
+												<div className="flex items-center gap-3">
+													<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
+														<IconComponent className="h-5 w-5 text-primary" />
+													</div>
+													<div>
+														<div className="flex items-center gap-2">
+															<h4 className="font-medium">{contract.provider}</h4>
+															<span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+																{getUtilityTypeLabel(contract.type)}
+															</span>
+														</div>
+														<p className="text-sm text-muted-foreground number-display">
+															{formatCurrency(contract.monthlyAmount)}/mois
+															<span className="text-xs ml-1">
+																({formatCurrency(contract.monthlyAmount * 12)}/an)
+															</span>
+														</p>
+													</div>
+												</div>
+												<div className="flex items-center gap-2 shrink-0">
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8"
+														onClick={() => openUtilityContractDialog(contract)}
+													>
+														<Pencil className="h-4 w-4" />
+													</Button>
+													<AlertDialog>
+														<AlertDialogTrigger asChild>
+															<Button
+																variant="ghost"
+																size="icon"
+																className="h-8 w-8 text-destructive hover:text-destructive"
+															>
+																<Trash2 className="h-4 w-4" />
+															</Button>
+														</AlertDialogTrigger>
+														<AlertDialogContent>
+															<AlertDialogHeader>
+																<AlertDialogTitle>Supprimer ce contrat ?</AlertDialogTitle>
+																<AlertDialogDescription>
+																	Cette action est irréversible. Le contrat {contract.provider} sera définitivement supprimé.
+																</AlertDialogDescription>
+															</AlertDialogHeader>
+															<AlertDialogFooter>
+																<AlertDialogCancel>Annuler</AlertDialogCancel>
+																<AlertDialogAction
+																	onClick={() => handleDeleteUtilityContract(contract.id)}
+																	disabled={deletingUtilityContractId === contract.id}
+																	className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+																>
+																	{deletingUtilityContractId === contract.id ? (
+																		<>
+																			<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+																			Suppression...
+																		</>
+																	) : (
+																		'Supprimer'
+																	)}
+																</AlertDialogAction>
+															</AlertDialogFooter>
+														</AlertDialogContent>
+													</AlertDialog>
+												</div>
+											</div>
+
+											{/* Additional info */}
+											{(contract.contractNumber || contract.link) && (
+												<div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between gap-4">
+													{contract.contractNumber && (
+														<p className="text-xs text-muted-foreground">
+															N° contrat: <span className="text-foreground">{contract.contractNumber}</span>
+														</p>
+													)}
+													{contract.link && (
+														<a
+															href={contract.link}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+														>
+															<ExternalLink className="h-3 w-3" />
+															Voir le contrat
+														</a>
+													)}
+												</div>
+											)}
+
+											{contract.notes && (
+												<div className="mt-2 pt-2 border-t border-border/40">
+													<p className="text-xs text-muted-foreground">{contract.notes}</p>
+												</div>
+											)}
+										</div>
+									)
+								})}
+							</div>
+						</div>
+					)}
+				</CardContent>
+			</Card>
 
 			{/* Insurance Dialog */}
 			<Dialog
@@ -2208,6 +2540,163 @@ export default function PropertyDetailPage() {
 									</>
 								) : (
 									isEditingCoOwnership ? 'Modifier' : 'Ajouter'
+								)}
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+
+			{/* Utility Contract Dialog */}
+			<Dialog
+				open={isUtilityContractDialogOpen}
+				onOpenChange={(open) => {
+					setIsUtilityContractDialogOpen(open)
+					if (!open) resetUtilityContractForm()
+				}}
+			>
+				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>
+							{editingUtilityContractId ? 'Modifier le contrat' : 'Ajouter un contrat'}
+						</DialogTitle>
+						<DialogDescription>
+							Renseignez les informations du contrat ou abonnement.
+						</DialogDescription>
+					</DialogHeader>
+					<form onSubmit={handleUtilityContractSubmit} className="space-y-4">
+						{/* Error message */}
+						{utilityContractFormError && (
+							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+								<p className="text-sm text-destructive">{utilityContractFormError}</p>
+							</div>
+						)}
+
+						{/* Type selection */}
+						<div className="space-y-2">
+							<Label htmlFor="utility-contract-type">Type de contrat *</Label>
+							<Select
+								value={utilityContractFormData.type}
+								onValueChange={(value) => handleUtilityContractInputChange('type', value)}
+							>
+								<SelectTrigger id="utility-contract-type">
+									<SelectValue placeholder="Sélectionner le type" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="ELECTRICITY">
+										<div className="flex items-center gap-2">
+											<Zap className="h-4 w-4" />
+											Électricité
+										</div>
+									</SelectItem>
+									<SelectItem value="GAS">
+										<div className="flex items-center gap-2">
+											<Flame className="h-4 w-4" />
+											Gaz
+										</div>
+									</SelectItem>
+									<SelectItem value="WATER">
+										<div className="flex items-center gap-2">
+											<Droplets className="h-4 w-4" />
+											Eau
+										</div>
+									</SelectItem>
+									<SelectItem value="INTERNET">
+										<div className="flex items-center gap-2">
+											<Wifi className="h-4 w-4" />
+											Internet
+										</div>
+									</SelectItem>
+									<SelectItem value="OTHER">
+										<div className="flex items-center gap-2">
+											<Zap className="h-4 w-4" />
+											Autre
+										</div>
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Provider and contract number */}
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-2">
+								<Label htmlFor="utility-contract-provider">Fournisseur *</Label>
+								<Input
+									id="utility-contract-provider"
+									placeholder="EDF, Engie, Free..."
+									value={utilityContractFormData.provider}
+									onChange={(e) => handleUtilityContractInputChange('provider', e.target.value)}
+								/>
+							</div>
+							<div className="space-y-2">
+								<Label htmlFor="utility-contract-number">N° de contrat</Label>
+								<Input
+									id="utility-contract-number"
+									placeholder="ABC-123456"
+									value={utilityContractFormData.contractNumber}
+									onChange={(e) => handleUtilityContractInputChange('contractNumber', e.target.value)}
+								/>
+							</div>
+						</div>
+
+						{/* Monthly amount */}
+						<div className="space-y-2">
+							<Label htmlFor="utility-contract-amount">Montant mensuel (€) *</Label>
+							<Input
+								id="utility-contract-amount"
+								type="number"
+								min="0"
+								step="0.01"
+								placeholder="80"
+								value={utilityContractFormData.monthlyAmount}
+								onChange={(e) => handleUtilityContractInputChange('monthlyAmount', e.target.value)}
+							/>
+							{utilityContractFormData.monthlyAmount && (
+								<p className="text-xs text-muted-foreground">
+									Soit {formatCurrency(Number.parseFloat(utilityContractFormData.monthlyAmount) * 12)}/an
+								</p>
+							)}
+						</div>
+
+						{/* Link */}
+						<div className="space-y-2">
+							<Label htmlFor="utility-contract-link">Lien vers le contrat</Label>
+							<Input
+								id="utility-contract-link"
+								placeholder="https://..."
+								value={utilityContractFormData.link}
+								onChange={(e) => handleUtilityContractInputChange('link', e.target.value)}
+							/>
+						</div>
+
+						{/* Notes */}
+						<div className="space-y-2">
+							<Label htmlFor="utility-contract-notes">Notes</Label>
+							<Input
+								id="utility-contract-notes"
+								placeholder="Notes additionnelles..."
+								value={utilityContractFormData.notes}
+								onChange={(e) => handleUtilityContractInputChange('notes', e.target.value)}
+							/>
+						</div>
+
+						<DialogFooter className="pt-4">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setIsUtilityContractDialogOpen(false)}
+								disabled={isSubmittingUtilityContract}
+							>
+								Annuler
+							</Button>
+							<Button type="submit" disabled={isSubmittingUtilityContract}>
+								{isSubmittingUtilityContract ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										{editingUtilityContractId ? 'Modification...' : 'Création...'}
+									</>
+								) : (
+									editingUtilityContractId ? 'Modifier' : 'Ajouter'
 								)}
 							</Button>
 						</DialogFooter>
