@@ -9,6 +9,12 @@ export {
 	type UpdateLoanDTO,
 	type LoanSummary,
 } from './loan-repository';
+export {
+	loanInsuranceRepository,
+	type LoanInsuranceWithMember as LoanInsuranceWithMemberType,
+	type CreateLoanInsuranceDTO,
+	type UpdateLoanInsuranceDTO,
+} from './loan-insurance-repository';
 export { memberRepository } from './member-repository';
 export {
 	propertyRepository,
