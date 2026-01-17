@@ -1,6 +1,11 @@
 export { accountRepository } from './account-repository';
 export { bankRepository } from './bank-repository';
 export {
+	coOwnershipRepository,
+	type CreateCoOwnershipDTO,
+	type UpdateCoOwnershipDTO,
+} from './co-ownership-repository';
+export {
 	loanRepository,
 	type LoanWithDetails,
 	type LoanInsuranceWithMember,
@@ -25,9 +30,19 @@ export {
 	type UpdatePropertyDTO,
 	type PropertySummary,
 } from './property-repository';
+export {
+	propertyInsuranceRepository,
+	type CreatePropertyInsuranceDTO,
+	type UpdatePropertyInsuranceDTO,
+} from './property-insurance-repository';
 export { rawImportRepository } from './raw-import-repository';
 export {
 	resetDemoTransactions,
 	transactionRepository,
 	type TransactionFilters,
 } from './transaction-repository';
+export {
+	utilityContractRepository,
+	type CreateUtilityContractDTO,
+	type UpdateUtilityContractDTO,
+} from './utility-contract-repository';
