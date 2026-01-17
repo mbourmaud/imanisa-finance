@@ -62,7 +62,8 @@ export default function HomePage() {
 								<p className="text-sm text-muted-foreground mt-0.5">Accéder à mon espace</p>
 							</div>
 							<div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-								<svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+									<title>Flèche vers la droite</title>
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
 								</svg>
 							</div>

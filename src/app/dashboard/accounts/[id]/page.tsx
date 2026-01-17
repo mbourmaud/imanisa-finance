@@ -807,8 +807,8 @@ export default function AccountDetailPage() {
 							className="shrink-0 h-8 w-8 rounded-lg hover:bg-white/20"
 							onClick={() => setError(null)}
 						>
-							<span className="sr-only">Fermer</span>
-							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+								<title>Fermer</title>
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 							</svg>
 						</Button>
