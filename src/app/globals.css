@@ -8,7 +8,13 @@
    Warm, friendly, personal finance for families
    ============================================ */
 
+/* ============================================
+   📐 DESIGN TOKENS - Spacing & Layout
+   See src/styles/tokens.ts for TypeScript values
+   ============================================ */
+
 @theme inline {
+	/* Color tokens */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-geist-sans);
@@ -42,6 +48,8 @@
 	--color-popover: var(--popover);
 	--color-card-foreground: var(--card-foreground);
 	--color-card: var(--card);
+
+	/* Border radius tokens */
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -49,6 +57,29 @@
 	--radius-2xl: calc(var(--radius) + 8px);
 	--radius-3xl: calc(var(--radius) + 12px);
 	--radius-4xl: calc(var(--radius) + 16px);
+
+	/* Spacing tokens - extends Tailwind spacing scale */
+	--spacing-xs: 0.25rem;   /* 4px */
+	--spacing-sm: 0.5rem;    /* 8px */
+	--spacing-md: 1rem;      /* 16px */
+	--spacing-lg: 1.5rem;    /* 24px */
+	--spacing-xl: 2rem;      /* 32px */
+	--spacing-2xl: 3rem;     /* 48px */
+	--spacing-3xl: 4rem;     /* 64px */
+
+	/* Container max-widths */
+	--container-sm: 640px;
+	--container-md: 768px;
+	--container-lg: 1024px;
+	--container-xl: 1280px;
+	--container-2xl: 1536px;
+
+	/* Layout tokens */
+	--page-gutter-mobile: 1rem;     /* 16px */
+	--page-gutter-desktop: 1.5rem;  /* 24px */
+	--section-gap: 2rem;            /* 32px */
+	--card-padding-sm: 1rem;        /* 16px */
+	--card-padding-md: 1.5rem;      /* 24px */
 }
 
 :root {
@@ -502,6 +533,63 @@
 			oklch(0.35 0.04 290) 80%,
 			transparent 100%
 		);
+	}
+
+	/* ============================================
+	   📐 LAYOUT UTILITY CLASSES
+	   Use these for consistent spacing across pages
+	   ============================================ */
+
+	/* Page gutter - horizontal padding for page content */
+	.gutter {
+		@apply px-4 sm:px-6;
+	}
+
+	/* Section spacing - vertical gap between page sections */
+	.section-spacing {
+		@apply py-8;
+	}
+
+	/* Card padding variants */
+	.card-padding {
+		@apply p-4 sm:p-6;
+	}
+
+	.card-padding-sm {
+		@apply p-4;
+	}
+
+	.card-padding-lg {
+		@apply p-6 sm:p-8;
+	}
+
+	/* Gap utility classes using token scale */
+	.gap-token-xs {
+		gap: var(--spacing-xs);
+	}
+
+	.gap-token-sm {
+		gap: var(--spacing-sm);
+	}
+
+	.gap-token-md {
+		gap: var(--spacing-md);
+	}
+
+	.gap-token-lg {
+		gap: var(--spacing-lg);
+	}
+
+	.gap-token-xl {
+		gap: var(--spacing-xl);
+	}
+
+	.gap-token-2xl {
+		gap: var(--spacing-2xl);
+	}
+
+	.gap-token-3xl {
+		gap: var(--spacing-3xl);
 	}
 }
 
