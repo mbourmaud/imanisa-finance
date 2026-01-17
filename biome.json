@@ -24,8 +24,7 @@
 			},
 			"suspicious": {
 				"noDocumentCookie": "off",
-				"noArrayIndexKey": "warn",
-				"useIterableCallbackReturn": "warn"
+				"noArrayIndexKey": "warn"
 			}
 		}
 	},

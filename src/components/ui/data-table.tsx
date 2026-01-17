@@ -147,27 +147,31 @@ export function DataTable<TData, TValue>({
 										colSpan={header.colSpan}
 										className="h-12 px-4 text-left align-middle font-medium text-muted-foreground"
 									>
-										{header.isPlaceholder ? null : (
+										{header.isPlaceholder ? null : header.column.getCanSort() ? (
 											<div
-												className={
-													header.column.getCanSort()
-														? 'flex cursor-pointer select-none items-center gap-1'
-														: ''
-												}
+												role="button"
+												tabIndex={0}
+												className="flex cursor-pointer select-none items-center gap-1"
 												onClick={header.column.getToggleSortingHandler()}
+												onKeyDown={(e) => {
+													if (e.key === 'Enter' || e.key === ' ') {
+														e.preventDefault();
+														header.column.getToggleSortingHandler()?.(e);
+													}
+												}}
 											>
 												{flexRender(header.column.columnDef.header, header.getContext())}
-												{header.column.getCanSort() && (
-													<span className="ml-1">
-														{{
-															asc: <ChevronUp className="h-4 w-4" />,
-															desc: <ChevronDown className="h-4 w-4" />,
-														}[header.column.getIsSorted() as string] ?? (
-															<ChevronDown className="h-4 w-4 opacity-30" />
-														)}
-													</span>
-												)}
+												<span className="ml-1">
+													{{
+														asc: <ChevronUp className="h-4 w-4" />,
+														desc: <ChevronDown className="h-4 w-4" />,
+													}[header.column.getIsSorted() as string] ?? (
+														<ChevronDown className="h-4 w-4 opacity-30" />
+													)}
+												</span>
 											</div>
+										) : (
+											flexRender(header.column.columnDef.header, header.getContext())
 										)}
 									</th>
 								))}
@@ -191,7 +195,14 @@ export function DataTable<TData, TValue>({
 									className={`border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted ${
 										onRowClick ? 'cursor-pointer' : ''
 									}`}
-									onClick={() => onRowClick?.(row.original)}
+									onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+									onKeyDown={onRowClick ? (e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault();
+											onRowClick(row.original);
+										}
+									} : undefined}
+									tabIndex={onRowClick ? 0 : undefined}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<td key={cell.id} className="p-4 align-middle">

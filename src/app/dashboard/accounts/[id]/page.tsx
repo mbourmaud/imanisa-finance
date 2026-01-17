@@ -701,10 +701,11 @@ export default function AccountDetailPage() {
 
 						<div className="space-y-5">
 							<div className="space-y-2">
-								<label className="text-sm font-semibold text-foreground">
+								<label htmlFor="edit-account-name" className="text-sm font-semibold text-foreground">
 									Nom du compte
 								</label>
 								<Input
+									id="edit-account-name"
 									value={editName}
 									onChange={(e) => setEditName(e.target.value)}
 									placeholder="Ex: Compte Joint"
@@ -712,11 +713,12 @@ export default function AccountDetailPage() {
 								/>
 							</div>
 							<div className="space-y-2">
-								<label className="text-sm font-semibold text-foreground">
+								<label htmlFor="edit-account-number" className="text-sm font-semibold text-foreground">
 									Numéro de compte
 									<span className="text-muted-foreground font-normal ml-1">(optionnel)</span>
 								</label>
 								<Input
+									id="edit-account-number"
 									value={editAccountNumber}
 									onChange={(e) => setEditAccountNumber(e.target.value)}
 									placeholder="Ex: FR76 1234 5678 9012"
@@ -724,11 +726,12 @@ export default function AccountDetailPage() {
 								/>
 							</div>
 							<div className="space-y-2">
-								<label className="text-sm font-semibold text-foreground">
+								<label htmlFor="edit-account-description" className="text-sm font-semibold text-foreground">
 									Description
 									<span className="text-muted-foreground font-normal ml-1">(optionnel)</span>
 								</label>
 								<Input
+									id="edit-account-description"
 									value={editDescription}
 									onChange={(e) => setEditDescription(e.target.value)}
 									placeholder="Ex: Compte pour les dépenses courantes"
@@ -804,8 +807,8 @@ export default function AccountDetailPage() {
 							className="shrink-0 h-8 w-8 rounded-lg hover:bg-white/20"
 							onClick={() => setError(null)}
 						>
-							<span className="sr-only">Fermer</span>
-							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+								<title>Fermer</title>
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 							</svg>
 						</Button>
@@ -833,8 +836,9 @@ export default function AccountDetailPage() {
 
 							{/* Account name */}
 							<div className="space-y-1.5">
-								<label className="text-sm text-muted-foreground">Nom du compte</label>
+								<label htmlFor="settings-account-name" className="text-sm text-muted-foreground">Nom du compte</label>
 								<Input
+									id="settings-account-name"
 									value={editName || account.name}
 									onChange={(e) => setEditName(e.target.value)}
 									onBlur={() => {
@@ -852,8 +856,9 @@ export default function AccountDetailPage() {
 
 							{/* Description */}
 							<div className="space-y-1.5">
-								<label className="text-sm text-muted-foreground">Description</label>
+								<label htmlFor="settings-account-description" className="text-sm text-muted-foreground">Description</label>
 								<Input
+									id="settings-account-description"
 									value={editDescription !== '' ? editDescription : (account.description || '')}
 									onChange={(e) => setEditDescription(e.target.value)}
 									onBlur={() => {
@@ -871,7 +876,7 @@ export default function AccountDetailPage() {
 
 							{/* Owners - Multi-select */}
 							<div className="space-y-1.5">
-								<label className="text-sm text-muted-foreground">Titulaires</label>
+								<span className="text-sm text-muted-foreground">Titulaires</span>
 								<div className="min-h-[42px] p-2 rounded-md border bg-background flex flex-wrap gap-2 items-center">
 									{account.accountMembers.map((am) => (
 										<div
@@ -956,7 +961,7 @@ export default function AccountDetailPage() {
 							{/* Export URL */}
 							<div className="space-y-1.5">
 								<div className="flex items-center justify-between">
-									<label className="text-sm text-muted-foreground">Lien d&apos;export banque</label>
+									<label htmlFor="settings-export-url" className="text-sm text-muted-foreground">Lien d&apos;export banque</label>
 									{account.exportUrl && (
 										<a
 											href={account.exportUrl}
@@ -969,6 +974,7 @@ export default function AccountDetailPage() {
 									)}
 								</div>
 								<Input
+									id="settings-export-url"
 									type="url"
 									value={exportUrlInput !== '' ? exportUrlInput : (account.exportUrl || '')}
 									onChange={(e) => setExportUrlInput(e.target.value)}
@@ -988,7 +994,7 @@ export default function AccountDetailPage() {
 
 							{/* Initial Balance */}
 							<div className="space-y-1.5">
-								<label className="text-sm text-muted-foreground">Solde initial</label>
+								<span className="text-sm text-muted-foreground">Solde initial</span>
 								<div className="grid grid-cols-2 gap-2">
 									<div className="relative">
 										<Input
@@ -1203,8 +1209,9 @@ export default function AccountDetailPage() {
 									</span>
 								)}
 							</div>
-							<label className="cursor-pointer">
+							<label htmlFor="transaction-import-file" className="cursor-pointer">
 								<input
+									id="transaction-import-file"
 									type="file"
 									accept=".csv,.xlsx,.xls"
 									onChange={handleFileSelect}
@@ -1242,6 +1249,7 @@ export default function AccountDetailPage() {
 
 				{/* Content */}
 				<div
+					role="presentation"
 					onDragEnter={handleDrag}
 					onDragLeave={handleDrag}
 					onDragOver={handleDrag}

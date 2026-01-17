@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { Camera, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -134,10 +135,12 @@ export function BankLogo({
 		>
 			{/* Logo image or initials */}
 			{showLogo ? (
-				<img
+				<Image
 					src={currentLogo}
 					alt={`Logo ${bankName}`}
 					className="h-full w-full object-cover"
+					fill
+					unoptimized
 					onError={() => setImageError(true)}
 				/>
 			) : (
