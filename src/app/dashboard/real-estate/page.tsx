@@ -5,13 +5,24 @@ import Link from 'next/link'
 import {
 	Building2,
 	Home,
+	Loader2,
 	MapPin,
 	MoreHorizontal,
 	Plus,
 	TrendingUp,
+	X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -19,7 +30,16 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { PropertyType, PropertyUsage, Loan } from '@prisma/client'
 
@@ -72,6 +92,59 @@ interface PropertySummary {
 	totalEquity: number
 	byType: Record<string, { count: number; value: number }>
 	byUsage: Record<string, { count: number; value: number }>
+}
+
+interface Member {
+	id: string
+	name: string
+	color: string | null
+}
+
+interface MemberShare {
+	memberId: string
+	ownershipShare: number
+}
+
+interface PropertyFormData {
+	name: string
+	type: PropertyType | ''
+	usage: PropertyUsage | ''
+	address: string
+	address2: string
+	city: string
+	postalCode: string
+	surface: string
+	rooms: string
+	bedrooms: string
+	purchasePrice: string
+	purchaseDate: string
+	notaryFees: string
+	agencyFees: string
+	currentValue: string
+	rentAmount: string
+	rentCharges: string
+	notes: string
+}
+
+const initialFormData: PropertyFormData = {
+	name: '',
+	type: '',
+	usage: '',
+	address: '',
+	address2: '',
+	city: '',
+	postalCode: '',
+	surface: '',
+	rooms: '',
+	bedrooms: '',
+	purchasePrice: '',
+	purchaseDate: '',
+	notaryFees: '',
+	agencyFees: '',
+	currentValue: '',
+	rentAmount: '',
+	rentCharges: '',
+	notes: '',
 }
 
 function formatCurrency(amount: number): string {
@@ -146,7 +219,7 @@ function StatsCardSkeleton() {
 	)
 }
 
-function EmptyState() {
+function EmptyState({ onAddClick }: { onAddClick: () => void }) {
 	return (
 		<Card className="border-border/60 border-dashed">
 			<CardContent className="flex flex-col items-center justify-center py-12">
@@ -157,7 +230,7 @@ function EmptyState() {
 				<p className="text-sm text-muted-foreground text-center max-w-sm mb-4">
 					Ajoutez votre premier bien pour commencer à suivre votre patrimoine immobilier.
 				</p>
-				<Button className="gap-2">
+				<Button className="gap-2" onClick={onAddClick}>
 					<Plus className="h-4 w-4" />
 					Ajouter un bien
 				</Button>
@@ -171,6 +244,14 @@ export default function RealEstatePage() {
 	const [summary, setSummary] = useState<PropertySummary | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
+
+	// Dialog state
+	const [isDialogOpen, setIsDialogOpen] = useState(false)
+	const [formData, setFormData] = useState<PropertyFormData>(initialFormData)
+	const [memberShares, setMemberShares] = useState<MemberShare[]>([])
+	const [members, setMembers] = useState<Member[]>([])
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [formError, setFormError] = useState<string | null>(null)
 
 	const fetchProperties = useCallback(async () => {
 		try {
@@ -190,9 +271,156 @@ export default function RealEstatePage() {
 		}
 	}, [])
 
+	const fetchMembers = useCallback(async () => {
+		try {
+			const response = await fetch('/api/members')
+			if (!response.ok) {
+				throw new Error('Erreur lors du chargement des membres')
+			}
+			const data = await response.json()
+			setMembers(data.members)
+		} catch (err) {
+			console.error('Error fetching members:', err)
+		}
+	}, [])
+
 	useEffect(() => {
 		fetchProperties()
-	}, [fetchProperties])
+		fetchMembers()
+	}, [fetchProperties, fetchMembers])
+
+	const handleInputChange = (field: keyof PropertyFormData, value: string) => {
+		setFormData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const handleAddMember = () => {
+		const availableMembers = members.filter(
+			(m) => !memberShares.some((ms) => ms.memberId === m.id)
+		)
+		if (availableMembers.length > 0) {
+			setMemberShares((prev) => [
+				...prev,
+				{ memberId: availableMembers[0].id, ownershipShare: 100 },
+			])
+		}
+	}
+
+	const handleRemoveMember = (memberId: string) => {
+		setMemberShares((prev) => prev.filter((ms) => ms.memberId !== memberId))
+	}
+
+	const handleMemberChange = (index: number, memberId: string) => {
+		setMemberShares((prev) =>
+			prev.map((ms, i) => (i === index ? { ...ms, memberId } : ms))
+		)
+	}
+
+	const handleShareChange = (index: number, share: number) => {
+		setMemberShares((prev) =>
+			prev.map((ms, i) => (i === index ? { ...ms, ownershipShare: share } : ms))
+		)
+	}
+
+	const resetForm = () => {
+		setFormData(initialFormData)
+		setMemberShares([])
+		setFormError(null)
+	}
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setFormError(null)
+		setIsSubmitting(true)
+
+		try {
+			// Validate required fields
+			if (!formData.name.trim()) {
+				throw new Error('Le nom est requis')
+			}
+			if (!formData.type) {
+				throw new Error('Le type est requis')
+			}
+			if (!formData.usage) {
+				throw new Error("L'usage est requis")
+			}
+			if (!formData.address.trim()) {
+				throw new Error("L'adresse est requise")
+			}
+			if (!formData.city.trim()) {
+				throw new Error('La ville est requise')
+			}
+			if (!formData.postalCode.trim()) {
+				throw new Error('Le code postal est requis')
+			}
+			if (!formData.surface) {
+				throw new Error('La surface est requise')
+			}
+			if (!formData.purchasePrice) {
+				throw new Error("Le prix d'achat est requis")
+			}
+			if (!formData.purchaseDate) {
+				throw new Error("La date d'achat est requise")
+			}
+			if (!formData.notaryFees) {
+				throw new Error('Les frais de notaire sont requis')
+			}
+			if (!formData.currentValue) {
+				throw new Error('La valeur actuelle est requise')
+			}
+
+			// Validate member shares total to 100%
+			if (memberShares.length > 0) {
+				const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)
+				if (totalShare !== 100) {
+					throw new Error('La somme des parts de propriété doit être égale à 100%')
+				}
+			}
+
+			const payload = {
+				name: formData.name.trim(),
+				type: formData.type,
+				usage: formData.usage,
+				address: formData.address.trim(),
+				address2: formData.address2.trim() || null,
+				city: formData.city.trim(),
+				postalCode: formData.postalCode.trim(),
+				surface: Number.parseFloat(formData.surface),
+				rooms: formData.rooms ? Number.parseInt(formData.rooms, 10) : null,
+				bedrooms: formData.bedrooms ? Number.parseInt(formData.bedrooms, 10) : null,
+				purchasePrice: Number.parseFloat(formData.purchasePrice),
+				purchaseDate: formData.purchaseDate,
+				notaryFees: Number.parseFloat(formData.notaryFees),
+				agencyFees: formData.agencyFees ? Number.parseFloat(formData.agencyFees) : null,
+				currentValue: Number.parseFloat(formData.currentValue),
+				rentAmount: formData.rentAmount ? Number.parseFloat(formData.rentAmount) : null,
+				rentCharges: formData.rentCharges ? Number.parseFloat(formData.rentCharges) : null,
+				notes: formData.notes.trim() || null,
+				memberShares: memberShares.length > 0 ? memberShares : undefined,
+			}
+
+			const response = await fetch('/api/properties', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la création du bien')
+			}
+
+			// Success - close dialog and refresh list
+			setIsDialogOpen(false)
+			resetForm()
+			await fetchProperties()
+		} catch (err) {
+			setFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsSubmitting(false)
+		}
+	}
+
+	const isRental = formData.usage === 'RENTAL'
 
 	return (
 		<div className="space-y-8">
@@ -202,10 +430,381 @@ export default function RealEstatePage() {
 					<h1 className="text-3xl font-semibold tracking-tight">Immobilier</h1>
 					<p className="mt-1 text-muted-foreground">Gérez votre patrimoine immobilier</p>
 				</div>
-				<Button className="gap-2">
-					<Plus className="h-4 w-4" />
-					Ajouter un bien
-				</Button>
+				<Dialog open={isDialogOpen} onOpenChange={(open) => {
+					setIsDialogOpen(open)
+					if (!open) resetForm()
+				}}>
+					<DialogTrigger asChild>
+						<Button className="gap-2">
+							<Plus className="h-4 w-4" />
+							Ajouter un bien
+						</Button>
+					</DialogTrigger>
+					<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+						<DialogHeader>
+							<DialogTitle>Ajouter un bien immobilier</DialogTitle>
+							<DialogDescription>
+								Renseignez les informations de votre bien immobilier.
+							</DialogDescription>
+						</DialogHeader>
+						<form onSubmit={handleSubmit} className="space-y-6">
+							{/* Error message */}
+							{formError && (
+								<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+									<p className="text-sm text-destructive">{formError}</p>
+								</div>
+							)}
+
+							{/* Basic info */}
+							<div className="space-y-4">
+								<h3 className="text-sm font-medium text-muted-foreground">Informations générales</h3>
+								<div className="grid gap-4 sm:grid-cols-2">
+									<div className="space-y-2">
+										<Label htmlFor="name">Nom du bien *</Label>
+										<Input
+											id="name"
+											placeholder="Appartement Paris 15"
+											value={formData.name}
+											onChange={(e) => handleInputChange('name', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="type">Type *</Label>
+										<Select
+											value={formData.type}
+											onValueChange={(value) => handleInputChange('type', value)}
+										>
+											<SelectTrigger className="w-full">
+												<SelectValue placeholder="Sélectionner..." />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="APARTMENT">Appartement</SelectItem>
+												<SelectItem value="HOUSE">Maison</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="usage">Usage *</Label>
+										<Select
+											value={formData.usage}
+											onValueChange={(value) => handleInputChange('usage', value)}
+										>
+											<SelectTrigger className="w-full">
+												<SelectValue placeholder="Sélectionner..." />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="PRIMARY">Résidence principale</SelectItem>
+												<SelectItem value="SECONDARY">Résidence secondaire</SelectItem>
+												<SelectItem value="RENTAL">Locatif</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="surface">Surface (m²) *</Label>
+										<Input
+											id="surface"
+											type="number"
+											min="0"
+											step="0.01"
+											placeholder="65"
+											value={formData.surface}
+											onChange={(e) => handleInputChange('surface', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="rooms">Pièces</Label>
+										<Input
+											id="rooms"
+											type="number"
+											min="0"
+											placeholder="3"
+											value={formData.rooms}
+											onChange={(e) => handleInputChange('rooms', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="bedrooms">Chambres</Label>
+										<Input
+											id="bedrooms"
+											type="number"
+											min="0"
+											placeholder="2"
+											value={formData.bedrooms}
+											onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+										/>
+									</div>
+								</div>
+							</div>
+
+							{/* Address */}
+							<div className="space-y-4">
+								<h3 className="text-sm font-medium text-muted-foreground">Adresse</h3>
+								<div className="space-y-4">
+									<div className="space-y-2">
+										<Label htmlFor="address">Adresse *</Label>
+										<Input
+											id="address"
+											placeholder="10 rue de Paris"
+											value={formData.address}
+											onChange={(e) => handleInputChange('address', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="address2">Complément d&apos;adresse</Label>
+										<Input
+											id="address2"
+											placeholder="Bâtiment A, 3ème étage"
+											value={formData.address2}
+											onChange={(e) => handleInputChange('address2', e.target.value)}
+										/>
+									</div>
+									<div className="grid gap-4 sm:grid-cols-2">
+										<div className="space-y-2">
+											<Label htmlFor="city">Ville *</Label>
+											<Input
+												id="city"
+												placeholder="Paris"
+												value={formData.city}
+												onChange={(e) => handleInputChange('city', e.target.value)}
+											/>
+										</div>
+										<div className="space-y-2">
+											<Label htmlFor="postalCode">Code postal *</Label>
+											<Input
+												id="postalCode"
+												placeholder="75015"
+												value={formData.postalCode}
+												onChange={(e) => handleInputChange('postalCode', e.target.value)}
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{/* Purchase info */}
+							<div className="space-y-4">
+								<h3 className="text-sm font-medium text-muted-foreground">Achat</h3>
+								<div className="grid gap-4 sm:grid-cols-2">
+									<div className="space-y-2">
+										<Label htmlFor="purchasePrice">Prix d&apos;achat (€) *</Label>
+										<Input
+											id="purchasePrice"
+											type="number"
+											min="0"
+											step="0.01"
+											placeholder="350000"
+											value={formData.purchasePrice}
+											onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="purchaseDate">Date d&apos;achat *</Label>
+										<Input
+											id="purchaseDate"
+											type="date"
+											value={formData.purchaseDate}
+											onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="notaryFees">Frais de notaire (€) *</Label>
+										<Input
+											id="notaryFees"
+											type="number"
+											min="0"
+											step="0.01"
+											placeholder="25000"
+											value={formData.notaryFees}
+											onChange={(e) => handleInputChange('notaryFees', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="agencyFees">Frais d&apos;agence (€)</Label>
+										<Input
+											id="agencyFees"
+											type="number"
+											min="0"
+											step="0.01"
+											placeholder="10000"
+											value={formData.agencyFees}
+											onChange={(e) => handleInputChange('agencyFees', e.target.value)}
+										/>
+									</div>
+								</div>
+							</div>
+
+							{/* Current value */}
+							<div className="space-y-4">
+								<h3 className="text-sm font-medium text-muted-foreground">Valeur actuelle</h3>
+								<div className="space-y-2">
+									<Label htmlFor="currentValue">Valeur estimée (€) *</Label>
+									<Input
+										id="currentValue"
+										type="number"
+										min="0"
+										step="0.01"
+										placeholder="380000"
+										value={formData.currentValue}
+										onChange={(e) => handleInputChange('currentValue', e.target.value)}
+									/>
+								</div>
+							</div>
+
+							{/* Rental info - only shown for RENTAL usage */}
+							{isRental && (
+								<div className="space-y-4">
+									<h3 className="text-sm font-medium text-muted-foreground">Informations locatives</h3>
+									<div className="grid gap-4 sm:grid-cols-2">
+										<div className="space-y-2">
+											<Label htmlFor="rentAmount">Loyer mensuel (€)</Label>
+											<Input
+												id="rentAmount"
+												type="number"
+												min="0"
+												step="0.01"
+												placeholder="1200"
+												value={formData.rentAmount}
+												onChange={(e) => handleInputChange('rentAmount', e.target.value)}
+											/>
+										</div>
+										<div className="space-y-2">
+											<Label htmlFor="rentCharges">Charges locatives (€)</Label>
+											<Input
+												id="rentCharges"
+												type="number"
+												min="0"
+												step="0.01"
+												placeholder="150"
+												value={formData.rentCharges}
+												onChange={(e) => handleInputChange('rentCharges', e.target.value)}
+											/>
+										</div>
+									</div>
+								</div>
+							)}
+
+							{/* Members/Owners */}
+							<div className="space-y-4">
+								<div className="flex items-center justify-between">
+									<h3 className="text-sm font-medium text-muted-foreground">Propriétaires</h3>
+									{members.length > memberShares.length && (
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											onClick={handleAddMember}
+											className="gap-1"
+										>
+											<Plus className="h-3 w-3" />
+											Ajouter
+										</Button>
+									)}
+								</div>
+								{memberShares.length === 0 ? (
+									<p className="text-sm text-muted-foreground">
+										Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des propriétaires.
+									</p>
+								) : (
+									<div className="space-y-3">
+										{memberShares.map((ms, index) => {
+											const member = members.find((m) => m.id === ms.memberId)
+											const availableMembers = members.filter(
+												(m) => m.id === ms.memberId || !memberShares.some((other) => other.memberId === m.id)
+											)
+											return (
+												<div key={ms.memberId} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+													<div
+														className="h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium text-white shrink-0"
+														style={{ backgroundColor: member?.color || '#6b7280' }}
+													>
+														{member?.name.charAt(0).toUpperCase()}
+													</div>
+													<Select
+														value={ms.memberId}
+														onValueChange={(value) => handleMemberChange(index, value)}
+													>
+														<SelectTrigger className="flex-1">
+															<SelectValue />
+														</SelectTrigger>
+														<SelectContent>
+															{availableMembers.map((m) => (
+																<SelectItem key={m.id} value={m.id}>
+																	{m.name}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
+													<div className="flex items-center gap-2">
+														<Input
+															type="number"
+															min="0"
+															max="100"
+															className="w-20"
+															value={ms.ownershipShare}
+															onChange={(e) =>
+																handleShareChange(index, Number.parseInt(e.target.value, 10) || 0)
+															}
+														/>
+														<span className="text-sm text-muted-foreground">%</span>
+													</div>
+													<Button
+														type="button"
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8 shrink-0"
+														onClick={() => handleRemoveMember(ms.memberId)}
+													>
+														<X className="h-4 w-4" />
+													</Button>
+												</div>
+											)
+										})}
+										{memberShares.length > 0 && (
+											<div className="text-xs text-muted-foreground text-right">
+												Total: {memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
+												{memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !== 100 && (
+													<span className="text-destructive ml-1">(doit être 100%)</span>
+												)}
+											</div>
+										)}
+									</div>
+								)}
+							</div>
+
+							{/* Notes */}
+							<div className="space-y-2">
+								<Label htmlFor="notes">Notes</Label>
+								<Input
+									id="notes"
+									placeholder="Notes additionnelles..."
+									value={formData.notes}
+									onChange={(e) => handleInputChange('notes', e.target.value)}
+								/>
+							</div>
+
+							<DialogFooter className="pt-4">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setIsDialogOpen(false)}
+									disabled={isSubmitting}
+								>
+									Annuler
+								</Button>
+								<Button type="submit" disabled={isSubmitting}>
+									{isSubmitting ? (
+										<>
+											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+											Création...
+										</>
+									) : (
+										'Créer le bien'
+									)}
+								</Button>
+							</DialogFooter>
+						</form>
+					</DialogContent>
+				</Dialog>
 			</div>
 
 			{/* Error state */}
@@ -326,7 +925,7 @@ export default function RealEstatePage() {
 					<PropertyCardSkeleton />
 				</div>
 			) : properties.length === 0 ? (
-				<EmptyState />
+				<EmptyState onAddClick={() => setIsDialogOpen(true)} />
 			) : (
 				<div className="grid gap-6 lg:grid-cols-2">
 					{properties.map((property) => {
