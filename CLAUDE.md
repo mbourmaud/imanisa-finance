@@ -545,3 +545,411 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 ## Tests
 
 Compte de test Playwright: `fr100828` / `1L0v31000niuM*`
+
+## Design Guidelines (Vercel Style)
+
+### Principes Visuels
+
+L'application suit les **Vercel Web Interface Guidelines** :
+
+- **Minimalisme** - Pas de clutter visuel, chaque élément a une raison d'être
+- **Whitespace généreux** - Laisser respirer les éléments (`space-y-6`, `gap-4`, `p-6`)
+- **Bordures subtiles** - Utiliser `border-border/60` au lieu de `border-border`
+- **Couleurs muted** - Texte secondaire en `text-muted-foreground`
+- **Hiérarchie typographique claire** - Titres en `font-semibold`, descriptions en `text-sm text-muted-foreground`
+- **Mobile-first** - Toujours designer pour mobile d'abord
+
+### Patterns Visuels
+
+```tsx
+// ❌ Mauvais - trop de bordures, pas assez d'espace
+<Card className="border p-2">
+  <h3 className="font-bold text-lg">Titre</h3>
+  <p className="text-gray-500">Description</p>
+</Card>
+
+// ✅ Bon - subtil et aéré
+<Card className="border-border/60">
+  <CardHeader className="pb-4">
+    <CardTitle className="text-lg font-medium">Titre</CardTitle>
+    <p className="text-sm text-muted-foreground">Description</p>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    {/* contenu */}
+  </CardContent>
+</Card>
+```
+
+### Stat Cards Pattern
+
+```tsx
+<div className="stat-card">
+  <div className="stat-card-content">
+    <div className="stat-card-text">
+      <p className="text-xs sm:text-sm font-medium text-muted-foreground">Label</p>
+      <p className="stat-card-value">{formatMoney(value)}</p>
+    </div>
+    <div className="stat-card-icon">
+      <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+    </div>
+  </div>
+</div>
+```
+
+### Responsive Breakpoints
+
+- Mobile: `< 640px` (default)
+- Tablet: `sm:` (640px+)
+- Desktop: `lg:` (1024px+)
+- Large: `xl:` (1280px+)
+
+```tsx
+// Grid responsive
+<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+
+// Texte responsive
+<p className="text-xs sm:text-sm">
+
+// Padding responsive
+<div className="p-4 sm:p-6">
+```
+
+## Gestion des Erreurs et Validation
+
+### Validation API (Early Returns)
+
+```typescript
+// src/app/api/accounts/route.ts
+export async function POST(request: Request) {
+  // 1. Auth check
+  const user = await getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // 2. Parse body
+  let body: CreateAccountInput;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  // 3. Validate required fields
+  if (!body.name?.trim()) {
+    return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+  }
+
+  // 4. Business logic
+  try {
+    const account = await accountRepository.create(body);
+    return NextResponse.json(account, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create account:', error);
+    return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
+  }
+}
+```
+
+### Gestion des Erreurs TanStack Query
+
+```tsx
+function AccountsList() {
+  const { data, isLoading, isError, error } = useAccountsQuery();
+
+  if (isLoading) {
+    return <LoadingState message="Chargement des comptes..." />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="Erreur de chargement"
+        message={error?.message || 'Une erreur est survenue'}
+        onRetry={() => queryClient.invalidateQueries({ queryKey: accountKeys.all })}
+      />
+    );
+  }
+
+  if (!data?.length) {
+    return <EmptyState title="Aucun compte" action={<CreateAccountButton />} />;
+  }
+
+  return <AccountsGrid accounts={data} />;
+}
+```
+
+### Toast Notifications
+
+```tsx
+import { toast } from 'sonner';
+
+// Succès
+toast.success('Compte créé avec succès');
+
+// Erreur
+toast.error('Échec de la création du compte');
+
+// Avec action
+toast.success('Transaction supprimée', {
+  action: {
+    label: 'Annuler',
+    onClick: () => undoDelete(),
+  },
+});
+
+// Loading promise
+toast.promise(createAccount(data), {
+  loading: 'Création en cours...',
+  success: 'Compte créé !',
+  error: 'Échec de la création',
+});
+```
+
+## Import/Export Patterns
+
+### Barrel Exports (index.ts)
+
+Chaque feature doit avoir un `index.ts` qui exporte tout :
+
+```typescript
+// src/features/accounts/index.ts
+
+// Hooks
+export {
+  accountKeys,
+  useAccountsQuery,
+  useAccountQuery,
+  useCreateAccountMutation,
+  useUpdateAccountMutation,
+  useDeleteAccountMutation,
+} from './hooks/use-accounts-query';
+
+// Types
+export type {
+  Account,
+  AccountWithDetails,
+  CreateAccountInput,
+  UpdateAccountInput,
+} from './types';
+
+// Services (si nécessaire côté client)
+export { accountService } from './services/account-service';
+```
+
+### Imports dans les Pages
+
+```typescript
+// ✅ Bon - import depuis le barrel
+import { useAccountsQuery, useCreateAccountMutation, type Account } from '@/features/accounts';
+
+// ❌ Mauvais - import direct des fichiers internes
+import { useAccountsQuery } from '@/features/accounts/hooks/use-accounts-query';
+import type { Account } from '@/features/accounts/types';
+```
+
+### Structure d'une Feature
+
+```
+src/features/accounts/
+├── hooks/
+│   └── use-accounts-query.ts    # TanStack Query hooks
+├── services/
+│   └── account-service.ts       # API calls (fetch)
+├── types/
+│   └── index.ts                 # TypeScript types
+├── components/                  # (optionnel) Composants spécifiques
+│   └── AccountCard.tsx
+└── index.ts                     # Barrel export
+```
+
+## Conventions de Commit
+
+### Format
+
+```
+<type>: <description courte>
+
+[corps optionnel]
+```
+
+### Types
+
+| Type | Usage |
+|------|-------|
+| `feat` | Nouvelle fonctionnalité |
+| `fix` | Correction de bug |
+| `refactor` | Refactoring sans changement de comportement |
+| `chore` | Tâches de maintenance (deps, config) |
+| `docs` | Documentation uniquement |
+| `style` | Formatage, pas de changement de code |
+| `test` | Ajout/modification de tests |
+| `perf` | Amélioration de performance |
+
+### Exemples
+
+```bash
+feat: add transaction categorization
+fix: resolve duplicate import on CSV upload
+refactor: extract AccountCard component
+chore: upgrade TanStack Query to v5
+docs: update README with setup instructions
+```
+
+### Règles
+
+- Message en **anglais**
+- Première lettre en **minuscule**
+- Pas de point final
+- Impératif présent ("add" pas "added")
+- Max 72 caractères pour la première ligne
+
+## Performance
+
+### React Optimizations
+
+**useMemo pour calculs coûteux** :
+
+```tsx
+// ✅ Bon - mémoïser les calculs dérivés
+const totalBalance = useMemo(() => {
+  return accounts.reduce((sum, acc) => sum + acc.balance, 0);
+}, [accounts]);
+
+// ❌ Mauvais - recalcul à chaque render
+const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+```
+
+**useCallback pour les handlers passés en props** :
+
+```tsx
+// ✅ Bon - stable reference
+const handleSelect = useCallback((id: string) => {
+  setSelectedIds(prev => [...prev, id]);
+}, []);
+
+<AccountList onSelect={handleSelect} />
+```
+
+**Éviter les re-renders inutiles** :
+
+```tsx
+// ❌ Mauvais - nouvel objet à chaque render
+<AccountCard style={{ marginTop: 10 }} />
+
+// ✅ Bon - objet stable ou className
+<AccountCard className="mt-2.5" />
+```
+
+### Next.js Optimizations
+
+**Dynamic imports pour code splitting** :
+
+```tsx
+import dynamic from 'next/dynamic';
+
+// Charger le composant lourd seulement quand nécessaire
+const HeavyChart = dynamic(() => import('@/components/charts/HeavyChart'), {
+  loading: () => <ChartSkeleton />,
+  ssr: false, // Si le composant utilise window/document
+});
+```
+
+**Image optimization** :
+
+```tsx
+import Image from 'next/image';
+
+<Image
+  src={bank.logo}
+  alt={bank.name}
+  width={40}
+  height={40}
+  className="rounded-lg"
+/>
+```
+
+### TanStack Query Optimizations
+
+**Stale time pour éviter refetch inutiles** :
+
+```typescript
+useQuery({
+  queryKey: ['banks'],
+  queryFn: fetchBanks,
+  staleTime: 5 * 60 * 1000, // 5 minutes - données qui changent peu
+});
+```
+
+**Placeholder data pour UX instantanée** :
+
+```typescript
+useQuery({
+  queryKey: accountKeys.detail(id),
+  queryFn: () => fetchAccount(id),
+  placeholderData: () => {
+    // Utiliser les données de la liste si disponibles
+    return queryClient
+      .getQueryData<Account[]>(accountKeys.lists())
+      ?.find(a => a.id === id);
+  },
+});
+```
+
+**Prefetch pour navigation anticipée** :
+
+```tsx
+function AccountCard({ account }: { account: Account }) {
+  const queryClient = useQueryClient();
+
+  const handleMouseEnter = () => {
+    // Prefetch les détails au survol
+    queryClient.prefetchQuery({
+      queryKey: accountKeys.detail(account.id),
+      queryFn: () => fetchAccount(account.id),
+    });
+  };
+
+  return (
+    <Link
+      href={`/dashboard/accounts/${account.id}`}
+      onMouseEnter={handleMouseEnter}
+    >
+      {/* ... */}
+    </Link>
+  );
+}
+```
+
+## Debugging
+
+### TanStack Query DevTools
+
+Les DevTools sont automatiquement activés en développement. Cliquer sur le logo React Query en bas à droite pour :
+- Voir toutes les queries et leur état
+- Invalider manuellement des queries
+- Voir le cache
+
+### Prisma Logging
+
+Activer les logs SQL en développement :
+
+```typescript
+// src/lib/prisma.ts
+export const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === 'development'
+    ? ['query', 'error', 'warn']
+    : ['error'],
+});
+```
+
+### Console Patterns
+
+```typescript
+// Préfixer les logs pour filtrage facile
+console.log('[AccountRepository]', 'Creating account:', data);
+console.error('[API/accounts]', 'Failed to fetch:', error);
+
+// Utiliser console.table pour les arrays
+console.table(accounts.map(a => ({ id: a.id, name: a.name, balance: a.balance })));
+```
