@@ -1,17 +1,19 @@
 import { AppSidebar } from '@/components/app-sidebar';
-import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-			<SidebarInset>
-				<header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-					<SidebarTrigger className="-ml-1" />
-					<Separator orientation="vertical" className="mr-2 h-4" />
+			<SidebarInset className="bg-muted/30">
+				{/* Mobile header with sidebar trigger */}
+				<header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-6 md:hidden">
+					<SidebarTrigger />
+					<span className="font-semibold">Imanisa Finance</span>
 				</header>
-				<main className="flex-1 p-6">{children}</main>
+				<main className="flex-1 p-6 md:p-8 lg:p-10">
+					<div className="mx-auto max-w-7xl animate-fade-in">{children}</div>
+				</main>
 			</SidebarInset>
 		</SidebarProvider>
 	);

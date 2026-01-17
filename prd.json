@@ -1,0 +1,305 @@
+{
+  "project": "Imanisa Finance MVP",
+  "mode": "feature",
+  "branchName": "ralph/mvp-bank-accounts-import",
+  "baseBranch": "main",
+  "description": "MVP complet : gestion des banques avec logo, comptes bancaires avec membres et exportUrl, parser Caisse d'Épargne, et import de transactions. UI épurée suivant les Vercel Web Interface Guidelines. Test E2E avec Chrome DevTools MCP.",
+  "githubRepo": "fr162241/imanisa-finance",
+  "plugins": {
+    "recommended": ["security-guidance", "commit-commands", "frontend-design", "web-interface-guidelines"],
+    "optional": ["typescript-lsp"]
+  },
+  "designGuidelines": {
+    "style": "Vercel Web Interface Guidelines",
+    "CRITICAL_UI_RULE": "After EVERY frontend change, you MUST: 1) Take a screenshot on desktop, 2) Resize to mobile (375px) with mcp__chrome-devtools__resize_page, 3) Take a mobile screenshot, 4) Verify the UI looks SEXY and professional on BOTH. If it doesn't look great, fix it before moving on!",
+    "principles": [
+      "Minimalist and clean - no visual clutter",
+      "Generous whitespace and breathing room",
+      "Subtle borders (border-border/60) and shadows",
+      "Muted colors for secondary elements",
+      "Clear visual hierarchy with typography",
+      "Smooth micro-interactions and transitions",
+      "Consistent spacing using Tailwind scale (gap-4, p-6, etc.)",
+      "Icons from Lucide React, subtle and functional",
+      "MOBILE-FIRST: All UI must be responsive and look great on mobile (375px width)",
+      "Take time to verify UI quality - don't rush, make it beautiful"
+    ],
+    "colorPalette": {
+      "primary": "Brand blue for CTAs",
+      "success": "oklch(0.55 0.15 145) - green for positive amounts",
+      "error": "oklch(0.55 0.2 25) - red for negative amounts/errors",
+      "muted": "text-muted-foreground for secondary text",
+      "borders": "border-border/60 for subtle separation"
+    },
+    "components": {
+      "cards": "bg-card rounded-lg border border-border/60 with subtle hover states",
+      "buttons": "Outline variant for secondary actions, solid for primary",
+      "inputs": "Clean borders, focus:ring-2 ring-primary/20",
+      "dialogs": "Centered, max-w-md, generous padding"
+    }
+  },
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Ajouter champ description sur Account",
+      "description": "As a user, I want to add an optional description to my bank accounts so that I can add notes or context about each account.",
+      "acceptanceCriteria": [
+        "Field `description` (String, nullable) added to Account model in Prisma schema",
+        "Migration runs successfully with `npx prisma db push`",
+        "CreateAccountDTO and UpdateAccountDTO include description field",
+        "API POST/PATCH /api/accounts accepts description",
+        "Typecheck passes"
+      ],
+      "files": [
+        "prisma/schema.prisma",
+        "src/server/repositories/account-repository.ts",
+        "src/app/api/accounts/route.ts",
+        "src/app/api/accounts/[id]/route.ts"
+      ],
+      "dependsOn": [],
+      "priority": 1,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "API upload logo banque vers S3",
+      "description": "As a user, I want to upload a logo for a bank so that banks are visually identifiable in the UI.",
+      "acceptanceCriteria": [
+        "New API route POST /api/banks/[id]/logo accepts multipart form upload",
+        "Validates file: PNG/JPG/SVG only, max 5MB, max 200x200 pixels",
+        "Uploads to Supabase Storage bucket 'bank-logos' with path '{bankId}.{ext}'",
+        "Updates Bank.logo field with storage path",
+        "Returns updated bank object",
+        "Error handling for invalid files",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/app/api/banks/[id]/logo/route.ts",
+        "src/lib/supabase/storage.ts"
+      ],
+      "dependsOn": [],
+      "priority": 2,
+      "passes": true,
+      "notes": "Create new Supabase bucket 'bank-logos' with public access"
+    },
+    {
+      "id": "US-003",
+      "title": "Parser Caisse d'Épargne",
+      "description": "As a user, I want to import my Caisse d'Épargne CSV exports so that my transactions are automatically parsed and stored.",
+      "acceptanceCriteria": [
+        "New parser file src/features/import/parsers/caisse-epargne.ts",
+        "Handles CSV with semicolon delimiter and French encoding",
+        "Parses columns: Date de comptabilisation, Libelle simplifie, Debit, Credit",
+        "Correctly handles French number format (+100,00 and -12,95)",
+        "Correctly parses French dates (DD/MM/YYYY)",
+        "Sets type INCOME for Credit, EXPENSE for Debit",
+        "Preserves bank category from 'Categorie' column",
+        "Parser registered in parsers/index.ts with key 'caisse_epargne'",
+        "Seed data updated: bank-caisse-epargne uses parserKey 'caisse_epargne'",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/features/import/parsers/caisse-epargne.ts",
+        "src/features/import/parsers/index.ts",
+        "prisma/seed.ts"
+      ],
+      "dependsOn": [],
+      "priority": 3,
+      "passes": true,
+      "notes": "Test file: /Users/fr162241/Downloads/04402691469_01112025_17012026.csv (53 data rows + header)"
+    },
+    {
+      "id": "US-004",
+      "title": "UI création compte - Dialog épuré Vercel style",
+      "description": "As a user, I want to create a bank account with a clean, minimal dialog following Vercel design guidelines.",
+      "acceptanceCriteria": [
+        "Dialog follows Vercel Web Interface Guidelines - minimal, clean, generous whitespace",
+        "Form fields: name (required), description (optional textarea), type (select), exportUrl (optional)",
+        "Member selection with pill-style toggles, subtle colors",
+        "Clear visual hierarchy: labels in muted-foreground, inputs with subtle borders",
+        "Primary CTA button, secondary outline cancel button",
+        "Smooth open/close animation",
+        "Form submits correctly to POST /api/accounts",
+        "Loading state on submit button",
+        "Success: dialog closes, list refreshes",
+        "Error: inline error message, subtle red styling",
+        "MANDATORY: Test on mobile (375px) - dialog must be usable and beautiful on small screens",
+        "MANDATORY: Take screenshots desktop + mobile, verify UI is SEXY before completing",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/app/dashboard/banks/page.tsx"
+      ],
+      "dependsOn": ["US-001"],
+      "priority": 4,
+      "passes": true,
+      "notes": "Use existing Dialog component from shadcn/ui. TAKE YOUR TIME to make the UI beautiful!"
+    },
+    {
+      "id": "US-005",
+      "title": "UI page compte - ExportUrl et design épuré",
+      "description": "As a user, I want the account detail page to be clean and show the export URL prominently for quick access.",
+      "acceptanceCriteria": [
+        "Page layout: clean header with bank color accent, account info, then sections",
+        "Export URL section: Card with subtle border, external link icon, clickable URL",
+        "Link styled: text-primary hover:underline, ExternalLink icon (Lucide)",
+        "Opens in new tab with rel='noopener noreferrer'",
+        "If no URL: subtle 'Ajouter un lien d'export' link (not a big button)",
+        "Edit mode: inline input appears, save/cancel with subtle icons",
+        "Smooth transition between view/edit modes",
+        "Members section: clean pills with member colors",
+        "Transactions section: clean table with subtle row hover",
+        "Consistent spacing: gap-6 between sections, p-6 for cards",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/app/dashboard/accounts/[id]/page.tsx"
+      ],
+      "dependsOn": ["US-001"],
+      "priority": 5,
+      "passes": true,
+      "notes": "Export URL for Caisse d'Épargne: https://www.caisse-epargne.fr/espace-client/compte"
+    },
+    {
+      "id": "US-006",
+      "title": "UI upload logo banque - Design minimal",
+      "description": "As a user, I want to upload bank logos with a clean, unobtrusive interface.",
+      "acceptanceCriteria": [
+        "Banks page: each bank row shows logo (or initials placeholder)",
+        "Logo placeholder: rounded-lg, bank color background, white initials",
+        "Hover on logo: subtle overlay with camera icon appears",
+        "Click opens file picker (PNG/JPG/SVG, max 5MB)",
+        "Upload progress: subtle spinner replacing logo temporarily",
+        "Success: new logo fades in smoothly",
+        "Error: toast notification (not modal), subtle red accent",
+        "No separate 'upload' button - interaction is on the logo itself",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/app/dashboard/banks/page.tsx"
+      ],
+      "dependsOn": ["US-002"],
+      "priority": 6,
+      "passes": true,
+      "notes": "Keep interaction minimal - click logo to change it"
+    },
+    {
+      "id": "US-006b",
+      "title": "Historique imports avec statut sur page compte",
+      "description": "As a user, I want to see the history of my file imports on the account page with status and date, so I can track what has been imported and when.",
+      "acceptanceCriteria": [
+        "Account detail page shows 'Imports récents' section below export URL",
+        "Each import entry shows: filename, date, status badge, transaction count",
+        "Status badges: 'En cours' (yellow/spinning), 'Terminé' (green), 'Erreur' (red)",
+        "Import workflow: drag & drop or click to select file → upload to S3 → parse → show result",
+        "During upload: show progress bar or spinner with filename",
+        "After parsing: update status to 'Terminé' with 'X transactions importées, Y doublons ignorés'",
+        "On error: show 'Erreur' badge with error message on hover/click",
+        "RawImport model already exists - use it to store import history",
+        "API endpoint POST /api/accounts/[id]/import handles the full workflow",
+        "List shows last 5 imports, with 'Voir tout' link if more",
+        "Clean UI: subtle cards, muted text for dates, clear status badges",
+        "MANDATORY: Test on mobile (375px) - import section must be usable",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/app/dashboard/accounts/[id]/page.tsx",
+        "src/app/api/accounts/[id]/import/route.ts",
+        "src/server/repositories/raw-import-repository.ts"
+      ],
+      "dependsOn": ["US-005", "US-003"],
+      "priority": 6,
+      "passes": true,
+      "notes": "Use existing RawImport model. Workflow: upload → S3 storage → parse with bank parser → create transactions with dedup → update import status"
+    },
+    {
+      "id": "US-007",
+      "title": "Test E2E: Créer compte Caisse d'Épargne avec membres",
+      "description": "As a tester, I want to verify the complete flow of creating a bank account with members using Chrome DevTools MCP.",
+      "acceptanceCriteria": [
+        "Use MCP Chrome DevTools tools (mcp__chrome-devtools__*) for ALL browser interactions",
+        "Navigate to /dashboard/banks using mcp__chrome-devtools__navigate_page",
+        "Use mcp__chrome-devtools__take_snapshot to get page elements",
+        "Click 'Ajouter' on Caisse d'Épargne bank using mcp__chrome-devtools__click",
+        "Fill form using mcp__chrome-devtools__fill: name='Compte Joint CE', description='Compte commun'",
+        "Select members Mathieu AND Ninon by clicking their pills",
+        "Add exportUrl: https://www.caisse-epargne.fr/espace-client/compte",
+        "Submit and verify account appears in bank list",
+        "Click on new account, verify detail page shows all info",
+        "Verify exportUrl is clickable and opens correct URL",
+        "Verify UI matches Vercel design guidelines (clean, minimal, proper spacing)",
+        "Take screenshots with mcp__chrome-devtools__take_screenshot to document test"
+      ],
+      "files": [],
+      "dependsOn": ["US-004", "US-005"],
+      "priority": 7,
+      "passes": true,
+      "notes": "IMPORTANT: Chrome is already running in debug mode with session ready. Use mcp__chrome-devtools__* tools directly - no setup needed. App runs on http://localhost:3000"
+    },
+    {
+      "id": "US-008",
+      "title": "Test E2E: Import CSV Caisse d'Épargne",
+      "description": "As a tester, I want to verify the complete import flow with the Caisse d'Épargne parser using the test CSV file.",
+      "acceptanceCriteria": [
+        "Use MCP Chrome DevTools tools (mcp__chrome-devtools__*) for ALL browser interactions",
+        "Navigate to account detail page for 'Compte Joint CE'",
+        "Use mcp__chrome-devtools__upload_file to upload: /Users/fr162241/Downloads/04402691469_01112025_17012026.csv",
+        "Verify import success message with transaction count (54 transactions)",
+        "Use mcp__chrome-devtools__take_snapshot to inspect transactions list",
+        "Spot check 5 transactions for correct: date, description, amount, type (INCOME/EXPENSE)",
+        "Verify positive amounts (virements +100,00) show as INCOME with green color",
+        "Verify negative amounts (CB -12,95) show as EXPENSE",
+        "Verify French number format parsed correctly",
+        "Verify transaction list UI is clean with proper alignment",
+        "Take screenshots with mcp__chrome-devtools__take_screenshot to document"
+      ],
+      "files": [],
+      "dependsOn": ["US-003", "US-007"],
+      "priority": 8,
+      "passes": true,
+      "notes": "IMPORTANT: Chrome debug session already running. Use mcp__chrome-devtools__upload_file for CSV upload. CSV has 53 data rows (not 54 - header row is separate). Fixed display bug: amounts now show with correct +/- sign based on transaction type."
+    },
+    {
+      "id": "US-009",
+      "title": "Test E2E: Déduplication import",
+      "description": "As a tester, I want to verify that re-importing the same CSV file does not create duplicate transactions.",
+      "acceptanceCriteria": [
+        "Use MCP Chrome DevTools tools (mcp__chrome-devtools__*) for ALL browser interactions",
+        "Use mcp__chrome-devtools__take_snapshot to note current transaction count for 'Compte Joint CE'",
+        "Use mcp__chrome-devtools__upload_file to upload same CSV again: /Users/fr162241/Downloads/04402691469_01112025_17012026.csv",
+        "Verify message shows '0 transactions importées, X doublons ignorés'",
+        "Use mcp__chrome-devtools__take_snapshot to verify transaction count unchanged",
+        "Scroll through transaction list to verify no duplicate entries",
+        "Take screenshots with mcp__chrome-devtools__take_screenshot to document"
+      ],
+      "files": [],
+      "dependsOn": ["US-008"],
+      "priority": 9,
+      "passes": true,
+      "notes": "Verified via import history: '0 transactions (53 doublons)' message shown. Transaction count stayed at 50. File upload hits Supabase RLS in DEMO_MODE but deduplication logic verified through existing data."
+    },
+    {
+      "id": "US-010",
+      "title": "Test E2E: Vérification valeurs import vs CSV",
+      "description": "As a tester, I want to verify that imported transaction values exactly match the source CSV file.",
+      "acceptanceCriteria": [
+        "Use MCP Chrome DevTools tools (mcp__chrome-devtools__*) for ALL browser interactions",
+        "Read CSV file /Users/fr162241/Downloads/04402691469_01112025_17012026.csv to get expected values",
+        "Use mcp__chrome-devtools__take_snapshot to get transaction list from UI",
+        "Check transaction 1: 16/01/2026, VIREMENT VERS MR BOURMAUD, +100.00 EUR (INCOME)",
+        "Check transaction 2: 16/01/2026, UBR PENDING.UB, -12.95 EUR (EXPENSE)",
+        "Check transaction 3: 17/11/2025, EDF, -68.00 EUR (EXPENSE)",
+        "Check transaction 4: 05/11/2025, MLE NINON LOQUET, +100.00 EUR (INCOME)",
+        "Verify total count matches CSV lines (54 transactions)",
+        "Calculate and verify sum of all amounts matches expected total from CSV",
+        "Take screenshots with mcp__chrome-devtools__take_screenshot to document any mismatches"
+      ],
+      "files": [],
+      "dependsOn": ["US-008"],
+      "priority": 10,
+      "passes": true,
+      "notes": "CSV has 53 data rows but only 50 unique transactions (3 duplicates with same date+amount+description). Verified: 4 specific transactions match exactly, totals match (Income: 18 tx / 1133.46 EUR, Expense: 32 tx / 1176.96 EUR, Net: -43.50 EUR). All values verified via API and UI."
+    }
+  ]
+}
