@@ -1,127 +1,256 @@
+'use client'
+
+import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import {
 	ArrowDown,
 	Building2,
 	Calendar,
-	Car,
 	CreditCard,
 	Euro,
+	ExternalLink,
+	Loader2,
 	MoreHorizontal,
 	Percent,
-	Plus,
 	TrendingDown,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Progress } from '@/components/ui/progress';
+} from '@/components/ui/dropdown-menu'
+import { Progress } from '@/components/ui/progress'
+import { Skeleton } from '@/components/ui/skeleton'
+import type { PropertyType } from '@prisma/client'
 
-const loans = [
-	{
-		id: '1',
-		name: 'Crédit Appartement Paris',
-		type: 'immobilier',
-		bank: 'Crédit Mutuel',
-		initialAmount: 400000,
-		remainingAmount: 320000,
-		monthlyPayment: 1850,
-		interestRate: 1.2,
-		startDate: '2019-06-15',
-		endDate: '2039-06-15',
-		insurance: 45,
-	},
-	{
-		id: '2',
-		name: 'Crédit Studio Lyon',
-		type: 'immobilier',
-		bank: 'LCL',
-		initialAmount: 160000,
-		remainingAmount: 95000,
-		monthlyPayment: 720,
-		interestRate: 1.5,
-		startDate: '2021-03-20',
-		endDate: '2041-03-20',
-		insurance: 25,
-	},
-	{
-		id: '3',
-		name: 'Crédit Résidence Principale',
-		type: 'immobilier',
-		bank: 'BNP Paribas',
-		initialAmount: 350000,
-		remainingAmount: 280000,
-		monthlyPayment: 1520,
-		interestRate: 1.35,
-		startDate: '2020-09-01',
-		endDate: '2045-09-01',
-		insurance: 50,
-	},
-	{
-		id: '4',
-		name: 'Crédit Auto',
-		type: 'auto',
-		bank: 'Cetelem',
-		initialAmount: 25000,
-		remainingAmount: 8500,
-		monthlyPayment: 450,
-		interestRate: 4.5,
-		startDate: '2022-01-15',
-		endDate: '2027-01-15',
-		insurance: 15,
-	},
-];
+// Types
+interface LoanInsuranceWithMember {
+	id: string
+	loanId: string
+	memberId: string
+	name: string
+	provider: string
+	contractNumber: string | null
+	coveragePercent: number
+	monthlyPremium: number
+	link: string | null
+	notes: string | null
+	createdAt: string
+	updatedAt: string
+	member: {
+		id: string
+		name: string
+		color: string | null
+	}
+}
 
-const totalRemaining = loans.reduce((s, l) => s + l.remainingAmount, 0);
-const totalMonthly = loans.reduce((s, l) => s + l.monthlyPayment + l.insurance, 0);
-const totalInsurance = loans.reduce((s, l) => s + l.insurance, 0);
-const avgRate = loans.reduce((s, l) => s + l.interestRate * l.remainingAmount, 0) / totalRemaining;
+interface LoanWithDetails {
+	id: string
+	propertyId: string
+	memberId: string | null
+	name: string
+	lender: string | null
+	loanNumber: string | null
+	initialAmount: number
+	remainingAmount: number
+	rate: number
+	monthlyPayment: number
+	startDate: string
+	endDate: string | null
+	notes: string | null
+	createdAt: string
+	updatedAt: string
+	property: {
+		id: string
+		name: string
+		type: PropertyType
+		address: string
+		city: string
+	}
+	member: {
+		id: string
+		name: string
+		color: string | null
+	} | null
+	loanInsurances: LoanInsuranceWithMember[]
+}
 
+interface LoanSummary {
+	totalLoans: number
+	totalRemaining: number
+	totalMonthlyPayment: number
+	averageRate: number
+	totalInsurance: number
+}
+
+// Helper functions
 function formatCurrency(amount: number): string {
 	return new Intl.NumberFormat('fr-FR', {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount);
+	}).format(amount)
 }
 
-function getIcon(type: string) {
+function getPropertyIcon(type: PropertyType) {
 	switch (type) {
-		case 'immobilier':
-			return Building2;
-		case 'auto':
-			return Car;
+		case 'HOUSE':
+		case 'APARTMENT':
+			return Building2
 		default:
-			return CreditCard;
+			return CreditCard
 	}
 }
 
-function calculateRemainingMonths(endDate: string): number {
-	const end = new Date(endDate);
-	const now = new Date();
-	const months = (end.getFullYear() - now.getFullYear()) * 12 + (end.getMonth() - now.getMonth());
-	return Math.max(0, months);
+function calculateRemainingMonths(endDate: string | null): number {
+	if (!endDate) return 0
+	const end = new Date(endDate)
+	const now = new Date()
+	const months = (end.getFullYear() - now.getFullYear()) * 12 + (end.getMonth() - now.getMonth())
+	return Math.max(0, months)
 }
 
-function formatRemainingTime(endDate: string): string {
-	const months = calculateRemainingMonths(endDate);
-	const years = Math.floor(months / 12);
-	const remainingMonths = months % 12;
+function formatRemainingTime(endDate: string | null): string {
+	if (!endDate) return 'Non définie'
+	const months = calculateRemainingMonths(endDate)
+	const years = Math.floor(months / 12)
+	const remainingMonths = months % 12
 
 	if (years > 0 && remainingMonths > 0) {
-		return `${years} an${years > 1 ? 's' : ''} et ${remainingMonths} mois`;
+		return `${years} an${years > 1 ? 's' : ''} et ${remainingMonths} mois`
 	}
 	if (years > 0) {
-		return `${years} an${years > 1 ? 's' : ''}`;
+		return `${years} an${years > 1 ? 's' : ''}`
 	}
-	return `${remainingMonths} mois`;
+	return `${remainingMonths} mois`
+}
+
+// Loading skeleton components
+function StatsCardSkeleton() {
+	return (
+		<div className="stat-card">
+			<div className="stat-card-content">
+				<div className="stat-card-text">
+					<Skeleton className="h-4 w-24 mb-2" />
+					<Skeleton className="h-8 w-32" />
+					<Skeleton className="h-3 w-20 mt-2" />
+				</div>
+				<Skeleton className="h-10 w-10 rounded-xl" />
+			</div>
+		</div>
+	)
+}
+
+function LoanCardSkeleton() {
+	return (
+		<Card className="border-border/60">
+			<CardHeader className="pb-3">
+				<div className="flex items-start justify-between">
+					<div className="flex items-center gap-4">
+						<Skeleton className="h-12 w-12 rounded-xl" />
+						<div>
+							<Skeleton className="h-5 w-40 mb-2" />
+							<Skeleton className="h-4 w-32" />
+						</div>
+					</div>
+					<div className="text-right hidden sm:block">
+						<Skeleton className="h-8 w-28 mb-1" />
+						<Skeleton className="h-3 w-20" />
+					</div>
+				</div>
+			</CardHeader>
+			<CardContent className="space-y-4">
+				<div>
+					<Skeleton className="h-3 w-full mb-2" />
+					<Skeleton className="h-2 w-full" />
+				</div>
+				<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-border/40">
+					<div className="rounded-xl bg-muted/30 p-3">
+						<Skeleton className="h-3 w-16 mb-2" />
+						<Skeleton className="h-5 w-20" />
+						<Skeleton className="h-3 w-14 mt-1" />
+					</div>
+					<div className="rounded-xl bg-muted/30 p-3">
+						<Skeleton className="h-3 w-16 mb-2" />
+						<Skeleton className="h-5 w-20" />
+						<Skeleton className="h-3 w-14 mt-1" />
+					</div>
+					<div className="rounded-xl bg-muted/30 p-3">
+						<Skeleton className="h-3 w-16 mb-2" />
+						<Skeleton className="h-5 w-20" />
+						<Skeleton className="h-3 w-14 mt-1" />
+					</div>
+					<div className="rounded-xl bg-muted/30 p-3">
+						<Skeleton className="h-3 w-16 mb-2" />
+						<Skeleton className="h-5 w-20" />
+						<Skeleton className="h-3 w-14 mt-1" />
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	)
+}
+
+// Empty state component
+function EmptyState() {
+	return (
+		<Card className="border-border/60 border-dashed">
+			<CardContent className="py-16">
+				<div className="flex flex-col items-center justify-center text-center">
+					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50 mb-4">
+						<CreditCard className="h-7 w-7 text-muted-foreground" />
+					</div>
+					<h3 className="text-lg font-medium mb-1">Aucun crédit</h3>
+					<p className="text-sm text-muted-foreground mb-4 max-w-sm">
+						Vos crédits apparaîtront ici. Commencez par ajouter un bien immobilier avec son crédit associé.
+					</p>
+					<Button asChild variant="outline" size="sm">
+						<Link href="/dashboard/real-estate">
+							<Building2 className="h-4 w-4 mr-2" />
+							Voir les biens
+						</Link>
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
+	)
 }
 
 export default function LoansPage() {
+	const [loans, setLoans] = useState<LoanWithDetails[]>([])
+	const [summary, setSummary] = useState<LoanSummary | null>(null)
+	const [isLoading, setIsLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
+
+	const fetchLoans = useCallback(async () => {
+		try {
+			setIsLoading(true)
+			setError(null)
+			const response = await fetch('/api/loans')
+			if (!response.ok) {
+				throw new Error('Erreur lors de la récupération des crédits')
+			}
+			const data = await response.json()
+			setLoans(data.loans)
+			setSummary(data.summary)
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsLoading(false)
+		}
+	}, [])
+
+	useEffect(() => {
+		fetchLoans()
+	}, [fetchLoans])
+
+	// Calculate total monthly with insurance
+	const totalMonthly = summary ? summary.totalMonthlyPayment + summary.totalInsurance : 0
+
 	return (
 		<div className="space-y-8">
 			{/* Header */}
@@ -130,200 +259,265 @@ export default function LoansPage() {
 					<h1 className="text-3xl font-semibold tracking-tight">Crédits</h1>
 					<p className="mt-1 text-muted-foreground">Suivez vos emprunts et échéanciers</p>
 				</div>
-				<Button className="gap-2">
-					<Plus className="h-4 w-4" />
-					Ajouter un crédit
-				</Button>
 			</div>
 
-			{/* Stats Overview */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Capital restant dû</p>
-							<p className="stat-card-value">{formatCurrency(totalRemaining)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-								{loans.length} crédit{loans.length > 1 ? 's' : ''} actif{loans.length > 1 ? 's' : ''}
-							</p>
-						</div>
-						<div className="stat-card-icon bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]">
-							<TrendingDown className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
+			{/* Loading State */}
+			{isLoading && (
+				<>
+					<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
+						<StatsCardSkeleton />
+						<StatsCardSkeleton />
+						<StatsCardSkeleton />
+						<StatsCardSkeleton />
 					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Mensualités</p>
-							<p className="stat-card-value">{formatCurrency(totalMonthly)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-								Dont {formatCurrency(totalInsurance)} assurance
-							</p>
-						</div>
-						<div className="stat-card-icon">
-							<Euro className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
+					<div className="space-y-4">
+						<LoanCardSkeleton />
+						<LoanCardSkeleton />
+						<LoanCardSkeleton />
 					</div>
-				</div>
+				</>
+			)}
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Taux moyen</p>
-							<p className="stat-card-value">{avgRate.toFixed(2)}%</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Sur capital restant</p>
+			{/* Error State */}
+			{error && !isLoading && (
+				<Card className="border-destructive/50">
+					<CardContent className="py-8">
+						<div className="flex flex-col items-center justify-center text-center">
+							<p className="text-destructive mb-4">{error}</p>
+							<Button onClick={fetchLoans} variant="outline" size="sm">
+								<Loader2 className="h-4 w-4 mr-2" />
+								Réessayer
+							</Button>
 						</div>
-						<div className="stat-card-icon">
-							<Percent className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+					</CardContent>
+				</Card>
+			)}
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Coût annuel</p>
-							<p className="stat-card-value">{formatCurrency(totalMonthly * 12)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Remboursements/an</p>
-						</div>
-						<div className="stat-card-icon">
-							<Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{/* Loans List */}
-			<div className="space-y-4">
-				{loans.map((loan) => {
-					const Icon = getIcon(loan.type);
-					const progress = ((loan.initialAmount - loan.remainingAmount) / loan.initialAmount) * 100;
-					const remainingMonths = calculateRemainingMonths(loan.endDate);
-
-					return (
-						<Card key={loan.id} className="border-border/60 group">
-							<CardHeader className="pb-3">
-								<div className="flex items-start justify-between">
-									<div className="flex items-center gap-4">
-										<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-											<Icon className="h-6 w-6" />
-										</div>
-										<div>
-											<CardTitle className="text-lg font-medium">{loan.name}</CardTitle>
-											<p className="text-sm text-muted-foreground">
-												{loan.bank} · {loan.interestRate}%
-											</p>
+			{/* Content */}
+			{!isLoading && !error && (
+				loans.length === 0 ? (
+					<EmptyState />
+				) : (
+					<>
+							{/* Stats Overview */}
+							{summary && (
+								<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
+									<div className="stat-card">
+										<div className="stat-card-content">
+											<div className="stat-card-text">
+												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Capital restant dû</p>
+												<p className="stat-card-value">{formatCurrency(summary.totalRemaining)}</p>
+												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
+													{summary.totalLoans} crédit{summary.totalLoans > 1 ? 's' : ''} actif{summary.totalLoans > 1 ? 's' : ''}
+												</p>
+											</div>
+											<div className="stat-card-icon bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]">
+												<TrendingDown className="h-4 w-4 sm:h-5 sm:w-5" />
+											</div>
 										</div>
 									</div>
-									<div className="flex items-center gap-4">
-										<div className="text-right hidden sm:block">
-											<p className="text-2xl font-semibold number-display">
-												{formatCurrency(loan.remainingAmount)}
-											</p>
-											<p className="text-xs text-muted-foreground">Capital restant</p>
+
+									<div className="stat-card">
+										<div className="stat-card-content">
+											<div className="stat-card-text">
+												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Mensualités</p>
+												<p className="stat-card-value">{formatCurrency(totalMonthly)}</p>
+												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
+													Dont {formatCurrency(summary.totalInsurance)} assurance
+												</p>
+											</div>
+											<div className="stat-card-icon">
+												<Euro className="h-4 w-4 sm:h-5 sm:w-5" />
+											</div>
 										</div>
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="ghost"
-													size="icon"
-													className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-												>
-													<MoreHorizontal className="h-4 w-4" />
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
-												<DropdownMenuItem>Voir l&apos;échéancier</DropdownMenuItem>
-												<DropdownMenuItem>Modifier</DropdownMenuItem>
-												<DropdownMenuItem>Simuler remboursement anticipé</DropdownMenuItem>
-												<DropdownMenuSeparator />
-												<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
+									</div>
+
+									<div className="stat-card">
+										<div className="stat-card-content">
+											<div className="stat-card-text">
+												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Taux moyen</p>
+												<p className="stat-card-value">{summary.averageRate.toFixed(2)}%</p>
+												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Sur capital restant</p>
+											</div>
+											<div className="stat-card-icon">
+												<Percent className="h-4 w-4 sm:h-5 sm:w-5" />
+											</div>
+										</div>
+									</div>
+
+									<div className="stat-card">
+										<div className="stat-card-content">
+											<div className="stat-card-text">
+												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Coût annuel</p>
+												<p className="stat-card-value">{formatCurrency(totalMonthly * 12)}</p>
+												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Remboursements/an</p>
+											</div>
+											<div className="stat-card-icon">
+												<Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+											</div>
+										</div>
 									</div>
 								</div>
-							</CardHeader>
-							<CardContent className="space-y-4">
-								{/* Progress Bar */}
-								<div>
-									<div className="flex justify-between text-xs mb-2">
-										<span className="text-muted-foreground">
-											Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
-										</span>
-										<span className="font-medium">{progress.toFixed(1)}%</span>
-									</div>
-									<Progress value={progress} className="h-2" />
-								</div>
+							)}
 
-								{/* Info Grid */}
-								<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-border/40">
-									<div className="rounded-xl bg-muted/30 p-3">
-										<div className="flex items-center gap-1 text-muted-foreground mb-1">
-											<Euro className="h-3.5 w-3.5" />
-											<span className="text-xs">Mensualité</span>
-										</div>
-										<p className="font-semibold number-display">
-											{formatCurrency(loan.monthlyPayment)}
-										</p>
-										<p className="text-xs text-muted-foreground">
-											+ {formatCurrency(loan.insurance)} assurance
-										</p>
-									</div>
-									<div className="rounded-xl bg-muted/30 p-3">
-										<div className="flex items-center gap-1 text-muted-foreground mb-1">
-											<Percent className="h-3.5 w-3.5" />
-											<span className="text-xs">Taux</span>
-										</div>
-										<p className="font-semibold">{loan.interestRate}%</p>
-										<p className="text-xs text-muted-foreground">Taux nominal</p>
-									</div>
-									<div className="rounded-xl bg-muted/30 p-3">
-										<div className="flex items-center gap-1 text-muted-foreground mb-1">
-											<Calendar className="h-3.5 w-3.5" />
-											<span className="text-xs">Durée restante</span>
-										</div>
-										<p className="font-semibold">{formatRemainingTime(loan.endDate)}</p>
-										<p className="text-xs text-muted-foreground">{remainingMonths} échéances</p>
-									</div>
-									<div className="rounded-xl bg-muted/30 p-3">
-										<div className="flex items-center gap-1 text-muted-foreground mb-1">
-											<ArrowDown className="h-3.5 w-3.5" />
-											<span className="text-xs">Montant initial</span>
-										</div>
-										<p className="font-semibold number-display">
-											{formatCurrency(loan.initialAmount)}
-										</p>
-										<p className="text-xs text-muted-foreground">Emprunté</p>
-									</div>
-								</div>
-							</CardContent>
-						</Card>
-					);
-				})}
-			</div>
+							{/* Loans List */}
+							<div className="space-y-4">
+								{loans.map((loan) => {
+									const Icon = getPropertyIcon(loan.property.type)
+									const progress = ((loan.initialAmount - loan.remainingAmount) / loan.initialAmount) * 100
+									const remainingMonths = calculateRemainingMonths(loan.endDate)
+									const loanInsuranceTotal = loan.loanInsurances.reduce((sum, ins) => sum + ins.monthlyPremium, 0)
 
-			{/* Summary Card */}
-			<Card className="border-border/60 bg-muted/20">
-				<CardContent className="pt-6">
-					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-						<div>
-							<p className="font-medium">Prochain prélèvement</p>
-							<p className="text-sm text-muted-foreground">Estimé au 5 du mois prochain</p>
-						</div>
-						<div className="text-right">
-							<p className="text-3xl font-semibold number-display">
-								{formatCurrency(totalMonthly)}
-							</p>
-							<p className="text-sm text-muted-foreground">
-								{formatCurrency(totalMonthly - totalInsurance)} capital +{' '}
-								{formatCurrency(totalInsurance)} assurance
-							</p>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
+									return (
+										<Card key={loan.id} className="border-border/60 group">
+											<CardHeader className="pb-3">
+												<div className="flex items-start justify-between">
+													<div className="flex items-center gap-4">
+														<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+															<Icon className="h-6 w-6" />
+														</div>
+														<div>
+															<CardTitle className="text-lg font-medium">{loan.name}</CardTitle>
+															<p className="text-sm text-muted-foreground">
+																{loan.lender || 'Prêt familial'} · {loan.rate}%
+															</p>
+															<Link
+																href={`/dashboard/real-estate/${loan.propertyId}`}
+																className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
+															>
+																{loan.property.name}
+																<ExternalLink className="h-3 w-3" />
+															</Link>
+														</div>
+													</div>
+													<div className="flex items-center gap-4">
+														<div className="text-right hidden sm:block">
+															<p className="text-2xl font-semibold number-display">
+																{formatCurrency(loan.remainingAmount)}
+															</p>
+															<p className="text-xs text-muted-foreground">Capital restant</p>
+														</div>
+														<DropdownMenu>
+															<DropdownMenuTrigger asChild>
+																<Button
+																	variant="ghost"
+																	size="icon"
+																	className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+																>
+																	<MoreHorizontal className="h-4 w-4" />
+																</Button>
+															</DropdownMenuTrigger>
+															<DropdownMenuContent align="end">
+																<DropdownMenuItem asChild>
+																	<Link href={`/dashboard/real-estate/${loan.propertyId}`}>
+																		Voir le bien
+																	</Link>
+																</DropdownMenuItem>
+																<DropdownMenuSeparator />
+																<DropdownMenuItem className="text-muted-foreground">
+																	Autres options à venir
+																</DropdownMenuItem>
+															</DropdownMenuContent>
+														</DropdownMenu>
+													</div>
+												</div>
+											</CardHeader>
+											<CardContent className="space-y-4">
+												{/* Mobile: Show remaining amount */}
+												<div className="sm:hidden">
+													<p className="text-2xl font-semibold number-display">
+														{formatCurrency(loan.remainingAmount)}
+													</p>
+													<p className="text-xs text-muted-foreground">Capital restant</p>
+												</div>
+
+												{/* Progress Bar */}
+												<div>
+													<div className="flex justify-between text-xs mb-2">
+														<span className="text-muted-foreground">
+															Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
+														</span>
+														<span className="font-medium">{progress.toFixed(1)}%</span>
+													</div>
+													<Progress value={progress} className="h-2" />
+												</div>
+
+												{/* Info Grid */}
+												<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-border/40">
+													<div className="rounded-xl bg-muted/30 p-3">
+														<div className="flex items-center gap-1 text-muted-foreground mb-1">
+															<Euro className="h-3.5 w-3.5" />
+															<span className="text-xs">Mensualité</span>
+														</div>
+														<p className="font-semibold number-display">
+															{formatCurrency(loan.monthlyPayment)}
+														</p>
+														{loanInsuranceTotal > 0 && (
+															<p className="text-xs text-muted-foreground">
+																+ {formatCurrency(loanInsuranceTotal)} assurance
+															</p>
+														)}
+													</div>
+													<div className="rounded-xl bg-muted/30 p-3">
+														<div className="flex items-center gap-1 text-muted-foreground mb-1">
+															<Percent className="h-3.5 w-3.5" />
+															<span className="text-xs">Taux</span>
+														</div>
+														<p className="font-semibold">{loan.rate}%</p>
+														<p className="text-xs text-muted-foreground">Taux nominal</p>
+													</div>
+													<div className="rounded-xl bg-muted/30 p-3">
+														<div className="flex items-center gap-1 text-muted-foreground mb-1">
+															<Calendar className="h-3.5 w-3.5" />
+															<span className="text-xs">Durée restante</span>
+														</div>
+														<p className="font-semibold">{formatRemainingTime(loan.endDate)}</p>
+														{loan.endDate && (
+															<p className="text-xs text-muted-foreground">{remainingMonths} échéances</p>
+														)}
+													</div>
+													<div className="rounded-xl bg-muted/30 p-3">
+														<div className="flex items-center gap-1 text-muted-foreground mb-1">
+															<ArrowDown className="h-3.5 w-3.5" />
+															<span className="text-xs">Montant initial</span>
+														</div>
+														<p className="font-semibold number-display">
+															{formatCurrency(loan.initialAmount)}
+														</p>
+														<p className="text-xs text-muted-foreground">Emprunté</p>
+													</div>
+												</div>
+											</CardContent>
+										</Card>
+									)
+								})}
+							</div>
+
+							{/* Summary Card */}
+							{summary && totalMonthly > 0 && (
+								<Card className="border-border/60 bg-muted/20">
+									<CardContent className="pt-6">
+										<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+											<div>
+												<p className="font-medium">Total mensuel</p>
+												<p className="text-sm text-muted-foreground">Tous crédits confondus</p>
+											</div>
+											<div className="text-right">
+												<p className="text-3xl font-semibold number-display">
+													{formatCurrency(totalMonthly)}
+												</p>
+												<p className="text-sm text-muted-foreground">
+													{formatCurrency(summary.totalMonthlyPayment)} capital +{' '}
+													{formatCurrency(summary.totalInsurance)} assurance
+												</p>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							)}
+					</>
+				)
+			)}
 		</div>
-	);
+	)
 }
