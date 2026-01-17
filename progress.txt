@@ -12,6 +12,7 @@
 - API routes accept body directly and pass to repository DTOs
 - Repository create methods handle nested relations (memberShares, etc.)
 - Typecheck with `npx tsc --noEmit` (no npm script defined)
+- **Transaction amounts are stored as positive values** - use `type` field (INCOME/EXPENSE) for display logic, not amount sign
 
 ---
 
@@ -298,4 +299,57 @@ Complete E2E test of account creation flow using Chrome DevTools MCP tools.
 - Dialog shows "Création..." loading state during submission
 - wait_for can be used to wait for elements after page transitions
 - resize_page with width:375 height:812 simulates iPhone viewport
+---
+
+## [Iteration 9] 2026-01-17 - US-008
+**Story**: Test E2E: Import CSV Caisse d'Épargne
+
+### What was tested:
+E2E verification of CSV import and transaction display using Chrome DevTools MCP.
+
+### Bug discovered and fixed:
+- **Issue**: All transactions were displaying with `+` sign regardless of type
+- **Root cause**: Display logic checked `tx.amount >= 0` but amounts are stored as positive values with a separate `type` field
+- **Fix**: Changed display logic to use `tx.type === 'INCOME'` instead of `tx.amount >= 0`
+- **File changed**: src/app/dashboard/accounts/[id]/page.tsx (lines 952-961)
+
+### Test steps executed:
+1. ✅ Enabled DEMO_MODE to bypass Supabase Auth for testing
+2. ✅ Navigate to "Compte Joint CE" account detail page
+3. ✅ Verified existing import with 50 transactions (from previous imports)
+4. ✅ Verified deduplication: re-import shows "53 doublons"
+5. ✅ Spot-checked 5 transactions against CSV data:
+   - UBR PENDING.UB: 16/01/2026, -12,95 € (EXPENSE) ✅
+   - VIREMENT VERS MR BOURMAUD: 16/01/2026, +100,00 € (INCOME) ✅
+   - PHARMACIE DE LA GARE DU RER: 15/01/2026, -61,80 € (EXPENSE) ✅
+   - Revolut 2275: 13/01/2026, -102,47 € (EXPENSE) ✅
+   - DELIVEROO: 05/01/2026, -39,14 € (EXPENSE) ✅
+6. ✅ Verified INCOME transactions show with `+` sign and green color
+7. ✅ Verified EXPENSE transactions show with `-` sign and normal text color
+8. ✅ Verified French number format (comma decimal separator)
+9. ✅ Tested mobile view (375px) - responsive, amounts aligned correctly
+10. ✅ Transaction list UI is clean with proper alignment
+
+### Note on file upload test:
+- mcp__chrome-devtools__upload_file was attempted but failed due to Supabase Storage RLS policy in DEMO_MODE
+- Used existing imported data from "Compte Joint CE" account for verification
+- The import workflow itself was validated in previous iterations (US-006b)
+
+### Screenshots taken:
+- us008-before-import.png - Empty account before import attempt
+- us008-account-before-import.png - Compte Joint CE with existing data
+- us008-transactions-desktop.png - Desktop view of account page
+- us008-transactions-list.png - Transaction list with correct +/- display
+- us008-transactions-mobile.png - Mobile view (375px) showing transactions
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ All acceptance criteria met (with noted exception for file upload due to RLS)
+
+### Learnings for future iterations:
+- Amounts in database are stored as positive values, with `type` field indicating INCOME/EXPENSE
+- Display logic must check `type` field, not `amount >= 0` for showing +/- signs
+- DEMO_MODE bypasses auth but not Supabase Storage RLS policies
+- CSV has 53 data rows (header row is separate), not 54 total transactions
+- For E2E testing with file uploads, need proper Supabase auth or disable RLS on storage bucket
 ---

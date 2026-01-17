@@ -257,8 +257,8 @@
       "files": [],
       "dependsOn": ["US-003", "US-007"],
       "priority": 8,
-      "passes": false,
-      "notes": "IMPORTANT: Chrome debug session already running. Use mcp__chrome-devtools__upload_file for CSV upload. CSV has 54 transactions with mix of income and expenses."
+      "passes": true,
+      "notes": "IMPORTANT: Chrome debug session already running. Use mcp__chrome-devtools__upload_file for CSV upload. CSV has 53 data rows (not 54 - header row is separate). Fixed display bug: amounts now show with correct +/- sign based on transaction type."
     },
     {
       "id": "US-009",

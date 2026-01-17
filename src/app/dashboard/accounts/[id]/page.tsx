@@ -951,12 +951,12 @@ export default function AccountDetailPage() {
 									</div>
 									<p
 										className={`font-medium number-display ${
-											tx.amount >= 0
+											tx.type === 'INCOME'
 												? 'text-[oklch(0.55_0.15_145)]'
 												: 'text-foreground'
 										}`}
 									>
-										{tx.amount >= 0 ? '+' : ''}
+										{tx.type === 'INCOME' ? '+' : '-'}
 										{formatMoney(tx.amount)}
 									</p>
 								</div>
