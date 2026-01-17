@@ -187,13 +187,10 @@ export const accountRepository = {
 				...(data.memberIds &&
 					!data.memberShares && {
 						accountMembers: {
-							create: (() => {
-								const memberIds = data.memberIds!;
-								return memberIds.map((memberId) => ({
-									memberId,
-									ownerShare: 100 / memberIds.length,
-								}));
-							})(),
+							create: data.memberIds.map((memberId) => ({
+								memberId,
+								ownerShare: 100 / data.memberIds!.length,
+							})),
 						},
 					}),
 			},
