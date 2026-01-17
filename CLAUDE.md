@@ -2,6 +2,53 @@
 
 Application de gestion financière familiale pour suivre les comptes bancaires, transactions, investissements et patrimoine immobilier.
 
+## SÉCURITÉ - RÈGLES CRITIQUES
+
+> **Ce repository est PUBLIC. Ne JAMAIS committer de données sensibles.**
+
+### Fichiers Interdits dans Git
+
+- `.env`, `.env.local`, `.env.production` - Variables d'environnement
+- `.ralph/` - Dossier Ralph avec données de test (transactions réelles, noms, montants)
+- `*.pem`, `*.key`, `*.crt` - Certificats et clés
+- `credentials.json`, `secrets.json` - Fichiers de secrets
+- Screenshots avec données personnelles
+
+### Vérifications Avant Commit
+
+```bash
+# Vérifier qu'aucun secret n'est dans le staging
+git diff --cached | grep -E "(password|secret|api_key|token|DATABASE_URL|SUPABASE)" || echo "OK"
+
+# Vérifier les fichiers ajoutés
+git status | grep -E "\.env|credential|secret|\.ralph"
+```
+
+### Données à Ne Jamais Logger/Committer
+
+- URLs de base de données avec credentials
+- Tokens Supabase, Vercel, GitHub
+- Noms réels des membres du foyer dans le code (utiliser des placeholders)
+- Montants réels de transactions/comptes dans les tests
+- Numéros de compte bancaire
+
+### .gitignore Obligatoire
+
+```gitignore
+.env*
+.ralph/
+*.pem
+*.key
+credentials*.json
+```
+
+### En Cas de Leak
+
+Si un secret a été commité par erreur :
+1. **Révoquer immédiatement** le secret concerné (régénérer le token)
+2. Utiliser `git filter-branch` ou BFG Repo-Cleaner pour supprimer de l'historique
+3. Force push après nettoyage
+
 ## Stack Technique
 
 - **Framework**: Next.js 16 (App Router)
