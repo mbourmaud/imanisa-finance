@@ -31,8 +31,32 @@ export interface PropertyWithMembers extends Property {
 	propertyMembers: PropertyMemberWithDetails[];
 }
 
+export interface LoanInsuranceWithMember {
+	id: string;
+	loanId: string;
+	memberId: string;
+	name: string;
+	provider: string;
+	contractNumber: string | null;
+	coveragePercent: number;
+	monthlyPremium: number;
+	link: string | null;
+	notes: string | null;
+	createdAt: Date;
+	updatedAt: Date;
+	member: {
+		id: string;
+		name: string;
+		color: string | null;
+	};
+}
+
+export interface LoanWithInsurances extends Loan {
+	loanInsurances: LoanInsuranceWithMember[];
+}
+
 export interface PropertyWithDetails extends PropertyWithMembers {
-	loans: Loan[];
+	loans: LoanWithInsurances[];
 	insurance: PropertyInsurance | null;
 	coOwnership: CoOwnership | null;
 	utilityContracts: UtilityContract[];
@@ -138,7 +162,21 @@ export const propertyRepository = {
 						},
 					},
 				},
-				loans: true,
+				loans: {
+					include: {
+						loanInsurances: {
+							include: {
+								member: {
+									select: {
+										id: true,
+										name: true,
+										color: true,
+									},
+								},
+							},
+						},
+					},
+				},
 				insurance: true,
 				coOwnership: true,
 				utilityContracts: true,
@@ -173,7 +211,21 @@ export const propertyRepository = {
 						},
 					},
 				},
-				loans: true,
+				loans: {
+					include: {
+						loanInsurances: {
+							include: {
+								member: {
+									select: {
+										id: true,
+										name: true,
+										color: true,
+									},
+								},
+							},
+						},
+					},
+				},
 				insurance: true,
 				coOwnership: true,
 				utilityContracts: true,
@@ -234,7 +286,21 @@ export const propertyRepository = {
 						},
 					},
 				},
-				loans: true,
+				loans: {
+					include: {
+						loanInsurances: {
+							include: {
+								member: {
+									select: {
+										id: true,
+										name: true,
+										color: true,
+									},
+								},
+							},
+						},
+					},
+				},
 				insurance: true,
 				coOwnership: true,
 				utilityContracts: true,
@@ -269,7 +335,21 @@ export const propertyRepository = {
 						},
 					},
 				},
-				loans: true,
+				loans: {
+					include: {
+						loanInsurances: {
+							include: {
+								member: {
+									select: {
+										id: true,
+										name: true,
+										color: true,
+									},
+								},
+							},
+						},
+					},
+				},
 				insurance: true,
 				coOwnership: true,
 				utilityContracts: true,

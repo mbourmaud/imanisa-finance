@@ -611,3 +611,54 @@
   - Utility contracts section properly shows 1:N relationship with summary stats (count and total)
   - Mobile view at 375px validates responsive design works correctly
 ---
+
+## [Iteration 27] 2026-01-17 - IMMO-027
+- **Story**: Cleanup - Supprimer code mort et mocks
+- **What was implemented**:
+  - Searched for mock data - none remaining (all replaced with API calls in previous stories)
+  - Verified no PropertyCharge references exist in codebase
+  - Removed unused PlaceholderSection component from property detail page
+  - Removed useless 'case OTHER:' in getUtilityTypeIcon switch statement (lint warning)
+  - Removed 5 console.error statements from immobilier pages:
+    - fetchMembers error in real-estate/page.tsx
+    - fetchMembers error in real-estate/[id]/page.tsx
+    - deletePropertyInsurance error
+    - deleteCoOwnership error
+    - deleteUtilityContract error
+    - deleteProperty error (kept setError() call for UI feedback)
+  - TypeScript check passes
+  - Lint passes for all immobilier files (0 warnings, 0 errors)
+- **Files changed**:
+  - src/app/dashboard/real-estate/page.tsx
+  - src/app/dashboard/real-estate/[id]/page.tsx
+- **Learnings for future iterations**:
+  - Use `catch { }` without parameter when not using the error object (Biome lint compliance)
+  - PlaceholderSection was left over from IMMO-015, should have been removed when sections were implemented
+  - 'case X:' immediately followed by 'default:' is a useless case in switch statements
+---
+
+## [Iteration 28] 2026-01-17 - IMMO-028
+- **Story**: Sync avec main - Mise à jour infrastructure TanStack
+- **What was implemented**:
+  - Rebased ralph/immobilier on origin/main to get TanStack Query infrastructure
+  - All 25 commits rebased successfully without merge conflicts
+  - Ran npm install - added 14 new packages including TanStack dependencies
+  - Regenerated Prisma client after rebase
+  - Verified all required TanStack files are present:
+    - src/components/providers.tsx (QueryClientProvider)
+    - src/lib/query-client.ts (configured query client)
+    - src/features/accounts/hooks/use-accounts-query.ts (reference implementation)
+    - src/features/imports/hooks/use-imports-query.ts
+    - src/features/members/hooks/use-members-query.ts
+    - src/components/ui/data-table.tsx (TanStack Table component)
+  - npm run build passes successfully
+  - TypeScript typecheck passes
+- **Dependencies added**:
+  - @tanstack/react-query ^5.90.17
+  - @tanstack/react-query-devtools ^5.91.2
+  - @tanstack/react-table ^8.21.3
+- **Learnings for future iterations**:
+  - After rebase, always regenerate Prisma client: `./node_modules/.bin/prisma generate`
+  - Untracked files like .last-branch and ralph-output.log can block rebase - remove before rebasing
+  - Stash modified files before rebase, pop after to preserve local changes
+---

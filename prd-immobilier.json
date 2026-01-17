@@ -578,7 +578,7 @@
       "files": ["src/app/dashboard/real-estate/page.tsx", "src/app/dashboard/loans/page.tsx"],
       "dependsOn": ["IMMO-026"],
       "priority": 27,
-      "passes": false,
+      "passes": true,
       "notes": "Final cleanup before PR."
     },
     {
@@ -600,7 +600,7 @@
       "files": [],
       "dependsOn": ["IMMO-027"],
       "priority": 28,
-      "passes": false,
+      "passes": true,
       "notes": "IMPORTANT: Main branch now has TanStack Query infrastructure. Rebase to get all new features before refactoring immobilier pages."
     },
     {
