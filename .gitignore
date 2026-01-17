@@ -47,3 +47,6 @@ data/
 *.db
 *.db-shm
 *.db-wal
+
+# Ralph PRD and progress files (contain sensitive data)
+.ralph/
