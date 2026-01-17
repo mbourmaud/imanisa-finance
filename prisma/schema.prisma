@@ -18,7 +18,7 @@ model Member {
   accountMembers    AccountMember[]
   investmentSources InvestmentSource[]
   loans             Loan[]
-  properties        Property[]
+  propertyMembers   PropertyMember[]
   user              User?
 }
 
@@ -203,39 +203,43 @@ model InvestmentTransaction {
 }
 
 model Property {
-  id            String           @id @default(uuid())
-  name          String
-  address       String?
-  city          String?
-  postalCode    String?
-  surfaceM2     Float?
-  purchasePrice Float?
-  purchaseDate  DateTime?
-  notaryFees    Float?
-  currentValue  Float?
-  notes         String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  memberId      String
-  loans         Loan[]
-  member        Member           @relation(fields: [memberId], references: [id])
-  charges       PropertyCharge[]
-
-  @@index([memberId])
+  id              String           @id @default(uuid())
+  name            String
+  type            PropertyType
+  usage           PropertyUsage
+  address         String
+  address2        String?
+  city            String
+  postalCode      String
+  surface         Float
+  rooms           Int?
+  bedrooms        Int?
+  purchasePrice   Float
+  purchaseDate    DateTime
+  notaryFees      Float
+  agencyFees      Float?
+  currentValue    Float
+  rentAmount      Float?
+  rentCharges     Float?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  loans           Loan[]
+  propertyMembers PropertyMember[]
 }
 
-model PropertyCharge {
-  id         String    @id @default(uuid())
-  propertyId String
-  name       String
-  amount     Float
-  frequency  String
-  startDate  DateTime
-  endDate    DateTime?
-  notes      String?
-  property   Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+model PropertyMember {
+  id             String   @id @default(uuid())
+  propertyId     String
+  memberId       String
+  ownershipShare Float
+  createdAt      DateTime @default(now())
+  property       Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  member         Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
+  @@unique([propertyId, memberId])
   @@index([propertyId])
+  @@index([memberId])
 }
 
 model Loan {
@@ -393,4 +397,15 @@ enum RawImportStatus {
   PROCESSING
   PROCESSED
   FAILED
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+}
+
+enum PropertyUsage {
+  PRIMARY
+  SECONDARY
+  RENTAL
 }
