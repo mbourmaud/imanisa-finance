@@ -175,6 +175,21 @@ const initialPropertyInsuranceFormData: PropertyInsuranceFormData = {
 	notes: '',
 }
 
+// Co-ownership form data
+interface CoOwnershipFormData {
+	name: string
+	quarterlyAmount: string
+	link: string
+	notes: string
+}
+
+const initialCoOwnershipFormData: CoOwnershipFormData = {
+	name: '',
+	quarterlyAmount: '',
+	link: '',
+	notes: '',
+}
+
 // Member type for dropdown
 interface Member {
 	id: string
@@ -535,6 +550,14 @@ export default function PropertyDetailPage() {
 	const [propertyInsuranceFormError, setPropertyInsuranceFormError] = useState<string | null>(null)
 	const [isDeletingPropertyInsurance, setIsDeletingPropertyInsurance] = useState(false)
 
+	// Co-ownership dialog state
+	const [isCoOwnershipDialogOpen, setIsCoOwnershipDialogOpen] = useState(false)
+	const [isEditingCoOwnership, setIsEditingCoOwnership] = useState(false)
+	const [coOwnershipFormData, setCoOwnershipFormData] = useState<CoOwnershipFormData>(initialCoOwnershipFormData)
+	const [isSubmittingCoOwnership, setIsSubmittingCoOwnership] = useState(false)
+	const [coOwnershipFormError, setCoOwnershipFormError] = useState<string | null>(null)
+	const [isDeletingCoOwnership, setIsDeletingCoOwnership] = useState(false)
+
 	const fetchProperty = useCallback(async () => {
 		try {
 			setLoading(true)
@@ -850,6 +873,102 @@ export default function PropertyDetailPage() {
 			console.error('Error deleting property insurance:', err)
 		} finally {
 			setIsDeletingPropertyInsurance(false)
+		}
+	}
+
+	// Co-ownership form handlers
+	const handleCoOwnershipInputChange = (field: keyof CoOwnershipFormData, value: string) => {
+		setCoOwnershipFormData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const resetCoOwnershipForm = () => {
+		setCoOwnershipFormData(initialCoOwnershipFormData)
+		setCoOwnershipFormError(null)
+		setIsEditingCoOwnership(false)
+	}
+
+	const openCoOwnershipDialog = (editMode: boolean) => {
+		if (editMode && property?.coOwnership) {
+			// Pre-fill form with existing data
+			setCoOwnershipFormData({
+				name: property.coOwnership.name,
+				quarterlyAmount: property.coOwnership.quarterlyAmount.toString(),
+				link: property.coOwnership.link || '',
+				notes: property.coOwnership.notes || '',
+			})
+			setIsEditingCoOwnership(true)
+		} else {
+			resetCoOwnershipForm()
+		}
+		setIsCoOwnershipDialogOpen(true)
+	}
+
+	const handleCoOwnershipSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setCoOwnershipFormError(null)
+		setIsSubmittingCoOwnership(true)
+
+		try {
+			// Validate required fields
+			if (!coOwnershipFormData.name.trim()) {
+				throw new Error('Le nom du syndic est requis')
+			}
+			if (!coOwnershipFormData.quarterlyAmount) {
+				throw new Error('Le montant trimestriel est requis')
+			}
+
+			const quarterlyAmount = Number.parseFloat(coOwnershipFormData.quarterlyAmount)
+			if (quarterlyAmount < 0) {
+				throw new Error('Le montant trimestriel ne peut pas être négatif')
+			}
+
+			const payload = {
+				name: coOwnershipFormData.name.trim(),
+				quarterlyAmount,
+				link: coOwnershipFormData.link.trim() || null,
+				notes: coOwnershipFormData.notes.trim() || null,
+			}
+
+			const method = isEditingCoOwnership ? 'PATCH' : 'POST'
+			const response = await fetch(`/api/properties/${propertyId}/co-ownership`, {
+				method,
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de l\'enregistrement')
+			}
+
+			// Success - close dialog and refresh data
+			setIsCoOwnershipDialogOpen(false)
+			resetCoOwnershipForm()
+			await fetchProperty()
+		} catch (err) {
+			setCoOwnershipFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsSubmittingCoOwnership(false)
+		}
+	}
+
+	const handleDeleteCoOwnership = async () => {
+		setIsDeletingCoOwnership(true)
+		try {
+			const response = await fetch(`/api/properties/${propertyId}/co-ownership`, {
+				method: 'DELETE',
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la suppression')
+			}
+
+			await fetchProperty()
+		} catch (err) {
+			console.error('Error deleting co-ownership:', err)
+		} finally {
+			setIsDeletingCoOwnership(false)
 		}
 	}
 
@@ -1512,12 +1631,145 @@ export default function PropertyDetailPage() {
 				</CardContent>
 			</Card>
 
-			{/* Copropriété Section - Placeholder */}
-			<PlaceholderSection
-				title="Copropriété"
-				icon={Building2}
-				description="Informations sur le syndic et les charges de copropriété"
-			/>
+			{/* Copropriété Section */}
+			<Card className="border-border/60">
+				<CardHeader className="pb-4">
+					<div className="flex items-center justify-between">
+						<CardTitle className="text-base font-medium flex items-center gap-2">
+							<Building2 className="h-4 w-4 text-muted-foreground" />
+							Copropriété
+						</CardTitle>
+						{!property.coOwnership && (
+							<Button
+								variant="outline"
+								size="sm"
+								className="gap-2"
+								onClick={() => openCoOwnershipDialog(false)}
+							>
+								<Plus className="h-4 w-4" />
+								Ajouter
+							</Button>
+						)}
+					</div>
+				</CardHeader>
+				<CardContent>
+					{property.coOwnership ? (
+						<div className="rounded-xl border border-border/60 p-4 space-y-4">
+							{/* Header with syndic name and actions */}
+							<div className="flex items-start justify-between gap-4">
+								<div className="flex items-center gap-3">
+									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
+										<Building2 className="h-5 w-5 text-primary" />
+									</div>
+									<div>
+										<h4 className="font-medium">{property.coOwnership.name}</h4>
+										<p className="text-sm text-muted-foreground">Syndic de copropriété</p>
+									</div>
+								</div>
+								<div className="flex items-center gap-2 shrink-0">
+									<Button
+										variant="ghost"
+										size="icon"
+										className="h-8 w-8"
+										onClick={() => openCoOwnershipDialog(true)}
+									>
+										<Pencil className="h-4 w-4" />
+									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-destructive hover:text-destructive"
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>Supprimer la copropriété ?</AlertDialogTitle>
+												<AlertDialogDescription>
+													Cette action est irréversible. Les informations de copropriété seront définitivement supprimées.
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Annuler</AlertDialogCancel>
+												<AlertDialogAction
+													onClick={handleDeleteCoOwnership}
+													disabled={isDeletingCoOwnership}
+													className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+												>
+													{isDeletingCoOwnership ? (
+														<>
+															<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+															Suppression...
+														</>
+													) : (
+														'Supprimer'
+													)}
+												</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
+								</div>
+							</div>
+
+							{/* Amounts */}
+							<div className="grid gap-4 sm:grid-cols-2 pt-2 border-t border-border/40">
+								<div>
+									<p className="text-xs text-muted-foreground">Charges trimestrielles</p>
+									<p className="font-medium number-display">{formatCurrency(property.coOwnership.quarterlyAmount)}</p>
+								</div>
+								<div>
+									<p className="text-xs text-muted-foreground">Charges annuelles</p>
+									<p className="font-medium number-display">{formatCurrency(property.coOwnership.quarterlyAmount * 4)}</p>
+								</div>
+							</div>
+
+							{/* Additional info */}
+							{property.coOwnership.link && (
+								<div className="pt-2 border-t border-border/40">
+									<a
+										href={property.coOwnership.link}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+									>
+										<ExternalLink className="h-3 w-3" />
+										Voir les documents
+									</a>
+								</div>
+							)}
+
+							{property.coOwnership.notes && (
+								<div className="pt-2 border-t border-border/40">
+									<p className="text-xs text-muted-foreground">Notes</p>
+									<p className="text-sm text-muted-foreground mt-0.5">{property.coOwnership.notes}</p>
+								</div>
+							)}
+						</div>
+					) : (
+						<div className="flex flex-col items-center justify-center py-8 text-center">
+							<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
+								<Building2 className="h-6 w-6 text-muted-foreground" />
+							</div>
+							<h4 className="font-medium mb-1">Aucune copropriété</h4>
+							<p className="text-sm text-muted-foreground mb-4">
+								Ajoutez les informations du syndic et des charges de copropriété.
+							</p>
+							<Button
+								variant="outline"
+								size="sm"
+								className="gap-2"
+								onClick={() => openCoOwnershipDialog(false)}
+							>
+								<Plus className="h-4 w-4" />
+								Ajouter
+							</Button>
+						</div>
+					)}
+				</CardContent>
+			</Card>
 
 			{/* Contrats Section - Placeholder */}
 			<PlaceholderSection
@@ -1855,6 +2107,107 @@ export default function PropertyDetailPage() {
 									</>
 								) : (
 									isEditingPropertyInsurance ? 'Modifier' : 'Ajouter'
+								)}
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+
+			{/* Co-Ownership Dialog */}
+			<Dialog
+				open={isCoOwnershipDialogOpen}
+				onOpenChange={(open) => {
+					setIsCoOwnershipDialogOpen(open)
+					if (!open) resetCoOwnershipForm()
+				}}
+			>
+				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>
+							{isEditingCoOwnership ? 'Modifier la copropriété' : 'Ajouter une copropriété'}
+						</DialogTitle>
+						<DialogDescription>
+							Renseignez les informations du syndic et des charges de copropriété.
+						</DialogDescription>
+					</DialogHeader>
+					<form onSubmit={handleCoOwnershipSubmit} className="space-y-4">
+						{/* Error message */}
+						{coOwnershipFormError && (
+							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+								<p className="text-sm text-destructive">{coOwnershipFormError}</p>
+							</div>
+						)}
+
+						{/* Syndic name */}
+						<div className="space-y-2">
+							<Label htmlFor="coownership-name">Nom du syndic *</Label>
+							<Input
+								id="coownership-name"
+								placeholder="Foncia, Nexity, Citya..."
+								value={coOwnershipFormData.name}
+								onChange={(e) => handleCoOwnershipInputChange('name', e.target.value)}
+							/>
+						</div>
+
+						{/* Quarterly amount */}
+						<div className="space-y-2">
+							<Label htmlFor="coownership-amount">Charges trimestrielles (€) *</Label>
+							<Input
+								id="coownership-amount"
+								type="number"
+								min="0"
+								step="0.01"
+								placeholder="450"
+								value={coOwnershipFormData.quarterlyAmount}
+								onChange={(e) => handleCoOwnershipInputChange('quarterlyAmount', e.target.value)}
+							/>
+							{coOwnershipFormData.quarterlyAmount && (
+								<p className="text-xs text-muted-foreground">
+									Soit {formatCurrency(Number.parseFloat(coOwnershipFormData.quarterlyAmount) * 4)}/an
+								</p>
+							)}
+						</div>
+
+						{/* Link */}
+						<div className="space-y-2">
+							<Label htmlFor="coownership-link">Lien vers les documents</Label>
+							<Input
+								id="coownership-link"
+								placeholder="https://..."
+								value={coOwnershipFormData.link}
+								onChange={(e) => handleCoOwnershipInputChange('link', e.target.value)}
+							/>
+						</div>
+
+						{/* Notes */}
+						<div className="space-y-2">
+							<Label htmlFor="coownership-notes">Notes</Label>
+							<Input
+								id="coownership-notes"
+								placeholder="Notes additionnelles..."
+								value={coOwnershipFormData.notes}
+								onChange={(e) => handleCoOwnershipInputChange('notes', e.target.value)}
+							/>
+						</div>
+
+						<DialogFooter className="pt-4">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setIsCoOwnershipDialogOpen(false)}
+								disabled={isSubmittingCoOwnership}
+							>
+								Annuler
+							</Button>
+							<Button type="submit" disabled={isSubmittingCoOwnership}>
+								{isSubmittingCoOwnership ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										{isEditingCoOwnership ? 'Modification...' : 'Création...'}
+									</>
+								) : (
+									isEditingCoOwnership ? 'Modifier' : 'Ajouter'
 								)}
 							</Button>
 						</DialogFooter>
