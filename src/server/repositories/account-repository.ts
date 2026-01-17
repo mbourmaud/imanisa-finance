@@ -264,30 +264,49 @@ export const accountRepository = {
 
 	/**
 	 * Calculate and update account balance from transactions
-	 * INCOME transactions are positive, EXPENSE transactions are negative
+	 * If initialBalance and initialBalanceDate are set, only count transactions after that date
+	 * Balance = initialBalance + income - expenses (for transactions after initialBalanceDate)
 	 */
 	async recalculateBalance(id: string): Promise<AccountWithDetails> {
-		// Sum all transactions for this account
-		const result = await prisma.transaction.aggregate({
-			where: { accountId: id },
-			_sum: { amount: true },
+		// Get account to check for initial balance settings
+		const account = await prisma.account.findUnique({
+			where: { id },
+			select: { initialBalance: true, initialBalanceDate: true },
 		});
+
+		if (!account) {
+			throw new Error('Account not found');
+		}
+
+		// Build date filter if initialBalanceDate is set
+		const dateFilter = account.initialBalanceDate
+			? { gte: account.initialBalanceDate }
+			: undefined;
 
 		// Get transactions grouped by type to calculate correctly
 		const incomeSum = await prisma.transaction.aggregate({
-			where: { accountId: id, type: 'INCOME' },
+			where: {
+				accountId: id,
+				type: 'INCOME',
+				...(dateFilter && { date: dateFilter }),
+			},
 			_sum: { amount: true },
 		});
 
 		const expenseSum = await prisma.transaction.aggregate({
-			where: { accountId: id, type: 'EXPENSE' },
+			where: {
+				accountId: id,
+				type: 'EXPENSE',
+				...(dateFilter && { date: dateFilter }),
+			},
 			_sum: { amount: true },
 		});
 
-		// Balance = income - expenses (amounts are stored as positive values)
+		// Balance = initialBalance + income - expenses (amounts are stored as positive values)
+		const initialBalance = account.initialBalance ?? 0;
 		const income = incomeSum._sum.amount ?? 0;
 		const expenses = expenseSum._sum.amount ?? 0;
-		const balance = income - expenses;
+		const balance = initialBalance + income - expenses;
 
 		return this.updateBalance(id, balance);
 	},

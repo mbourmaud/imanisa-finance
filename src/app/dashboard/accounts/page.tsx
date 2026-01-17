@@ -1,51 +1,142 @@
 'use client';
 
-import { useEffect } from 'react';
+/**
+ * Accounts Page
+ *
+ * Lists all accounts grouped by type with stats.
+ * Uses TanStack Query for data fetching.
+ */
+
+import { useMemo } from 'react';
 import Link from 'next/link';
-import { Building, ChevronRight, CreditCard, MoreHorizontal, PiggyBank, Plus, TrendingUp, Wallet } from 'lucide-react';
+import {
+	Building,
+	ChevronRight,
+	CreditCard,
+	Loader2,
+	PiggyBank,
+	Plus,
+	TrendingUp,
+	Wallet,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useAccounts, useAccountActions } from '@/features/accounts';
+import { useAccountsQuery } from '@/features/accounts';
 import { formatMoney, formatMoneyCompact } from '@/shared/utils';
 import type { AccountType } from '@/features/accounts/types';
 
-const accountTypeConfig: Record<AccountType, { label: string; icon: typeof Wallet }> = {
+// Account type returned by API
+interface ApiAccount {
+	id: string;
+	name: string;
+	type: string;
+	bankId: string;
+	balance: number;
+	currency: string;
+	bank?: {
+		id: string;
+		name: string;
+		color: string;
+	};
+	accountMembers?: Array<{
+		ownerShare: number;
+	}>;
+}
+
+const accountTypeConfig: Record<string, { label: string; icon: typeof Wallet }> = {
+	CHECKING: { label: 'Comptes courants', icon: Wallet },
+	SAVINGS: { label: 'Épargne', icon: PiggyBank },
+	INVESTMENT: { label: 'Investissements', icon: TrendingUp },
+	LOAN: { label: 'Crédits', icon: CreditCard },
+	// Legacy lowercase types
 	checking: { label: 'Comptes courants', icon: Wallet },
 	savings: { label: 'Épargne', icon: PiggyBank },
 	investment: { label: 'Investissements', icon: TrendingUp },
 	credit: { label: 'Crédits', icon: CreditCard },
 };
 
+function getOwnerShare(account: ApiAccount): number {
+	// Use first member's share or default to 100
+	return account.accountMembers?.[0]?.ownerShare ?? 100;
+}
+
 export default function AccountsPage() {
-	const { accounts, accountsByType, totalBalance, isLoading, refetch } = useAccounts();
-	const { deleteAccount, openEditModal } = useAccountActions();
+	// Use TanStack Query for data fetching
+	const { data: accounts = [], isLoading, isError } = useAccountsQuery() as {
+		data: ApiAccount[] | undefined;
+		isLoading: boolean;
+		isError: boolean;
+	};
+
+	// Group accounts by type
+	const accountsByType = useMemo(() => {
+		return accounts.reduce(
+			(acc, account) => {
+				const type = account.type;
+				if (!acc[type]) {
+					acc[type] = [];
+				}
+				acc[type].push(account);
+				return acc;
+			},
+			{} as Record<string, ApiAccount[]>
+		);
+	}, [accounts]);
+
+	// Calculate total balance
+	const totalBalance = useMemo(() => {
+		return accounts.reduce(
+			(sum, acc) => sum + acc.balance * (getOwnerShare(acc) / 100),
+			0
+		);
+	}, [accounts]);
 
 	// Group accounts by type for display
-	const accountGroups = Object.entries(accountsByType)
-		.filter(([_, accs]) => accs.length > 0)
-		.map(([type, accs]) => ({
-			type: type as AccountType,
-			...accountTypeConfig[type as AccountType],
-			accounts: accs,
-			total: accs.reduce((sum, acc) => sum + acc.balance * (acc.ownerShare / 100), 0),
-		}));
+	const accountGroups = useMemo(() => {
+		return Object.entries(accountsByType)
+			.filter(([_, accs]) => accs.length > 0)
+			.map(([type, accs]) => ({
+				type,
+				...(accountTypeConfig[type] || { label: type, icon: Wallet }),
+				accounts: accs,
+				total: accs.reduce((sum, acc) => sum + acc.balance * (getOwnerShare(acc) / 100), 0),
+			}));
+	}, [accountsByType]);
 
 	// Calculate totals by type for stat cards
-	const checkingTotal = accountsByType.checking?.reduce((s, a) => s + a.balance * (a.ownerShare / 100), 0) ?? 0;
-	const savingsTotal = accountsByType.savings?.reduce((s, a) => s + a.balance * (a.ownerShare / 100), 0) ?? 0;
-	const investmentTotal = accountsByType.investment?.reduce((s, a) => s + a.balance * (a.ownerShare / 100), 0) ?? 0;
+	const checkingTotal = useMemo(() => {
+		const checkingAccounts = accountsByType['CHECKING'] || accountsByType['checking'] || [];
+		return checkingAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
+	}, [accountsByType]);
 
-	if (isLoading && accounts.length === 0) {
+	const savingsTotal = useMemo(() => {
+		const savingsAccounts = accountsByType['SAVINGS'] || accountsByType['savings'] || [];
+		return savingsAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
+	}, [accountsByType]);
+
+	const investmentTotal = useMemo(() => {
+		const investmentAccounts = accountsByType['INVESTMENT'] || accountsByType['investment'] || [];
+		return investmentAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
+	}, [accountsByType]);
+
+	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center h-64">
-				<div className="text-muted-foreground">Chargement...</div>
+				<div className="flex flex-col items-center gap-4">
+					<div className="relative">
+						<div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 animate-pulse" />
+						<Loader2 className="h-6 w-6 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+					</div>
+					<p className="text-sm text-muted-foreground">Chargement des comptes...</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (isError) {
+		return (
+			<div className="flex items-center justify-center h-64">
+				<div className="text-muted-foreground">Erreur lors du chargement des comptes</div>
 			</div>
 		);
 	}
@@ -142,12 +233,20 @@ export default function AccountsPage() {
 										className="flex items-center justify-between rounded-xl bg-muted/30 p-4 transition-colors hover:bg-muted/50 group"
 									>
 										<div className="flex items-center gap-4">
-											<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background">
-												<Building className="h-5 w-5 text-muted-foreground" />
+											<div
+												className="flex h-10 w-10 items-center justify-center rounded-lg"
+												style={{
+													backgroundColor: account.bank?.color ? `${account.bank.color}20` : undefined,
+												}}
+											>
+												<Building
+													className="h-5 w-5"
+													style={{ color: account.bank?.color || undefined }}
+												/>
 											</div>
 											<div>
 												<p className="font-medium">{account.name}</p>
-												<p className="text-xs text-muted-foreground">{account.bankName}</p>
+												<p className="text-xs text-muted-foreground">{account.bank?.name || 'Banque'}</p>
 											</div>
 										</div>
 										<div className="flex items-center gap-4">
@@ -160,6 +259,23 @@ export default function AccountsPage() {
 						</Card>
 					);
 				})}
+
+				{/* Empty state */}
+				{accountGroups.length === 0 && (
+					<div className="text-center py-16">
+						<div className="h-20 w-20 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
+							<Wallet className="h-10 w-10 text-muted-foreground/50" />
+						</div>
+						<p className="font-semibold text-foreground">Aucun compte</p>
+						<p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
+							Ajoutez votre premier compte pour commencer à suivre vos finances
+						</p>
+						<Button className="mt-6 gap-2">
+							<Plus className="h-4 w-4" />
+							Ajouter un compte
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

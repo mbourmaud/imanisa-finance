@@ -100,8 +100,13 @@ export const creditMutuelParser: Parser = {
 					h.toLowerCase().includes('libelle') ||
 					h.toLowerCase().includes('description'),
 			);
-			const debitIndex = header.findIndex((h) => h.toLowerCase().includes('débit'));
-			const creditIndex = header.findIndex((h) => h.toLowerCase().includes('crédit'));
+			// Support both with and without accents: débit/debit, crédit/credit
+			const debitIndex = header.findIndex(
+				(h) => h.toLowerCase().includes('débit') || h.toLowerCase().includes('debit')
+			);
+			const creditIndex = header.findIndex(
+				(h) => h.toLowerCase().includes('crédit') || h.toLowerCase().includes('credit')
+			);
 			const amountIndex = header.findIndex((h) => h.toLowerCase().includes('montant'));
 
 			if (dateIndex === -1) {
@@ -138,9 +143,18 @@ export const creditMutuelParser: Parser = {
 				let amount = 0;
 				if (debitIndex !== -1 && creditIndex !== -1) {
 					// Separate debit/credit columns
+					// CM format: debit column has negative values (-100), credit has positive values (+100)
 					const debit = parseFrenchNumber(fields[debitIndex]);
 					const credit = parseFrenchNumber(fields[creditIndex]);
-					amount = credit > 0 ? credit : -debit;
+					// If credit > 0, use credit (income)
+					// If debit is already negative (CM format), use it directly
+					// If debit is positive (some other format), negate it
+					if (credit > 0) {
+						amount = credit;
+					} else if (debit !== 0) {
+						// CM stores debits as negative values, so use as-is
+						amount = debit;
+					}
 				} else if (amountIndex !== -1) {
 					// Single amount column
 					amount = parseFrenchNumber(fields[amountIndex]);

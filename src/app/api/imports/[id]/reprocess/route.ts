@@ -75,13 +75,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 				return NextResponse.json({ error: 'Failed to download file from storage' }, { status: 500 });
 			}
 
-			// Convert blob to string/arraybuffer based on mime type
-			let content: string | ArrayBuffer;
-			if (rawImport.mimeType === 'text/csv') {
-				content = await fileBlob.text();
-			} else {
-				content = await fileBlob.arrayBuffer();
-			}
+			// Always pass ArrayBuffer to let the parser handle encoding
+			// CSV files from French banks often use ISO-8859-1/Windows-1252 encoding
+			const content = await fileBlob.arrayBuffer();
 
 			// Parse the file
 			const parseResult = await parseImport(rawImport.bankKey, content, rawImport.mimeType);

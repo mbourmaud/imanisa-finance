@@ -1,6 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+/**
+ * Account Detail Page
+ *
+ * Uses TanStack Query for data fetching and mutations.
+ * Supports infinite scroll for transactions, import management, and account settings.
+ */
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -9,27 +16,55 @@ import {
 	Check,
 	CheckCircle2,
 	ChevronDown,
-	ChevronUp,
 	Clock,
 	ExternalLink,
 	FileSpreadsheet,
 	Link as LinkIcon,
 	Loader2,
 	Pencil,
+	Plus,
 	RefreshCw,
 	RotateCcw,
 	Search,
+	Settings,
 	Trash2,
 	Upload,
-	Users,
+	Wallet,
 	X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetDescription,
+} from '@/components/ui/sheet';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { formatMoney, formatDate, formatRelativeTime } from '@/shared/utils';
 
+// TanStack Query hooks
+import {
+	useAccountQuery,
+	useUpdateAccountMutation,
+	useDeleteAccountMutation,
+	useSyncAccountMutation,
+	useAddAccountMemberMutation,
+	useRemoveAccountMemberMutation,
+} from '@/features/accounts';
+import {
+	useImportsQuery,
+	useUploadImportMutation,
+	useProcessImportMutation,
+	useReprocessImportMutation,
+	useDeleteImportMutation,
+} from '@/features/imports';
+import { useMembersQuery } from '@/features/members';
+import { useTransactionsQuery } from '@/features/transactions/hooks/use-transactions-query';
+
+// Types for data returned by API (more complete than domain types)
 interface AccountMember {
 	id: string;
 	memberId: string;
@@ -51,7 +86,7 @@ interface Bank {
 	parserKey: string;
 }
 
-interface Account {
+interface AccountDetail {
 	id: string;
 	name: string;
 	description: string | null;
@@ -59,6 +94,8 @@ interface Account {
 	type: string;
 	accountNumber: string | null;
 	balance: number;
+	initialBalance: number;
+	initialBalanceDate: string | null;
 	currency: string;
 	exportUrl: string | null;
 	bank: Bank;
@@ -82,26 +119,6 @@ interface RawImport {
 	createdAt: string;
 }
 
-interface Transaction {
-	id: string;
-	date: string;
-	description: string;
-	amount: number;
-	type: string;
-	transactionCategory: {
-		categoryId: string;
-		category: { id: string; name: string; icon: string; color: string };
-	} | null;
-}
-
-interface PaginatedTransactions {
-	items: Transaction[];
-	total: number;
-	page: number;
-	pageSize: number;
-	totalPages: number;
-}
-
 function getStatusIcon(status: RawImport['status']) {
 	switch (status) {
 		case 'PROCESSED':
@@ -115,25 +132,6 @@ function getStatusIcon(status: RawImport['status']) {
 	}
 }
 
-function getStatusLabel(status: RawImport['status']) {
-	switch (status) {
-		case 'PROCESSED':
-			return 'Traite';
-		case 'PROCESSING':
-			return 'En cours...';
-		case 'FAILED':
-			return 'Erreur';
-		default:
-			return 'En attente';
-	}
-}
-
-function formatFileSize(bytes: number): string {
-	if (bytes < 1024) return `${bytes} B`;
-	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 function getAccountTypeLabel(type: string): string {
 	const types: Record<string, string> = {
 		CHECKING: 'Compte courant',
@@ -144,7 +142,6 @@ function getAccountTypeLabel(type: string): string {
 	return types[type] || type;
 }
 
-// Get short name from bank name (first letters of each word)
 function getBankShortName(name: string): string {
 	return name
 		.split(' ')
@@ -159,165 +156,185 @@ export default function AccountDetailPage() {
 	const router = useRouter();
 	const accountId = params.id as string;
 
-	const [account, setAccount] = useState<Account | null>(null);
-	const [imports, setImports] = useState<RawImport[]>([]);
-	const [transactions, setTransactions] = useState<PaginatedTransactions | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	const [isUploading, setIsUploading] = useState(false);
-	const [dragActive, setDragActive] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	// ===== TanStack Query Hooks =====
+	const {
+		data: account,
+		isLoading: isLoadingAccount,
+		isError: isAccountError,
+	} = useAccountQuery(accountId) as {
+		data: AccountDetail | undefined;
+		isLoading: boolean;
+		isError: boolean;
+	};
+
+	const { data: imports = [] } = useImportsQuery({ accountId }) as {
+		data: RawImport[] | undefined;
+	};
+
+	const { data: allMembers = [] } = useMembersQuery();
+
+	// Transactions with pagination
 	const [searchQuery, setSearchQuery] = useState('');
 	const [currentPage, setCurrentPage] = useState(1);
-	const [showImports, setShowImports] = useState(true);
-	const [showAllImports, setShowAllImports] = useState(false);
+	const pageSize = 30;
 
-	// Export URL editing
-	const [isEditingExportUrl, setIsEditingExportUrl] = useState(false);
+	const {
+		data: transactionsData,
+		isLoading: isLoadingTransactions,
+		isFetching: isFetchingTransactions,
+	} = useTransactionsQuery(
+		{ accountId, search: searchQuery || undefined },
+		{ page: currentPage, pageSize }
+	);
+
+	// ===== Mutations =====
+	const updateAccountMutation = useUpdateAccountMutation();
+	const deleteAccountMutation = useDeleteAccountMutation();
+	const syncAccountMutation = useSyncAccountMutation();
+	const addMemberMutation = useAddAccountMemberMutation();
+	const removeMemberMutation = useRemoveAccountMemberMutation();
+	const uploadImportMutation = useUploadImportMutation();
+	const processImportMutation = useProcessImportMutation();
+	const reprocessImportMutation = useReprocessImportMutation();
+	const deleteImportMutation = useDeleteImportMutation();
+
+	// ===== Local UI State =====
+	const [showSettings, setShowSettings] = useState(false);
+	const [showAllImports, setShowAllImports] = useState(false);
+	const [dragActive, setDragActive] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	// Edit states (inline editing in settings)
+	const [editName, setEditName] = useState('');
+	const [editDescription, setEditDescription] = useState('');
+	const [editAccountNumber, setEditAccountNumber] = useState('');
 	const [exportUrlInput, setExportUrlInput] = useState('');
-	const [isSavingExportUrl, setIsSavingExportUrl] = useState(false);
+	const [editInitialBalance, setEditInitialBalance] = useState('');
+	const [editInitialBalanceDate, setEditInitialBalanceDate] = useState('');
+
+	// Edit drawer
+	const [isEditingAccount, setIsEditingAccount] = useState(false);
 
 	// Confirmation dialogs
 	const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 	const [deleteImportId, setDeleteImportId] = useState<string | null>(null);
 
-	// Fetch account data
-	const fetchAccount = useCallback(async () => {
-		try {
-			const response = await fetch(`/api/accounts/${accountId}`);
-			if (!response.ok) {
-				if (response.status === 404) {
-					router.push('/dashboard/accounts');
-					return;
-				}
-				throw new Error('Failed to fetch account');
-			}
-			const data = await response.json();
-			setAccount(data);
-		} catch (err) {
-			console.error('Error fetching account:', err);
-			setError('Impossible de charger le compte');
-		}
-	}, [accountId, router]);
+	// Members dropdown
+	const [showMemberDropdown, setShowMemberDropdown] = useState(false);
 
-	// Fetch imports for this account
-	const fetchImports = useCallback(async () => {
-		try {
-			const response = await fetch(`/api/imports?accountId=${accountId}`);
-			if (response.ok) {
-				const data = await response.json();
-				setImports(data.items || []);
-			}
-		} catch (err) {
-			console.error('Error fetching imports:', err);
-		}
-	}, [accountId]);
+	// Infinite scroll refs
+	const observerRef = useRef<IntersectionObserver | null>(null);
+	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-	// Fetch transactions for this account
-	const fetchTransactions = useCallback(
-		async (page = 1, search = '') => {
-			try {
-				const params = new URLSearchParams({
-					accountId,
-					page: page.toString(),
-					pageSize: '20',
+	// Transaction type matching API response
+	interface ApiTransaction {
+		id: string;
+		date: string;
+		description: string;
+		amount: number;
+		type: string;
+		transactionCategory?: {
+			categoryId: string;
+			category: { id: string; name: string; icon: string; color: string };
+		} | null;
+	}
+
+	// Accumulated transactions for infinite scroll
+	const [allTransactions, setAllTransactions] = useState<ApiTransaction[]>([]);
+
+	// Track total and hasMore
+	const totalTransactions = transactionsData?.total ?? 0;
+	const hasMore = currentPage < (transactionsData?.totalPages ?? 0);
+
+	// Update accumulated transactions when new data arrives
+	useEffect(() => {
+		if (transactionsData?.items) {
+			// Cast items to ApiTransaction since the API returns them with transactionCategory
+			const items = transactionsData.items as unknown as ApiTransaction[];
+			if (currentPage === 1) {
+				setAllTransactions(items);
+			} else {
+				setAllTransactions((prev) => {
+					const existingIds = new Set(prev.map((t) => t.id));
+					const newItems = items.filter((t) => !existingIds.has(t.id));
+					return [...prev, ...newItems];
 				});
-				if (search) params.append('search', search);
-
-				const response = await fetch(`/api/transactions?${params}`);
-				if (response.ok) {
-					const data = await response.json();
-					setTransactions(data);
-				}
-			} catch (err) {
-				console.error('Error fetching transactions:', err);
 			}
-		},
-		[accountId],
-	);
+		}
+	}, [transactionsData?.items, currentPage]);
 
-	// Initial data fetch
+	// Reset transactions when search changes
 	useEffect(() => {
-		const loadData = async () => {
-			setIsLoading(true);
-			await Promise.all([fetchAccount(), fetchImports(), fetchTransactions(1, '')]);
-			setIsLoading(false);
+		setCurrentPage(1);
+		setAllTransactions([]);
+	}, [searchQuery]);
+
+	// Infinite scroll observer
+	const loadMore = useCallback(() => {
+		if (!isFetchingTransactions && hasMore) {
+			setCurrentPage((prev) => prev + 1);
+		}
+	}, [isFetchingTransactions, hasMore]);
+
+	useEffect(() => {
+		const currentRef = loadMoreRef.current;
+		if (!currentRef || allTransactions.length === 0 || !hasMore) return;
+
+		if (observerRef.current) {
+			observerRef.current.disconnect();
+		}
+
+		observerRef.current = new IntersectionObserver(
+			(entries) => {
+				const [entry] = entries;
+				if (entry.isIntersecting && !isFetchingTransactions) {
+					loadMore();
+				}
+			},
+			{ threshold: 0.1, rootMargin: '100px' }
+		);
+
+		observerRef.current.observe(currentRef);
+
+		return () => {
+			if (observerRef.current) {
+				observerRef.current.disconnect();
+			}
 		};
-		loadData();
-	}, [fetchAccount, fetchImports, fetchTransactions]);
+	}, [allTransactions.length, hasMore, isFetchingTransactions, loadMore]);
 
-	// Handle search
-	useEffect(() => {
-		const timeoutId = setTimeout(() => {
-			fetchTransactions(1, searchQuery);
-			setCurrentPage(1);
-		}, 300);
-		return () => clearTimeout(timeoutId);
-	}, [searchQuery, fetchTransactions]);
-
-	// Handle page change
-	const handlePageChange = (page: number) => {
-		setCurrentPage(page);
-		fetchTransactions(page, searchQuery);
-	};
-
-	// Handle file upload
+	// ===== Handlers =====
 	const handleUpload = async (file: File) => {
 		if (!account) return;
 
-		setIsUploading(true);
 		setError(null);
-
 		try {
-			const formData = new FormData();
-			formData.append('file', file);
-			formData.append('bankKey', account.bank.parserKey);
-			formData.append('accountId', account.id);
-
-			const uploadResponse = await fetch('/api/imports/upload', {
-				method: 'POST',
-				body: formData,
+			const result = await uploadImportMutation.mutateAsync({
+				file,
+				bankKey: account.bank.parserKey,
+				accountId: account.id,
 			});
 
-			if (!uploadResponse.ok) {
-				const data = await uploadResponse.json();
-				throw new Error(data.error || 'Upload failed');
+			if (result.process.skippedCount > 0) {
+				setError(
+					`${result.process.recordsCount} transactions importées, ${result.process.skippedCount} doublons ignorés`
+				);
 			}
 
-			const uploadData = await uploadResponse.json();
-
-			// Auto-process the import
-			const processResponse = await fetch(`/api/imports/${uploadData.id}/process`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ accountId: account.id }),
-			});
-
-			if (processResponse.ok) {
-				const processData = await processResponse.json();
-				if (processData.skippedCount > 0) {
-					setError(
-						`${processData.recordsCount} transactions importees, ${processData.skippedCount} doublons ignores`,
-					);
-				}
-			}
-
-			// Refresh data
-			await Promise.all([fetchAccount(), fetchImports(), fetchTransactions(currentPage, searchQuery)]);
+			// Reset transactions to reload
+			setCurrentPage(1);
+			setAllTransactions([]);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Upload failed');
-		} finally {
-			setIsUploading(false);
 		}
 	};
 
-	// Handle file selection
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) handleUpload(file);
 		e.target.value = '';
 	};
 
-	// Handle drag and drop
 	const handleDrag = (e: React.DragEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -336,61 +353,30 @@ export default function AccountDetailPage() {
 		if (file) handleUpload(file);
 	};
 
-	// Process pending import
 	const handleProcess = async (importId: string) => {
 		try {
-			const response = await fetch(`/api/imports/${importId}/process`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ accountId }),
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Processing failed');
-			}
-
-			await Promise.all([fetchAccount(), fetchImports(), fetchTransactions(currentPage, searchQuery)]);
+			await processImportMutation.mutateAsync({ importId, accountId });
+			setCurrentPage(1);
+			setAllTransactions([]);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Processing failed');
 		}
 	};
 
-	// Reprocess import
 	const handleReprocess = async (importId: string) => {
 		try {
-			const response = await fetch(`/api/imports/${importId}/reprocess`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ accountId }),
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Reprocessing failed');
-			}
-
-			await Promise.all([fetchAccount(), fetchImports(), fetchTransactions(currentPage, searchQuery)]);
+			await reprocessImportMutation.mutateAsync({ importId, accountId });
+			setCurrentPage(1);
+			setAllTransactions([]);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Reprocessing failed');
 		}
 	};
 
-	// Delete import
 	const confirmDeleteImport = async () => {
 		if (!deleteImportId) return;
-
 		try {
-			const response = await fetch(`/api/imports/${deleteImportId}`, {
-				method: 'DELETE',
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Delete failed');
-			}
-
-			await fetchImports();
+			await deleteImportMutation.mutateAsync({ importId: deleteImportId, accountId });
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Delete failed');
 		} finally {
@@ -398,602 +384,976 @@ export default function AccountDetailPage() {
 		}
 	};
 
-	// Delete account
 	const confirmDeleteAccount = async () => {
 		if (!account) return;
-
 		try {
-			const response = await fetch(`/api/accounts/${accountId}`, {
-				method: 'DELETE',
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Delete failed');
-			}
-
+			await deleteAccountMutation.mutateAsync(accountId);
 			router.push('/dashboard/banks');
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Impossible de supprimer le compte');
 		}
 	};
 
-	// Save export URL
-	const saveExportUrl = async () => {
-		if (!account) return;
-
-		setIsSavingExportUrl(true);
+	const addMemberToAccount = async (memberId: string) => {
+		setShowMemberDropdown(false);
 		try {
-			const response = await fetch(`/api/accounts/${accountId}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ exportUrl: exportUrlInput || null }),
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Failed to save');
-			}
-
-			await fetchAccount();
-			setIsEditingExportUrl(false);
+			await addMemberMutation.mutateAsync({ accountId, memberId, ownerShare: 100 });
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Impossible de sauvegarder');
-		} finally {
-			setIsSavingExportUrl(false);
+			console.error('Error adding member:', err);
 		}
 	};
 
-	// Start editing export URL
-	const startEditingExportUrl = () => {
-		setExportUrlInput(account?.exportUrl || '');
-		setIsEditingExportUrl(true);
+	const removeMemberFromAccount = async (memberId: string) => {
+		try {
+			await removeMemberMutation.mutateAsync({ accountId, memberId });
+		} catch (err) {
+			console.error('Error removing member:', err);
+		}
 	};
 
-	// Cancel editing export URL
-	const cancelEditingExportUrl = () => {
-		setIsEditingExportUrl(false);
-		setExportUrlInput('');
+	// Save functions for inline editing
+	const saveAccountDetails = async () => {
+		if (!account) return;
+		const name = editName || account.name;
+		if (!name.trim()) return;
+
+		try {
+			await updateAccountMutation.mutateAsync({
+				id: accountId,
+				input: {
+					name: name.trim(),
+					description: (editDescription !== '' ? editDescription : account.description)?.trim() || undefined,
+					accountNumber: (editAccountNumber !== '' ? editAccountNumber : account.accountNumber)?.trim() || undefined,
+				},
+			});
+			setIsEditingAccount(false);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Impossible de sauvegarder');
+		}
 	};
 
-	if (isLoading) {
+	const saveExportUrl = async () => {
+		if (!account) return;
+		const urlValue = exportUrlInput !== '' ? exportUrlInput : account.exportUrl || '';
+		if (urlValue === (account.exportUrl || '')) return;
+
+		try {
+			await updateAccountMutation.mutateAsync({
+				id: accountId,
+				input: { exportUrl: urlValue || undefined },
+			});
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Impossible de sauvegarder');
+		}
+	};
+
+	const saveInitialBalance = async () => {
+		if (!account) return;
+
+		const balanceStr = editInitialBalance !== '' ? editInitialBalance : account.initialBalance?.toString() || '0';
+		const balanceValue = parseFloat(balanceStr.replace(',', '.'));
+		if (isNaN(balanceValue)) {
+			setError('Montant invalide');
+			return;
+		}
+
+		const dateValue = editInitialBalanceDate || (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '');
+
+		try {
+			await updateAccountMutation.mutateAsync({
+				id: accountId,
+				input: {
+					initialBalance: balanceValue,
+					initialBalanceDate: dateValue ? new Date(dateValue).toISOString() : undefined,
+				},
+			});
+			// Sync balance
+			await syncAccountMutation.mutateAsync(accountId);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Impossible de sauvegarder');
+		}
+	};
+
+	const startEditingAccount = () => {
+		if (!account) return;
+		setEditName(account.name);
+		setEditDescription(account.description || '');
+		setEditAccountNumber(account.accountNumber || '');
+		setIsEditingAccount(true);
+	};
+
+	const cancelEditingAccount = () => {
+		setIsEditingAccount(false);
+		setEditName('');
+		setEditDescription('');
+		setEditAccountNumber('');
+	};
+
+	// ===== Computed values =====
+	const accountImports = imports ?? [];
+	const isUploading = uploadImportMutation.isPending;
+	const isLoadingMore = isFetchingTransactions && currentPage > 1;
+
+	// Members not yet added to account
+	const availableMembers = useMemo(() => {
+		if (!account) return [];
+		return (allMembers ?? []).filter(
+			(m) => !account.accountMembers.some((am) => am.memberId === m.id)
+		);
+	}, [allMembers, account]);
+
+	// ===== Render =====
+	if (isLoadingAccount) {
 		return (
 			<div className="flex items-center justify-center h-64">
-				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+				<div className="flex flex-col items-center gap-4">
+					<div className="relative">
+						<div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 animate-pulse" />
+						<Loader2 className="h-6 w-6 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+					</div>
+					<p className="text-sm text-muted-foreground">Chargement du compte...</p>
+				</div>
 			</div>
 		);
 	}
 
-	if (!account) {
+	if (isAccountError || !account) {
 		return (
-			<div className="flex flex-col items-center justify-center h-64 gap-4">
-				<AlertCircle className="h-12 w-12 text-muted-foreground" />
-				<p className="text-muted-foreground">Compte non trouve</p>
-				<Button variant="outline" asChild>
-					<Link href="/dashboard/accounts">Retour aux comptes</Link>
+			<div className="flex flex-col items-center justify-center h-64 gap-6">
+				<div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center">
+					<AlertCircle className="h-8 w-8 text-muted-foreground" />
+				</div>
+				<div className="text-center">
+					<p className="font-medium text-foreground">Compte introuvable</p>
+					<p className="text-sm text-muted-foreground mt-1">Ce compte n&apos;existe pas ou a été supprimé</p>
+				</div>
+				<Button variant="outline" className="gap-2" asChild>
+					<Link href="/dashboard/accounts">
+						<ArrowLeft className="h-4 w-4" />
+						Retour aux comptes
+					</Link>
 				</Button>
 			</div>
 		);
 	}
-
-	// Imports are now filtered by accountId on the API side
-	const accountImports = imports;
-	const pendingImports = accountImports.filter((imp) => imp.status === 'PENDING');
 
 	return (
 		<div className="space-y-6">
 			{/* Back link */}
 			<Link
 				href="/dashboard/banks"
-				className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+				className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-all duration-200 group"
 			>
-				<ArrowLeft className="h-4 w-4" />
+				<ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
 				Retour aux banques
 			</Link>
 
-			{/* Header with subtle bank color accent */}
-			<div
-				className="relative rounded-xl border border-border/60 bg-card p-6"
-				style={{
-					borderLeftWidth: '4px',
-					borderLeftColor: account.bank.color,
-				}}
-			>
-				<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-					<div className="flex items-start gap-4">
+			{/* Header - Glassmorphism card */}
+			<div className="glass-card p-6 sm:p-8 hover-shine">
+				{/* Gradient accent bar */}
+				<div
+					className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
+					style={{
+						background: `linear-gradient(90deg, ${account.bank.color}, ${account.bank.color}88, transparent)`
+					}}
+				/>
+
+				<div className="flex items-start gap-5">
+					{/* Bank logo with glow */}
+					<div className="relative group/logo shrink-0">
 						<div
-							className="flex h-14 w-14 items-center justify-center rounded-2xl text-white font-bold text-lg shrink-0"
+							className="absolute inset-0 rounded-2xl blur-xl opacity-40 group-hover/logo:opacity-60 transition-opacity"
 							style={{ backgroundColor: account.bank.color }}
+						/>
+						<div
+							className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-white font-bold text-lg shadow-lg transition-transform hover:scale-105"
+							style={{
+								background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)`
+							}}
 						>
 							{getBankShortName(account.bank.name)}
 						</div>
-						<div className="min-w-0">
-							<h1 className="text-2xl font-semibold tracking-tight">{account.name}</h1>
-							<div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-								<span>{account.bank.name}</span>
-								<span className="hidden sm:inline">•</span>
-								<span>{getAccountTypeLabel(account.type)}</span>
-								{account.accountNumber && (
-									<>
-										<span className="hidden sm:inline">•</span>
-										<span className="font-mono">{account.accountNumber}</span>
-									</>
-								)}
+					</div>
+
+					{/* Content */}
+					<div className="flex-1 min-w-0">
+						{/* Top row: Name + Balance + Actions */}
+						<div className="flex items-start justify-between gap-4">
+							<div className="min-w-0">
+								<div className="flex items-center gap-3">
+									<h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{account.name}</h1>
+									<Button
+										variant="ghost"
+										size="icon"
+										className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/10 shrink-0 transition-all"
+										onClick={startEditingAccount}
+									>
+										<Pencil className="h-4 w-4" />
+									</Button>
+								</div>
 							</div>
-							{account.description && (
-								<p className="mt-2 text-sm text-muted-foreground">{account.description}</p>
+
+							{/* Balance + Actions */}
+							<div className="flex items-center gap-4 shrink-0">
+								<div className="text-right">
+									<p className="text-3xl sm:text-4xl font-bold number-display tracking-tight">
+										{formatMoney(account.balance, account.currency as 'EUR')}
+									</p>
+									<p className="text-xs text-muted-foreground mt-1 font-medium">
+										{account._count.transactions} transaction{account._count.transactions !== 1 ? 's' : ''}
+									</p>
+								</div>
+
+								{/* Actions */}
+								<div className="flex items-center gap-2">
+									<Button
+										variant="ghost"
+										size="icon"
+										className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-white/20 shadow-sm transition-all hover:scale-105"
+										onClick={() => setShowSettings(true)}
+									>
+										<Settings className="h-4 w-4" />
+									</Button>
+									<Button
+										variant="ghost"
+										size="icon"
+										className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-[oklch(0.55_0.2_25)]/10 border border-white/20 shadow-sm text-muted-foreground hover:text-[oklch(0.55_0.2_25)] transition-all hover:scale-105"
+										onClick={() => setDeleteAccountOpen(true)}
+									>
+										<Trash2 className="h-4 w-4" />
+									</Button>
+								</div>
+							</div>
+						</div>
+
+						{/* Bottom row: Bank info + Members */}
+						<div className="flex flex-wrap items-center gap-2 mt-3">
+							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-white/10 text-muted-foreground">
+								{account.bank.name}
+							</span>
+							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-white/10 text-muted-foreground">
+								{getAccountTypeLabel(account.type)}
+							</span>
+							{account.accountNumber && (
+								<span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-white/60 dark:bg-white/10 text-muted-foreground">
+									{account.accountNumber}
+								</span>
+							)}
+							{/* Members */}
+							{account.accountMembers.length > 0 && (
+								<>
+									<span className="text-muted-foreground/40">•</span>
+									<div className="flex items-center gap-2">
+										<div className="flex -space-x-2">
+											{account.accountMembers.map((am) => (
+												<div
+													key={am.id}
+													className="relative group/avatar"
+												>
+													<div
+														className="absolute inset-0 rounded-full blur-md opacity-0 group-hover/avatar:opacity-50 transition-opacity"
+														style={{ backgroundColor: am.member.color || '#6b7280' }}
+													/>
+													<div
+														className="relative h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold ring-2 ring-white/80 dark:ring-card shadow-sm transition-transform hover:scale-110 hover:z-10"
+														style={{ backgroundColor: am.member.color || '#6b7280' }}
+														title={`${am.member.name} (${am.ownerShare}%)`}
+													>
+														{am.member.name.charAt(0).toUpperCase()}
+													</div>
+												</div>
+											))}
+										</div>
+										<span className="text-xs text-muted-foreground hidden sm:inline font-medium">
+											{account.accountMembers.map((am) => am.member.name).join(', ')}
+										</span>
+									</div>
+								</>
 							)}
 						</div>
-					</div>
-					<div className="flex items-start gap-4 sm:text-right">
-						<div>
-							<p className="text-3xl font-semibold number-display">
-								{formatMoney(account.balance, account.currency as 'EUR')}
-							</p>
-							<p className="text-sm text-muted-foreground mt-1">
-								{account._count.transactions} transaction{account._count.transactions !== 1 ? 's' : ''}
-							</p>
-						</div>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="text-muted-foreground hover:text-[oklch(0.55_0.2_25)] hover:bg-[oklch(0.55_0.2_25)]/10 shrink-0"
-							onClick={() => setDeleteAccountOpen(true)}
-						>
-							<Trash2 className="h-4 w-4" />
-						</Button>
+						{account.description && (
+							<p className="text-sm text-muted-foreground mt-3 hidden sm:block">{account.description}</p>
+						)}
 					</div>
 				</div>
 			</div>
 
-			{/* Error message */}
+			{/* Account Edit Drawer */}
+			<Sheet open={isEditingAccount} onOpenChange={setIsEditingAccount}>
+				<SheetContent side="right" className="w-full sm:w-[420px] sm:max-w-[90vw] overflow-y-auto border-l border-white/20 bg-gradient-to-b from-background to-background/95">
+					<SheetHeader className="pb-6">
+						<SheetTitle className="text-xl font-bold">Modifier le compte</SheetTitle>
+						<SheetDescription>
+							Modifiez les informations du compte.
+						</SheetDescription>
+					</SheetHeader>
+
+					<div className="space-y-6">
+						{/* Bank logo centered with glow */}
+						<div className="relative w-fit mx-auto">
+							<div
+								className="absolute inset-0 rounded-2xl blur-xl opacity-50"
+								style={{ backgroundColor: account.bank.color }}
+							/>
+							<div
+								className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-white font-bold text-lg shadow-lg"
+								style={{ background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)` }}
+							>
+								{getBankShortName(account.bank.name)}
+							</div>
+						</div>
+
+						<div className="space-y-5">
+							<div className="space-y-2">
+								<label className="text-sm font-semibold text-foreground">
+									Nom du compte
+								</label>
+								<Input
+									value={editName}
+									onChange={(e) => setEditName(e.target.value)}
+									placeholder="Ex: Compte Joint"
+									className="h-12 text-base rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:border-primary/50"
+								/>
+							</div>
+							<div className="space-y-2">
+								<label className="text-sm font-semibold text-foreground">
+									Numéro de compte
+									<span className="text-muted-foreground font-normal ml-1">(optionnel)</span>
+								</label>
+								<Input
+									value={editAccountNumber}
+									onChange={(e) => setEditAccountNumber(e.target.value)}
+									placeholder="Ex: FR76 1234 5678 9012"
+									className="h-12 font-mono rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:border-primary/50"
+								/>
+							</div>
+							<div className="space-y-2">
+								<label className="text-sm font-semibold text-foreground">
+									Description
+									<span className="text-muted-foreground font-normal ml-1">(optionnel)</span>
+								</label>
+								<Input
+									value={editDescription}
+									onChange={(e) => setEditDescription(e.target.value)}
+									placeholder="Ex: Compte pour les dépenses courantes"
+									className="h-12 rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:border-primary/50"
+								/>
+							</div>
+						</div>
+
+						<div className="flex gap-3 pt-4">
+							<Button
+								variant="outline"
+								className="flex-1 h-12 rounded-xl border-white/20 hover:bg-white/50 dark:hover:bg-white/5"
+								onClick={cancelEditingAccount}
+								disabled={updateAccountMutation.isPending}
+							>
+								Annuler
+							</Button>
+							<Button
+								className="flex-1 h-12 rounded-xl shadow-md hover:shadow-lg transition-all"
+								onClick={saveAccountDetails}
+								disabled={updateAccountMutation.isPending || !editName.trim()}
+							>
+								{updateAccountMutation.isPending ? (
+									<Loader2 className="h-4 w-4 animate-spin mr-2" />
+								) : (
+									<Check className="h-4 w-4 mr-2" />
+								)}
+								Enregistrer
+							</Button>
+						</div>
+					</div>
+				</SheetContent>
+			</Sheet>
+
+			{/* Error/Success message - floating toast style */}
 			{error && (
 				<div
-					className={`rounded-lg border p-4 ${
-						error.includes('importees')
-							? 'border-[oklch(0.55_0.15_145)]/20 bg-[oklch(0.55_0.15_145)]/5'
-							: 'border-[oklch(0.55_0.2_25)]/20 bg-[oklch(0.55_0.2_25)]/5'
+					className={`fixed bottom-6 right-6 z-50 max-w-md animate-fade-in rounded-2xl p-4 shadow-xl ${
+						error.includes('importées')
+							? 'bg-[oklch(0.55_0.15_145)]/10 border border-[oklch(0.55_0.15_145)]/20'
+							: 'bg-[oklch(0.55_0.2_25)]/10 border border-[oklch(0.55_0.2_25)]/20'
 					}`}
+					style={{
+						backdropFilter: 'blur(16px)',
+						WebkitBackdropFilter: 'blur(16px)'
+					}}
 				>
-					<div
-						className={`flex items-center gap-2 ${
-							error.includes('importees')
-								? 'text-[oklch(0.55_0.15_145)]'
-								: 'text-[oklch(0.55_0.2_25)]'
-						}`}
-					>
-						{error.includes('importees') ? (
-							<CheckCircle2 className="h-4 w-4" />
-						) : (
-							<AlertCircle className="h-4 w-4" />
-						)}
-						<span className="font-medium">{error}</span>
+					<div className="flex items-start gap-3">
+						<div className={`shrink-0 h-8 w-8 rounded-xl flex items-center justify-center ${
+							error.includes('importées')
+								? 'bg-[oklch(0.55_0.15_145)]/20'
+								: 'bg-[oklch(0.55_0.2_25)]/20'
+						}`}>
+							{error.includes('importées') ? (
+								<CheckCircle2 className="h-4 w-4 text-[oklch(0.55_0.15_145)]" />
+							) : (
+								<AlertCircle className="h-4 w-4 text-[oklch(0.55_0.2_25)]" />
+							)}
+						</div>
+						<div className="flex-1 min-w-0">
+							<p className={`text-sm font-semibold ${
+								error.includes('importées')
+									? 'text-[oklch(0.55_0.15_145)]'
+									: 'text-[oklch(0.55_0.2_25)]'
+							}`}>
+								{error.includes('importées') ? 'Import réussi' : 'Erreur'}
+							</p>
+							<p className="text-sm text-foreground/80 mt-0.5">{error}</p>
+						</div>
 						<Button
 							variant="ghost"
-							size="sm"
-							className="ml-auto h-6 px-2"
+							size="icon"
+							className="shrink-0 h-8 w-8 rounded-lg hover:bg-white/20"
 							onClick={() => setError(null)}
 						>
-							Fermer
+							<span className="sr-only">Fermer</span>
+							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
 						</Button>
 					</div>
 				</div>
 			)}
 
-			{/* Members */}
-			{account.accountMembers.length > 0 && (
-				<Card className="border-border/60">
-					<CardHeader className="pb-3">
-						<div className="flex items-center gap-2">
-							<Users className="h-4 w-4 text-muted-foreground" />
-							<CardTitle className="text-base font-medium">Titulaires</CardTitle>
-						</div>
-					</CardHeader>
-					<CardContent>
-						<div className="flex flex-wrap gap-3">
-							{account.accountMembers.map((am) => (
-								<div
-									key={am.id}
-									className="flex items-center gap-2 rounded-full bg-muted/40 px-3 py-1.5"
-								>
-									<div
-										className="h-6 w-6 rounded-full flex items-center justify-center text-white text-xs font-medium"
-										style={{ backgroundColor: am.member.color || '#6b7280' }}
-									>
-										{am.member.name.charAt(0).toUpperCase()}
-									</div>
-									<span className="text-sm font-medium">{am.member.name}</span>
-									<span className="text-xs text-muted-foreground">({am.ownerShare}%)</span>
-								</div>
-							))}
-						</div>
-					</CardContent>
-				</Card>
-			)}
-
-			{/* Export URL Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-3">
-					<div className="flex items-center gap-2">
-						<LinkIcon className="h-4 w-4 text-muted-foreground" />
-						<CardTitle className="text-base font-medium">Lien d&apos;export</CardTitle>
-					</div>
-				</CardHeader>
-				<CardContent>
-					{isEditingExportUrl ? (
-						<div className="flex items-center gap-2">
-							<Input
-								type="url"
-								value={exportUrlInput}
-								onChange={(e) => setExportUrlInput(e.target.value)}
-								placeholder="https://www.banque.fr/espace-client/compte"
-								className="flex-1"
-								autoFocus
-							/>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-9 w-9 text-muted-foreground hover:text-[oklch(0.55_0.15_145)] hover:bg-[oklch(0.55_0.15_145)]/10"
-								onClick={saveExportUrl}
-								disabled={isSavingExportUrl}
-							>
-								{isSavingExportUrl ? (
-									<Loader2 className="h-4 w-4 animate-spin" />
-								) : (
-									<Check className="h-4 w-4" />
-								)}
-							</Button>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-9 w-9 text-muted-foreground hover:text-[oklch(0.55_0.2_25)] hover:bg-[oklch(0.55_0.2_25)]/10"
-								onClick={cancelEditingExportUrl}
-								disabled={isSavingExportUrl}
-							>
-								<X className="h-4 w-4" />
-							</Button>
-						</div>
-					) : account.exportUrl ? (
-						<div className="flex items-center justify-between">
-							<a
-								href={account.exportUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center gap-2 text-primary hover:underline transition-colors group"
-							>
-								<span className="break-all">{account.exportUrl}</span>
-								<ExternalLink className="h-4 w-4 shrink-0 opacity-60 group-hover:opacity-100" />
-							</a>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0 ml-2"
-								onClick={startEditingExportUrl}
-							>
-								<Pencil className="h-3.5 w-3.5" />
-							</Button>
-						</div>
-					) : (
-						<button
-							type="button"
-							onClick={startEditingExportUrl}
-							className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-						>
-							<Pencil className="h-3.5 w-3.5" />
-							<span>Ajouter un lien d&apos;export</span>
-						</button>
-					)}
-				</CardContent>
-			</Card>
-
-			{/* Import Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-3">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2">
-							<Upload className="h-4 w-4 text-muted-foreground" />
-							<CardTitle className="text-base font-medium">Import</CardTitle>
-						</div>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="h-8 gap-1"
-							onClick={() => setShowImports(!showImports)}
-						>
-							{showImports ? (
-								<>
-									<ChevronUp className="h-4 w-4" />
-									Masquer
-								</>
-							) : (
-								<>
-									<ChevronDown className="h-4 w-4" />
-									{accountImports.length > 0 && `${accountImports.length} imports`}
-								</>
-							)}
-						</Button>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					{/* Drop zone */}
-					<div
-						onDragEnter={handleDrag}
-						onDragLeave={handleDrag}
-						onDragOver={handleDrag}
-						onDrop={handleDrop}
-						className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-colors ${
-							isUploading
-								? 'border-primary bg-primary/5'
-								: dragActive
-									? 'border-primary bg-primary/5'
-									: 'border-border/60 bg-muted/20 hover:border-primary/50 hover:bg-muted/30'
-						}`}
-					>
-						<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							{isUploading ? (
-								<Loader2 className="h-6 w-6 animate-spin" />
-							) : (
-								<FileSpreadsheet className="h-6 w-6" />
-							)}
-						</div>
-						<p className="mt-3 text-sm text-center text-muted-foreground">
-							{isUploading
-								? 'Import en cours...'
-								: 'Glissez votre fichier CSV ici ou cliquez pour selectionner'}
-						</p>
-						<label className="mt-3 cursor-pointer">
-							<input
-								type="file"
-								accept=".csv,.xlsx,.xls"
-								onChange={handleFileSelect}
-								className="hidden"
-								disabled={isUploading}
-							/>
-							<Button size="sm" className="gap-2" disabled={isUploading} asChild>
-								<span>
-									<Upload className="h-4 w-4" />
-									Selectionner un fichier
-								</span>
-							</Button>
-						</label>
+			{/* Settings Drawer - 33% width on desktop */}
+			<Sheet open={showSettings} onOpenChange={setShowSettings}>
+				<SheetContent side="right" className="w-full sm:w-[33vw] sm:min-w-[400px] sm:max-w-[500px] overflow-y-auto bg-background border-l p-0">
+					{/* Header */}
+					<div className="px-5 py-4 border-b">
+						<SheetHeader>
+							<SheetTitle className="text-base font-semibold">Paramètres</SheetTitle>
+							<SheetDescription className="text-xs">
+								Informations et historique du compte
+							</SheetDescription>
+						</SheetHeader>
 					</div>
 
-					{/* Import history */}
-					{showImports && accountImports.length > 0 && (
-						<div className="space-y-2 pt-2">
-							<div className="flex items-center justify-between">
-								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Historique des imports
-								</p>
-								{accountImports.length > 5 && (
-									<button
-										type="button"
-										onClick={() => setShowAllImports(!showAllImports)}
-										className="text-xs text-primary hover:underline"
-									>
-										{showAllImports ? 'Afficher moins' : `Voir tout (${accountImports.length})`}
-									</button>
-								)}
-							</div>
-							{(showAllImports ? accountImports : accountImports.slice(0, 5)).map((imp) => (
-								<div
-									key={imp.id}
-									className={`flex items-center justify-between rounded-lg p-3 text-sm ${
-										imp.status === 'FAILED'
-											? 'bg-[oklch(0.55_0.2_25)]/5 border border-[oklch(0.55_0.2_25)]/20'
-											: 'bg-muted/30'
-									}`}
-								>
-									<div className="flex items-center gap-3">
-										<div
-											className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-												imp.status === 'FAILED'
-													? 'bg-[oklch(0.55_0.2_25)]/10'
-													: 'bg-background'
-											}`}
-										>
-											<FileSpreadsheet
-												className={`h-4 w-4 ${
-													imp.status === 'FAILED'
-														? 'text-[oklch(0.55_0.2_25)]'
-														: 'text-muted-foreground'
-												}`}
-											/>
-										</div>
-										<div>
-											<div className="flex items-center gap-2">
-												<span className="font-medium">{imp.filename}</span>
-												<div
-													className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${
-														imp.status === 'PROCESSED'
-															? 'bg-[oklch(0.55_0.15_145)]/10 text-[oklch(0.55_0.15_145)]'
-															: imp.status === 'PROCESSING'
-																? 'bg-primary/10 text-primary'
-																: imp.status === 'FAILED'
-																	? 'bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]'
-																	: 'bg-muted text-muted-foreground'
-													}`}
-												>
-													{getStatusIcon(imp.status)}
-													<span>{getStatusLabel(imp.status)}</span>
-												</div>
-											</div>
-											<p className="text-xs text-muted-foreground">
-												{formatFileSize(imp.fileSize)} •{' '}
-												{formatRelativeTime(imp.createdAt)}
-												{imp.recordsCount !== null && (
-													<span className="text-[oklch(0.55_0.15_145)]">
-														{' '}
-														• {imp.recordsCount} transactions
-													</span>
-												)}
-												{imp.skippedCount !== null && imp.skippedCount > 0 && (
-													<span className="text-muted-foreground">
-														{' '}
-														({imp.skippedCount} doublons)
-													</span>
-												)}
-												{imp.errorMessage && (
-													<span className="text-[oklch(0.55_0.2_25)]">
-														{' '}
-														• {imp.errorMessage}
-													</span>
-												)}
-											</p>
-										</div>
-									</div>
-									<div className="flex items-center gap-1">
-										{imp.status === 'PENDING' && (
-											<Button
-												variant="ghost"
-												size="sm"
-												className="h-7 gap-1 text-xs"
-												onClick={() => handleProcess(imp.id)}
-											>
-												<RefreshCw className="h-3 w-3" />
-												Traiter
-											</Button>
-										)}
-										{imp.status === 'PROCESSED' && (
-											<Button
-												variant="ghost"
-												size="sm"
-												className="h-7 gap-1 text-xs"
-												onClick={() => handleReprocess(imp.id)}
-											>
-												<RotateCcw className="h-3 w-3" />
-												Retraiter
-											</Button>
-										)}
-										{imp.status === 'FAILED' && (
-											<Button
-												variant="ghost"
-												size="sm"
-												className="h-7 gap-1 text-xs"
-												onClick={() => handleProcess(imp.id)}
-											>
-												<RefreshCw className="h-3 w-3" />
-												Reessayer
-											</Button>
-										)}
-										<Button
-											variant="ghost"
-											size="icon"
-											className="h-7 w-7 text-muted-foreground hover:text-[oklch(0.55_0.2_25)]"
-											onClick={() => setDeleteImportId(imp.id)}
-										>
-											<Trash2 className="h-3 w-3" />
-										</Button>
-									</div>
-								</div>
-							))}
-						</div>
-					)}
+					<div className="divide-y">
+						{/* Section 1: Informations */}
+						<div className="px-5 py-5 space-y-5">
+							<h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Informations</h3>
 
-					{pendingImports.length > 0 && (
-						<div className="rounded-lg border border-[oklch(0.7_0.15_75)]/20 bg-[oklch(0.7_0.15_75)]/5 p-3">
-							<div className="flex items-center gap-2 text-[oklch(0.7_0.15_75)]">
-								<Clock className="h-4 w-4" />
-								<span className="text-sm font-medium">
-									{pendingImports.length} fichier{pendingImports.length > 1 ? 's' : ''} en
-									attente de traitement
-								</span>
-							</div>
-						</div>
-					)}
-				</CardContent>
-			</Card>
-
-			{/* Transactions */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<CardTitle className="text-base font-medium">Transactions</CardTitle>
-						<div className="flex items-center gap-2">
-							<div className="relative">
-								<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+							{/* Account name */}
+							<div className="space-y-1.5">
+								<label className="text-sm text-muted-foreground">Nom du compte</label>
 								<Input
-									placeholder="Rechercher..."
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									className="pl-9 h-9 w-64"
+									value={editName || account.name}
+									onChange={(e) => setEditName(e.target.value)}
+									onBlur={() => {
+										if (editName && editName !== account.name) {
+											saveAccountDetails();
+										}
+									}}
+									onFocus={() => {
+										if (!editName) setEditName(account.name);
+									}}
+									className="h-10 text-sm font-medium"
+									placeholder="Nom du compte"
 								/>
 							</div>
+
+							{/* Description */}
+							<div className="space-y-1.5">
+								<label className="text-sm text-muted-foreground">Description</label>
+								<Input
+									value={editDescription !== '' ? editDescription : (account.description || '')}
+									onChange={(e) => setEditDescription(e.target.value)}
+									onBlur={() => {
+										if (editDescription !== (account.description || '')) {
+											saveAccountDetails();
+										}
+									}}
+									onFocus={() => {
+										if (editDescription === '') setEditDescription(account.description || '');
+									}}
+									className="h-10 text-sm"
+									placeholder="Description (optionnel)"
+								/>
+							</div>
+
+							{/* Owners - Multi-select */}
+							<div className="space-y-1.5">
+								<label className="text-sm text-muted-foreground">Titulaires</label>
+								<div className="min-h-[42px] p-2 rounded-md border bg-background flex flex-wrap gap-2 items-center">
+									{account.accountMembers.map((am) => (
+										<div
+											key={am.id}
+											className={`inline-flex items-center gap-1.5 pl-1.5 pr-1 py-1 rounded-md bg-muted text-sm transition-opacity ${
+												removeMemberMutation.isPending && removeMemberMutation.variables?.memberId === am.memberId ? 'opacity-50' : ''
+											}`}
+										>
+											<div
+												className="h-5 w-5 rounded-full flex items-center justify-center text-white text-xs font-medium"
+												style={{ backgroundColor: am.member.color || '#6b7280' }}
+											>
+												{removeMemberMutation.isPending && removeMemberMutation.variables?.memberId === am.memberId ? (
+													<Loader2 className="h-3 w-3 animate-spin" />
+												) : (
+													am.member.name.charAt(0).toUpperCase()
+												)}
+											</div>
+											<span className="font-medium">{am.member.name}</span>
+											<button
+												type="button"
+												onClick={() => removeMemberFromAccount(am.memberId)}
+												disabled={removeMemberMutation.isPending || addMemberMutation.isPending}
+												className="h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted-foreground/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+											>
+												<X className="h-3 w-3" />
+											</button>
+										</div>
+									))}
+									{/* Loading indicator when adding */}
+									{addMemberMutation.isPending && addMemberMutation.variables && (
+										<div className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-md bg-muted/50 text-sm animate-pulse">
+											<div
+												className="h-5 w-5 rounded-full flex items-center justify-center text-white text-xs font-medium"
+												style={{ backgroundColor: allMembers?.find(m => m.id === addMemberMutation.variables?.memberId)?.color || '#6b7280' }}
+											>
+												<Loader2 className="h-3 w-3 animate-spin" />
+											</div>
+											<span className="font-medium text-muted-foreground">
+												{allMembers?.find(m => m.id === addMemberMutation.variables?.memberId)?.name}
+											</span>
+										</div>
+									)}
+									{/* Add member button */}
+									<div className="relative">
+										<button
+											type="button"
+											onClick={() => setShowMemberDropdown(!showMemberDropdown)}
+											disabled={addMemberMutation.isPending || removeMemberMutation.isPending}
+											className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+										>
+											<Plus className="h-4 w-4" />
+											Ajouter
+										</button>
+										{showMemberDropdown && (
+											<div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-md border bg-popover p-1 shadow-md">
+												{availableMembers.map((member) => (
+													<button
+														key={member.id}
+														type="button"
+														onClick={() => addMemberToAccount(member.id)}
+														className="w-full flex items-center gap-2 px-2 py-1.5 rounded-sm text-sm hover:bg-muted transition-colors text-left"
+													>
+														<div
+															className="h-5 w-5 rounded-full flex items-center justify-center text-white text-xs font-medium"
+															style={{ backgroundColor: member.color || '#6b7280' }}
+														>
+															{member.name.charAt(0).toUpperCase()}
+														</div>
+														<span>{member.name}</span>
+													</button>
+												))}
+												{availableMembers.length === 0 && (
+													<p className="px-2 py-1.5 text-sm text-muted-foreground">Tous les membres sont ajoutés</p>
+												)}
+											</div>
+										)}
+									</div>
+								</div>
+							</div>
+
+							{/* Export URL */}
+							<div className="space-y-1.5">
+								<div className="flex items-center justify-between">
+									<label className="text-sm text-muted-foreground">Lien d&apos;export banque</label>
+									{account.exportUrl && (
+										<a
+											href={account.exportUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+										>
+											Ouvrir <ExternalLink className="h-3 w-3" />
+										</a>
+									)}
+								</div>
+								<Input
+									type="url"
+									value={exportUrlInput !== '' ? exportUrlInput : (account.exportUrl || '')}
+									onChange={(e) => setExportUrlInput(e.target.value)}
+									onBlur={() => {
+										const currentValue = exportUrlInput !== '' ? exportUrlInput : (account.exportUrl || '');
+										if (currentValue !== (account.exportUrl || '')) {
+											saveExportUrl();
+										}
+									}}
+									onFocus={() => {
+										if (exportUrlInput === '') setExportUrlInput(account.exportUrl || '');
+									}}
+									placeholder="https://www.banque.fr/espace-client"
+									className="h-10 text-sm"
+								/>
+							</div>
+
+							{/* Initial Balance */}
+							<div className="space-y-1.5">
+								<label className="text-sm text-muted-foreground">Solde initial</label>
+								<div className="grid grid-cols-2 gap-2">
+									<div className="relative">
+										<Input
+											type="text"
+											value={editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0')}
+											onChange={(e) => setEditInitialBalance(e.target.value)}
+											onBlur={() => {
+												const currentValue = editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0');
+												if (currentValue !== (account.initialBalance?.toString() || '0') ||
+													editInitialBalanceDate !== (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '')) {
+													saveInitialBalance();
+												}
+											}}
+											onFocus={() => {
+												if (editInitialBalance === '') {
+													setEditInitialBalance(account.initialBalance?.toString() || '0');
+													if (account.initialBalanceDate) {
+														setEditInitialBalanceDate(new Date(account.initialBalanceDate).toISOString().split('T')[0]);
+													}
+												}
+											}}
+											placeholder="0,00"
+											className="h-10 text-sm font-mono pr-12"
+										/>
+										<span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">EUR</span>
+									</div>
+									<Input
+										type="date"
+										value={editInitialBalanceDate !== '' ? editInitialBalanceDate : (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '')}
+										onChange={(e) => setEditInitialBalanceDate(e.target.value)}
+										onBlur={() => {
+											const currentBalanceDate = editInitialBalanceDate !== '' ? editInitialBalanceDate : (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '');
+											const currentBalance = editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0');
+											if (currentBalanceDate !== (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '') ||
+												currentBalance !== (account.initialBalance?.toString() || '0')) {
+												saveInitialBalance();
+											}
+										}}
+										onFocus={() => {
+											if (editInitialBalanceDate === '') {
+												setEditInitialBalance(account.initialBalance?.toString() || '0');
+												if (account.initialBalanceDate) {
+													setEditInitialBalanceDate(new Date(account.initialBalanceDate).toISOString().split('T')[0]);
+												}
+											}
+										}}
+										className="h-10 text-sm"
+									/>
+								</div>
+							</div>
+						</div>
+
+						{/* Section 2: Imports */}
+						<div className="px-5 py-5 space-y-3">
+							<div className="flex items-center justify-between">
+								<h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+									Imports
+									{accountImports.length > 0 && (
+										<span className="ml-1 text-muted-foreground/60">({accountImports.length})</span>
+									)}
+								</h3>
+								{accountImports.length > 5 && (
+									<Button
+										variant="ghost"
+										size="sm"
+										className="h-6 px-2 text-xs"
+										onClick={() => setShowAllImports(!showAllImports)}
+									>
+										{showAllImports ? 'Réduire' : 'Tout voir'}
+									</Button>
+								)}
+							</div>
+
+							{accountImports.length === 0 ? (
+								<div className="text-center py-6 rounded-lg bg-muted/20 border border-dashed">
+									<FileSpreadsheet className="h-6 w-6 mx-auto text-muted-foreground/40 mb-2" />
+									<p className="text-xs text-muted-foreground">Aucun import</p>
+								</div>
+							) : (
+								<div className="space-y-2">
+									{(showAllImports ? accountImports : accountImports.slice(0, 5)).map((imp) => (
+										<div
+											key={imp.id}
+											className={`flex items-center gap-2 rounded-lg p-2.5 border text-sm ${
+												imp.status === 'FAILED'
+													? 'bg-destructive/5 border-destructive/20'
+													: 'bg-muted/20 border-transparent'
+											}`}
+										>
+											<div className={`h-6 w-6 rounded flex items-center justify-center shrink-0 ${
+												imp.status === 'PROCESSED' ? 'bg-[oklch(0.55_0.15_145)]/10' :
+												imp.status === 'FAILED' ? 'bg-destructive/10' :
+												imp.status === 'PROCESSING' ? 'bg-primary/10' :
+												'bg-muted'
+											}`}>
+												{getStatusIcon(imp.status)}
+											</div>
+											<div className="min-w-0 flex-1">
+												<p className="text-xs font-medium truncate">{imp.filename}</p>
+												<p className="text-[11px] text-muted-foreground">
+													{formatRelativeTime(imp.createdAt)}
+													{imp.recordsCount !== null && (
+														<span className="text-[oklch(0.5_0.15_145)]"> • {imp.recordsCount} tx</span>
+													)}
+												</p>
+											</div>
+											<div className="flex items-center shrink-0">
+												{imp.status === 'PENDING' && (
+													<Button
+														variant="outline"
+														size="sm"
+														className="h-6 px-2 text-xs"
+														onClick={() => handleProcess(imp.id)}
+														disabled={processImportMutation.isPending}
+													>
+														{processImportMutation.isPending && processImportMutation.variables?.importId === imp.id ? (
+															<Loader2 className="h-3 w-3 animate-spin" />
+														) : (
+															'Traiter'
+														)}
+													</Button>
+												)}
+												{imp.status === 'PROCESSED' && (
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-6 w-6"
+														onClick={() => handleReprocess(imp.id)}
+														title="Retraiter"
+														disabled={reprocessImportMutation.isPending}
+													>
+														{reprocessImportMutation.isPending && reprocessImportMutation.variables?.importId === imp.id ? (
+															<Loader2 className="h-3 w-3 animate-spin" />
+														) : (
+															<RotateCcw className="h-3 w-3" />
+														)}
+													</Button>
+												)}
+												{imp.status === 'FAILED' && (
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-6 w-6"
+														onClick={() => handleProcess(imp.id)}
+														title="Réessayer"
+														disabled={processImportMutation.isPending}
+													>
+														{processImportMutation.isPending && processImportMutation.variables?.importId === imp.id ? (
+															<Loader2 className="h-3 w-3 animate-spin" />
+														) : (
+															<RefreshCw className="h-3 w-3" />
+														)}
+													</Button>
+												)}
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-6 w-6 text-muted-foreground hover:text-destructive"
+													onClick={() => setDeleteImportId(imp.id)}
+													disabled={deleteImportMutation.isPending}
+												>
+													{deleteImportMutation.isPending && deleteImportId === imp.id ? (
+														<Loader2 className="h-3 w-3 animate-spin" />
+													) : (
+														<Trash2 className="h-3 w-3" />
+													)}
+												</Button>
+											</div>
+										</div>
+									))}
+								</div>
+							)}
+						</div>
+
+						{/* Section 3: Gestion du compte */}
+						<div className="px-5 py-4 space-y-3">
+							<h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Gestion du compte</h3>
+							<Button
+								variant="outline"
+								size="sm"
+								className="w-full h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+								onClick={() => {
+									setShowSettings(false);
+									setDeleteAccountOpen(true);
+								}}
+							>
+								<Trash2 className="h-3 w-3 mr-1.5" />
+								Supprimer le compte
+							</Button>
+							{account._count.transactions > 0 && (
+								<p className="text-[11px] text-muted-foreground text-center">
+									{account._count.transactions} transaction{account._count.transactions > 1 ? 's' : ''} sera{account._count.transactions > 1 ? 'ont' : ''} également supprimée{account._count.transactions > 1 ? 's' : ''}
+								</p>
+							)}
 						</div>
 					</div>
-				</CardHeader>
-				<CardContent>
-					{!transactions || transactions.items.length === 0 ? (
-						<div className="text-center py-8 text-muted-foreground">
-							<FileSpreadsheet className="h-12 w-12 mx-auto mb-3 opacity-50" />
-							<p>Aucune transaction</p>
-							<p className="text-sm">Importez votre premier releve ci-dessus</p>
+				</SheetContent>
+			</Sheet>
+
+			{/* Transactions - Glassmorphism Section with Infinite Scroll */}
+			<div className="glass-card">
+				{/* Header */}
+				<div className="p-6 pb-4">
+					<div className="flex flex-col gap-5">
+						{/* Title row */}
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-3">
+								<h2 className="text-xl font-bold tracking-tight">Transactions</h2>
+								{totalTransactions > 0 && (
+									<span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
+										{totalTransactions}
+									</span>
+								)}
+							</div>
+							<label className="cursor-pointer">
+								<input
+									type="file"
+									accept=".csv,.xlsx,.xls"
+									onChange={handleFileSelect}
+									className="hidden"
+									disabled={isUploading}
+								/>
+								<Button
+									className="gap-2 rounded-xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+									disabled={isUploading}
+									asChild
+								>
+									<span>
+										{isUploading ? (
+											<Loader2 className="h-4 w-4 animate-spin" />
+										) : (
+											<Upload className="h-4 w-4" />
+										)}
+										Importer
+									</span>
+								</Button>
+							</label>
+						</div>
+						{/* Search row */}
+						<div className="relative group">
+							<Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+							<Input
+								placeholder="Rechercher une transaction..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="pl-12 h-12 text-base rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:bg-white dark:focus:bg-white/10 focus:border-primary/50 transition-all shadow-sm"
+							/>
+						</div>
+					</div>
+				</div>
+
+				{/* Content */}
+				<div
+					onDragEnter={handleDrag}
+					onDragLeave={handleDrag}
+					onDragOver={handleDrag}
+					onDrop={handleDrop}
+					className={`px-6 pb-6 relative ${dragActive ? 'bg-primary/5' : ''}`}
+				>
+					{/* Drag overlay */}
+					{dragActive && (
+						<div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-dashed border-primary/50 rounded-2xl z-10 m-2">
+							<div className="text-center">
+								<div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+									<Upload className="h-8 w-8 text-primary" />
+								</div>
+								<p className="text-sm font-semibold text-primary">Déposez votre fichier ici</p>
+								<p className="text-xs text-primary/70 mt-1">CSV, XLSX ou XLS</p>
+							</div>
+						</div>
+					)}
+
+					{allTransactions.length === 0 && !isLoadingTransactions ? (
+						<div className="text-center py-16">
+							<div className="h-20 w-20 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
+								<FileSpreadsheet className="h-10 w-10 text-muted-foreground/50" />
+							</div>
+							<p className="font-semibold text-foreground">Aucune transaction</p>
+							<p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
+								Glissez un fichier CSV ou cliquez sur Importer pour ajouter vos transactions
+							</p>
 						</div>
 					) : (
 						<div className="space-y-1">
-							{transactions.items.map((tx) => (
+							{allTransactions.map((tx, index) => (
 								<div
 									key={tx.id}
-									className="flex items-center justify-between rounded-lg p-3 hover:bg-muted/30 transition-colors"
+									className="group flex items-center justify-between rounded-xl px-4 py-3.5 hover:bg-white/60 dark:hover:bg-white/5 transition-all duration-200 cursor-default"
+									style={{ animationDelay: `${Math.min(index, 10) * 20}ms` }}
 								>
-									<div className="flex items-center gap-4">
-										<div className="w-20 text-sm text-muted-foreground">
-											{formatDate(tx.date, 'D MMM')}
+									<div className="flex items-center gap-4 min-w-0">
+										{/* Date badge */}
+										<div className="w-16 shrink-0">
+											<div className="inline-flex flex-col items-center px-2.5 py-1.5 rounded-lg bg-muted/40 dark:bg-white/5 group-hover:bg-muted/60 dark:group-hover:bg-white/10 transition-colors">
+												<span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+													{formatDate(tx.date, 'MMM')}
+												</span>
+												<span className="text-sm font-bold text-foreground -mt-0.5">
+													{formatDate(tx.date, 'D')}
+												</span>
+											</div>
 										</div>
-										<div>
-											<p className="font-medium">{tx.description}</p>
+										<div className="min-w-0">
+											<p className="font-medium truncate text-foreground group-hover:text-foreground transition-colors">
+												{tx.description}
+											</p>
 											{tx.transactionCategory?.category && (
-												<p className="text-xs text-muted-foreground">
-													{tx.transactionCategory.category.icon} {tx.transactionCategory.category.name}
+												<p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+													<span>{tx.transactionCategory.category.icon}</span>
+													<span>{tx.transactionCategory.category.name}</span>
 												</p>
 											)}
 										</div>
 									</div>
 									<p
-										className={`font-medium number-display ${
+										className={`font-bold number-display shrink-0 ml-4 text-base ${
 											tx.type === 'INCOME'
 												? 'text-[oklch(0.55_0.15_145)]'
 												: 'text-foreground'
 										}`}
 									>
-										{tx.type === 'INCOME' ? '+' : '-'}
+										{tx.type === 'INCOME' ? '+' : '−'}
 										{formatMoney(tx.amount)}
 									</p>
 								</div>
 							))}
 
-							{/* Pagination */}
-							{transactions.totalPages > 1 && (
-								<div className="flex items-center justify-between pt-4 border-t">
-									<p className="text-sm text-muted-foreground">
-										Page {transactions.page} sur{' '}
-										{transactions.totalPages} ({transactions.total}{' '}
-										transactions)
-									</p>
-									<div className="flex items-center gap-2">
+							{/* Infinite scroll trigger & loading indicator */}
+							<div ref={loadMoreRef} className="py-8">
+								{isLoadingMore ? (
+									<div className="flex items-center justify-center gap-3">
+										<div className="relative">
+											<div className="h-8 w-8 rounded-full bg-primary/10 animate-pulse" />
+											<Loader2 className="h-5 w-5 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+										</div>
+										<span className="text-sm text-muted-foreground font-medium">Chargement...</span>
+									</div>
+								) : hasMore ? (
+									<div className="flex flex-col items-center gap-2">
 										<Button
-											variant="outline"
+											variant="ghost"
 											size="sm"
-											disabled={currentPage === 1}
-											onClick={() => handlePageChange(currentPage - 1)}
+											onClick={loadMore}
+											className="text-muted-foreground hover:text-foreground rounded-xl hover:bg-white/60 dark:hover:bg-white/5"
 										>
-											Precedent
-										</Button>
-										<Button
-											variant="outline"
-											size="sm"
-											disabled={currentPage === transactions.totalPages}
-											onClick={() => handlePageChange(currentPage + 1)}
-										>
-											Suivant
+											Charger plus de transactions
 										</Button>
 									</div>
-								</div>
-							)}
+								) : allTransactions.length > 0 ? (
+									<div className="flex items-center justify-center gap-2 pt-4 border-t border-border/30">
+										<CheckCircle2 className="h-4 w-4 text-muted-foreground/50" />
+										<span className="text-sm text-muted-foreground">
+											{allTransactions.length} transactions affichées
+										</span>
+									</div>
+								) : null}
+							</div>
 						</div>
 					)}
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Confirmation Dialogs */}
 			<ConfirmDialog

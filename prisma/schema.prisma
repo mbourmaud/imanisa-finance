@@ -51,21 +51,23 @@ model Bank {
 
 /// Account: A bank account linked to a Bank
 model Account {
-  id             String          @id @default(uuid())
-  name           String
-  description    String?         // Optional notes or context about the account
-  accountNumber  String?
-  type           AccountType     @default(CHECKING)
-  balance        Float           @default(0)
-  currency       String          @default("EUR")
-  exportUrl      String?         // URL for exporting statements
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  bankId         String
-  bank           Bank            @relation(fields: [bankId], references: [id])
-  accountMembers AccountMember[]
-  rawImports     RawImport[]
-  transactions   Transaction[]
+  id                 String          @id @default(uuid())
+  name               String
+  description        String?         // Optional notes or context about the account
+  accountNumber      String?
+  type               AccountType     @default(CHECKING)
+  balance            Float           @default(0)
+  initialBalance     Float           @default(0)    // Starting balance at initialBalanceDate
+  initialBalanceDate DateTime?                      // Date of the initial balance reference
+  currency           String          @default("EUR")
+  exportUrl          String?         // URL for exporting statements
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  bankId             String
+  bank               Bank            @relation(fields: [bankId], references: [id])
+  accountMembers     AccountMember[]
+  rawImports         RawImport[]
+  transactions       Transaction[]
 
   @@index([bankId])
 }

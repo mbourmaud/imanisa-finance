@@ -38,6 +38,11 @@ export interface UpdateAccountInput {
 	name?: string;
 	type?: AccountType;
 	isActive?: boolean;
+	description?: string;
+	accountNumber?: string;
+	exportUrl?: string;
+	initialBalance?: number;
+	initialBalanceDate?: string;
 }
 
 export interface AccountFilters {
