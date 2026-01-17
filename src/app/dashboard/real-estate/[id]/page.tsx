@@ -6,6 +6,8 @@ import { useParams, useRouter } from 'next/navigation'
 import {
 	ArrowLeft,
 	Building2,
+	ChevronDown,
+	ChevronUp,
 	CreditCard,
 	Home,
 	Landmark,
@@ -40,6 +42,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { PropertyType, PropertyUsage, Loan, PropertyInsurance, CoOwnership, UtilityContract, LoanInsurance } from '@prisma/client'
 
@@ -103,6 +112,36 @@ const initialLoanFormData: LoanFormData = {
 	startDate: '',
 	endDate: '',
 	notes: '',
+}
+
+// Insurance form data
+interface InsuranceFormData {
+	memberId: string
+	name: string
+	provider: string
+	contractNumber: string
+	coveragePercent: string
+	monthlyPremium: string
+	link: string
+	notes: string
+}
+
+const initialInsuranceFormData: InsuranceFormData = {
+	memberId: '',
+	name: '',
+	provider: '',
+	contractNumber: '',
+	coveragePercent: '',
+	monthlyPremium: '',
+	link: '',
+	notes: '',
+}
+
+// Member type for dropdown
+interface Member {
+	id: string
+	name: string
+	color: string | null
 }
 
 interface PropertyWithDetails {
@@ -220,10 +259,21 @@ function PlaceholderSection({ title, icon: Icon, description }: { title: string;
 	)
 }
 
-function LoanCard({ loan }: { loan: LoanWithDetails }) {
+function LoanCard({
+	loan,
+	onAddInsurance,
+}: {
+	loan: LoanWithDetails
+	onAddInsurance: (loanId: string) => void
+}) {
+	const [isExpanded, setIsExpanded] = useState(false)
 	const paidPercent = loan.initialAmount > 0
 		? ((loan.initialAmount - loan.remainingAmount) / loan.initialAmount) * 100
 		: 0
+
+	const hasInsurances = loan.loanInsurances && loan.loanInsurances.length > 0
+	const totalInsurancePremium = loan.loanInsurances?.reduce((sum, ins) => sum + ins.monthlyPremium, 0) || 0
+	const totalCoverage = loan.loanInsurances?.reduce((sum, ins) => sum + ins.coveragePercent, 0) || 0
 
 	return (
 		<div className="rounded-xl border border-border/60 p-4 space-y-4">
@@ -268,6 +318,87 @@ function LoanCard({ loan }: { loan: LoanWithDetails }) {
 					N° contrat: {loan.loanNumber}
 				</p>
 			)}
+
+			{/* Insurance section */}
+			<div className="pt-3 border-t border-border/40">
+				<button
+					type="button"
+					onClick={() => setIsExpanded(!isExpanded)}
+					className="flex items-center justify-between w-full text-left"
+				>
+					<div className="flex items-center gap-2">
+						<Shield className="h-4 w-4 text-muted-foreground" />
+						<span className="text-sm font-medium">
+							Assurance emprunteur
+							{hasInsurances && (
+								<span className="ml-2 text-xs text-muted-foreground font-normal">
+									({loan.loanInsurances?.length} contrat{loan.loanInsurances && loan.loanInsurances.length > 1 ? 's' : ''})
+								</span>
+							)}
+						</span>
+					</div>
+					<div className="flex items-center gap-2">
+						{hasInsurances && (
+							<span className="text-xs text-muted-foreground">
+								{formatCurrency(totalInsurancePremium)}/mois · {totalCoverage}%
+							</span>
+						)}
+						{isExpanded ? (
+							<ChevronUp className="h-4 w-4 text-muted-foreground" />
+						) : (
+							<ChevronDown className="h-4 w-4 text-muted-foreground" />
+						)}
+					</div>
+				</button>
+
+				{isExpanded && (
+					<div className="mt-3 space-y-3">
+						{hasInsurances ? (
+							<div className="space-y-2">
+								{loan.loanInsurances?.map((insurance) => (
+									<div
+										key={insurance.id}
+										className="flex items-center gap-3 p-3 rounded-lg bg-muted/30"
+									>
+										<div
+											className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0"
+											style={{ backgroundColor: insurance.member.color || '#6b7280' }}
+										>
+											{insurance.member.name.charAt(0).toUpperCase()}
+										</div>
+										<div className="flex-1 min-w-0">
+											<div className="flex items-center gap-2 flex-wrap">
+												<span className="text-sm font-medium truncate">{insurance.member.name}</span>
+												<span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+													{insurance.coveragePercent}%
+												</span>
+											</div>
+											<p className="text-xs text-muted-foreground truncate">
+												{insurance.provider} · {formatCurrency(insurance.monthlyPremium)}/mois
+											</p>
+										</div>
+									</div>
+								))}
+							</div>
+						) : (
+							<div className="text-center py-3">
+								<p className="text-sm text-muted-foreground mb-2">
+									Aucune assurance emprunteur
+								</p>
+							</div>
+						)}
+						<Button
+							variant="outline"
+							size="sm"
+							className="w-full gap-2"
+							onClick={() => onAddInsurance(loan.id)}
+						>
+							<Plus className="h-3.5 w-3.5" />
+							Ajouter une assurance
+						</Button>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }
@@ -324,6 +455,17 @@ export default function PropertyDetailPage() {
 	const [loanFormData, setLoanFormData] = useState<LoanFormData>(initialLoanFormData)
 	const [isSubmittingLoan, setIsSubmittingLoan] = useState(false)
 	const [loanFormError, setLoanFormError] = useState<string | null>(null)
+
+	// Insurance dialog state
+	const [isInsuranceDialogOpen, setIsInsuranceDialogOpen] = useState(false)
+	const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null)
+	const [insuranceFormData, setInsuranceFormData] = useState<InsuranceFormData>(initialInsuranceFormData)
+	const [isSubmittingInsurance, setIsSubmittingInsurance] = useState(false)
+	const [insuranceFormError, setInsuranceFormError] = useState<string | null>(null)
+
+	// Members for dropdown
+	const [members, setMembers] = useState<Member[]>([])
+	const [loadingMembers, setLoadingMembers] = useState(false)
 
 	const fetchProperty = useCallback(async () => {
 		try {
@@ -429,6 +571,105 @@ export default function PropertyDetailPage() {
 			setLoanFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
 		} finally {
 			setIsSubmittingLoan(false)
+		}
+	}
+
+	// Fetch members for insurance dropdown
+	const fetchMembers = useCallback(async () => {
+		setLoadingMembers(true)
+		try {
+			const response = await fetch('/api/members')
+			if (response.ok) {
+				const data = await response.json()
+				setMembers(data.members || [])
+			}
+		} catch (err) {
+			console.error('Error fetching members:', err)
+		} finally {
+			setLoadingMembers(false)
+		}
+	}, [])
+
+	// Insurance form handlers
+	const handleOpenInsuranceDialog = useCallback((loanId: string) => {
+		setSelectedLoanId(loanId)
+		setIsInsuranceDialogOpen(true)
+		fetchMembers()
+	}, [fetchMembers])
+
+	const handleInsuranceInputChange = (field: keyof InsuranceFormData, value: string) => {
+		setInsuranceFormData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const resetInsuranceForm = () => {
+		setInsuranceFormData(initialInsuranceFormData)
+		setInsuranceFormError(null)
+		setSelectedLoanId(null)
+	}
+
+	const handleInsuranceSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setInsuranceFormError(null)
+		setIsSubmittingInsurance(true)
+
+		try {
+			// Validate required fields
+			if (!insuranceFormData.memberId) {
+				throw new Error('Le membre est requis')
+			}
+			if (!insuranceFormData.name.trim()) {
+				throw new Error('Le nom de l\'assurance est requis')
+			}
+			if (!insuranceFormData.provider.trim()) {
+				throw new Error('L\'assureur est requis')
+			}
+			if (!insuranceFormData.coveragePercent) {
+				throw new Error('Le taux de couverture est requis')
+			}
+			if (!insuranceFormData.monthlyPremium) {
+				throw new Error('La prime mensuelle est requise')
+			}
+
+			const coveragePercent = Number.parseFloat(insuranceFormData.coveragePercent)
+			const monthlyPremium = Number.parseFloat(insuranceFormData.monthlyPremium)
+
+			if (coveragePercent < 0 || coveragePercent > 100) {
+				throw new Error('Le taux de couverture doit être entre 0 et 100')
+			}
+			if (monthlyPremium < 0) {
+				throw new Error('La prime mensuelle ne peut pas être négative')
+			}
+
+			const payload = {
+				memberId: insuranceFormData.memberId,
+				name: insuranceFormData.name.trim(),
+				provider: insuranceFormData.provider.trim(),
+				contractNumber: insuranceFormData.contractNumber.trim() || null,
+				coveragePercent,
+				monthlyPremium,
+				link: insuranceFormData.link.trim() || null,
+				notes: insuranceFormData.notes.trim() || null,
+			}
+
+			const response = await fetch(`/api/loans/${selectedLoanId}/insurances`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la création de l\'assurance')
+			}
+
+			// Success - close dialog and refresh data
+			setIsInsuranceDialogOpen(false)
+			resetInsuranceForm()
+			await fetchProperty()
+		} catch (err) {
+			setInsuranceFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsSubmittingInsurance(false)
 		}
 	}
 
@@ -911,7 +1152,11 @@ export default function PropertyDetailPage() {
 							{/* Loan cards */}
 							<div className="space-y-3">
 								{property.loans.map((loan) => (
-									<LoanCard key={loan.id} loan={loan} />
+									<LoanCard
+										key={loan.id}
+										loan={loan}
+										onAddInsurance={handleOpenInsuranceDialog}
+									/>
 								))}
 							</div>
 						</div>
@@ -939,6 +1184,170 @@ export default function PropertyDetailPage() {
 				icon={Zap}
 				description="Électricité, gaz, eau, internet et autres contrats"
 			/>
+
+			{/* Insurance Dialog */}
+			<Dialog
+				open={isInsuranceDialogOpen}
+				onOpenChange={(open) => {
+					setIsInsuranceDialogOpen(open)
+					if (!open) resetInsuranceForm()
+				}}
+			>
+				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>Ajouter une assurance emprunteur</DialogTitle>
+						<DialogDescription>
+							Renseignez les informations de l'assurance pour ce prêt.
+						</DialogDescription>
+					</DialogHeader>
+					<form onSubmit={handleInsuranceSubmit} className="space-y-4">
+						{/* Error message */}
+						{insuranceFormError && (
+							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+								<p className="text-sm text-destructive">{insuranceFormError}</p>
+							</div>
+						)}
+
+						{/* Member selection */}
+						<div className="space-y-2">
+							<Label htmlFor="insurance-member">Emprunteur assuré *</Label>
+							{loadingMembers ? (
+								<Skeleton className="h-10 w-full" />
+							) : (
+								<Select
+									value={insuranceFormData.memberId}
+									onValueChange={(value) => handleInsuranceInputChange('memberId', value)}
+								>
+									<SelectTrigger id="insurance-member">
+										<SelectValue placeholder="Sélectionner un membre" />
+									</SelectTrigger>
+									<SelectContent>
+										{members.map((member) => (
+											<SelectItem key={member.id} value={member.id}>
+												<div className="flex items-center gap-2">
+													<div
+														className="h-4 w-4 rounded-full"
+														style={{ backgroundColor: member.color || '#6b7280' }}
+													/>
+													{member.name}
+												</div>
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							)}
+						</div>
+
+						{/* Insurance info */}
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-2">
+								<Label htmlFor="insurance-name">Nom de l'assurance *</Label>
+								<Input
+									id="insurance-name"
+									placeholder="Assurance ADI"
+									value={insuranceFormData.name}
+									onChange={(e) => handleInsuranceInputChange('name', e.target.value)}
+								/>
+							</div>
+							<div className="space-y-2">
+								<Label htmlFor="insurance-provider">Assureur *</Label>
+								<Input
+									id="insurance-provider"
+									placeholder="April, CNP, MAIF..."
+									value={insuranceFormData.provider}
+									onChange={(e) => handleInsuranceInputChange('provider', e.target.value)}
+								/>
+							</div>
+						</div>
+
+						{/* Coverage and premium */}
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-2">
+								<Label htmlFor="insurance-coverage">Quotité (%) *</Label>
+								<Input
+									id="insurance-coverage"
+									type="number"
+									min="0"
+									max="100"
+									step="1"
+									placeholder="50"
+									value={insuranceFormData.coveragePercent}
+									onChange={(e) => handleInsuranceInputChange('coveragePercent', e.target.value)}
+								/>
+								<p className="text-xs text-muted-foreground">
+									Pourcentage du capital couvert
+								</p>
+							</div>
+							<div className="space-y-2">
+								<Label htmlFor="insurance-premium">Prime mensuelle (€) *</Label>
+								<Input
+									id="insurance-premium"
+									type="number"
+									min="0"
+									step="0.01"
+									placeholder="25"
+									value={insuranceFormData.monthlyPremium}
+									onChange={(e) => handleInsuranceInputChange('monthlyPremium', e.target.value)}
+								/>
+							</div>
+						</div>
+
+						{/* Contract number */}
+						<div className="space-y-2">
+							<Label htmlFor="insurance-contract">N° de contrat</Label>
+							<Input
+								id="insurance-contract"
+								placeholder="ASS-2024-001"
+								value={insuranceFormData.contractNumber}
+								onChange={(e) => handleInsuranceInputChange('contractNumber', e.target.value)}
+							/>
+						</div>
+
+						{/* Link */}
+						<div className="space-y-2">
+							<Label htmlFor="insurance-link">Lien vers le contrat</Label>
+							<Input
+								id="insurance-link"
+								placeholder="https://..."
+								value={insuranceFormData.link}
+								onChange={(e) => handleInsuranceInputChange('link', e.target.value)}
+							/>
+						</div>
+
+						{/* Notes */}
+						<div className="space-y-2">
+							<Label htmlFor="insurance-notes">Notes</Label>
+							<Input
+								id="insurance-notes"
+								placeholder="Notes additionnelles..."
+								value={insuranceFormData.notes}
+								onChange={(e) => handleInsuranceInputChange('notes', e.target.value)}
+							/>
+						</div>
+
+						<DialogFooter className="pt-4">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setIsInsuranceDialogOpen(false)}
+								disabled={isSubmittingInsurance}
+							>
+								Annuler
+							</Button>
+							<Button type="submit" disabled={isSubmittingInsurance}>
+								{isSubmittingInsurance ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Création...
+									</>
+								) : (
+									'Ajouter l\'assurance'
+								)}
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
 		</div>
 	)
 }
