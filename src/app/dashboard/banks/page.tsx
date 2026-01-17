@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
+	ChevronDown,
 	ChevronRight,
 	CreditCard,
 	Landmark,
@@ -22,6 +23,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -324,13 +331,42 @@ export default function BanksPage() {
 				</div>
 			)}
 
-			{/* Supported Banks - Bank accounts */}
+			{/* Bank accounts section */}
 			<div className="mt-8">
-				<div className="flex items-center gap-2 mb-4">
-					<Landmark className="h-4 w-4 text-muted-foreground" />
-					<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-						Comptes bancaires
-					</h2>
+				<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-2">
+						<div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/50">
+							<Landmark className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+						</div>
+						<h2 className="text-sm font-semibold text-foreground">
+							Comptes bancaires
+						</h2>
+						<div className="flex-1 ml-3 h-px bg-border/50" />
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" size="sm" className="gap-1 text-xs">
+								<Plus className="h-3.5 w-3.5" />
+								Ajouter
+								<ChevronDown className="h-3 w-3 opacity-50" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-48">
+							{data?.bankAccounts.map((bank) => (
+								<DropdownMenuItem
+									key={bank.id}
+									onClick={() => handleAddAccountClick(bank)}
+									className="gap-2"
+								>
+									<span
+										className="w-2 h-2 rounded-full"
+										style={{ backgroundColor: bank.color }}
+									/>
+									{bank.name}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				{loading ? (
@@ -472,13 +508,42 @@ export default function BanksPage() {
 				)}
 			</div>
 
-			{/* Investments */}
+			{/* Investments section */}
 			<div className="mt-8">
-				<div className="flex items-center gap-2 mb-4">
-					<TrendingUp className="h-4 w-4 text-muted-foreground" />
-					<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-						Investissements
-					</h2>
+				<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-2">
+						<div className="flex h-6 w-6 items-center justify-center rounded-md bg-purple-100 dark:bg-purple-900/50">
+							<TrendingUp className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+						</div>
+						<h2 className="text-sm font-semibold text-foreground">
+							Investissements
+						</h2>
+						<div className="flex-1 ml-3 h-px bg-border/50" />
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" size="sm" className="gap-1 text-xs">
+								<Plus className="h-3.5 w-3.5" />
+								Ajouter
+								<ChevronDown className="h-3 w-3 opacity-50" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-48">
+							{data?.investmentAccounts.map((bank) => (
+								<DropdownMenuItem
+									key={bank.id}
+									onClick={() => handleAddAccountClick(bank)}
+									className="gap-2"
+								>
+									<span
+										className="w-2 h-2 rounded-full"
+										style={{ backgroundColor: bank.color }}
+									/>
+									{bank.name}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				{loading ? (
