@@ -1,0 +1,585 @@
+{
+  "project": "Imanisa Finance - Immobilier",
+  "mode": "feature",
+  "branchName": "ralph/immobilier",
+  "baseBranch": "main",
+  "description": "Module immobilier complet : gestion des biens, prêts, assurances emprunteur, assurance bien, copropriété et contrats. Architecture Clean/DDD, UI épurée Vercel style, données dynamiques depuis la BDD.",
+  "githubRepo": "fr162241/imanisa-finance",
+  "plugins": {
+    "recommended": ["security-guidance", "commit-commands", "frontend-design", "web-interface-guidelines"],
+    "optional": ["typescript-lsp"]
+  },
+  "designGuidelines": {
+    "style": "Vercel Web Interface Guidelines",
+    "CRITICAL_UI_RULE": "After EVERY frontend change: 1) Take screenshot on desktop, 2) Resize to mobile (375px) with mcp__chrome-devtools__resize_page, 3) Take mobile screenshot, 4) Verify UI is clean and professional on BOTH. Fix before moving on!",
+    "codeQuality": [
+      "DRY - Don't Repeat Yourself, extract common logic",
+      "KISS - Keep It Simple, no over-engineering",
+      "Clean Architecture - Domain > Application > Infrastructure",
+      "Delete dead code when found",
+      "No mocks - all data from database",
+      "Typecheck must pass"
+    ],
+    "testing": "Use Chrome DevTools MCP (mcp__chrome-devtools__*) to test EVERY feature manually. Take your time, quality over speed.",
+    "principles": [
+      "Minimalist and clean - no visual clutter",
+      "Generous whitespace and breathing room",
+      "Subtle borders (border-border/60) and shadows",
+      "Muted colors for secondary elements",
+      "Clear visual hierarchy with typography",
+      "Mobile-first responsive design"
+    ]
+  },
+  "dataModel": {
+    "reference": "docs/design-immobilier.md",
+    "entities": ["Property", "PropertyMember", "Loan", "LoanInsurance", "PropertyInsurance", "CoOwnership", "UtilityContract"],
+    "enums": ["PropertyType (HOUSE, APARTMENT)", "PropertyUsage (PRIMARY, SECONDARY, RENTAL)", "InsuranceType (PNO, MRH)", "UtilityType (ELECTRICITY, GAS, WATER, INTERNET, OTHER)"]
+  },
+  "userStories": [
+    {
+      "id": "IMMO-001",
+      "title": "Schema Prisma - Property et PropertyMember",
+      "description": "As a developer, I want the Property and PropertyMember models in Prisma so that I can store real estate data.",
+      "acceptanceCriteria": [
+        "Property model with: id, name, type (PropertyType enum), usage (PropertyUsage enum), address, address2?, city, postalCode, surface, rooms?, bedrooms?, purchasePrice, purchaseDate, notaryFees, agencyFees?, currentValue, rentAmount?, rentCharges?, notes?, createdAt, updatedAt",
+        "PropertyType enum: HOUSE, APARTMENT",
+        "PropertyUsage enum: PRIMARY, SECONDARY, RENTAL",
+        "PropertyMember model with: id, propertyId, memberId, ownershipShare, createdAt",
+        "Proper relations: Property has many PropertyMember, PropertyMember belongs to Member",
+        "Indexes on propertyId and memberId",
+        "npx prisma db push runs successfully",
+        "npx prisma generate runs successfully",
+        "Typecheck passes"
+      ],
+      "files": ["prisma/schema.prisma"],
+      "dependsOn": [],
+      "priority": 1,
+      "passes": false,
+      "notes": "Remove old Property/PropertyCharge models if they exist. Clean slate."
+    },
+    {
+      "id": "IMMO-002",
+      "title": "Schema Prisma - Loan (mise à jour)",
+      "description": "As a developer, I want the Loan model updated to match our design so that loans are properly linked to properties.",
+      "acceptanceCriteria": [
+        "Loan model with: id, propertyId (required FK), memberId (FK), name, lender?, loanNumber?, initialAmount, remainingAmount, rate, monthlyPayment, startDate, endDate?, notes?, createdAt, updatedAt",
+        "Remove old fields: type, bank (replaced by lender), insuranceMonthly (moved to LoanInsurance)",
+        "Relation: Loan belongs to Property (required), Loan belongs to Member",
+        "Index on propertyId and memberId",
+        "npx prisma db push runs successfully",
+        "Typecheck passes"
+      ],
+      "files": ["prisma/schema.prisma"],
+      "dependsOn": ["IMMO-001"],
+      "priority": 2,
+      "passes": false,
+      "notes": "lender is nullable (empty = family loan). insuranceMonthly removed, handled by LoanInsurance."
+    },
+    {
+      "id": "IMMO-003",
+      "title": "Schema Prisma - LoanInsurance",
+      "description": "As a developer, I want the LoanInsurance model so that each co-borrower can have their own insurance entry.",
+      "acceptanceCriteria": [
+        "LoanInsurance model with: id, loanId (FK), memberId (FK), name, provider, contractNumber?, coveragePercent, monthlyPremium, link?, notes?, createdAt, updatedAt",
+        "Relation: LoanInsurance belongs to Loan, LoanInsurance belongs to Member",
+        "Indexes on loanId and memberId",
+        "npx prisma db push runs successfully",
+        "Typecheck passes"
+      ],
+      "files": ["prisma/schema.prisma"],
+      "dependsOn": ["IMMO-002"],
+      "priority": 3,
+      "passes": false,
+      "notes": "Each member (Mathieu, Ninon) can have separate insurance with different coverage %."
+    },
+    {
+      "id": "IMMO-004",
+      "title": "Schema Prisma - PropertyInsurance, CoOwnership, UtilityContract",
+      "description": "As a developer, I want the remaining models for property-related contracts and charges.",
+      "acceptanceCriteria": [
+        "PropertyInsurance model with: id, propertyId (FK unique), type (InsuranceType enum), provider, contractNumber?, monthlyPremium, startDate, endDate?, coverage?, link?, notes?, createdAt, updatedAt",
+        "InsuranceType enum: PNO, MRH",
+        "CoOwnership model with: id, propertyId (FK unique), name, quarterlyAmount, link?, notes?, createdAt, updatedAt",
+        "UtilityContract model with: id, propertyId (FK), type (UtilityType enum), provider, contractNumber?, monthlyAmount, link?, notes?, createdAt, updatedAt",
+        "UtilityType enum: ELECTRICITY, GAS, WATER, INTERNET, OTHER",
+        "PropertyInsurance and CoOwnership are 1:1 with Property (unique constraint on propertyId)",
+        "UtilityContract is 1:N with Property",
+        "npx prisma db push runs successfully",
+        "Typecheck passes"
+      ],
+      "files": ["prisma/schema.prisma"],
+      "dependsOn": ["IMMO-001"],
+      "priority": 4,
+      "passes": false,
+      "notes": "Delete old PropertyCharge model if it exists."
+    },
+    {
+      "id": "IMMO-005",
+      "title": "Repository - PropertyRepository",
+      "description": "As a developer, I want a PropertyRepository following clean architecture patterns.",
+      "acceptanceCriteria": [
+        "Create src/server/repositories/property-repository.ts",
+        "Methods: getAll(), getById(id), create(data), update(id, data), delete(id)",
+        "Include propertyMembers with member details in queries",
+        "Include related loans, insurance, coOwnership, utilityContracts counts",
+        "Proper TypeScript types for PropertyWithDetails",
+        "Export from src/server/repositories/index.ts",
+        "Typecheck passes"
+      ],
+      "files": ["src/server/repositories/property-repository.ts", "src/server/repositories/index.ts"],
+      "dependsOn": ["IMMO-004"],
+      "priority": 5,
+      "passes": false,
+      "notes": "Follow existing repository patterns (account-repository.ts as reference)."
+    },
+    {
+      "id": "IMMO-006",
+      "title": "Repository - LoanRepository",
+      "description": "As a developer, I want a LoanRepository for managing property loans.",
+      "acceptanceCriteria": [
+        "Create src/server/repositories/loan-repository.ts",
+        "Methods: getAll(), getByProperty(propertyId), getById(id), create(data), update(id, data), delete(id)",
+        "Include property and member details in queries",
+        "Include loanInsurances with member details",
+        "Proper TypeScript types for LoanWithDetails",
+        "Export from src/server/repositories/index.ts",
+        "Typecheck passes"
+      ],
+      "files": ["src/server/repositories/loan-repository.ts", "src/server/repositories/index.ts"],
+      "dependsOn": ["IMMO-005"],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-007",
+      "title": "Repository - LoanInsuranceRepository",
+      "description": "As a developer, I want a LoanInsuranceRepository for managing loan insurances per member.",
+      "acceptanceCriteria": [
+        "Create src/server/repositories/loan-insurance-repository.ts",
+        "Methods: getByLoan(loanId), getById(id), create(data), update(id, data), delete(id)",
+        "Include member details in queries",
+        "Proper TypeScript types",
+        "Export from src/server/repositories/index.ts",
+        "Typecheck passes"
+      ],
+      "files": ["src/server/repositories/loan-insurance-repository.ts", "src/server/repositories/index.ts"],
+      "dependsOn": ["IMMO-006"],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-008",
+      "title": "Repository - PropertyInsurance, CoOwnership, UtilityContract",
+      "description": "As a developer, I want repositories for property-related contracts.",
+      "acceptanceCriteria": [
+        "Create src/server/repositories/property-insurance-repository.ts with: getByProperty, create, update, delete",
+        "Create src/server/repositories/co-ownership-repository.ts with: getByProperty, create, update, delete",
+        "Create src/server/repositories/utility-contract-repository.ts with: getByProperty, getById, create, update, delete",
+        "Proper TypeScript types for each",
+        "Export all from src/server/repositories/index.ts",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/server/repositories/property-insurance-repository.ts",
+        "src/server/repositories/co-ownership-repository.ts",
+        "src/server/repositories/utility-contract-repository.ts",
+        "src/server/repositories/index.ts"
+      ],
+      "dependsOn": ["IMMO-005"],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-009",
+      "title": "API Routes - Properties CRUD",
+      "description": "As a developer, I want API routes for property management.",
+      "acceptanceCriteria": [
+        "GET /api/properties - List all properties with members and summary stats",
+        "POST /api/properties - Create property with memberIds and ownershipShares",
+        "GET /api/properties/[id] - Get property with all related data",
+        "PATCH /api/properties/[id] - Update property",
+        "DELETE /api/properties/[id] - Delete property (cascade)",
+        "Proper validation and error handling",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/api/properties/route.ts", "src/app/api/properties/[id]/route.ts"],
+      "dependsOn": ["IMMO-005"],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-010",
+      "title": "API Routes - Loans CRUD",
+      "description": "As a developer, I want API routes for loan management.",
+      "acceptanceCriteria": [
+        "GET /api/properties/[id]/loans - List loans for a property",
+        "POST /api/properties/[id]/loans - Create loan for property",
+        "GET /api/loans/[id] - Get loan with insurances",
+        "PATCH /api/loans/[id] - Update loan",
+        "DELETE /api/loans/[id] - Delete loan (cascade insurances)",
+        "Proper validation and error handling",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/api/properties/[id]/loans/route.ts", "src/app/api/loans/[id]/route.ts"],
+      "dependsOn": ["IMMO-006", "IMMO-009"],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-011",
+      "title": "API Routes - LoanInsurance CRUD",
+      "description": "As a developer, I want API routes for loan insurance management.",
+      "acceptanceCriteria": [
+        "GET /api/loans/[id]/insurances - List insurances for a loan",
+        "POST /api/loans/[id]/insurances - Create insurance for loan",
+        "PATCH /api/loan-insurances/[id] - Update insurance",
+        "DELETE /api/loan-insurances/[id] - Delete insurance",
+        "Proper validation and error handling",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/api/loans/[id]/insurances/route.ts", "src/app/api/loan-insurances/[id]/route.ts"],
+      "dependsOn": ["IMMO-007", "IMMO-010"],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-012",
+      "title": "API Routes - PropertyInsurance, CoOwnership, UtilityContract",
+      "description": "As a developer, I want API routes for property contracts.",
+      "acceptanceCriteria": [
+        "POST/PATCH/DELETE /api/properties/[id]/insurance - Property insurance (1:1)",
+        "POST/PATCH/DELETE /api/properties/[id]/co-ownership - CoOwnership (1:1)",
+        "GET/POST /api/properties/[id]/utility-contracts - Utility contracts (1:N)",
+        "PATCH/DELETE /api/utility-contracts/[id] - Update/delete utility contract",
+        "Proper validation and error handling",
+        "Typecheck passes"
+      ],
+      "files": [
+        "src/app/api/properties/[id]/insurance/route.ts",
+        "src/app/api/properties/[id]/co-ownership/route.ts",
+        "src/app/api/properties/[id]/utility-contracts/route.ts",
+        "src/app/api/utility-contracts/[id]/route.ts"
+      ],
+      "dependsOn": ["IMMO-008", "IMMO-009"],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-013",
+      "title": "UI - Page liste des biens immobiliers",
+      "description": "As a user, I want to see all my properties in a clean list with key stats.",
+      "acceptanceCriteria": [
+        "Replace mock data with API call to GET /api/properties",
+        "Display properties in cards with: name, type, address, currentValue, loan remaining",
+        "Stats header: total value, total equity, total loans, number of properties",
+        "Button 'Ajouter un bien' in header",
+        "Loading state while fetching",
+        "Empty state if no properties",
+        "Remove all dead/mock code",
+        "Use Chrome DevTools MCP to verify: desktop screenshot, mobile (375px) screenshot",
+        "UI must be clean, minimal, Vercel style",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/page.tsx"],
+      "dependsOn": ["IMMO-009"],
+      "priority": 13,
+      "passes": false,
+      "notes": "IMPORTANT: Test with mcp__chrome-devtools__take_screenshot on desktop AND mobile (375px)."
+    },
+    {
+      "id": "IMMO-014",
+      "title": "UI - Dialog création de bien",
+      "description": "As a user, I want to create a new property with basic info and select owners.",
+      "acceptanceCriteria": [
+        "Dialog opens on 'Ajouter un bien' click",
+        "Form fields: name (required), type (select HOUSE/APARTMENT), usage (select PRIMARY/SECONDARY/RENTAL), address, city, postalCode, surface, purchasePrice, purchaseDate, notaryFees, agencyFees",
+        "Member selection with ownership % (like account creation)",
+        "If RENTAL selected, show rentAmount and rentCharges fields",
+        "Submit calls POST /api/properties",
+        "Loading state on submit",
+        "Success: close dialog, refresh list",
+        "Error: inline error message",
+        "Clean UI with proper spacing, labels in muted-foreground",
+        "Test on mobile (375px) - dialog must be scrollable and usable",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/page.tsx"],
+      "dependsOn": ["IMMO-013"],
+      "priority": 14,
+      "passes": false,
+      "notes": "Use Chrome DevTools MCP to test the full flow: open dialog, fill form, submit, verify property appears."
+    },
+    {
+      "id": "IMMO-015",
+      "title": "UI - Page détail du bien",
+      "description": "As a user, I want to see all details of a property on a dedicated page.",
+      "acceptanceCriteria": [
+        "Create src/app/dashboard/real-estate/[id]/page.tsx",
+        "Fetch property data from GET /api/properties/[id]",
+        "Header: property name, type badge, usage badge, address",
+        "Section 'Informations': all property fields in clean layout",
+        "Section 'Propriétaires': list members with ownership %",
+        "Section 'Prêts': placeholder (will be implemented next)",
+        "Section 'Assurance': placeholder",
+        "Section 'Copropriété': placeholder",
+        "Section 'Contrats': placeholder",
+        "Back button to /dashboard/real-estate",
+        "Edit button in header (for future story)",
+        "Clean UI, proper spacing between sections",
+        "Test on desktop and mobile",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-014"],
+      "priority": 15,
+      "passes": false,
+      "notes": "Use Chrome DevTools MCP to navigate from list to detail page."
+    },
+    {
+      "id": "IMMO-016",
+      "title": "UI - Section Prêts sur page détail",
+      "description": "As a user, I want to see and add loans on the property detail page.",
+      "acceptanceCriteria": [
+        "Section 'Prêts' shows list of loans from API",
+        "Each loan card shows: name, lender, remainingAmount, monthlyPayment, rate, progress bar",
+        "Button 'Ajouter un prêt' opens dialog",
+        "Dialog form: name, lender, loanNumber, initialAmount, remainingAmount, rate, monthlyPayment, startDate, endDate",
+        "Submit calls POST /api/properties/[id]/loans",
+        "Success: refresh loans list",
+        "Empty state if no loans",
+        "Clean UI, consistent with rest of page",
+        "Test on mobile",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-015", "IMMO-010"],
+      "priority": 16,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-017",
+      "title": "UI - Section Assurance emprunteur sur prêt",
+      "description": "As a user, I want to add loan insurance for each co-borrower.",
+      "acceptanceCriteria": [
+        "Each loan card has expandable section or sub-list for insurances",
+        "Show existing insurances: member name, provider, coverage %, monthly premium",
+        "Button 'Ajouter assurance' opens dialog",
+        "Dialog form: select member, name, provider, contractNumber, coveragePercent, monthlyPremium, link",
+        "Submit calls POST /api/loans/[id]/insurances",
+        "Success: refresh display",
+        "Clean UI, subtle nested styling",
+        "Test with multiple insurances (Mathieu 50%, Ninon 50%)",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-016", "IMMO-011"],
+      "priority": 17,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-018",
+      "title": "UI - Section Assurance bien (PNO/MRH)",
+      "description": "As a user, I want to add property insurance (PNO or MRH).",
+      "acceptanceCriteria": [
+        "Section 'Assurance' shows existing insurance or empty state",
+        "Button 'Ajouter assurance' (only if none exists)",
+        "Dialog form: type (PNO/MRH), provider, contractNumber, monthlyPremium, startDate, coverage, link",
+        "Submit calls POST /api/properties/[id]/insurance",
+        "If insurance exists, show edit/delete options",
+        "Clean card display with provider, type badge, monthly amount",
+        "Test on mobile",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-015", "IMMO-012"],
+      "priority": 18,
+      "passes": false,
+      "notes": "1:1 relationship - only one insurance per property."
+    },
+    {
+      "id": "IMMO-019",
+      "title": "UI - Section Copropriété",
+      "description": "As a user, I want to add co-ownership/syndic info.",
+      "acceptanceCriteria": [
+        "Section 'Copropriété' shows existing or empty state",
+        "Button 'Ajouter' (only if none exists)",
+        "Dialog form: name (syndic), quarterlyAmount, link",
+        "Submit calls POST /api/properties/[id]/co-ownership",
+        "If exists, show edit/delete options",
+        "Display: syndic name, quarterly amount, yearly total calculated",
+        "Test on mobile",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-015", "IMMO-012"],
+      "priority": 19,
+      "passes": false,
+      "notes": "1:1 relationship - only one co-ownership per property."
+    },
+    {
+      "id": "IMMO-020",
+      "title": "UI - Section Contrats (EDF, GDF...)",
+      "description": "As a user, I want to add utility contracts.",
+      "acceptanceCriteria": [
+        "Section 'Contrats' shows list of utility contracts",
+        "Button 'Ajouter un contrat'",
+        "Dialog form: type (ELECTRICITY/GAS/WATER/INTERNET/OTHER), provider, contractNumber, monthlyAmount, link",
+        "Submit calls POST /api/properties/[id]/utility-contracts",
+        "Each contract shows: type icon, provider, monthly amount, link",
+        "Edit/delete on each contract",
+        "Empty state if no contracts",
+        "Test on mobile",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-015", "IMMO-012"],
+      "priority": 20,
+      "passes": false,
+      "notes": "1:N relationship - multiple contracts per property."
+    },
+    {
+      "id": "IMMO-021",
+      "title": "UI - Édition du bien",
+      "description": "As a user, I want to edit property information.",
+      "acceptanceCriteria": [
+        "Edit button in header opens dialog with current values",
+        "All fields editable (same as creation)",
+        "Can update ownership shares",
+        "Submit calls PATCH /api/properties/[id]",
+        "Success: refresh page data",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-015"],
+      "priority": 21,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-022",
+      "title": "UI - Suppression du bien",
+      "description": "As a user, I want to delete a property with confirmation.",
+      "acceptanceCriteria": [
+        "Delete option in dropdown menu",
+        "Confirmation dialog: 'Supprimer ce bien ? Cette action supprimera aussi les prêts, assurances et contrats associés.'",
+        "Calls DELETE /api/properties/[id]",
+        "Success: redirect to /dashboard/real-estate",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/real-estate/[id]/page.tsx"],
+      "dependsOn": ["IMMO-021"],
+      "priority": 22,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-023",
+      "title": "UI - Page Crédits connectée à la BDD",
+      "description": "As a user, I want the loans page to show real data from database.",
+      "acceptanceCriteria": [
+        "Replace mock data in /dashboard/loans with API call",
+        "Create GET /api/loans endpoint that returns all loans with property info",
+        "Display loans grouped by property or flat list",
+        "Stats: total remaining, total monthly, average rate",
+        "Link each loan to its property detail page",
+        "Remove all mock data",
+        "Test on desktop and mobile",
+        "Typecheck passes"
+      ],
+      "files": ["src/app/dashboard/loans/page.tsx", "src/app/api/loans/route.ts"],
+      "dependsOn": ["IMMO-016"],
+      "priority": 23,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-024",
+      "title": "Test E2E - Création complète d'un bien",
+      "description": "As a tester, I want to verify the complete property creation flow using Chrome DevTools MCP.",
+      "acceptanceCriteria": [
+        "Use mcp__chrome-devtools__navigate_page to go to /dashboard/real-estate",
+        "Use mcp__chrome-devtools__take_snapshot to verify page loaded",
+        "Click 'Ajouter un bien' using mcp__chrome-devtools__click",
+        "Fill form: name='Appartement Rueil', type=APARTMENT, usage=PRIMARY, address='10 rue de Paris', city='Rueil-Malmaison', postalCode='92500', surface=65, purchasePrice=350000",
+        "Select members Mathieu (50%) and Ninon (50%)",
+        "Submit and verify property appears in list",
+        "Click on property to go to detail page",
+        "Verify all info displayed correctly",
+        "Take screenshots to document"
+      ],
+      "files": [],
+      "dependsOn": ["IMMO-015"],
+      "priority": 24,
+      "passes": false,
+      "notes": "IMPORTANT: Use mcp__chrome-devtools__* tools for ALL browser interactions. App runs on http://localhost:3000"
+    },
+    {
+      "id": "IMMO-025",
+      "title": "Test E2E - Ajout prêt et assurance emprunteur",
+      "description": "As a tester, I want to verify adding a loan with insurances.",
+      "acceptanceCriteria": [
+        "Navigate to property detail page created in IMMO-024",
+        "Click 'Ajouter un prêt' in Prêts section",
+        "Fill: name='Crédit Immo Rueil', lender='Crédit Mutuel', initialAmount=280000, remainingAmount=250000, rate=1.5, monthlyPayment=1200",
+        "Submit and verify loan appears",
+        "Add insurance for Mathieu: coverage 50%, monthlyPremium 25€",
+        "Add insurance for Ninon: coverage 50%, monthlyPremium 25€",
+        "Verify both insurances display under the loan",
+        "Take screenshots"
+      ],
+      "files": [],
+      "dependsOn": ["IMMO-024", "IMMO-017"],
+      "priority": 25,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-026",
+      "title": "Test E2E - Ajout assurance bien, copro, contrats",
+      "description": "As a tester, I want to verify adding all property-related contracts.",
+      "acceptanceCriteria": [
+        "On property detail page, add PropertyInsurance: type=MRH, provider='MAIF', monthlyPremium=35",
+        "Add CoOwnership: name='Syndic Nexity', quarterlyAmount=450",
+        "Add UtilityContract: type=ELECTRICITY, provider='EDF', monthlyAmount=80",
+        "Add UtilityContract: type=INTERNET, provider='Free', monthlyAmount=30",
+        "Verify all sections display correctly",
+        "Verify totals/summaries are calculated",
+        "Test on mobile (375px)",
+        "Take screenshots"
+      ],
+      "files": [],
+      "dependsOn": ["IMMO-025", "IMMO-020"],
+      "priority": 26,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "IMMO-027",
+      "title": "Cleanup - Supprimer code mort et mocks",
+      "description": "As a developer, I want to ensure no dead code or mocks remain.",
+      "acceptanceCriteria": [
+        "Search for any remaining mock data in real-estate and loans pages",
+        "Remove unused imports and variables",
+        "Remove old PropertyCharge references if any",
+        "Verify no console.log statements left",
+        "Run typecheck - must pass",
+        "Run lint - fix any issues",
+        "Final visual check on all pages"
+      ],
+      "files": ["src/app/dashboard/real-estate/page.tsx", "src/app/dashboard/loans/page.tsx"],
+      "dependsOn": ["IMMO-026"],
+      "priority": 27,
+      "passes": false,
+      "notes": "Final cleanup before PR."
+    }
+  ]
+}
