@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
 	ChevronRight,
+	CreditCard,
 	Landmark,
 	Plus,
 	TrendingUp,
 	Users,
+	Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
 	Dialog,
 	DialogContent,
@@ -86,15 +89,20 @@ function formatCurrency(amount: number): string {
 	}).format(amount);
 }
 
-// Skeleton for the stats row
-function StatsRowSkeleton() {
+// Skeleton for the stats cards
+function StatsCardsSkeleton() {
 	return (
-		<div className="grid grid-cols-3 gap-6 py-6 border-b border-border/50">
+		<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 			{[1, 2, 3].map((i) => (
-				<div key={i}>
-					<Skeleton className="h-4 w-20 mb-2" />
-					<Skeleton className="h-8 w-24" />
-				</div>
+				<Card key={i} className="py-4">
+					<CardContent className="flex items-center gap-4 px-4">
+						<Skeleton className="h-10 w-10 rounded-lg" />
+						<div className="flex-1">
+							<Skeleton className="h-3 w-16 mb-2" />
+							<Skeleton className="h-6 w-20" />
+						</div>
+					</CardContent>
+				</Card>
 			))}
 		</div>
 	);
@@ -241,34 +249,66 @@ export default function BanksPage() {
 				</p>
 			</div>
 
-			{/* Stats Row - Stripe style */}
+			{/* Stats Cards */}
 			{loading ? (
-				<StatsRowSkeleton />
+				<StatsCardsSkeleton />
 			) : error ? (
 				<div className="py-6 text-destructive">{error}</div>
 			) : (
-				<div className="grid grid-cols-3 gap-6 py-6 border-b border-border/50">
-					<div>
-						<p className="text-sm text-muted-foreground">Banques utilisées</p>
-						<p className="text-2xl font-semibold mt-1 tabular-nums">
-							{data?.summary.totalBanksUsed ?? 0}
-							<span className="text-sm font-normal text-muted-foreground ml-1">
-								/ {data?.summary.totalBanksAvailable ?? 0}
-							</span>
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Comptes actifs</p>
-						<p className="text-2xl font-semibold mt-1 tabular-nums">
-							{data?.summary.totalAccounts ?? 0}
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Solde total</p>
-						<p className="text-2xl font-semibold mt-1 tabular-nums">
-							{formatCurrency(data?.summary.totalBalance ?? 0)}
-						</p>
-					</div>
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					{/* Banks Card */}
+					<Card className="py-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30">
+						<CardContent className="flex items-center gap-4 px-4">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/50">
+								<Landmark className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+							</div>
+							<div>
+								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+									Banques
+								</p>
+								<p className="text-2xl font-semibold tabular-nums">
+									{data?.summary.totalBanksUsed ?? 0}
+									<span className="text-sm font-normal text-muted-foreground ml-1">
+										/ {data?.summary.totalBanksAvailable ?? 0}
+									</span>
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Accounts Card */}
+					<Card className="py-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50 dark:border-blue-800/30">
+						<CardContent className="flex items-center gap-4 px-4">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+								<CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+							</div>
+							<div>
+								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+									Comptes actifs
+								</p>
+								<p className="text-2xl font-semibold tabular-nums">
+									{data?.summary.totalAccounts ?? 0}
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Balance Card */}
+					<Card className="py-4 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-800/30">
+						<CardContent className="flex items-center gap-4 px-4">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+								<Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+							</div>
+							<div>
+								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+									Solde total
+								</p>
+								<p className="text-2xl font-semibold tabular-nums">
+									{formatCurrency(data?.summary.totalBalance ?? 0)}
+								</p>
+							</div>
+						</CardContent>
+					</Card>
 				</div>
 			)}
 
