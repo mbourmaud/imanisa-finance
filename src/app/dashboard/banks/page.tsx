@@ -277,7 +277,7 @@ export default function BanksPage() {
 			) : (
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					{/* Banks Card */}
-					<Card className="py-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30">
+					<Card className="py-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
 						<CardContent className="flex items-center gap-4 px-4">
 							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/50">
 								<Landmark className="h-5 w-5 text-amber-600 dark:text-amber-400" />
@@ -297,7 +297,7 @@ export default function BanksPage() {
 					</Card>
 
 					{/* Accounts Card */}
-					<Card className="py-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50 dark:border-blue-800/30">
+					<Card className="py-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50 dark:border-blue-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '50ms', animationFillMode: 'backwards' }}>
 						<CardContent className="flex items-center gap-4 px-4">
 							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
 								<CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -314,7 +314,7 @@ export default function BanksPage() {
 					</Card>
 
 					{/* Balance Card */}
-					<Card className="py-4 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-800/30">
+					<Card className="py-4 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
 						<CardContent className="flex items-center gap-4 px-4">
 							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
 								<Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -378,18 +378,22 @@ export default function BanksPage() {
 					</div>
 				) : (
 					<div className="space-y-3">
-						{data?.bankAccounts.map((bank) => {
+						{data?.bankAccounts.map((bank, index) => {
 							const hasAccounts = bank.accountCount > 0;
 
 							return (
 								<div
 									key={bank.id}
-									className={`rounded-lg p-4 border-l-4 transition-colors ${
+									className={`rounded-lg p-4 border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 ${
 										hasAccounts
-											? 'bg-card border border-border/60'
+											? 'bg-card border border-border/60 hover:shadow-sm'
 											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
 									}`}
-									style={{ borderLeftColor: bank.color }}
+									style={{
+										borderLeftColor: bank.color,
+										animationDelay: `${index * 50}ms`,
+										animationFillMode: 'backwards',
+									}}
 									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
 								>
 									{/* Bank header */}
@@ -459,7 +463,7 @@ export default function BanksPage() {
 											<Link
 												key={account.id}
 												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-sm hover:border-border/60 transition-all duration-200 group cursor-pointer"
+												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-md hover:border-border/60 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 											>
 												<div className="flex items-center gap-3">
 													<div>
@@ -554,18 +558,22 @@ export default function BanksPage() {
 					</div>
 				) : (
 					<div className="space-y-3">
-						{data?.investmentAccounts.map((bank) => {
+						{data?.investmentAccounts.map((bank, index) => {
 							const hasAccounts = bank.accountCount > 0;
 
 							return (
 								<div
 									key={bank.id}
-									className={`rounded-lg p-4 border-l-4 transition-colors ${
+									className={`rounded-lg p-4 border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 ${
 										hasAccounts
-											? 'bg-card border border-border/60'
+											? 'bg-card border border-border/60 hover:shadow-sm'
 											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
 									}`}
-									style={{ borderLeftColor: bank.color }}
+									style={{
+										borderLeftColor: bank.color,
+										animationDelay: `${index * 50}ms`,
+										animationFillMode: 'backwards',
+									}}
 									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
 								>
 									{/* Bank header */}
@@ -635,7 +643,7 @@ export default function BanksPage() {
 											<Link
 												key={account.id}
 												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-sm hover:border-border/60 transition-all duration-200 group cursor-pointer"
+												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-md hover:border-border/60 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 											>
 												<div className="flex items-center gap-3">
 													<div>
