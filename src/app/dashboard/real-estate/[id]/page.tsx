@@ -24,6 +24,7 @@ import {
 	Users,
 	Wallet,
 	Wifi,
+	X,
 	Zap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -210,6 +211,55 @@ const initialUtilityContractFormData: UtilityContractFormData = {
 	monthlyAmount: '',
 	link: '',
 	notes: '',
+}
+
+// Property edit form data
+interface PropertyFormData {
+	name: string
+	type: PropertyType | ''
+	usage: PropertyUsage | ''
+	address: string
+	address2: string
+	city: string
+	postalCode: string
+	surface: string
+	rooms: string
+	bedrooms: string
+	purchasePrice: string
+	purchaseDate: string
+	notaryFees: string
+	agencyFees: string
+	currentValue: string
+	rentAmount: string
+	rentCharges: string
+	notes: string
+}
+
+const initialPropertyFormData: PropertyFormData = {
+	name: '',
+	type: '',
+	usage: '',
+	address: '',
+	address2: '',
+	city: '',
+	postalCode: '',
+	surface: '',
+	rooms: '',
+	bedrooms: '',
+	purchasePrice: '',
+	purchaseDate: '',
+	notaryFees: '',
+	agencyFees: '',
+	currentValue: '',
+	rentAmount: '',
+	rentCharges: '',
+	notes: '',
+}
+
+// Member share for ownership editing
+interface MemberShare {
+	memberId: string
+	ownershipShare: number
 }
 
 // Member type for dropdown
@@ -620,6 +670,13 @@ export default function PropertyDetailPage() {
 	const [isSubmittingUtilityContract, setIsSubmittingUtilityContract] = useState(false)
 	const [utilityContractFormError, setUtilityContractFormError] = useState<string | null>(null)
 	const [deletingUtilityContractId, setDeletingUtilityContractId] = useState<string | null>(null)
+
+	// Property edit dialog state
+	const [isEditPropertyDialogOpen, setIsEditPropertyDialogOpen] = useState(false)
+	const [propertyFormData, setPropertyFormData] = useState<PropertyFormData>(initialPropertyFormData)
+	const [editMemberShares, setEditMemberShares] = useState<MemberShare[]>([])
+	const [isSubmittingProperty, setIsSubmittingProperty] = useState(false)
+	const [propertyFormError, setPropertyFormError] = useState<string | null>(null)
 
 	const fetchProperty = useCallback(async () => {
 		try {
@@ -1143,6 +1200,175 @@ export default function PropertyDetailPage() {
 		}
 	}
 
+	// Property edit form handlers
+	const handlePropertyInputChange = (field: keyof PropertyFormData, value: string) => {
+		setPropertyFormData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const resetPropertyForm = () => {
+		setPropertyFormData(initialPropertyFormData)
+		setEditMemberShares([])
+		setPropertyFormError(null)
+	}
+
+	const openEditPropertyDialog = () => {
+		if (!property) return
+		// Pre-fill form with existing data
+		setPropertyFormData({
+			name: property.name,
+			type: property.type,
+			usage: property.usage,
+			address: property.address,
+			address2: property.address2 || '',
+			city: property.city,
+			postalCode: property.postalCode,
+			surface: property.surface.toString(),
+			rooms: property.rooms?.toString() || '',
+			bedrooms: property.bedrooms?.toString() || '',
+			purchasePrice: property.purchasePrice.toString(),
+			purchaseDate: new Date(property.purchaseDate).toISOString().split('T')[0],
+			notaryFees: property.notaryFees.toString(),
+			agencyFees: property.agencyFees?.toString() || '',
+			currentValue: property.currentValue.toString(),
+			rentAmount: property.rentAmount?.toString() || '',
+			rentCharges: property.rentCharges?.toString() || '',
+			notes: property.notes || '',
+		})
+		// Pre-fill member shares
+		setEditMemberShares(
+			property.propertyMembers.map((pm) => ({
+				memberId: pm.memberId,
+				ownershipShare: pm.ownershipShare,
+			}))
+		)
+		// Fetch members for dropdown
+		fetchMembers()
+		setIsEditPropertyDialogOpen(true)
+	}
+
+	const handleAddMember = () => {
+		const availableMembers = members.filter(
+			(m) => !editMemberShares.some((ms) => ms.memberId === m.id)
+		)
+		if (availableMembers.length > 0) {
+			setEditMemberShares((prev) => [
+				...prev,
+				{ memberId: availableMembers[0].id, ownershipShare: 100 },
+			])
+		}
+	}
+
+	const handleRemoveMember = (memberId: string) => {
+		setEditMemberShares((prev) => prev.filter((ms) => ms.memberId !== memberId))
+	}
+
+	const handleMemberChange = (index: number, memberId: string) => {
+		setEditMemberShares((prev) =>
+			prev.map((ms, i) => (i === index ? { ...ms, memberId } : ms))
+		)
+	}
+
+	const handleShareChange = (index: number, share: number) => {
+		setEditMemberShares((prev) =>
+			prev.map((ms, i) => (i === index ? { ...ms, ownershipShare: share } : ms))
+		)
+	}
+
+	const handlePropertySubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setPropertyFormError(null)
+		setIsSubmittingProperty(true)
+
+		try {
+			// Validate required fields
+			if (!propertyFormData.name.trim()) {
+				throw new Error('Le nom est requis')
+			}
+			if (!propertyFormData.type) {
+				throw new Error('Le type est requis')
+			}
+			if (!propertyFormData.usage) {
+				throw new Error("L'usage est requis")
+			}
+			if (!propertyFormData.address.trim()) {
+				throw new Error("L'adresse est requise")
+			}
+			if (!propertyFormData.city.trim()) {
+				throw new Error('La ville est requise')
+			}
+			if (!propertyFormData.postalCode.trim()) {
+				throw new Error('Le code postal est requis')
+			}
+			if (!propertyFormData.surface) {
+				throw new Error('La surface est requise')
+			}
+			if (!propertyFormData.purchasePrice) {
+				throw new Error("Le prix d'achat est requis")
+			}
+			if (!propertyFormData.purchaseDate) {
+				throw new Error("La date d'achat est requise")
+			}
+			if (!propertyFormData.notaryFees) {
+				throw new Error('Les frais de notaire sont requis')
+			}
+			if (!propertyFormData.currentValue) {
+				throw new Error('La valeur actuelle est requise')
+			}
+
+			// Validate member shares total to 100%
+			if (editMemberShares.length > 0) {
+				const totalShare = editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)
+				if (totalShare !== 100) {
+					throw new Error('La somme des parts de propriété doit être égale à 100%')
+				}
+			}
+
+			const payload = {
+				name: propertyFormData.name.trim(),
+				type: propertyFormData.type,
+				usage: propertyFormData.usage,
+				address: propertyFormData.address.trim(),
+				address2: propertyFormData.address2.trim() || null,
+				city: propertyFormData.city.trim(),
+				postalCode: propertyFormData.postalCode.trim(),
+				surface: Number.parseFloat(propertyFormData.surface),
+				rooms: propertyFormData.rooms ? Number.parseInt(propertyFormData.rooms, 10) : null,
+				bedrooms: propertyFormData.bedrooms ? Number.parseInt(propertyFormData.bedrooms, 10) : null,
+				purchasePrice: Number.parseFloat(propertyFormData.purchasePrice),
+				purchaseDate: propertyFormData.purchaseDate,
+				notaryFees: Number.parseFloat(propertyFormData.notaryFees),
+				agencyFees: propertyFormData.agencyFees ? Number.parseFloat(propertyFormData.agencyFees) : null,
+				currentValue: Number.parseFloat(propertyFormData.currentValue),
+				rentAmount: propertyFormData.rentAmount ? Number.parseFloat(propertyFormData.rentAmount) : null,
+				rentCharges: propertyFormData.rentCharges ? Number.parseFloat(propertyFormData.rentCharges) : null,
+				notes: propertyFormData.notes.trim() || null,
+				memberShares: editMemberShares.length > 0 ? editMemberShares : undefined,
+			}
+
+			const response = await fetch(`/api/properties/${propertyId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la modification du bien')
+			}
+
+			// Success - close dialog and refresh data
+			setIsEditPropertyDialogOpen(false)
+			resetPropertyForm()
+			await fetchProperty()
+		} catch (err) {
+			setPropertyFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+		} finally {
+			setIsSubmittingProperty(false)
+		}
+	}
+
+	const isEditFormRental = propertyFormData.usage === 'RENTAL'
+
 	// Loading state
 	if (loading) {
 		return (
@@ -1225,7 +1451,7 @@ export default function PropertyDetailPage() {
 					</div>
 				</div>
 				<div className="flex items-center gap-2 sm:shrink-0">
-					<Button variant="outline" className="gap-2">
+					<Button variant="outline" className="gap-2" onClick={openEditPropertyDialog}>
 						<Pencil className="h-4 w-4" />
 						Modifier
 					</Button>
@@ -2697,6 +2923,382 @@ export default function PropertyDetailPage() {
 									</>
 								) : (
 									editingUtilityContractId ? 'Modifier' : 'Ajouter'
+								)}
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+
+			{/* Edit Property Dialog */}
+			<Dialog
+				open={isEditPropertyDialogOpen}
+				onOpenChange={(open) => {
+					setIsEditPropertyDialogOpen(open)
+					if (!open) resetPropertyForm()
+				}}
+			>
+				<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>Modifier le bien immobilier</DialogTitle>
+						<DialogDescription>
+							Modifiez les informations de votre bien immobilier.
+						</DialogDescription>
+					</DialogHeader>
+					<form onSubmit={handlePropertySubmit} className="space-y-6">
+						{/* Error message */}
+						{propertyFormError && (
+							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+								<p className="text-sm text-destructive">{propertyFormError}</p>
+							</div>
+						)}
+
+						{/* Basic info */}
+						<div className="space-y-4">
+							<h3 className="text-sm font-medium text-muted-foreground">Informations générales</h3>
+							<div className="grid gap-4 sm:grid-cols-2">
+								<div className="space-y-2">
+									<Label htmlFor="edit-name">Nom du bien *</Label>
+									<Input
+										id="edit-name"
+										placeholder="Appartement Paris 15"
+										value={propertyFormData.name}
+										onChange={(e) => handlePropertyInputChange('name', e.target.value)}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-type">Type *</Label>
+									<Select
+										value={propertyFormData.type}
+										onValueChange={(value) => handlePropertyInputChange('type', value)}
+									>
+										<SelectTrigger className="w-full">
+											<SelectValue placeholder="Sélectionner..." />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="APARTMENT">Appartement</SelectItem>
+											<SelectItem value="HOUSE">Maison</SelectItem>
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-usage">Usage *</Label>
+									<Select
+										value={propertyFormData.usage}
+										onValueChange={(value) => handlePropertyInputChange('usage', value)}
+									>
+										<SelectTrigger className="w-full">
+											<SelectValue placeholder="Sélectionner..." />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="PRIMARY">Résidence principale</SelectItem>
+											<SelectItem value="SECONDARY">Résidence secondaire</SelectItem>
+											<SelectItem value="RENTAL">Locatif</SelectItem>
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-surface">Surface (m²) *</Label>
+									<Input
+										id="edit-surface"
+										type="number"
+										min="0"
+										step="0.01"
+										placeholder="65"
+										value={propertyFormData.surface}
+										onChange={(e) => handlePropertyInputChange('surface', e.target.value)}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-rooms">Pièces</Label>
+									<Input
+										id="edit-rooms"
+										type="number"
+										min="0"
+										placeholder="3"
+										value={propertyFormData.rooms}
+										onChange={(e) => handlePropertyInputChange('rooms', e.target.value)}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-bedrooms">Chambres</Label>
+									<Input
+										id="edit-bedrooms"
+										type="number"
+										min="0"
+										placeholder="2"
+										value={propertyFormData.bedrooms}
+										onChange={(e) => handlePropertyInputChange('bedrooms', e.target.value)}
+									/>
+								</div>
+							</div>
+						</div>
+
+						{/* Address */}
+						<div className="space-y-4">
+							<h3 className="text-sm font-medium text-muted-foreground">Adresse</h3>
+							<div className="space-y-4">
+								<div className="space-y-2">
+									<Label htmlFor="edit-address">Adresse *</Label>
+									<Input
+										id="edit-address"
+										placeholder="10 rue de Paris"
+										value={propertyFormData.address}
+										onChange={(e) => handlePropertyInputChange('address', e.target.value)}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-address2">Complément d&apos;adresse</Label>
+									<Input
+										id="edit-address2"
+										placeholder="Bâtiment A, 3ème étage"
+										value={propertyFormData.address2}
+										onChange={(e) => handlePropertyInputChange('address2', e.target.value)}
+									/>
+								</div>
+								<div className="grid gap-4 sm:grid-cols-2">
+									<div className="space-y-2">
+										<Label htmlFor="edit-city">Ville *</Label>
+										<Input
+											id="edit-city"
+											placeholder="Paris"
+											value={propertyFormData.city}
+											onChange={(e) => handlePropertyInputChange('city', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="edit-postalCode">Code postal *</Label>
+										<Input
+											id="edit-postalCode"
+											placeholder="75015"
+											value={propertyFormData.postalCode}
+											onChange={(e) => handlePropertyInputChange('postalCode', e.target.value)}
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Purchase info */}
+						<div className="space-y-4">
+							<h3 className="text-sm font-medium text-muted-foreground">Achat</h3>
+							<div className="grid gap-4 sm:grid-cols-2">
+								<div className="space-y-2">
+									<Label htmlFor="edit-purchasePrice">Prix d&apos;achat (€) *</Label>
+									<Input
+										id="edit-purchasePrice"
+										type="number"
+										min="0"
+										step="0.01"
+										placeholder="350000"
+										value={propertyFormData.purchasePrice}
+										onChange={(e) => handlePropertyInputChange('purchasePrice', e.target.value)}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-purchaseDate">Date d&apos;achat *</Label>
+									<Input
+										id="edit-purchaseDate"
+										type="date"
+										value={propertyFormData.purchaseDate}
+										onChange={(e) => handlePropertyInputChange('purchaseDate', e.target.value)}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-notaryFees">Frais de notaire (€) *</Label>
+									<Input
+										id="edit-notaryFees"
+										type="number"
+										min="0"
+										step="0.01"
+										placeholder="25000"
+										value={propertyFormData.notaryFees}
+										onChange={(e) => handlePropertyInputChange('notaryFees', e.target.value)}
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="edit-agencyFees">Frais d&apos;agence (€)</Label>
+									<Input
+										id="edit-agencyFees"
+										type="number"
+										min="0"
+										step="0.01"
+										placeholder="10000"
+										value={propertyFormData.agencyFees}
+										onChange={(e) => handlePropertyInputChange('agencyFees', e.target.value)}
+									/>
+								</div>
+							</div>
+						</div>
+
+						{/* Current value */}
+						<div className="space-y-4">
+							<h3 className="text-sm font-medium text-muted-foreground">Valeur actuelle</h3>
+							<div className="space-y-2">
+								<Label htmlFor="edit-currentValue">Valeur estimée (€) *</Label>
+								<Input
+									id="edit-currentValue"
+									type="number"
+									min="0"
+									step="0.01"
+									placeholder="380000"
+									value={propertyFormData.currentValue}
+									onChange={(e) => handlePropertyInputChange('currentValue', e.target.value)}
+								/>
+							</div>
+						</div>
+
+						{/* Rental info - only shown for RENTAL usage */}
+						{isEditFormRental && (
+							<div className="space-y-4">
+								<h3 className="text-sm font-medium text-muted-foreground">Informations locatives</h3>
+								<div className="grid gap-4 sm:grid-cols-2">
+									<div className="space-y-2">
+										<Label htmlFor="edit-rentAmount">Loyer mensuel (€)</Label>
+										<Input
+											id="edit-rentAmount"
+											type="number"
+											min="0"
+											step="0.01"
+											placeholder="1200"
+											value={propertyFormData.rentAmount}
+											onChange={(e) => handlePropertyInputChange('rentAmount', e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="edit-rentCharges">Charges locatives (€)</Label>
+										<Input
+											id="edit-rentCharges"
+											type="number"
+											min="0"
+											step="0.01"
+											placeholder="150"
+											value={propertyFormData.rentCharges}
+											onChange={(e) => handlePropertyInputChange('rentCharges', e.target.value)}
+										/>
+									</div>
+								</div>
+							</div>
+						)}
+
+						{/* Members/Owners */}
+						<div className="space-y-4">
+							<div className="flex items-center justify-between">
+								<h3 className="text-sm font-medium text-muted-foreground">Propriétaires</h3>
+								{members.length > editMemberShares.length && (
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={handleAddMember}
+										className="gap-1"
+									>
+										<Plus className="h-3 w-3" />
+										Ajouter
+									</Button>
+								)}
+							</div>
+							{loadingMembers ? (
+								<Skeleton className="h-10 w-full" />
+							) : editMemberShares.length === 0 ? (
+								<p className="text-sm text-muted-foreground">
+									Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des propriétaires.
+								</p>
+							) : (
+								<div className="space-y-3">
+									{editMemberShares.map((ms, index) => {
+										const member = members.find((m) => m.id === ms.memberId)
+										const availableMembers = members.filter(
+											(m) => m.id === ms.memberId || !editMemberShares.some((other) => other.memberId === m.id)
+										)
+										return (
+											<div key={ms.memberId} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+												<div
+													className="h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium text-white shrink-0"
+													style={{ backgroundColor: member?.color || '#6b7280' }}
+												>
+													{member?.name.charAt(0).toUpperCase()}
+												</div>
+												<Select
+													value={ms.memberId}
+													onValueChange={(value) => handleMemberChange(index, value)}
+												>
+													<SelectTrigger className="flex-1">
+														<SelectValue />
+													</SelectTrigger>
+													<SelectContent>
+														{availableMembers.map((m) => (
+															<SelectItem key={m.id} value={m.id}>
+																{m.name}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+												<div className="flex items-center gap-2">
+													<Input
+														type="number"
+														min="0"
+														max="100"
+														className="w-20"
+														value={ms.ownershipShare}
+														onChange={(e) =>
+															handleShareChange(index, Number.parseInt(e.target.value, 10) || 0)
+														}
+													/>
+													<span className="text-sm text-muted-foreground">%</span>
+												</div>
+												<Button
+													type="button"
+													variant="ghost"
+													size="icon"
+													className="h-8 w-8 shrink-0"
+													onClick={() => handleRemoveMember(ms.memberId)}
+												>
+													<X className="h-4 w-4" />
+												</Button>
+											</div>
+										)
+									})}
+									{editMemberShares.length > 0 && (
+										<div className="text-xs text-muted-foreground text-right">
+											Total: {editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
+											{editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !== 100 && (
+												<span className="text-destructive ml-1">(doit être 100%)</span>
+											)}
+										</div>
+									)}
+								</div>
+							)}
+						</div>
+
+						{/* Notes */}
+						<div className="space-y-2">
+							<Label htmlFor="edit-notes">Notes</Label>
+							<Input
+								id="edit-notes"
+								placeholder="Notes additionnelles..."
+								value={propertyFormData.notes}
+								onChange={(e) => handlePropertyInputChange('notes', e.target.value)}
+							/>
+						</div>
+
+						<DialogFooter className="pt-4">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setIsEditPropertyDialogOpen(false)}
+								disabled={isSubmittingProperty}
+							>
+								Annuler
+							</Button>
+							<Button type="submit" disabled={isSubmittingProperty}>
+								{isSubmittingProperty ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Modification...
+									</>
+								) : (
+									'Enregistrer'
 								)}
 							</Button>
 						</DialogFooter>
