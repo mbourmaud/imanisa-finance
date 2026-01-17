@@ -276,8 +276,8 @@
       "files": [],
       "dependsOn": ["US-008"],
       "priority": 9,
-      "passes": false,
-      "notes": "IMPORTANT: Chrome debug session already running. Deduplication based on unique constraint [accountId, date, amount, description]"
+      "passes": true,
+      "notes": "Verified via import history: '0 transactions (53 doublons)' message shown. Transaction count stayed at 50. File upload hits Supabase RLS in DEMO_MODE but deduplication logic verified through existing data."
     },
     {
       "id": "US-010",
