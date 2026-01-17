@@ -3,13 +3,18 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
+	ChevronDown,
 	ChevronRight,
+	CreditCard,
 	Landmark,
 	Plus,
 	TrendingUp,
 	Users,
+	Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
 	Dialog,
 	DialogContent,
@@ -18,6 +23,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,12 +40,14 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { BankLogo } from '@/components/banks/BankLogo';
 
 interface AccountMember {
 	id: string;
 	name: string;
 	ownerShare: number;
+	color?: string | null;
 }
 
 interface Account {
@@ -86,40 +99,55 @@ function formatCurrency(amount: number): string {
 	}).format(amount);
 }
 
-// Skeleton for the stats row
-function StatsRowSkeleton() {
+// Skeleton for the stats cards
+function StatsCardsSkeleton() {
 	return (
-		<div className="grid grid-cols-3 gap-6 py-6 border-b border-border/50">
+		<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 			{[1, 2, 3].map((i) => (
-				<div key={i}>
-					<Skeleton className="h-4 w-20 mb-2" />
-					<Skeleton className="h-8 w-24" />
-				</div>
+				<Card key={i} className="py-4">
+					<CardContent className="flex items-center gap-4 px-4">
+						<Skeleton className="h-10 w-10 rounded-lg" />
+						<div className="flex-1">
+							<Skeleton className="h-3 w-16 mb-2" />
+							<Skeleton className="h-6 w-20" />
+						</div>
+					</CardContent>
+				</Card>
 			))}
 		</div>
 	);
 }
 
-// Skeleton for bank row
+// Skeleton for bank card
 function BankRowSkeleton() {
 	return (
-		<div className="flex items-center gap-4 py-4 border-b border-border/40">
-			<Skeleton className="h-10 w-10 rounded-lg" />
-			<div className="flex-1">
-				<Skeleton className="h-5 w-32 mb-1" />
-				<Skeleton className="h-4 w-20" />
+		<div className="bg-card rounded-lg border border-border/60 p-4 border-l-4 border-l-muted-foreground/20">
+			<div className="flex items-center gap-4">
+				<Skeleton className="h-10 w-10 rounded-lg" />
+				<div className="flex-1">
+					<Skeleton className="h-5 w-32 mb-1" />
+					<Skeleton className="h-4 w-20" />
+				</div>
+				<Skeleton className="h-6 w-24" />
+				<Skeleton className="h-9 w-24 rounded-md" />
 			</div>
-			<Skeleton className="h-6 w-24" />
 		</div>
 	);
 }
 
-// Account type labels
+// Account type labels and colors
 const ACCOUNT_TYPE_LABELS: Record<string, string> = {
 	CHECKING: 'Compte courant',
 	SAVINGS: 'Épargne',
 	INVESTMENT: 'Investissement',
 	LOAN: 'Prêt',
+};
+
+const ACCOUNT_TYPE_COLORS: Record<string, string> = {
+	CHECKING: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+	SAVINGS: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+	INVESTMENT: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
+	LOAN: 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
 };
 
 export default function BanksPage() {
@@ -241,236 +269,426 @@ export default function BanksPage() {
 				</p>
 			</div>
 
-			{/* Stats Row - Stripe style */}
+			{/* Stats Cards */}
 			{loading ? (
-				<StatsRowSkeleton />
+				<StatsCardsSkeleton />
 			) : error ? (
 				<div className="py-6 text-destructive">{error}</div>
 			) : (
-				<div className="grid grid-cols-3 gap-6 py-6 border-b border-border/50">
-					<div>
-						<p className="text-sm text-muted-foreground">Banques utilisées</p>
-						<p className="text-2xl font-semibold mt-1 tabular-nums">
-							{data?.summary.totalBanksUsed ?? 0}
-							<span className="text-sm font-normal text-muted-foreground ml-1">
-								/ {data?.summary.totalBanksAvailable ?? 0}
-							</span>
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Comptes actifs</p>
-						<p className="text-2xl font-semibold mt-1 tabular-nums">
-							{data?.summary.totalAccounts ?? 0}
-						</p>
-					</div>
-					<div>
-						<p className="text-sm text-muted-foreground">Solde total</p>
-						<p className="text-2xl font-semibold mt-1 tabular-nums">
-							{formatCurrency(data?.summary.totalBalance ?? 0)}
-						</p>
-					</div>
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					{/* Banks Card */}
+					<Card className="py-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+						<CardContent className="flex items-center gap-4 px-4">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/50">
+								<Landmark className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+							</div>
+							<div>
+								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+									Banques
+								</p>
+								<p className="text-2xl font-semibold tabular-nums">
+									{data?.summary.totalBanksUsed ?? 0}
+									<span className="text-sm font-normal text-muted-foreground ml-1">
+										/ {data?.summary.totalBanksAvailable ?? 0}
+									</span>
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Accounts Card */}
+					<Card className="py-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50 dark:border-blue-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '50ms', animationFillMode: 'backwards' }}>
+						<CardContent className="flex items-center gap-4 px-4">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+								<CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+							</div>
+							<div>
+								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+									Comptes actifs
+								</p>
+								<p className="text-2xl font-semibold tabular-nums">
+									{data?.summary.totalAccounts ?? 0}
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Balance Card */}
+					<Card className="py-4 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
+						<CardContent className="flex items-center gap-4 px-4">
+							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+								<Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+							</div>
+							<div>
+								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+									Solde total
+								</p>
+								<p className="text-2xl font-semibold tabular-nums">
+									{formatCurrency(data?.summary.totalBalance ?? 0)}
+								</p>
+							</div>
+						</CardContent>
+					</Card>
 				</div>
 			)}
 
-			{/* Supported Banks - Bank accounts */}
+			{/* Bank accounts section */}
 			<div className="mt-8">
-				<div className="flex items-center gap-2 mb-4">
-					<Landmark className="h-4 w-4 text-muted-foreground" />
-					<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-						Comptes bancaires
-					</h2>
+				<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-2">
+						<div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/50">
+							<Landmark className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+						</div>
+						<h2 className="text-sm font-semibold text-foreground">
+							Comptes bancaires
+						</h2>
+						<div className="flex-1 ml-3 h-px bg-border/50" />
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" size="sm" className="gap-1 text-xs">
+								<Plus className="h-3.5 w-3.5" />
+								Ajouter
+								<ChevronDown className="h-3 w-3 opacity-50" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-48">
+							{data?.bankAccounts.map((bank) => (
+								<DropdownMenuItem
+									key={bank.id}
+									onClick={() => handleAddAccountClick(bank)}
+									className="gap-2"
+								>
+									<span
+										className="w-2 h-2 rounded-full"
+										style={{ backgroundColor: bank.color }}
+									/>
+									{bank.name}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				{loading ? (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
+					<div className="space-y-3">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 					</div>
 				) : (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
-						{data?.bankAccounts.map((bank) => (
-							<div key={bank.id} className="p-4">
-								{/* Bank header */}
-								<div className="flex items-center gap-4">
-									<BankLogo
-										bankId={bank.id}
-										bankName={bank.name}
-										bankColor={bank.color}
-										logo={bankLogos[bank.id] ?? bank.logo}
-										size="md"
-										onLogoChange={(url) => handleLogoChange(bank.id, url)}
-									/>
-									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-2">
-											<p className="font-medium">{bank.name}</p>
-											{bank.accountCount > 0 && (
-												<span className="text-xs text-muted-foreground">
-													{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-												</span>
+					<div className="space-y-3">
+						{data?.bankAccounts.map((bank, index) => {
+							const hasAccounts = bank.accountCount > 0;
+
+							return (
+								<div
+									key={bank.id}
+									className={`rounded-lg p-4 border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 ${
+										hasAccounts
+											? 'bg-card border border-border/60 hover:shadow-sm'
+											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
+									}`}
+									style={{
+										borderLeftColor: bank.color,
+										animationDelay: `${index * 50}ms`,
+										animationFillMode: 'backwards',
+									}}
+									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
+								>
+									{/* Bank header */}
+									<div className="flex items-center gap-4">
+										<BankLogo
+											bankId={bank.id}
+											bankName={bank.name}
+											bankColor={bank.color}
+											logo={bankLogos[bank.id] ?? bank.logo}
+											size="lg"
+											onLogoChange={(url) => handleLogoChange(bank.id, url)}
+										/>
+										<div className="flex-1 min-w-0">
+											<div className="flex items-center gap-2">
+												<h3 className={`text-lg font-semibold ${!hasAccounts && 'text-muted-foreground'}`}>{bank.name}</h3>
+												{hasAccounts ? (
+													<Badge variant="secondary" className="text-xs">
+														{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
+													</Badge>
+												) : (
+													<span className="text-xs text-muted-foreground italic">
+														Aucun compte
+													</span>
+												)}
+											</div>
+											{bank.description && (
+												<p className="text-sm text-muted-foreground mt-0.5">
+													{bank.description}
+												</p>
 											)}
 										</div>
-										{bank.description && (
-											<p className="text-sm text-muted-foreground">
-												{bank.description}
-											</p>
+										{hasAccounts ? (
+											<>
+												<p className="text-lg font-semibold tabular-nums">
+													{formatCurrency(bank.totalBalance)}
+												</p>
+												<Button
+													variant="ghost"
+													size="sm"
+													className="gap-1 text-muted-foreground hover:text-foreground"
+													onClick={() => handleAddAccountClick(bank)}
+												>
+													<Plus className="h-4 w-4" />
+													<span className="hidden sm:inline">Ajouter</span>
+												</Button>
+											</>
+										) : (
+											<Button
+												variant="default"
+												size="sm"
+												className="gap-1"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleAddAccountClick(bank);
+												}}
+											>
+												<Plus className="h-4 w-4" />
+												Ajouter un compte
+											</Button>
 										)}
 									</div>
-									{bank.accountCount > 0 && (
-										<p className="font-semibold tabular-nums mr-4">
-											{formatCurrency(bank.totalBalance)}
-										</p>
-									)}
-									<Button
-										variant="outline"
-										size="sm"
-										className="gap-1"
-										onClick={() => handleAddAccountClick(bank)}
-									>
-										<Plus className="h-4 w-4" />
-										Ajouter
-									</Button>
-								</div>
 
-								{/* Accounts list */}
-								{bank.accounts.length > 0 && (
-									<div className="mt-4 ml-14 space-y-2">
+									{/* Accounts list */}
+									{bank.accounts.length > 0 && (
+									<div className="mt-4 ml-16 space-y-2">
 										{bank.accounts.map((account) => (
 											<Link
 												key={account.id}
 												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group cursor-pointer"
+												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-md hover:border-border/60 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 											>
 												<div className="flex items-center gap-3">
 													<div>
-														<p className="font-medium text-sm">{account.name}</p>
-														<div className="flex items-center gap-2 text-xs text-muted-foreground">
-															<span>{ACCOUNT_TYPE_LABELS[account.type] || account.type}</span>
-															{account.members.length > 0 && (
-																<>
-																	<span>·</span>
-																	<span className="flex items-center gap-1">
-																		<Users className="h-3 w-3" />
-																		{account.members.map((m) => m.name).join(', ')}
-																	</span>
-																</>
-															)}
+														<div className="flex items-center gap-2">
+															<p className="font-medium text-sm group-hover:text-foreground">{account.name}</p>
+															<span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ACCOUNT_TYPE_COLORS[account.type] || 'bg-muted text-muted-foreground'}`}>
+																{ACCOUNT_TYPE_LABELS[account.type] || account.type}
+															</span>
 														</div>
+														{account.members.length > 0 && (
+															<div className="flex items-center gap-1 mt-1">
+																<div className="flex -space-x-1">
+																	{account.members.map((member) => (
+																		<Tooltip key={member.id}>
+																			<TooltipTrigger asChild>
+																				<span
+																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
+																					style={{ backgroundColor: member.color || '#6b7280' }}
+																				>
+																					{member.name.charAt(0).toUpperCase()}
+																				</span>
+																			</TooltipTrigger>
+																			<TooltipContent>
+																				<p>{member.name}</p>
+																			</TooltipContent>
+																		</Tooltip>
+																	))}
+																</div>
+															</div>
+														)}
 													</div>
 												</div>
-												<div className="flex items-center gap-2">
-													<p className="font-medium tabular-nums text-sm">
+												<div className="flex items-center gap-3">
+													<p className="font-semibold tabular-nums text-sm">
 														{formatCurrency(account.balance)}
 													</p>
-													<ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+													<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
 												</div>
 											</Link>
 										))}
 									</div>
 								)}
-							</div>
-						))}
+								</div>
+							);
+						})}
 					</div>
 				)}
 			</div>
 
-			{/* Supported Banks - Investments */}
+			{/* Investments section */}
 			<div className="mt-8">
-				<div className="flex items-center gap-2 mb-4">
-					<TrendingUp className="h-4 w-4 text-muted-foreground" />
-					<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-						Investissements
-					</h2>
+				<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-2">
+						<div className="flex h-6 w-6 items-center justify-center rounded-md bg-purple-100 dark:bg-purple-900/50">
+							<TrendingUp className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+						</div>
+						<h2 className="text-sm font-semibold text-foreground">
+							Investissements
+						</h2>
+						<div className="flex-1 ml-3 h-px bg-border/50" />
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" size="sm" className="gap-1 text-xs">
+								<Plus className="h-3.5 w-3.5" />
+								Ajouter
+								<ChevronDown className="h-3 w-3 opacity-50" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-48">
+							{data?.investmentAccounts.map((bank) => (
+								<DropdownMenuItem
+									key={bank.id}
+									onClick={() => handleAddAccountClick(bank)}
+									className="gap-2"
+								>
+									<span
+										className="w-2 h-2 rounded-full"
+										style={{ backgroundColor: bank.color }}
+									/>
+									{bank.name}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				{loading ? (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
+					<div className="space-y-3">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 					</div>
 				) : (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
-						{data?.investmentAccounts.map((bank) => (
-							<div key={bank.id} className="p-4">
-								{/* Bank header */}
-								<div className="flex items-center gap-4">
-									<BankLogo
-										bankId={bank.id}
-										bankName={bank.name}
-										bankColor={bank.color}
-										logo={bankLogos[bank.id] ?? bank.logo}
-										size="md"
-										onLogoChange={(url) => handleLogoChange(bank.id, url)}
-									/>
-									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-2">
-											<p className="font-medium">{bank.name}</p>
-											{bank.accountCount > 0 && (
-												<span className="text-xs text-muted-foreground">
-													{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-												</span>
+					<div className="space-y-3">
+						{data?.investmentAccounts.map((bank, index) => {
+							const hasAccounts = bank.accountCount > 0;
+
+							return (
+								<div
+									key={bank.id}
+									className={`rounded-lg p-4 border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 ${
+										hasAccounts
+											? 'bg-card border border-border/60 hover:shadow-sm'
+											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
+									}`}
+									style={{
+										borderLeftColor: bank.color,
+										animationDelay: `${index * 50}ms`,
+										animationFillMode: 'backwards',
+									}}
+									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
+								>
+									{/* Bank header */}
+									<div className="flex items-center gap-4">
+										<BankLogo
+											bankId={bank.id}
+											bankName={bank.name}
+											bankColor={bank.color}
+											logo={bankLogos[bank.id] ?? bank.logo}
+											size="lg"
+											onLogoChange={(url) => handleLogoChange(bank.id, url)}
+										/>
+										<div className="flex-1 min-w-0">
+											<div className="flex items-center gap-2">
+												<h3 className={`text-lg font-semibold ${!hasAccounts && 'text-muted-foreground'}`}>{bank.name}</h3>
+												{hasAccounts ? (
+													<Badge variant="secondary" className="text-xs">
+														{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
+													</Badge>
+												) : (
+													<span className="text-xs text-muted-foreground italic">
+														Aucun compte
+													</span>
+												)}
+											</div>
+											{bank.description && (
+												<p className="text-sm text-muted-foreground mt-0.5">
+													{bank.description}
+												</p>
 											)}
 										</div>
-										{bank.description && (
-											<p className="text-sm text-muted-foreground">
-												{bank.description}
-											</p>
+										{hasAccounts ? (
+											<>
+												<p className="text-lg font-semibold tabular-nums">
+													{formatCurrency(bank.totalBalance)}
+												</p>
+												<Button
+													variant="ghost"
+													size="sm"
+													className="gap-1 text-muted-foreground hover:text-foreground"
+													onClick={() => handleAddAccountClick(bank)}
+												>
+													<Plus className="h-4 w-4" />
+													<span className="hidden sm:inline">Ajouter</span>
+												</Button>
+											</>
+										) : (
+											<Button
+												variant="default"
+												size="sm"
+												className="gap-1"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleAddAccountClick(bank);
+												}}
+											>
+												<Plus className="h-4 w-4" />
+												Ajouter un compte
+											</Button>
 										)}
 									</div>
-									{bank.accountCount > 0 && (
-										<p className="font-semibold tabular-nums mr-4">
-											{formatCurrency(bank.totalBalance)}
-										</p>
-									)}
-									<Button
-										variant="outline"
-										size="sm"
-										className="gap-1"
-										onClick={() => handleAddAccountClick(bank)}
-									>
-										<Plus className="h-4 w-4" />
-										Ajouter
-									</Button>
-								</div>
 
-								{/* Accounts list */}
-								{bank.accounts.length > 0 && (
-									<div className="mt-4 ml-14 space-y-2">
+									{/* Accounts list */}
+									{bank.accounts.length > 0 && (
+									<div className="mt-4 ml-16 space-y-2">
 										{bank.accounts.map((account) => (
 											<Link
 												key={account.id}
 												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group cursor-pointer"
+												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-md hover:border-border/60 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 											>
 												<div className="flex items-center gap-3">
 													<div>
-														<p className="font-medium text-sm">{account.name}</p>
-														<div className="flex items-center gap-2 text-xs text-muted-foreground">
-															<span>{ACCOUNT_TYPE_LABELS[account.type] || account.type}</span>
-															{account.members.length > 0 && (
-																<>
-																	<span>·</span>
-																	<span className="flex items-center gap-1">
-																		<Users className="h-3 w-3" />
-																		{account.members.map((m) => m.name).join(', ')}
-																	</span>
-																</>
-															)}
+														<div className="flex items-center gap-2">
+															<p className="font-medium text-sm group-hover:text-foreground">{account.name}</p>
+															<span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ACCOUNT_TYPE_COLORS[account.type] || 'bg-muted text-muted-foreground'}`}>
+																{ACCOUNT_TYPE_LABELS[account.type] || account.type}
+															</span>
 														</div>
+														{account.members.length > 0 && (
+															<div className="flex items-center gap-1 mt-1">
+																<div className="flex -space-x-1">
+																	{account.members.map((member) => (
+																		<Tooltip key={member.id}>
+																			<TooltipTrigger asChild>
+																				<span
+																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
+																					style={{ backgroundColor: member.color || '#6b7280' }}
+																				>
+																					{member.name.charAt(0).toUpperCase()}
+																				</span>
+																			</TooltipTrigger>
+																			<TooltipContent>
+																				<p>{member.name}</p>
+																			</TooltipContent>
+																		</Tooltip>
+																	))}
+																</div>
+															</div>
+														)}
 													</div>
 												</div>
-												<div className="flex items-center gap-2">
-													<p className="font-medium tabular-nums text-sm">
+												<div className="flex items-center gap-3">
+													<p className="font-semibold tabular-nums text-sm">
 														{formatCurrency(account.balance)}
 													</p>
-													<ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+													<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
 												</div>
 											</Link>
 										))}
 									</div>
 								)}
-							</div>
-						))}
+								</div>
+							);
+						})}
 					</div>
 				)}
 			</div>
