@@ -169,6 +169,7 @@ export default function AccountDetailPage() {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [currentPage, setCurrentPage] = useState(1);
 	const [showImports, setShowImports] = useState(true);
+	const [showAllImports, setShowAllImports] = useState(false);
 
 	// Export URL editing
 	const [isEditingExportUrl, setIsEditingExportUrl] = useState(false);
@@ -475,7 +476,8 @@ export default function AccountDetailPage() {
 		);
 	}
 
-	const accountImports = imports.filter((imp) => imp.bankKey === account.bank.parserKey);
+	// Imports are now filtered by accountId on the API side
+	const accountImports = imports;
 	const pendingImports = accountImports.filter((imp) => imp.status === 'PENDING');
 
 	return (
@@ -759,10 +761,21 @@ export default function AccountDetailPage() {
 					{/* Import history */}
 					{showImports && accountImports.length > 0 && (
 						<div className="space-y-2 pt-2">
-							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-								Historique des imports
-							</p>
-							{accountImports.map((imp) => (
+							<div className="flex items-center justify-between">
+								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+									Historique des imports
+								</p>
+								{accountImports.length > 5 && (
+									<button
+										type="button"
+										onClick={() => setShowAllImports(!showAllImports)}
+										className="text-xs text-primary hover:underline"
+									>
+										{showAllImports ? 'Afficher moins' : `Voir tout (${accountImports.length})`}
+									</button>
+								)}
+							</div>
+							{(showAllImports ? accountImports : accountImports.slice(0, 5)).map((imp) => (
 								<div
 									key={imp.id}
 									className={`flex items-center justify-between rounded-lg p-3 text-sm ${
