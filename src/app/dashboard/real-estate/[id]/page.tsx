@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import {
@@ -67,43 +67,35 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import type { PropertyType, PropertyUsage, InsuranceType, UtilityType, Loan, PropertyInsurance, CoOwnership, UtilityContract, LoanInsurance } from '@prisma/client'
-
-// Type for property with members and related data
-interface PropertyMemberWithDetails {
-	id: string
-	memberId: string
-	ownershipShare: number
-	member: {
-		id: string
-		name: string
-		color: string | null
-	}
-}
-
-interface LoanInsuranceWithMember extends LoanInsurance {
-	member: {
-		id: string
-		name: string
-		color: string | null
-	}
-}
-
-interface LoanWithDetails extends Loan {
-	property: {
-		id: string
-		name: string
-		type: PropertyType
-		address: string
-		city: string
-	}
-	member: {
-		id: string
-		name: string
-		color: string | null
-	} | null
-	loanInsurances: LoanInsuranceWithMember[]
-}
+import {
+	usePropertyQuery,
+	useUpdatePropertyMutation,
+	useDeletePropertyMutation,
+	useCreatePropertyInsuranceMutation,
+	useUpdatePropertyInsuranceMutation,
+	useDeletePropertyInsuranceMutation,
+	useCreateCoOwnershipMutation,
+	useUpdateCoOwnershipMutation,
+	useDeleteCoOwnershipMutation,
+	useCreateUtilityContractMutation,
+	useUpdateUtilityContractMutation,
+	useDeleteUtilityContractMutation,
+	type PropertyType,
+	type PropertyUsage,
+	type InsuranceType,
+	type UtilityType,
+} from '@/features/properties'
+import {
+	useCreateLoanMutation,
+	useCreateLoanInsuranceMutation,
+} from '@/features/loans'
+import { useMembersQuery } from '@/features/members/hooks/use-members-query'
+import type {
+	Loan,
+	UtilityContract as PropertyUtilityContract,
+	PropertyWithDetails,
+	MemberShare,
+} from '@/features/properties'
 
 interface LoanFormData {
 	name: string
@@ -256,51 +248,6 @@ const initialPropertyFormData: PropertyFormData = {
 	notes: '',
 }
 
-// Member share for ownership editing
-interface MemberShare {
-	memberId: string
-	ownershipShare: number
-}
-
-// Member type for dropdown
-interface Member {
-	id: string
-	name: string
-	color: string | null
-}
-
-interface PropertyWithDetails {
-	id: string
-	name: string
-	type: PropertyType
-	usage: PropertyUsage
-	address: string
-	address2: string | null
-	city: string
-	postalCode: string
-	surface: number
-	rooms: number | null
-	bedrooms: number | null
-	purchasePrice: number
-	purchaseDate: string
-	notaryFees: number
-	agencyFees: number | null
-	currentValue: number
-	rentAmount: number | null
-	rentCharges: number | null
-	notes: string | null
-	createdAt: string
-	updatedAt: string
-	propertyMembers: PropertyMemberWithDetails[]
-	loans: LoanWithDetails[]
-	insurance: PropertyInsurance | null
-	coOwnership: CoOwnership | null
-	utilityContracts: UtilityContract[]
-	_count: {
-		loans: number
-		utilityContracts: number
-	}
-}
 
 function formatCurrency(amount: number): string {
 	return new Intl.NumberFormat('fr-FR', {
@@ -426,7 +373,7 @@ function LoanCard({
 	loan,
 	onAddInsurance,
 }: {
-	loan: LoanWithDetails
+	loan: Loan
 	onAddInsurance: (loanId: string) => void
 }) {
 	const [isExpanded, setIsExpanded] = useState(false)
@@ -609,48 +556,53 @@ export default function PropertyDetailPage() {
 	const router = useRouter()
 	const propertyId = params.id as string
 
-	const [property, setProperty] = useState<PropertyWithDetails | null>(null)
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	// TanStack Query hooks
+	const { data: property, isLoading: loading, isError, error: queryError } = usePropertyQuery(propertyId)
+	const { data: members = [], isLoading: loadingMembers } = useMembersQuery()
+	const error = isError ? (queryError instanceof Error ? queryError.message : 'Une erreur est survenue') : null
+
+	// Mutations
+	const createLoanMutation = useCreateLoanMutation()
+	const createLoanInsuranceMutation = useCreateLoanInsuranceMutation()
+	const updatePropertyMutation = useUpdatePropertyMutation()
+	const deletePropertyMutation = useDeletePropertyMutation()
+	const createPropertyInsuranceMutation = useCreatePropertyInsuranceMutation()
+	const updatePropertyInsuranceMutation = useUpdatePropertyInsuranceMutation()
+	const deletePropertyInsuranceMutation = useDeletePropertyInsuranceMutation()
+	const createCoOwnershipMutation = useCreateCoOwnershipMutation()
+	const updateCoOwnershipMutation = useUpdateCoOwnershipMutation()
+	const deleteCoOwnershipMutation = useDeleteCoOwnershipMutation()
+	const createUtilityContractMutation = useCreateUtilityContractMutation()
+	const updateUtilityContractMutation = useUpdateUtilityContractMutation()
+	const deleteUtilityContractMutation = useDeleteUtilityContractMutation()
 
 	// Loan dialog state
 	const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false)
 	const [loanFormData, setLoanFormData] = useState<LoanFormData>(initialLoanFormData)
-	const [isSubmittingLoan, setIsSubmittingLoan] = useState(false)
 	const [loanFormError, setLoanFormError] = useState<string | null>(null)
 
 	// Insurance dialog state
 	const [isInsuranceDialogOpen, setIsInsuranceDialogOpen] = useState(false)
 	const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null)
 	const [insuranceFormData, setInsuranceFormData] = useState<InsuranceFormData>(initialInsuranceFormData)
-	const [isSubmittingInsurance, setIsSubmittingInsurance] = useState(false)
 	const [insuranceFormError, setInsuranceFormError] = useState<string | null>(null)
-
-	// Members for dropdown
-	const [members, setMembers] = useState<Member[]>([])
-	const [loadingMembers, setLoadingMembers] = useState(false)
 
 	// Property insurance dialog state
 	const [isPropertyInsuranceDialogOpen, setIsPropertyInsuranceDialogOpen] = useState(false)
 	const [isEditingPropertyInsurance, setIsEditingPropertyInsurance] = useState(false)
 	const [propertyInsuranceFormData, setPropertyInsuranceFormData] = useState<PropertyInsuranceFormData>(initialPropertyInsuranceFormData)
-	const [isSubmittingPropertyInsurance, setIsSubmittingPropertyInsurance] = useState(false)
 	const [propertyInsuranceFormError, setPropertyInsuranceFormError] = useState<string | null>(null)
-	const [isDeletingPropertyInsurance, setIsDeletingPropertyInsurance] = useState(false)
 
 	// Co-ownership dialog state
 	const [isCoOwnershipDialogOpen, setIsCoOwnershipDialogOpen] = useState(false)
 	const [isEditingCoOwnership, setIsEditingCoOwnership] = useState(false)
 	const [coOwnershipFormData, setCoOwnershipFormData] = useState<CoOwnershipFormData>(initialCoOwnershipFormData)
-	const [isSubmittingCoOwnership, setIsSubmittingCoOwnership] = useState(false)
 	const [coOwnershipFormError, setCoOwnershipFormError] = useState<string | null>(null)
-	const [isDeletingCoOwnership, setIsDeletingCoOwnership] = useState(false)
 
 	// Utility contract dialog state
 	const [isUtilityContractDialogOpen, setIsUtilityContractDialogOpen] = useState(false)
 	const [editingUtilityContractId, setEditingUtilityContractId] = useState<string | null>(null)
 	const [utilityContractFormData, setUtilityContractFormData] = useState<UtilityContractFormData>(initialUtilityContractFormData)
-	const [isSubmittingUtilityContract, setIsSubmittingUtilityContract] = useState(false)
 	const [utilityContractFormError, setUtilityContractFormError] = useState<string | null>(null)
 	const [deletingUtilityContractId, setDeletingUtilityContractId] = useState<string | null>(null)
 
@@ -658,36 +610,21 @@ export default function PropertyDetailPage() {
 	const [isEditPropertyDialogOpen, setIsEditPropertyDialogOpen] = useState(false)
 	const [propertyFormData, setPropertyFormData] = useState<PropertyFormData>(initialPropertyFormData)
 	const [editMemberShares, setEditMemberShares] = useState<MemberShare[]>([])
-	const [isSubmittingProperty, setIsSubmittingProperty] = useState(false)
 	const [propertyFormError, setPropertyFormError] = useState<string | null>(null)
 
 	// Property delete state
 	const [showDeletePropertyDialog, setShowDeletePropertyDialog] = useState(false)
-	const [isDeletingProperty, setIsDeletingProperty] = useState(false)
 
-	const fetchProperty = useCallback(async () => {
-		try {
-			setLoading(true)
-			setError(null)
-			const response = await fetch(`/api/properties/${propertyId}`)
-			if (!response.ok) {
-				if (response.status === 404) {
-					throw new Error('Bien non trouvé')
-				}
-				throw new Error('Erreur lors du chargement du bien')
-			}
-			const data = await response.json()
-			setProperty(data)
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setLoading(false)
-		}
-	}, [propertyId])
-
-	useEffect(() => {
-		fetchProperty()
-	}, [fetchProperty])
+	// Derived mutation states
+	const isSubmittingLoan = createLoanMutation.isPending
+	const isSubmittingInsurance = createLoanInsuranceMutation.isPending
+	const isSubmittingPropertyInsurance = createPropertyInsuranceMutation.isPending || updatePropertyInsuranceMutation.isPending
+	const isDeletingPropertyInsurance = deletePropertyInsuranceMutation.isPending
+	const isSubmittingCoOwnership = createCoOwnershipMutation.isPending || updateCoOwnershipMutation.isPending
+	const isDeletingCoOwnership = deleteCoOwnershipMutation.isPending
+	const isSubmittingUtilityContract = createUtilityContractMutation.isPending || updateUtilityContractMutation.isPending
+	const isSubmittingProperty = updatePropertyMutation.isPending
+	const isDeletingProperty = deletePropertyMutation.isPending
 
 	// Loan form handlers
 	const handleLoanInputChange = (field: keyof LoanFormData, value: string) => {
@@ -702,7 +639,6 @@ export default function PropertyDetailPage() {
 	const handleLoanSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setLoanFormError(null)
-		setIsSubmittingLoan(true)
 
 		try {
 			// Validate required fields
@@ -737,63 +673,35 @@ export default function PropertyDetailPage() {
 				throw new Error('Le taux doit être entre 0 et 100')
 			}
 
-			const payload = {
-				name: loanFormData.name.trim(),
-				lender: loanFormData.lender.trim() || null,
-				loanNumber: loanFormData.loanNumber.trim() || null,
-				initialAmount,
-				remainingAmount,
-				rate,
-				monthlyPayment,
-				startDate: loanFormData.startDate,
-				endDate: loanFormData.endDate || null,
-				notes: loanFormData.notes.trim() || null,
-			}
-
-			const response = await fetch(`/api/properties/${propertyId}/loans`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+			await createLoanMutation.mutateAsync({
+				propertyId,
+				input: {
+					name: loanFormData.name.trim(),
+					lender: loanFormData.lender.trim() || null,
+					loanNumber: loanFormData.loanNumber.trim() || null,
+					initialAmount,
+					remainingAmount,
+					rate,
+					monthlyPayment,
+					startDate: loanFormData.startDate,
+					endDate: loanFormData.endDate || null,
+					notes: loanFormData.notes.trim() || null,
+				},
 			})
 
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la création du prêt')
-			}
-
-			// Success - close dialog and refresh data
+			// Success - close dialog
 			setIsLoanDialogOpen(false)
 			resetLoanForm()
-			await fetchProperty()
 		} catch (err) {
 			setLoanFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsSubmittingLoan(false)
 		}
 	}
 
-	// Fetch members for insurance dropdown
-	const fetchMembers = useCallback(async () => {
-		setLoadingMembers(true)
-		try {
-			const response = await fetch('/api/members')
-			if (response.ok) {
-				const data = await response.json()
-				setMembers(data.members || [])
-			}
-		} catch {
-			// Member fetch failed silently
-		} finally {
-			setLoadingMembers(false)
-		}
-	}, [])
-
 	// Insurance form handlers
-	const handleOpenInsuranceDialog = useCallback((loanId: string) => {
+	const handleOpenInsuranceDialog = (loanId: string) => {
 		setSelectedLoanId(loanId)
 		setIsInsuranceDialogOpen(true)
-		fetchMembers()
-	}, [fetchMembers])
+	}
 
 	const handleInsuranceInputChange = (field: keyof InsuranceFormData, value: string) => {
 		setInsuranceFormData((prev) => ({ ...prev, [field]: value }))
@@ -808,7 +716,6 @@ export default function PropertyDetailPage() {
 	const handleInsuranceSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setInsuranceFormError(null)
-		setIsSubmittingInsurance(true)
 
 		try {
 			// Validate required fields
@@ -838,36 +745,30 @@ export default function PropertyDetailPage() {
 				throw new Error('La prime mensuelle ne peut pas être négative')
 			}
 
-			const payload = {
-				memberId: insuranceFormData.memberId,
-				name: insuranceFormData.name.trim(),
-				provider: insuranceFormData.provider.trim(),
-				contractNumber: insuranceFormData.contractNumber.trim() || null,
-				coveragePercent,
-				monthlyPremium,
-				link: insuranceFormData.link.trim() || null,
-				notes: insuranceFormData.notes.trim() || null,
+			if (!selectedLoanId) {
+				throw new Error('Aucun prêt sélectionné')
 			}
 
-			const response = await fetch(`/api/loans/${selectedLoanId}/insurances`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+			await createLoanInsuranceMutation.mutateAsync({
+				loanId: selectedLoanId,
+				propertyId,
+				input: {
+					memberId: insuranceFormData.memberId,
+					name: insuranceFormData.name.trim(),
+					provider: insuranceFormData.provider.trim(),
+					contractNumber: insuranceFormData.contractNumber.trim() || null,
+					coveragePercent,
+					monthlyPremium,
+					link: insuranceFormData.link.trim() || null,
+					notes: insuranceFormData.notes.trim() || null,
+				},
 			})
 
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la création de l\'assurance')
-			}
-
-			// Success - close dialog and refresh data
+			// Success - close dialog
 			setIsInsuranceDialogOpen(false)
 			resetInsuranceForm()
-			await fetchProperty()
 		} catch (err) {
 			setInsuranceFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsSubmittingInsurance(false)
 		}
 	}
 
@@ -906,7 +807,6 @@ export default function PropertyDetailPage() {
 	const handlePropertyInsuranceSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setPropertyInsuranceFormError(null)
-		setIsSubmittingPropertyInsurance(true)
 
 		try {
 			// Validate required fields
@@ -928,8 +828,8 @@ export default function PropertyDetailPage() {
 				throw new Error('La prime mensuelle ne peut pas être négative')
 			}
 
-			const payload = {
-				type: propertyInsuranceFormData.type,
+			const input = {
+				type: propertyInsuranceFormData.type as InsuranceType,
 				provider: propertyInsuranceFormData.provider.trim(),
 				contractNumber: propertyInsuranceFormData.contractNumber.trim() || null,
 				monthlyPremium,
@@ -940,46 +840,25 @@ export default function PropertyDetailPage() {
 				notes: propertyInsuranceFormData.notes.trim() || null,
 			}
 
-			const method = isEditingPropertyInsurance ? 'PATCH' : 'POST'
-			const response = await fetch(`/api/properties/${propertyId}/insurance`, {
-				method,
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de l\'enregistrement de l\'assurance')
+			if (isEditingPropertyInsurance) {
+				await updatePropertyInsuranceMutation.mutateAsync({ propertyId, input })
+			} else {
+				await createPropertyInsuranceMutation.mutateAsync({ propertyId, input })
 			}
 
-			// Success - close dialog and refresh data
+			// Success - close dialog
 			setIsPropertyInsuranceDialogOpen(false)
 			resetPropertyInsuranceForm()
-			await fetchProperty()
 		} catch (err) {
 			setPropertyInsuranceFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsSubmittingPropertyInsurance(false)
 		}
 	}
 
 	const handleDeletePropertyInsurance = async () => {
-		setIsDeletingPropertyInsurance(true)
 		try {
-			const response = await fetch(`/api/properties/${propertyId}/insurance`, {
-				method: 'DELETE',
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la suppression')
-			}
-
-			await fetchProperty()
+			await deletePropertyInsuranceMutation.mutateAsync(propertyId)
 		} catch {
 			// Property insurance deletion failed silently
-		} finally {
-			setIsDeletingPropertyInsurance(false)
 		}
 	}
 
@@ -1013,7 +892,6 @@ export default function PropertyDetailPage() {
 	const handleCoOwnershipSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setCoOwnershipFormError(null)
-		setIsSubmittingCoOwnership(true)
 
 		try {
 			// Validate required fields
@@ -1029,53 +907,32 @@ export default function PropertyDetailPage() {
 				throw new Error('Le montant trimestriel ne peut pas être négatif')
 			}
 
-			const payload = {
+			const input = {
 				name: coOwnershipFormData.name.trim(),
 				quarterlyAmount,
 				link: coOwnershipFormData.link.trim() || null,
 				notes: coOwnershipFormData.notes.trim() || null,
 			}
 
-			const method = isEditingCoOwnership ? 'PATCH' : 'POST'
-			const response = await fetch(`/api/properties/${propertyId}/co-ownership`, {
-				method,
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de l\'enregistrement')
+			if (isEditingCoOwnership) {
+				await updateCoOwnershipMutation.mutateAsync({ propertyId, input })
+			} else {
+				await createCoOwnershipMutation.mutateAsync({ propertyId, input })
 			}
 
-			// Success - close dialog and refresh data
+			// Success - close dialog
 			setIsCoOwnershipDialogOpen(false)
 			resetCoOwnershipForm()
-			await fetchProperty()
 		} catch (err) {
 			setCoOwnershipFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsSubmittingCoOwnership(false)
 		}
 	}
 
 	const handleDeleteCoOwnership = async () => {
-		setIsDeletingCoOwnership(true)
 		try {
-			const response = await fetch(`/api/properties/${propertyId}/co-ownership`, {
-				method: 'DELETE',
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la suppression')
-			}
-
-			await fetchProperty()
+			await deleteCoOwnershipMutation.mutateAsync(propertyId)
 		} catch {
 			// Co-ownership deletion failed silently
-		} finally {
-			setIsDeletingCoOwnership(false)
 		}
 	}
 
@@ -1090,7 +947,7 @@ export default function PropertyDetailPage() {
 		setEditingUtilityContractId(null)
 	}
 
-	const openUtilityContractDialog = (contract?: UtilityContract) => {
+	const openUtilityContractDialog = (contract?: PropertyUtilityContract) => {
 		if (contract) {
 			// Pre-fill form with existing data
 			setUtilityContractFormData({
@@ -1111,7 +968,6 @@ export default function PropertyDetailPage() {
 	const handleUtilityContractSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setUtilityContractFormError(null)
-		setIsSubmittingUtilityContract(true)
 
 		try {
 			// Validate required fields
@@ -1130,8 +986,8 @@ export default function PropertyDetailPage() {
 				throw new Error('Le montant mensuel ne peut pas être négatif')
 			}
 
-			const payload = {
-				type: utilityContractFormData.type,
+			const input = {
+				type: utilityContractFormData.type as UtilityType,
 				provider: utilityContractFormData.provider.trim(),
 				contractNumber: utilityContractFormData.contractNumber.trim() || null,
 				monthlyAmount,
@@ -1139,47 +995,24 @@ export default function PropertyDetailPage() {
 				notes: utilityContractFormData.notes.trim() || null,
 			}
 
-			const isEditing = editingUtilityContractId !== null
-			const url = isEditing
-				? `/api/utility-contracts/${editingUtilityContractId}`
-				: `/api/properties/${propertyId}/utility-contracts`
-			const method = isEditing ? 'PATCH' : 'POST'
-
-			const response = await fetch(url, {
-				method,
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de l\'enregistrement')
+			if (editingUtilityContractId) {
+				await updateUtilityContractMutation.mutateAsync({ id: editingUtilityContractId, propertyId, input })
+			} else {
+				await createUtilityContractMutation.mutateAsync({ propertyId, input })
 			}
 
-			// Success - close dialog and refresh data
+			// Success - close dialog
 			setIsUtilityContractDialogOpen(false)
 			resetUtilityContractForm()
-			await fetchProperty()
 		} catch (err) {
 			setUtilityContractFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsSubmittingUtilityContract(false)
 		}
 	}
 
 	const handleDeleteUtilityContract = async (contractId: string) => {
 		setDeletingUtilityContractId(contractId)
 		try {
-			const response = await fetch(`/api/utility-contracts/${contractId}`, {
-				method: 'DELETE',
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la suppression')
-			}
-
-			await fetchProperty()
+			await deleteUtilityContractMutation.mutateAsync({ id: contractId, propertyId })
 		} catch {
 			// Utility contract deletion failed silently
 		} finally {
@@ -1228,8 +1061,6 @@ export default function PropertyDetailPage() {
 				ownershipShare: pm.ownershipShare,
 			}))
 		)
-		// Fetch members for dropdown
-		fetchMembers()
 		setIsEditPropertyDialogOpen(true)
 	}
 
@@ -1264,7 +1095,6 @@ export default function PropertyDetailPage() {
 	const handlePropertySubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setPropertyFormError(null)
-		setIsSubmittingProperty(true)
 
 		try {
 			// Validate required fields
@@ -1310,70 +1140,47 @@ export default function PropertyDetailPage() {
 				}
 			}
 
-			const payload = {
-				name: propertyFormData.name.trim(),
-				type: propertyFormData.type,
-				usage: propertyFormData.usage,
-				address: propertyFormData.address.trim(),
-				address2: propertyFormData.address2.trim() || null,
-				city: propertyFormData.city.trim(),
-				postalCode: propertyFormData.postalCode.trim(),
-				surface: Number.parseFloat(propertyFormData.surface),
-				rooms: propertyFormData.rooms ? Number.parseInt(propertyFormData.rooms, 10) : null,
-				bedrooms: propertyFormData.bedrooms ? Number.parseInt(propertyFormData.bedrooms, 10) : null,
-				purchasePrice: Number.parseFloat(propertyFormData.purchasePrice),
-				purchaseDate: propertyFormData.purchaseDate,
-				notaryFees: Number.parseFloat(propertyFormData.notaryFees),
-				agencyFees: propertyFormData.agencyFees ? Number.parseFloat(propertyFormData.agencyFees) : null,
-				currentValue: Number.parseFloat(propertyFormData.currentValue),
-				rentAmount: propertyFormData.rentAmount ? Number.parseFloat(propertyFormData.rentAmount) : null,
-				rentCharges: propertyFormData.rentCharges ? Number.parseFloat(propertyFormData.rentCharges) : null,
-				notes: propertyFormData.notes.trim() || null,
-				memberShares: editMemberShares.length > 0 ? editMemberShares : undefined,
-			}
-
-			const response = await fetch(`/api/properties/${propertyId}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+			await updatePropertyMutation.mutateAsync({
+				id: propertyId,
+				input: {
+					name: propertyFormData.name.trim(),
+					type: propertyFormData.type as PropertyType,
+					usage: propertyFormData.usage as PropertyUsage,
+					address: propertyFormData.address.trim(),
+					address2: propertyFormData.address2.trim() || null,
+					city: propertyFormData.city.trim(),
+					postalCode: propertyFormData.postalCode.trim(),
+					surface: Number.parseFloat(propertyFormData.surface),
+					rooms: propertyFormData.rooms ? Number.parseInt(propertyFormData.rooms, 10) : null,
+					bedrooms: propertyFormData.bedrooms ? Number.parseInt(propertyFormData.bedrooms, 10) : null,
+					purchasePrice: Number.parseFloat(propertyFormData.purchasePrice),
+					purchaseDate: propertyFormData.purchaseDate,
+					notaryFees: Number.parseFloat(propertyFormData.notaryFees),
+					agencyFees: propertyFormData.agencyFees ? Number.parseFloat(propertyFormData.agencyFees) : null,
+					currentValue: Number.parseFloat(propertyFormData.currentValue),
+					rentAmount: propertyFormData.rentAmount ? Number.parseFloat(propertyFormData.rentAmount) : null,
+					rentCharges: propertyFormData.rentCharges ? Number.parseFloat(propertyFormData.rentCharges) : null,
+					notes: propertyFormData.notes.trim() || null,
+					memberShares: editMemberShares.length > 0 ? editMemberShares : undefined,
+				},
 			})
 
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la modification du bien')
-			}
-
-			// Success - close dialog and refresh data
+			// Success - close dialog
 			setIsEditPropertyDialogOpen(false)
 			resetPropertyForm()
-			await fetchProperty()
 		} catch (err) {
 			setPropertyFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsSubmittingProperty(false)
 		}
 	}
 
 	// Delete property handler
 	const handleDeleteProperty = async () => {
-		setIsDeletingProperty(true)
 		try {
-			const response = await fetch(`/api/properties/${propertyId}`, {
-				method: 'DELETE',
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la suppression du bien')
-			}
-
+			await deletePropertyMutation.mutateAsync(propertyId)
 			// Success - redirect to property list
 			router.push('/dashboard/real-estate')
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Erreur lors de la suppression')
+		} catch {
 			setShowDeletePropertyDialog(false)
-		} finally {
-			setIsDeletingProperty(false)
 		}
 	}
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import {
 	Building2,
@@ -41,69 +41,15 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { PropertyType, PropertyUsage, Loan } from '@prisma/client'
-
-// Type for property with members and related data
-interface PropertyMemberWithDetails {
-	id: string
-	memberId: string
-	ownershipShare: number
-	member: {
-		id: string
-		name: string
-		color: string | null
-	}
-}
-
-interface PropertyWithDetails {
-	id: string
-	name: string
-	type: PropertyType
-	usage: PropertyUsage
-	address: string
-	address2: string | null
-	city: string
-	postalCode: string
-	surface: number
-	rooms: number | null
-	bedrooms: number | null
-	purchasePrice: number
-	purchaseDate: string
-	notaryFees: number
-	agencyFees: number | null
-	currentValue: number
-	rentAmount: number | null
-	rentCharges: number | null
-	notes: string | null
-	createdAt: string
-	updatedAt: string
-	propertyMembers: PropertyMemberWithDetails[]
-	loans: Loan[]
-	_count: {
-		loans: number
-		utilityContracts: number
-	}
-}
-
-interface PropertySummary {
-	totalProperties: number
-	totalValue: number
-	totalLoansRemaining: number
-	totalEquity: number
-	byType: Record<string, { count: number; value: number }>
-	byUsage: Record<string, { count: number; value: number }>
-}
-
-interface Member {
-	id: string
-	name: string
-	color: string | null
-}
-
-interface MemberShare {
-	memberId: string
-	ownershipShare: number
-}
+import {
+	usePropertiesQuery,
+	useCreatePropertyMutation,
+	type PropertyWithDetails,
+	type PropertyType,
+	type PropertyUsage,
+	type MemberShare,
+} from '@/features/properties'
+import { useMembersQuery } from '@/features/members/hooks/use-members-query'
 
 interface PropertyFormData {
 	name: string
@@ -240,54 +186,20 @@ function EmptyState({ onAddClick }: { onAddClick: () => void }) {
 }
 
 export default function RealEstatePage() {
-	const [properties, setProperties] = useState<PropertyWithDetails[]>([])
-	const [summary, setSummary] = useState<PropertySummary | null>(null)
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	// TanStack Query hooks
+	const { data, isLoading, isError, error } = usePropertiesQuery()
+	const { data: members = [] } = useMembersQuery()
+	const createPropertyMutation = useCreatePropertyMutation()
 
 	// Dialog state
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
 	const [formData, setFormData] = useState<PropertyFormData>(initialFormData)
 	const [memberShares, setMemberShares] = useState<MemberShare[]>([])
-	const [members, setMembers] = useState<Member[]>([])
-	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [formError, setFormError] = useState<string | null>(null)
 
-	const fetchProperties = useCallback(async () => {
-		try {
-			setLoading(true)
-			setError(null)
-			const response = await fetch('/api/properties')
-			if (!response.ok) {
-				throw new Error('Erreur lors du chargement des biens')
-			}
-			const data = await response.json()
-			setProperties(data.properties)
-			setSummary(data.summary)
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setLoading(false)
-		}
-	}, [])
-
-	const fetchMembers = useCallback(async () => {
-		try {
-			const response = await fetch('/api/members')
-			if (!response.ok) {
-				throw new Error('Erreur lors du chargement des membres')
-			}
-			const data = await response.json()
-			setMembers(data.members)
-		} catch {
-			// Member fetch failed silently
-		}
-	}, [])
-
-	useEffect(() => {
-		fetchProperties()
-		fetchMembers()
-	}, [fetchProperties, fetchMembers])
+	// Derived data from query
+	const properties = data?.properties ?? []
+	const summary = data?.summary ?? null
 
 	const handleInputChange = (field: keyof PropertyFormData, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }))
@@ -330,7 +242,6 @@ export default function RealEstatePage() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setFormError(null)
-		setIsSubmitting(true)
 
 		try {
 			// Validate required fields
@@ -376,10 +287,10 @@ export default function RealEstatePage() {
 				}
 			}
 
-			const payload = {
+			await createPropertyMutation.mutateAsync({
 				name: formData.name.trim(),
-				type: formData.type,
-				usage: formData.usage,
+				type: formData.type as PropertyType,
+				usage: formData.usage as PropertyUsage,
 				address: formData.address.trim(),
 				address2: formData.address2.trim() || null,
 				city: formData.city.trim(),
@@ -396,31 +307,18 @@ export default function RealEstatePage() {
 				rentCharges: formData.rentCharges ? Number.parseFloat(formData.rentCharges) : null,
 				notes: formData.notes.trim() || null,
 				memberShares: memberShares.length > 0 ? memberShares : undefined,
-			}
-
-			const response = await fetch('/api/properties', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
 			})
 
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Erreur lors de la création du bien')
-			}
-
-			// Success - close dialog and refresh list
+			// Success - close dialog and reset form
 			setIsDialogOpen(false)
 			resetForm()
-			await fetchProperties()
 		} catch (err) {
 			setFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsSubmitting(false)
 		}
 	}
 
 	const isRental = formData.usage === 'RENTAL'
+	const isSubmitting = createPropertyMutation.isPending
 
 	return (
 		<div className="space-y-8">
@@ -808,20 +706,19 @@ export default function RealEstatePage() {
 			</div>
 
 			{/* Error state */}
-			{error && (
+			{isError && (
 				<Card className="border-destructive/50 bg-destructive/5">
 					<CardContent className="py-4">
-						<p className="text-sm text-destructive">{error}</p>
-						<Button variant="outline" size="sm" className="mt-2" onClick={fetchProperties}>
-							Réessayer
-						</Button>
+						<p className="text-sm text-destructive">
+							{error instanceof Error ? error.message : 'Une erreur est survenue'}
+						</p>
 					</CardContent>
 				</Card>
 			)}
 
 			{/* Stats Overview */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
-				{loading ? (
+				{isLoading ? (
 					<>
 						<StatsCardSkeleton />
 						<StatsCardSkeleton />
@@ -896,7 +793,7 @@ export default function RealEstatePage() {
 			</div>
 
 			{/* Credit Progress */}
-			{!loading && summary && summary.totalValue > 0 && (
+			{!isLoading && summary && summary.totalValue > 0 && (
 				<Card className="border-border/60">
 					<CardContent className="pt-6">
 						<div className="flex items-center justify-between mb-3">
@@ -919,7 +816,7 @@ export default function RealEstatePage() {
 			)}
 
 			{/* Properties Grid */}
-			{loading ? (
+			{isLoading ? (
 				<div className="grid gap-6 lg:grid-cols-2">
 					<PropertyCardSkeleton />
 					<PropertyCardSkeleton />
@@ -928,7 +825,7 @@ export default function RealEstatePage() {
 				<EmptyState onAddClick={() => setIsDialogOpen(true)} />
 			) : (
 				<div className="grid gap-6 lg:grid-cols-2">
-					{properties.map((property) => {
+					{properties.map((property: PropertyWithDetails) => {
 						const totalLoansRemaining = property.loans.reduce((sum, loan) => sum + loan.remainingAmount, 0)
 						const appreciation =
 							((property.currentValue - property.purchasePrice) / property.purchasePrice) * 100
@@ -936,7 +833,7 @@ export default function RealEstatePage() {
 						const loanProgress = property.purchasePrice > 0
 							? (totalLoansRemaining / property.purchasePrice) * 100
 							: 0
-						const isRental = property.usage === 'RENTAL'
+						const isRentalProperty = property.usage === 'RENTAL'
 
 						return (
 							<Card key={property.id} className="border-border/60 group overflow-hidden">
@@ -1063,7 +960,7 @@ export default function RealEstatePage() {
 									</div>
 
 									{/* Rent Info if rental */}
-									{isRental && property.rentAmount && (
+									{isRentalProperty && property.rentAmount && (
 										<div className="rounded-xl bg-[oklch(0.55_0.15_145)]/10 p-3">
 											<div className="flex justify-between items-center">
 												<div>

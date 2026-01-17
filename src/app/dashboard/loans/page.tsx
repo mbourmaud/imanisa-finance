@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
 	ArrowDown,
@@ -25,67 +24,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useLoansQuery } from '@/features/loans'
 import type { PropertyType } from '@prisma/client'
-
-// Types
-interface LoanInsuranceWithMember {
-	id: string
-	loanId: string
-	memberId: string
-	name: string
-	provider: string
-	contractNumber: string | null
-	coveragePercent: number
-	monthlyPremium: number
-	link: string | null
-	notes: string | null
-	createdAt: string
-	updatedAt: string
-	member: {
-		id: string
-		name: string
-		color: string | null
-	}
-}
-
-interface LoanWithDetails {
-	id: string
-	propertyId: string
-	memberId: string | null
-	name: string
-	lender: string | null
-	loanNumber: string | null
-	initialAmount: number
-	remainingAmount: number
-	rate: number
-	monthlyPayment: number
-	startDate: string
-	endDate: string | null
-	notes: string | null
-	createdAt: string
-	updatedAt: string
-	property: {
-		id: string
-		name: string
-		type: PropertyType
-		address: string
-		city: string
-	}
-	member: {
-		id: string
-		name: string
-		color: string | null
-	} | null
-	loanInsurances: LoanInsuranceWithMember[]
-}
-
-interface LoanSummary {
-	totalLoans: number
-	totalRemaining: number
-	totalMonthlyPayment: number
-	averageRate: number
-	totalInsurance: number
-}
 
 // Helper functions
 function formatCurrency(amount: number): string {
@@ -221,32 +161,10 @@ function EmptyState() {
 }
 
 export default function LoansPage() {
-	const [loans, setLoans] = useState<LoanWithDetails[]>([])
-	const [summary, setSummary] = useState<LoanSummary | null>(null)
-	const [isLoading, setIsLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	const { data, isLoading, isError, error, refetch } = useLoansQuery()
 
-	const fetchLoans = useCallback(async () => {
-		try {
-			setIsLoading(true)
-			setError(null)
-			const response = await fetch('/api/loans')
-			if (!response.ok) {
-				throw new Error('Erreur lors de la récupération des crédits')
-			}
-			const data = await response.json()
-			setLoans(data.loans)
-			setSummary(data.summary)
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Une erreur est survenue')
-		} finally {
-			setIsLoading(false)
-		}
-	}, [])
-
-	useEffect(() => {
-		fetchLoans()
-	}, [fetchLoans])
+	const loans = data?.loans ?? []
+	const summary = data?.summary ?? null
 
 	// Calculate total monthly with insurance
 	const totalMonthly = summary ? summary.totalMonthlyPayment + summary.totalInsurance : 0
@@ -279,12 +197,14 @@ export default function LoansPage() {
 			)}
 
 			{/* Error State */}
-			{error && !isLoading && (
+			{isError && !isLoading && (
 				<Card className="border-destructive/50">
 					<CardContent className="py-8">
 						<div className="flex flex-col items-center justify-center text-center">
-							<p className="text-destructive mb-4">{error}</p>
-							<Button onClick={fetchLoans} variant="outline" size="sm">
+							<p className="text-destructive mb-4">
+								{error instanceof Error ? error.message : 'Une erreur est survenue'}
+							</p>
+							<Button onClick={() => refetch()} variant="outline" size="sm">
 								<Loader2 className="h-4 w-4 mr-2" />
 								Réessayer
 							</Button>
@@ -294,7 +214,7 @@ export default function LoansPage() {
 			)}
 
 			{/* Content */}
-			{!isLoading && !error && (
+			{!isLoading && !isError && (
 				loans.length === 0 ? (
 					<EmptyState />
 				) : (
