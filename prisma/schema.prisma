@@ -243,28 +243,26 @@ model PropertyMember {
 }
 
 model Loan {
-  id               String    @id @default(uuid())
-  propertyId       String?
-  name             String
-  bank             String
-  loanNumber       String?
-  type             LoanType  @default(MORTGAGE)
-  initialAmount    Float
-  remainingAmount  Float
-  rate             Float
-  monthlyPayment   Float
-  insuranceMonthly Float     @default(0)
-  startDate        DateTime?
-  endDate          DateTime?
-  notes            String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  memberId         String
-  member           Member    @relation(fields: [memberId], references: [id])
-  property         Property? @relation(fields: [propertyId], references: [id])
+  id              String   @id @default(uuid())
+  propertyId      String
+  memberId        String?
+  name            String
+  lender          String?
+  loanNumber      String?
+  initialAmount   Float
+  remainingAmount Float
+  rate            Float
+  monthlyPayment  Float
+  startDate       DateTime
+  endDate         DateTime?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  member          Member?  @relation(fields: [memberId], references: [id])
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
-  @@index([memberId])
   @@index([propertyId])
+  @@index([memberId])
 }
 
 model RawImport {
@@ -356,13 +354,6 @@ enum CategorySource {
   MANUAL
 }
 
-enum LoanType {
-  MORTGAGE
-  CONSUMER
-  STUDENT
-  AUTO
-  OTHER
-}
 
 enum InvestmentSourceType {
   PEA
