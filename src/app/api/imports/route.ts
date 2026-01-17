@@ -6,7 +6,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { rawImportRepository } from '@/server/repositories';
-import type { RawImportStatus } from '@prisma/client';
+import type { RawImportStatus } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
 	try {

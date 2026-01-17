@@ -4,7 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { Account, AccountMember, AccountType, Bank } from '@prisma/client';
+import type { Account, AccountMember, AccountType, Bank } from '@/lib/prisma';
 
 // Types
 export interface AccountWithMembers extends Account {

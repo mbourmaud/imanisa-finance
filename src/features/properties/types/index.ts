@@ -2,7 +2,7 @@
  * Property domain types
  */
 
-import type { PropertyType, PropertyUsage, InsuranceType, UtilityType } from '@prisma/client'
+import type { PropertyType, PropertyUsage, InsuranceType, UtilityType } from '@/lib/prisma'
 
 export interface Member {
 	id: string

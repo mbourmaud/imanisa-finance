@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { RawImportStatus } from '@prisma/client';
+import type { RawImportStatus } from '@/lib/prisma';
 
 export interface CreateRawImportDTO {
 	userId: string;

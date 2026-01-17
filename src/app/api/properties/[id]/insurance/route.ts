@@ -10,7 +10,7 @@ import {
 	propertyRepository,
 	propertyInsuranceRepository,
 } from '@/server/repositories';
-import type { InsuranceType } from '@prisma/client';
+import type { InsuranceType } from '@/lib/prisma';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;

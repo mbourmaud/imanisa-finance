@@ -7,7 +7,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { utilityContractRepository } from '@/server/repositories';
-import type { UtilityType } from '@prisma/client';
+import type { UtilityType } from '@/lib/prisma';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;

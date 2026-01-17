@@ -1,6 +1,8 @@
 /**
- * Next.js Middleware
+ * Next.js Proxy (formerly Middleware)
  * Handles authentication checks and redirects with Supabase
+ *
+ * @see https://nextjs.org/docs/app/api-reference/file-conventions/proxy
  */
 
 import type { NextRequest } from 'next/server';
@@ -10,7 +12,7 @@ import { updateSession } from '@/lib/supabase/middleware';
 // Check if demo mode is enabled
 const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 	// In demo mode, bypass all auth checks
 	if (isDemoMode) {
 		return NextResponse.next();

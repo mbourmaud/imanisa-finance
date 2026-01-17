@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { PropertyInsurance, InsuranceType } from '@prisma/client';
+import type { PropertyInsurance, InsuranceType } from '@/lib/prisma';
 
 // Types
 export interface CreatePropertyInsuranceDTO {

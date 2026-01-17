@@ -2,7 +2,7 @@
  * Loan domain types
  */
 
-import type { PropertyType, PropertyUsage } from '@prisma/client'
+import type { PropertyType, PropertyUsage } from '@/lib/prisma'
 
 export interface Member {
 	id: string

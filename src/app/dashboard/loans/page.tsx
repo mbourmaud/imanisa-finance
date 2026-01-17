@@ -25,7 +25,7 @@ import {
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useLoansQuery } from '@/features/loans'
-import type { PropertyType } from '@prisma/client'
+import type { PropertyType } from '@/lib/prisma'
 
 // Helper functions
 function formatCurrency(amount: number): string {

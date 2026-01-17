@@ -286,7 +286,7 @@ export default function BudgetPage() {
 				</CardHeader>
 				<CardContent>
 					<div className="grid gap-8 md:grid-cols-2 items-center">
-						<DonutChart data={chartData} height={280} innerRadius={70} outerRadius={110} />
+						<DonutChart data={chartData} className="h-72" />
 						<ChartLegend items={chartData} total={totalSpent} />
 					</div>
 				</CardContent>

@@ -3,9 +3,14 @@
  * Seeds the database with initial data: banks and household members
  */
 
-import { PrismaClient, BankType } from '@prisma/client';
+import { PrismaClient, BankType } from '../src/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+import 'dotenv/config';
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // Supported banks with parsers
 const BANKS = [

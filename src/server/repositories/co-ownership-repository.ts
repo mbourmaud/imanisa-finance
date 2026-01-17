@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { CoOwnership } from '@prisma/client';
+import type { CoOwnership } from '@/lib/prisma';
 
 // Types
 export interface CreateCoOwnershipDTO {

@@ -4,7 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { Transaction, TransactionType, Prisma } from '@prisma/client';
+import type { Transaction, TransactionType, Prisma } from '@/lib/prisma';
 import type { ParsedTransaction } from '@/features/import/parsers/types';
 
 // Types

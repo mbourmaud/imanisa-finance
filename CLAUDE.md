@@ -15,6 +15,7 @@ Application de gestion financière familiale pour suivre les comptes bancaires, 
   - **Zustand** - Client state (UI, selection, filters)
 - **Forms**: TanStack Form + Zod validation
 - **Tables**: TanStack Table (sorting, filtering, pagination, selection)
+- **Charts**: Tremor (DonutChart, BarChart, AreaChart)
 
 ## Principes Architecturaux
 
@@ -545,6 +546,72 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 ## Tests
 
 Compte de test Playwright: `fr100828` / `1L0v31000niuM*`
+
+## Charts avec Tremor
+
+On utilise **Tremor** pour les graphiques (pas Recharts ni shadcn/charts). API simple et déclarative.
+
+### Composants disponibles
+
+Nos composants wrappent Tremor dans `src/components/charts/` :
+
+```tsx
+import { DonutChart, ChartLegend } from '@/components/charts/pie-chart';
+import { IncomeExpenseBarChart } from '@/components/charts/bar-chart';
+import { PatrimonyAreaChart, InvestmentPerformanceChart } from '@/components/charts/area-chart';
+```
+
+### Usage DonutChart
+
+```tsx
+const data = [
+  { name: 'Alimentation', value: 450, color: '#10b981' },
+  { name: 'Transport', value: 200, color: '#3b82f6' },
+  { name: 'Loisirs', value: 150, color: '#8b5cf6' },
+];
+
+<DonutChart data={data} className="h-72" />
+<ChartLegend items={data} total={800} />
+```
+
+### Usage BarChart
+
+```tsx
+const data = [
+  { label: 'Jan', income: 3500, expenses: 2800 },
+  { label: 'Fév', income: 3200, expenses: 2600 },
+];
+
+<IncomeExpenseBarChart data={data} className="h-72" />
+```
+
+### Usage AreaChart
+
+```tsx
+// Patrimoine simple
+const data = [
+  { date: '2024-01', value: 50000, label: 'Jan' },
+  { date: '2024-02', value: 52000, label: 'Fév' },
+];
+
+<PatrimonyAreaChart data={data} className="h-72" />
+
+// Performance investissement (valeur vs investi)
+const investData = [
+  { date: '2024-01', value: 10500, invested: 10000, label: 'Jan' },
+  { date: '2024-02', value: 11200, invested: 10500, label: 'Fév' },
+];
+
+<InvestmentPerformanceChart data={investData} className="h-72" />
+```
+
+### Couleurs Tremor
+
+Tremor utilise des noms de couleurs prédéfinis : `emerald`, `rose`, `indigo`, `slate`, `amber`, `cyan`, etc.
+
+```tsx
+<BarChart colors={['emerald', 'rose']} />
+```
 
 ## Design Guidelines (Vercel Style)
 

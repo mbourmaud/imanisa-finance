@@ -383,7 +383,7 @@ export default function InvestmentsPage() {
 					</div>
 				</CardHeader>
 				<CardContent>
-					<InvestmentPerformanceChart data={demoInvestmentPerformance} height={280} />
+					<InvestmentPerformanceChart data={demoInvestmentPerformance} className="h-72" />
 				</CardContent>
 			</Card>
 		</div>

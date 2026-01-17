@@ -4,7 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { Member } from '@prisma/client';
+import type { Member } from '@/lib/prisma';
 
 export interface MemberWithAccounts extends Member {
 	accountMembers: {

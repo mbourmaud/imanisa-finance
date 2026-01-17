@@ -4,7 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { BankType } from '@prisma/client';
+import type { BankType } from '@/lib/prisma';
 
 export interface Bank {
 	id: string;

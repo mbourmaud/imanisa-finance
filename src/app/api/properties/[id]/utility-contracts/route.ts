@@ -9,7 +9,7 @@ import {
 	propertyRepository,
 	utilityContractRepository,
 } from '@/server/repositories';
-import type { UtilityType } from '@prisma/client';
+import type { UtilityType } from '@/lib/prisma';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;

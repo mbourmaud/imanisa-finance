@@ -1,6 +1,6 @@
 'use client';
 
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { DonutChart as TremorDonutChart } from '@tremor/react';
 import { formatMoneyCompact } from '@/shared/utils';
 
 interface PieDataPoint {
@@ -11,63 +11,24 @@ interface PieDataPoint {
 
 interface DonutChartProps {
 	data: PieDataPoint[];
-	height?: number;
-	innerRadius?: number;
-	outerRadius?: number;
-	showLabels?: boolean;
+	showLabel?: boolean;
+	className?: string;
 }
 
-export function DonutChart({
-	data,
-	height = 280,
-	innerRadius = 60,
-	outerRadius = 100,
-}: DonutChartProps) {
+export function DonutChart({ data, showLabel = true, className }: DonutChartProps) {
 	const total = data.reduce((sum, item) => sum + item.value, 0);
 
 	return (
-		<ResponsiveContainer width="100%" height={height}>
-			<PieChart>
-				<Pie
-					data={data}
-					cx="50%"
-					cy="50%"
-					innerRadius={innerRadius}
-					outerRadius={outerRadius}
-					paddingAngle={2}
-					dataKey="value"
-					stroke="none"
-				>
-					{data.map((entry, index) => (
-						<Cell key={`cell-${index}`} fill={entry.color} />
-					))}
-				</Pie>
-				<Tooltip
-					content={({ active, payload }) => {
-						if (active && payload && payload.length) {
-							const item = payload[0].payload as PieDataPoint;
-							const percentage = ((item.value / total) * 100).toFixed(1);
-							return (
-								<div className="rounded-lg border border-border/60 bg-card p-3 shadow-lg">
-									<div className="flex items-center gap-2">
-										<div
-											className="h-3 w-3 rounded-full"
-											style={{ backgroundColor: item.color }}
-										/>
-										<p className="text-sm font-medium">{item.name}</p>
-									</div>
-									<p className="mt-1 text-lg font-semibold number-display">
-										{formatMoneyCompact(item.value)}
-									</p>
-									<p className="text-xs text-muted-foreground">{percentage}%</p>
-								</div>
-							);
-						}
-						return null;
-					}}
-				/>
-			</PieChart>
-		</ResponsiveContainer>
+		<TremorDonutChart
+			data={data}
+			category="value"
+			index="name"
+			colors={data.map((d) => d.color)}
+			showLabel={showLabel}
+			label={formatMoneyCompact(total)}
+			valueFormatter={(value) => formatMoneyCompact(value)}
+			className={className}
+		/>
 	);
 }
 

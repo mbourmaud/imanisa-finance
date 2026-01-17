@@ -13,7 +13,7 @@ import type {
 	PropertyInsurance,
 	CoOwnership,
 	UtilityContract,
-} from '@prisma/client';
+} from '@/lib/prisma';
 
 // Types
 export interface PropertyMemberWithDetails {

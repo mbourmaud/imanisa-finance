@@ -6,7 +6,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { accountRepository, bankRepository } from '@/server/repositories';
-import type { AccountType } from '@prisma/client';
+import type { AccountType } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
 	try {

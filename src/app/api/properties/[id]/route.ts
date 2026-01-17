@@ -7,7 +7,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { propertyRepository, memberRepository } from '@/server/repositories';
-import type { PropertyType, PropertyUsage } from '@prisma/client';
+import type { PropertyType, PropertyUsage } from '@/lib/prisma';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;

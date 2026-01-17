@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { UtilityContract, UtilityType } from '@prisma/client';
+import type { UtilityContract, UtilityType } from '@/lib/prisma';
 
 // Types
 export interface CreateUtilityContractDTO {
