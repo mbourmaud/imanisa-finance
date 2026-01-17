@@ -1,5 +1,14 @@
 export { accountRepository } from './account-repository';
 export { bankRepository } from './bank-repository';
+export {
+	loanRepository,
+	type LoanWithDetails,
+	type LoanInsuranceWithMember,
+	type LoanFilters,
+	type CreateLoanDTO,
+	type UpdateLoanDTO,
+	type LoanSummary,
+} from './loan-repository';
 export { memberRepository } from './member-repository';
 export {
 	propertyRepository,
