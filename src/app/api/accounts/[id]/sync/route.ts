@@ -1,6 +1,6 @@
 /**
  * Account Sync API Route
- * POST /api/accounts/:id/sync - Sync account balance with bank
+ * POST /api/accounts/:id/sync - Recalculate account balance from transactions
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
@@ -14,16 +14,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 	try {
 		const { id } = await params;
 
-		// In demo mode, just update the lastSyncAt timestamp
-		// In real mode, this would call the bank API
 		const account = await accountRepository.getById(id);
 
 		if (!account) {
 			return NextResponse.json({ error: 'Account not found' }, { status: 404 });
 		}
 
-		// Simulate sync by updating lastSyncAt
-		const updated = await accountRepository.updateBalance(id, account.balance);
+		// Recalculate balance from all transactions
+		const updated = await accountRepository.recalculateBalance(id);
 
 		return NextResponse.json(updated);
 	} catch (error) {

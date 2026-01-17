@@ -116,6 +116,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 				},
 			});
 
+			// Recalculate account balance after import
+			await accountRepository.recalculateBalance(accountId);
+
 			// Build response message
 			let message = `Successfully imported ${importResult.inserted} transaction${importResult.inserted !== 1 ? 's' : ''}`;
 			if (importResult.skipped > 0) {

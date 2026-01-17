@@ -19,7 +19,9 @@ const parsers: Map<string, Parser> = new Map([
 	['Crédit Mutuel', creditMutuelParser],
 	['CIC', creditMutuelParser],
 	['caisse_epargne', caisseEpargneParser],
+	['caisse_epargne_entreprise', caisseEpargneParser], // CE Pro uses same format
 	["Caisse d'Épargne", caisseEpargneParser],
+	["Caisse d'Épargne Pro", caisseEpargneParser],
 	['other', genericParser],
 ]);
 

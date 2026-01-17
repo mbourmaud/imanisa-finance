@@ -263,6 +263,36 @@ export const accountRepository = {
 	},
 
 	/**
+	 * Calculate and update account balance from transactions
+	 * INCOME transactions are positive, EXPENSE transactions are negative
+	 */
+	async recalculateBalance(id: string): Promise<AccountWithDetails> {
+		// Sum all transactions for this account
+		const result = await prisma.transaction.aggregate({
+			where: { accountId: id },
+			_sum: { amount: true },
+		});
+
+		// Get transactions grouped by type to calculate correctly
+		const incomeSum = await prisma.transaction.aggregate({
+			where: { accountId: id, type: 'INCOME' },
+			_sum: { amount: true },
+		});
+
+		const expenseSum = await prisma.transaction.aggregate({
+			where: { accountId: id, type: 'EXPENSE' },
+			_sum: { amount: true },
+		});
+
+		// Balance = income - expenses (amounts are stored as positive values)
+		const income = incomeSum._sum.amount ?? 0;
+		const expenses = expenseSum._sum.amount ?? 0;
+		const balance = income - expenses;
+
+		return this.updateBalance(id, balance);
+	},
+
+	/**
 	 * Delete an account
 	 */
 	async delete(id: string): Promise<void> {

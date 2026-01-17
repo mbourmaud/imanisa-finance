@@ -10,7 +10,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { downloadRawFile } from '@/lib/supabase/storage';
 import { parseImport } from '@/features/import/parsers';
-import { rawImportRepository } from '@/server/repositories';
+import { rawImportRepository, accountRepository } from '@/server/repositories';
 import { prisma } from '@/lib/prisma';
 
 interface RouteParams {
@@ -137,6 +137,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			if (rawImport.accountId !== accountId) {
 				await rawImportRepository.updateStatus(id, { accountId });
 			}
+
+			// Recalculate account balance after reprocess
+			await accountRepository.recalculateBalance(accountId);
 
 			return NextResponse.json({
 				success: true,
