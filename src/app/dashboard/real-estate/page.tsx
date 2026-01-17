@@ -279,8 +279,8 @@ export default function RealEstatePage() {
 			}
 			const data = await response.json()
 			setMembers(data.members)
-		} catch (err) {
-			console.error('Error fetching members:', err)
+		} catch {
+			// Member fetch failed silently
 		}
 	}, [])
 

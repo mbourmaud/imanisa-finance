@@ -391,7 +391,6 @@ function getUtilityTypeIcon(type: UtilityType): React.ElementType {
 			return Droplets
 		case 'INTERNET':
 			return Wifi
-		case 'OTHER':
 		default:
 			return Zap
 	}
@@ -417,22 +416,6 @@ function SectionSkeleton() {
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
-				</div>
-			</CardContent>
-		</Card>
-	)
-}
-
-function PlaceholderSection({ title, icon: Icon, description }: { title: string; icon: React.ElementType; description: string }) {
-	return (
-		<Card className="border-border/60 border-dashed">
-			<CardContent className="flex items-center gap-4 py-6">
-				<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50 shrink-0">
-					<Icon className="h-5 w-5 text-muted-foreground" />
-				</div>
-				<div>
-					<h3 className="font-medium">{title}</h3>
-					<p className="text-sm text-muted-foreground">{description}</p>
 				</div>
 			</CardContent>
 		</Card>
@@ -798,8 +781,8 @@ export default function PropertyDetailPage() {
 				const data = await response.json()
 				setMembers(data.members || [])
 			}
-		} catch (err) {
-			console.error('Error fetching members:', err)
+		} catch {
+			// Member fetch failed silently
 		} finally {
 			setLoadingMembers(false)
 		}
@@ -993,8 +976,8 @@ export default function PropertyDetailPage() {
 			}
 
 			await fetchProperty()
-		} catch (err) {
-			console.error('Error deleting property insurance:', err)
+		} catch {
+			// Property insurance deletion failed silently
 		} finally {
 			setIsDeletingPropertyInsurance(false)
 		}
@@ -1089,8 +1072,8 @@ export default function PropertyDetailPage() {
 			}
 
 			await fetchProperty()
-		} catch (err) {
-			console.error('Error deleting co-ownership:', err)
+		} catch {
+			// Co-ownership deletion failed silently
 		} finally {
 			setIsDeletingCoOwnership(false)
 		}
@@ -1197,8 +1180,8 @@ export default function PropertyDetailPage() {
 			}
 
 			await fetchProperty()
-		} catch (err) {
-			console.error('Error deleting utility contract:', err)
+		} catch {
+			// Utility contract deletion failed silently
 		} finally {
 			setDeletingUtilityContractId(null)
 		}
@@ -1387,7 +1370,6 @@ export default function PropertyDetailPage() {
 			// Success - redirect to property list
 			router.push('/dashboard/real-estate')
 		} catch (err) {
-			console.error('Error deleting property:', err)
 			setError(err instanceof Error ? err.message : 'Erreur lors de la suppression')
 			setShowDeletePropertyDialog(false)
 		} finally {
