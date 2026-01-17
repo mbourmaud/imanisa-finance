@@ -17,6 +17,7 @@ model Member {
   createdAt         DateTime           @default(now())
   accountMembers    AccountMember[]
   investmentSources InvestmentSource[]
+  loanInsurances    LoanInsurance[]
   loans             Loan[]
   propertyMembers   PropertyMember[]
   user              User?
@@ -243,7 +244,7 @@ model PropertyMember {
 }
 
 model Loan {
-  id              String   @id @default(uuid())
+  id              String          @id @default(uuid())
   propertyId      String
   memberId        String?
   name            String
@@ -256,12 +257,34 @@ model Loan {
   startDate       DateTime
   endDate         DateTime?
   notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  member          Member?  @relation(fields: [memberId], references: [id])
-  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  loanInsurances  LoanInsurance[]
+  member          Member?         @relation(fields: [memberId], references: [id])
+  property        Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
+  @@index([memberId])
+}
+
+/// LoanInsurance: Insurance for a loan, one per co-borrower (member)
+model LoanInsurance {
+  id              String   @id @default(uuid())
+  loanId          String
+  memberId        String
+  name            String
+  provider        String
+  contractNumber  String?
+  coveragePercent Float
+  monthlyPremium  Float
+  link            String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  loan            Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  member          Member   @relation(fields: [memberId], references: [id])
+
+  @@index([loanId])
   @@index([memberId])
 }
 
