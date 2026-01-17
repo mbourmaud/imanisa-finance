@@ -678,6 +678,10 @@ export default function PropertyDetailPage() {
 	const [isSubmittingProperty, setIsSubmittingProperty] = useState(false)
 	const [propertyFormError, setPropertyFormError] = useState<string | null>(null)
 
+	// Property delete state
+	const [showDeletePropertyDialog, setShowDeletePropertyDialog] = useState(false)
+	const [isDeletingProperty, setIsDeletingProperty] = useState(false)
+
 	const fetchProperty = useCallback(async () => {
 		try {
 			setLoading(true)
@@ -1367,6 +1371,30 @@ export default function PropertyDetailPage() {
 		}
 	}
 
+	// Delete property handler
+	const handleDeleteProperty = async () => {
+		setIsDeletingProperty(true)
+		try {
+			const response = await fetch(`/api/properties/${propertyId}`, {
+				method: 'DELETE',
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.error || 'Erreur lors de la suppression du bien')
+			}
+
+			// Success - redirect to property list
+			router.push('/dashboard/real-estate')
+		} catch (err) {
+			console.error('Error deleting property:', err)
+			setError(err instanceof Error ? err.message : 'Erreur lors de la suppression')
+			setShowDeletePropertyDialog(false)
+		} finally {
+			setIsDeletingProperty(false)
+		}
+	}
+
 	const isEditFormRental = propertyFormData.usage === 'RENTAL'
 
 	// Loading state
@@ -1464,7 +1492,13 @@ export default function PropertyDetailPage() {
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem>Exporter les données</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+							<DropdownMenuItem
+								className="text-destructive"
+								onClick={() => setShowDeletePropertyDialog(true)}
+							>
+								<Trash2 className="h-4 w-4 mr-2" />
+								Supprimer
+							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
@@ -3305,6 +3339,36 @@ export default function PropertyDetailPage() {
 					</form>
 				</DialogContent>
 			</Dialog>
+
+			{/* Delete Property Confirmation Dialog */}
+			<AlertDialog open={showDeletePropertyDialog} onOpenChange={setShowDeletePropertyDialog}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Supprimer ce bien ?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Cette action est irréversible. Le bien « {property.name} » sera définitivement supprimé,
+							ainsi que tous les prêts, assurances et contrats associés.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={isDeletingProperty}>Annuler</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleDeleteProperty}
+							disabled={isDeletingProperty}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							{isDeletingProperty ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Suppression...
+								</>
+							) : (
+								'Supprimer'
+							)}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	)
 }
