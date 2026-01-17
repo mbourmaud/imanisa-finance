@@ -41,10 +41,10 @@ interface LegendItem {
 export function ChartLegend({ items, total }: { items: LegendItem[]; total: number }) {
 	return (
 		<div className="space-y-2">
-			{items.map((item, index) => {
+			{items.map((item) => {
 				const percentage = ((item.value / total) * 100).toFixed(1);
 				return (
-					<div key={index} className="flex items-center justify-between">
+					<div key={item.name} className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
 							<div
 								className="h-3 w-3 rounded-full"
