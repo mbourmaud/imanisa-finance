@@ -15,6 +15,7 @@ import {
 	Users,
 	Wallet,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
@@ -222,11 +223,14 @@ export function AppSidebar() {
 					<DropdownMenuTrigger asChild>
 						<button className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors">
 							{avatarUrl ? (
-								<img
+								<Image
 									src={avatarUrl}
 									alt={fullName ?? 'Avatar'}
 									referrerPolicy="no-referrer"
 									className="h-10 w-10 rounded-full border-2 border-primary/20 object-cover"
+									width={40}
+									height={40}
+									unoptimized
 								/>
 							) : (
 								<Avatar className="h-10 w-10 border-2 border-primary/20">
