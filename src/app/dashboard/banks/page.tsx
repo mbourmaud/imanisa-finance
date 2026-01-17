@@ -47,6 +47,7 @@ interface AccountMember {
 	id: string;
 	name: string;
 	ownerShare: number;
+	color?: string | null;
 }
 
 interface Account {
@@ -476,7 +477,7 @@ export default function BanksPage() {
 																			<TooltipTrigger asChild>
 																				<span
 																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
-																					style={{ backgroundColor: '#6b7280' }}
+																					style={{ backgroundColor: member.color || '#6b7280' }}
 																				>
 																					{member.name.charAt(0).toUpperCase()}
 																				</span>
@@ -652,7 +653,7 @@ export default function BanksPage() {
 																			<TooltipTrigger asChild>
 																				<span
 																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
-																					style={{ backgroundColor: '#6b7280' }}
+																					style={{ backgroundColor: member.color || '#6b7280' }}
 																				>
 																					{member.name.charAt(0).toUpperCase()}
 																				</span>
