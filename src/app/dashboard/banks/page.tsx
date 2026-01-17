@@ -33,6 +33,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { BankLogo } from '@/components/banks/BankLogo';
 
 interface AccountMember {
@@ -126,12 +127,19 @@ function BankRowSkeleton() {
 	);
 }
 
-// Account type labels
+// Account type labels and colors
 const ACCOUNT_TYPE_LABELS: Record<string, string> = {
 	CHECKING: 'Compte courant',
 	SAVINGS: 'Épargne',
 	INVESTMENT: 'Investissement',
 	LOAN: 'Prêt',
+};
+
+const ACCOUNT_TYPE_COLORS: Record<string, string> = {
+	CHECKING: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+	SAVINGS: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+	INVESTMENT: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
+	LOAN: 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
 };
 
 export default function BanksPage() {
@@ -387,30 +395,44 @@ export default function BanksPage() {
 											<Link
 												key={account.id}
 												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group cursor-pointer"
+												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-sm hover:border-border/60 transition-all duration-200 group cursor-pointer"
 											>
 												<div className="flex items-center gap-3">
 													<div>
-														<p className="font-medium text-sm">{account.name}</p>
-														<div className="flex items-center gap-2 text-xs text-muted-foreground">
-															<span>{ACCOUNT_TYPE_LABELS[account.type] || account.type}</span>
-															{account.members.length > 0 && (
-																<>
-																	<span>·</span>
-																	<span className="flex items-center gap-1">
-																		<Users className="h-3 w-3" />
-																		{account.members.map((m) => m.name).join(', ')}
-																	</span>
-																</>
-															)}
+														<div className="flex items-center gap-2">
+															<p className="font-medium text-sm group-hover:text-foreground">{account.name}</p>
+															<span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ACCOUNT_TYPE_COLORS[account.type] || 'bg-muted text-muted-foreground'}`}>
+																{ACCOUNT_TYPE_LABELS[account.type] || account.type}
+															</span>
 														</div>
+														{account.members.length > 0 && (
+															<div className="flex items-center gap-1 mt-1">
+																<div className="flex -space-x-1">
+																	{account.members.map((member) => (
+																		<Tooltip key={member.id}>
+																			<TooltipTrigger asChild>
+																				<span
+																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
+																					style={{ backgroundColor: '#6b7280' }}
+																				>
+																					{member.name.charAt(0).toUpperCase()}
+																				</span>
+																			</TooltipTrigger>
+																			<TooltipContent>
+																				<p>{member.name}</p>
+																			</TooltipContent>
+																		</Tooltip>
+																	))}
+																</div>
+															</div>
+														)}
 													</div>
 												</div>
-												<div className="flex items-center gap-2">
-													<p className="font-medium tabular-nums text-sm">
+												<div className="flex items-center gap-3">
+													<p className="font-semibold tabular-nums text-sm">
 														{formatCurrency(account.balance)}
 													</p>
-													<ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+													<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
 												</div>
 											</Link>
 										))}
@@ -492,30 +514,44 @@ export default function BanksPage() {
 											<Link
 												key={account.id}
 												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group cursor-pointer"
+												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-sm hover:border-border/60 transition-all duration-200 group cursor-pointer"
 											>
 												<div className="flex items-center gap-3">
 													<div>
-														<p className="font-medium text-sm">{account.name}</p>
-														<div className="flex items-center gap-2 text-xs text-muted-foreground">
-															<span>{ACCOUNT_TYPE_LABELS[account.type] || account.type}</span>
-															{account.members.length > 0 && (
-																<>
-																	<span>·</span>
-																	<span className="flex items-center gap-1">
-																		<Users className="h-3 w-3" />
-																		{account.members.map((m) => m.name).join(', ')}
-																	</span>
-																</>
-															)}
+														<div className="flex items-center gap-2">
+															<p className="font-medium text-sm group-hover:text-foreground">{account.name}</p>
+															<span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ACCOUNT_TYPE_COLORS[account.type] || 'bg-muted text-muted-foreground'}`}>
+																{ACCOUNT_TYPE_LABELS[account.type] || account.type}
+															</span>
 														</div>
+														{account.members.length > 0 && (
+															<div className="flex items-center gap-1 mt-1">
+																<div className="flex -space-x-1">
+																	{account.members.map((member) => (
+																		<Tooltip key={member.id}>
+																			<TooltipTrigger asChild>
+																				<span
+																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
+																					style={{ backgroundColor: '#6b7280' }}
+																				>
+																					{member.name.charAt(0).toUpperCase()}
+																				</span>
+																			</TooltipTrigger>
+																			<TooltipContent>
+																				<p>{member.name}</p>
+																			</TooltipContent>
+																		</Tooltip>
+																	))}
+																</div>
+															</div>
+														)}
 													</div>
 												</div>
-												<div className="flex items-center gap-2">
-													<p className="font-medium tabular-nums text-sm">
+												<div className="flex items-center gap-3">
+													<p className="font-semibold tabular-nums text-sm">
 														{formatCurrency(account.balance)}
 													</p>
-													<ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+													<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
 												</div>
 											</Link>
 										))}
