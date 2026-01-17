@@ -108,16 +108,19 @@ function StatsCardsSkeleton() {
 	);
 }
 
-// Skeleton for bank row
+// Skeleton for bank card
 function BankRowSkeleton() {
 	return (
-		<div className="flex items-center gap-4 py-4 border-b border-border/40">
-			<Skeleton className="h-10 w-10 rounded-lg" />
-			<div className="flex-1">
-				<Skeleton className="h-5 w-32 mb-1" />
-				<Skeleton className="h-4 w-20" />
+		<div className="bg-card rounded-lg border border-border/60 p-4 border-l-4 border-l-muted-foreground/20">
+			<div className="flex items-center gap-4">
+				<Skeleton className="h-10 w-10 rounded-lg" />
+				<div className="flex-1">
+					<Skeleton className="h-5 w-32 mb-1" />
+					<Skeleton className="h-4 w-20" />
+				</div>
+				<Skeleton className="h-6 w-24" />
+				<Skeleton className="h-9 w-24 rounded-md" />
 			</div>
-			<Skeleton className="h-6 w-24" />
 		</div>
 	);
 }
@@ -322,15 +325,19 @@ export default function BanksPage() {
 				</div>
 
 				{loading ? (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
+					<div className="space-y-3">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 					</div>
 				) : (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
+					<div className="space-y-3">
 						{data?.bankAccounts.map((bank) => (
-							<div key={bank.id} className="p-4">
+							<div
+								key={bank.id}
+								className="bg-card rounded-lg border border-border/60 p-4 border-l-4"
+								style={{ borderLeftColor: bank.color }}
+							>
 								{/* Bank header */}
 								<div className="flex items-center gap-4">
 									<BankLogo
@@ -414,7 +421,7 @@ export default function BanksPage() {
 				)}
 			</div>
 
-			{/* Supported Banks - Investments */}
+			{/* Investments */}
 			<div className="mt-8">
 				<div className="flex items-center gap-2 mb-4">
 					<TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -424,14 +431,18 @@ export default function BanksPage() {
 				</div>
 
 				{loading ? (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
+					<div className="space-y-3">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 					</div>
 				) : (
-					<div className="bg-card rounded-lg border border-border/60 divide-y divide-border/40">
+					<div className="space-y-3">
 						{data?.investmentAccounts.map((bank) => (
-							<div key={bank.id} className="p-4">
+							<div
+								key={bank.id}
+								className="bg-card rounded-lg border border-border/60 p-4 border-l-4"
+								style={{ borderLeftColor: bank.color }}
+							>
 								{/* Bank header */}
 								<div className="flex items-center gap-4">
 									<BankLogo
