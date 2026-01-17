@@ -47,7 +47,7 @@ function parseFrenchDate(dateStr: string): Date | null {
 	const month = parseInt(parts[1], 10) - 1; // JavaScript months are 0-indexed
 	const year = parseInt(parts[2], 10);
 
-	if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+	if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year)) return null;
 
 	return new Date(year, month, day);
 }
@@ -62,7 +62,7 @@ function parseFrenchNumber(numStr: string): number {
 	const cleaned = numStr.replace(/\s/g, '').replace(',', '.');
 	const num = parseFloat(cleaned);
 
-	return isNaN(num) ? 0 : num;
+	return Number.isNaN(num) ? 0 : num;
 }
 
 export const creditMutuelParser: Parser = {
@@ -70,7 +70,7 @@ export const creditMutuelParser: Parser = {
 	name: 'Crédit Mutuel',
 	supportedMimeTypes: ['text/csv'],
 
-	async parse(content: string | ArrayBuffer, mimeType: string): Promise<ParseResult> {
+	async parse(content: string | ArrayBuffer, _mimeType: string): Promise<ParseResult> {
 		const errors: string[] = [];
 		const warnings: string[] = [];
 		const transactions: ParsedTransaction[] = [];

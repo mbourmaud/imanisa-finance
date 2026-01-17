@@ -63,29 +63,29 @@ function parseDate(dateStr: string): Date | null {
 	// French format: DD/MM/YYYY
 	let match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
 	if (match) {
-		return new Date(parseInt(match[3]), parseInt(match[2]) - 1, parseInt(match[1]));
+		return new Date(parseInt(match[3], 10), parseInt(match[2], 10) - 1, parseInt(match[1], 10));
 	}
 
 	// ISO format: YYYY-MM-DD
 	match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 	if (match) {
-		return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
+		return new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10));
 	}
 
 	// US format: MM/DD/YYYY
 	match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
 	if (match) {
-		const month = parseInt(match[1]);
-		const day = parseInt(match[2]);
+		const month = parseInt(match[1], 10);
+		const day = parseInt(match[2], 10);
 		// If month > 12, assume it's actually DD/MM/YYYY
 		if (month <= 12) {
-			return new Date(parseInt(match[3]), month - 1, day);
+			return new Date(parseInt(match[3], 10), month - 1, day);
 		}
 	}
 
 	// Try native parsing as fallback
 	const parsed = new Date(dateStr);
-	return isNaN(parsed.getTime()) ? null : parsed;
+	return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 /**
@@ -110,7 +110,7 @@ function parseNumber(numStr: string): number {
 	}
 
 	const num = parseFloat(cleaned);
-	return isNaN(num) ? 0 : num;
+	return Number.isNaN(num) ? 0 : num;
 }
 
 /**
@@ -130,7 +130,7 @@ export const genericParser: Parser = {
 	supportedMimeTypes: ['text/csv'],
 
 	async parse(content: string | ArrayBuffer): Promise<ParseResult> {
-		const errors: string[] = [];
+		const _errors: string[] = [];
 		const warnings: string[] = [];
 		const transactions: ParsedTransaction[] = [];
 

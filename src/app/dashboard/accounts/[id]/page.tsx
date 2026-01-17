@@ -15,11 +15,9 @@ import {
 	ArrowLeft,
 	Check,
 	CheckCircle2,
-	ChevronDown,
 	Clock,
 	ExternalLink,
 	FileSpreadsheet,
-	Link as LinkIcon,
 	Loader2,
 	Pencil,
 	Plus,
@@ -29,11 +27,9 @@ import {
 	Settings,
 	Trash2,
 	Upload,
-	Wallet,
 	X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
 	Sheet,
@@ -267,7 +263,7 @@ export default function AccountDetailPage() {
 	useEffect(() => {
 		setCurrentPage(1);
 		setAllTransactions([]);
-	}, [searchQuery]);
+	}, []);
 
 	// Infinite scroll observer
 	const loadMore = useCallback(() => {
@@ -452,7 +448,7 @@ export default function AccountDetailPage() {
 
 		const balanceStr = editInitialBalance !== '' ? editInitialBalance : account.initialBalance?.toString() || '0';
 		const balanceValue = parseFloat(balanceStr.replace(',', '.'));
-		if (isNaN(balanceValue)) {
+		if (Number.isNaN(balanceValue)) {
 			setError('Montant invalide');
 			return;
 		}

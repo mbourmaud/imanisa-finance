@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import {
 	Bell,
-	ChevronRight,
 	Database,
 	Download,
 	Globe,
@@ -11,7 +10,6 @@ import {
 	Moon,
 	Palette,
 	Plus,
-	Save,
 	Shield,
 	Sun,
 	Upload,
@@ -19,7 +17,6 @@ import {
 	Users,
 	Pencil,
 	Trash2,
-	X,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';

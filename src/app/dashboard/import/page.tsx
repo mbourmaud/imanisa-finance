@@ -153,7 +153,7 @@ export default function ImportPage() {
 	// Reset account selection when bank changes
 	useEffect(() => {
 		setSelectedAccountId('');
-	}, [selectedBankId]);
+	}, []);
 
 	// Handle file upload
 	const handleUpload = async (file: File) => {

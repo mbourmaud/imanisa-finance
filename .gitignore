@@ -50,3 +50,4 @@ data/
 
 # Ralph PRD and progress files (contain sensitive data)
 .ralph/
+.hive/

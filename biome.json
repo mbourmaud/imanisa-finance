@@ -6,7 +6,28 @@
 	},
 	"linter": {
 		"enabled": true,
-		"rules": { "recommended": true }
+		"rules": {
+			"recommended": true,
+			"style": {
+				"noNonNullAssertion": "off"
+			},
+			"a11y": {
+				"noLabelWithoutControl": "warn",
+				"noStaticElementInteractions": "warn",
+				"useKeyWithClickEvents": "warn",
+				"useButtonType": "warn",
+				"noSvgWithoutTitle": "warn",
+				"useSemanticElements": "warn"
+			},
+			"performance": {
+				"noImgElement": "warn"
+			},
+			"suspicious": {
+				"noDocumentCookie": "off",
+				"noArrayIndexKey": "warn",
+				"useIterableCallbackReturn": "warn"
+			}
+		}
 	},
 	"formatter": {
 		"enabled": true,

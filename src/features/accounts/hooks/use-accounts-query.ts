@@ -6,7 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { accountService } from '../services/account-service';
-import type { Account, AccountFilters, CreateAccountInput, UpdateAccountInput } from '../types';
+import type { AccountFilters, CreateAccountInput, UpdateAccountInput } from '../types';
 
 /**
  * Query key factory for accounts

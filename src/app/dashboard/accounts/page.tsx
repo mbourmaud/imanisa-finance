@@ -22,8 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAccountsQuery } from '@/features/accounts';
-import { formatMoney, formatMoneyCompact } from '@/shared/utils';
-import type { AccountType } from '@/features/accounts/types';
+import { formatMoneyCompact } from '@/shared/utils';
 
 // Account type returned by API
 interface ApiAccount {
@@ -105,17 +104,17 @@ export default function AccountsPage() {
 
 	// Calculate totals by type for stat cards
 	const checkingTotal = useMemo(() => {
-		const checkingAccounts = accountsByType['CHECKING'] || accountsByType['checking'] || [];
+		const checkingAccounts = accountsByType.CHECKING || accountsByType.checking || [];
 		return checkingAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
 	}, [accountsByType]);
 
 	const savingsTotal = useMemo(() => {
-		const savingsAccounts = accountsByType['SAVINGS'] || accountsByType['savings'] || [];
+		const savingsAccounts = accountsByType.SAVINGS || accountsByType.savings || [];
 		return savingsAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
 	}, [accountsByType]);
 
 	const investmentTotal = useMemo(() => {
-		const investmentAccounts = accountsByType['INVESTMENT'] || accountsByType['investment'] || [];
+		const investmentAccounts = accountsByType.INVESTMENT || accountsByType.investment || [];
 		return investmentAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
 	}, [accountsByType]);
 

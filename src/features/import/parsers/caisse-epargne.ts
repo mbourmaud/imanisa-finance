@@ -48,7 +48,7 @@ function parseFrenchDate(dateStr: string): Date | null {
 	const month = parseInt(parts[1], 10) - 1; // JavaScript months are 0-indexed
 	const year = parseInt(parts[2], 10);
 
-	if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+	if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year)) return null;
 
 	// Use UTC to avoid timezone issues
 	return new Date(Date.UTC(year, month, day, 12, 0, 0));
@@ -70,7 +70,7 @@ function parseCaisseEpargneNumber(numStr: string): number {
 	}
 
 	const num = parseFloat(cleaned);
-	return isNaN(num) ? 0 : num;
+	return Number.isNaN(num) ? 0 : num;
 }
 
 export const caisseEpargneParser: Parser = {
