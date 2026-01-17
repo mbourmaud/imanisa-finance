@@ -12,6 +12,7 @@ import {
 	Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
 	Dialog,
@@ -345,43 +346,43 @@ export default function BanksPage() {
 										bankName={bank.name}
 										bankColor={bank.color}
 										logo={bankLogos[bank.id] ?? bank.logo}
-										size="md"
+										size="lg"
 										onLogoChange={(url) => handleLogoChange(bank.id, url)}
 									/>
 									<div className="flex-1 min-w-0">
 										<div className="flex items-center gap-2">
-											<p className="font-medium">{bank.name}</p>
+											<h3 className="text-lg font-semibold">{bank.name}</h3>
 											{bank.accountCount > 0 && (
-												<span className="text-xs text-muted-foreground">
+												<Badge variant="secondary" className="text-xs">
 													{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-												</span>
+												</Badge>
 											)}
 										</div>
 										{bank.description && (
-											<p className="text-sm text-muted-foreground">
+											<p className="text-sm text-muted-foreground mt-0.5">
 												{bank.description}
 											</p>
 										)}
 									</div>
 									{bank.accountCount > 0 && (
-										<p className="font-semibold tabular-nums mr-4">
+										<p className="text-lg font-semibold tabular-nums">
 											{formatCurrency(bank.totalBalance)}
 										</p>
 									)}
 									<Button
-										variant="outline"
+										variant="ghost"
 										size="sm"
-										className="gap-1"
+										className="gap-1 text-muted-foreground hover:text-foreground"
 										onClick={() => handleAddAccountClick(bank)}
 									>
 										<Plus className="h-4 w-4" />
-										Ajouter
+										<span className="hidden sm:inline">Ajouter</span>
 									</Button>
 								</div>
 
 								{/* Accounts list */}
 								{bank.accounts.length > 0 && (
-									<div className="mt-4 ml-14 space-y-2">
+									<div className="mt-4 ml-16 space-y-2">
 										{bank.accounts.map((account) => (
 											<Link
 												key={account.id}
@@ -450,43 +451,43 @@ export default function BanksPage() {
 										bankName={bank.name}
 										bankColor={bank.color}
 										logo={bankLogos[bank.id] ?? bank.logo}
-										size="md"
+										size="lg"
 										onLogoChange={(url) => handleLogoChange(bank.id, url)}
 									/>
 									<div className="flex-1 min-w-0">
 										<div className="flex items-center gap-2">
-											<p className="font-medium">{bank.name}</p>
+											<h3 className="text-lg font-semibold">{bank.name}</h3>
 											{bank.accountCount > 0 && (
-												<span className="text-xs text-muted-foreground">
+												<Badge variant="secondary" className="text-xs">
 													{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-												</span>
+												</Badge>
 											)}
 										</div>
 										{bank.description && (
-											<p className="text-sm text-muted-foreground">
+											<p className="text-sm text-muted-foreground mt-0.5">
 												{bank.description}
 											</p>
 										)}
 									</div>
 									{bank.accountCount > 0 && (
-										<p className="font-semibold tabular-nums mr-4">
+										<p className="text-lg font-semibold tabular-nums">
 											{formatCurrency(bank.totalBalance)}
 										</p>
 									)}
 									<Button
-										variant="outline"
+										variant="ghost"
 										size="sm"
-										className="gap-1"
+										className="gap-1 text-muted-foreground hover:text-foreground"
 										onClick={() => handleAddAccountClick(bank)}
 									>
 										<Plus className="h-4 w-4" />
-										Ajouter
+										<span className="hidden sm:inline">Ajouter</span>
 									</Button>
 								</div>
 
 								{/* Accounts list */}
 								{bank.accounts.length > 0 && (
-									<div className="mt-4 ml-14 space-y-2">
+									<div className="mt-4 ml-16 space-y-2">
 										{bank.accounts.map((account) => (
 											<Link
 												key={account.id}
