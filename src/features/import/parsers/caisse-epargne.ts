@@ -103,8 +103,9 @@ export const caisseEpargneParser: Parser = {
 			const header = parseCSVLine(lines[0]);
 
 			// Find column indices
+			// Support both "Date comptable" (CE Pro) and "Date de comptabilisation" (CE standard)
 			const dateIndex = header.findIndex(
-				(h) => h.toLowerCase() === 'date de comptabilisation'
+				(h) => h.toLowerCase() === 'date comptable' || h.toLowerCase() === 'date de comptabilisation'
 			);
 			const descriptionIndex = header.findIndex(
 				(h) => h.toLowerCase() === 'libelle simplifie'
@@ -112,21 +113,23 @@ export const caisseEpargneParser: Parser = {
 			const categoryIndex = header.findIndex(
 				(h) => h.toLowerCase() === 'categorie'
 			);
+			// Support both "Debit" and "Débit" (with accent)
 			const debitIndex = header.findIndex(
-				(h) => h.toLowerCase() === 'debit'
+				(h) => h.toLowerCase() === 'debit' || h.toLowerCase() === 'débit'
 			);
+			// Support both "Credit" and "Crédit" (with accent)
 			const creditIndex = header.findIndex(
-				(h) => h.toLowerCase() === 'credit'
+				(h) => h.toLowerCase() === 'credit' || h.toLowerCase() === 'crédit'
 			);
 			const referenceIndex = header.findIndex(
-				(h) => h.toLowerCase() === 'reference'
+				(h) => h.toLowerCase() === 'reference' || h.toLowerCase() === 'référence'
 			);
 
 			// Validate required columns
 			if (dateIndex === -1) {
 				return {
 					success: false,
-					errors: ['Could not find "Date de comptabilisation" column in CSV'],
+					errors: ['Could not find "Date comptable" or "Date de comptabilisation" column in CSV'],
 				};
 			}
 
