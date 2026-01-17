@@ -1,0 +1,301 @@
+# Ralph Progress Log
+# Project: Imanisa Finance MVP
+# Location: /Users/fr162241/Projects/imanisa-finance
+# Started: Sat Jan 17 08:25:12 CET 2026
+#
+# This file is generated and maintained by Ralph.
+# See: https://github.com/thecgaigroup/ralph-cc-loop
+---
+
+## Codebase Patterns
+- Use `prisma db push` for schema changes (not migrate) in dev mode
+- API routes accept body directly and pass to repository DTOs
+- Repository create methods handle nested relations (memberShares, etc.)
+- Typecheck with `npx tsc --noEmit` (no npm script defined)
+
+---
+
+## [Iteration 1] 2026-01-17 09:27 CET - US-001
+**Story**: Ajouter champ description sur Account
+
+### What was implemented:
+- Added nullable `description` field to Account model in Prisma schema
+- Updated CreateAccountDTO and UpdateAccountDTO in account-repository.ts
+- Modified POST /api/accounts to accept and pass description
+- PATCH /api/accounts/[id] already handles description through UpdateAccountDTO
+
+### Files changed:
+- prisma/schema.prisma (added description field)
+- src/server/repositories/account-repository.ts (updated DTOs and create method)
+- src/app/api/accounts/route.ts (accept description in POST body)
+- src/app/api/accounts/[id]/route.ts (no changes needed - uses UpdateAccountDTO)
+
+### Verification:
+- ✅ prisma db push successful
+- ✅ npx tsc --noEmit passes
+
+### Learnings for future iterations:
+- The PATCH route passes body directly to repository.update(), so adding fields to UpdateAccountDTO automatically makes them available
+- The project doesn't have a typecheck npm script, use `npx tsc --noEmit` directly
+---
+
+## [Iteration 2] 2026-01-17 - US-002
+**Story**: API upload logo banque vers S3
+
+### What was implemented:
+- Created POST /api/banks/[id]/logo API route for multipart form upload
+- Enhanced src/lib/supabase/storage.ts with bank logo functions:
+  - `validateLogoFile()` - validates MIME type (PNG/JPG/SVG) and file size (max 5MB)
+  - `validateImageDimensions()` - checks dimensions for PNG/JPG (max 200x200)
+  - `uploadBankLogo()` - uploads to 'bank-logos' bucket with upsert
+  - `deleteBankLogo()` - removes logos from storage
+  - `getBankLogoPublicUrl()` - returns public URL for logo
+- API validates file, uploads to Supabase Storage, updates Bank.logo field
+
+### Files changed:
+- src/app/api/banks/[id]/logo/route.ts (new)
+- src/lib/supabase/storage.ts (enhanced with bank logo functions)
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ npx biome lint on new files passes
+
+### Learnings for future iterations:
+- File validation pattern: separate validation functions for MIME type, size, and dimensions
+- For PNG: dimensions at offset 16/20 (big-endian 32-bit)
+- For JPEG: find SOF0 marker (0xFF 0xC0-C2) for dimensions
+- SVG files don't have fixed dimensions - skip dimension validation
+- Use upsert: true when uploading to replace existing files with same name
+- Delete old logo files with different extensions before uploading new one
+---
+
+## [Iteration 3] 2026-01-17 - US-003
+**Story**: Parser Caisse d'Épargne
+
+### What was implemented:
+- Created `src/features/import/parsers/caisse-epargne.ts` parser for Caisse d'Épargne CSV format
+- Parser handles:
+  - Semicolon-delimited CSV files
+  - Windows-1252 encoding (French characters)
+  - French date format (DD/MM/YYYY) with UTC dates at noon to avoid timezone issues
+  - French number format with explicit signs (+100,00 / -12,95)
+  - Separate Debit/Credit columns (Credit→INCOME, Debit→EXPENSE)
+  - Preserves bank category from 'Categorie' column
+- Registered parser in index.ts with keys: `caisse_epargne`, `Caisse d'Épargne`
+- Added to BANK_TEMPLATES array for UI display
+
+### Files changed:
+- src/features/import/parsers/caisse-epargne.ts (new)
+- src/features/import/parsers/index.ts (added import and registration)
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ Tested with actual CSV file: 53 transactions parsed correctly
+  - INCOME: 20 transactions (+1333.46 EUR)
+  - EXPENSE: 33 transactions (-1190.86 EUR)
+- ✅ Verified specific transactions:
+  - Virements +100,00 → INCOME
+  - UBR PENDING.UB -12,95 → EXPENSE
+  - EDF -68,00 → EXPENSE
+  - MLE NINON LOQUET +100,00 → INCOME
+
+### Learnings for future iterations:
+- Use `Date.UTC(year, month, day, 12, 0, 0)` to avoid timezone issues with date parsing
+- Caisse d'Épargne uses separate Debit/Credit columns, not a single amount column
+- The CSV file has 54 lines total (1 header + 53 data rows), not 54 data rows
+- Parser pattern: parseCSVLine → parseFrenchDate → parseCaisseEpargneNumber
+---
+
+## [Iteration 4] 2026-01-17 - US-004
+**Story**: UI création compte - Dialog épuré Vercel style
+
+### What was implemented:
+- Enhanced account creation dialog following Vercel Web Interface Guidelines
+- Added new Textarea UI component (`src/components/ui/textarea.tsx`)
+- Form fields: name (required), description (optional textarea), type (select), exportUrl (optional)
+- Member selection with pill-style toggles using subtle borders and primary color highlight
+- Inline error handling with destructive styling (rounded-md, subtle red background)
+- Loading state on submit button ("Création...")
+- Responsive design: works beautifully on desktop and mobile (375px)
+
+### Files changed:
+- src/app/dashboard/banks/page.tsx (enhanced dialog with all new fields)
+- src/components/ui/textarea.tsx (new shadcn-style component)
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ Browser test on desktop: dialog opens, all fields visible, clean design
+- ✅ Browser test on mobile (375px): dialog responsive, buttons stack correctly
+- ✅ Form submission: created "Compte Joint CE" with description, exportUrl, and members (Mathieu, Ninon)
+- ✅ Success: dialog closes, list refreshes showing new account
+
+### Screenshots:
+- us004-dialog-desktop.png - Desktop view of the dialog
+- us004-dialog-mobile.png - Mobile view of the empty dialog
+- us004-dialog-mobile-filled.png - Mobile view with form filled
+- us004-result-desktop.png - Banks page showing the created account
+
+### Learnings for future iterations:
+- Use DialogDescription for accessibility (announces dialog purpose)
+- DialogFooter with `flex-col-reverse` puts primary action on top on mobile
+- Member pills: use border + bg-primary/10 for selected state instead of solid background
+- Always test dialogs at 375px width to ensure mobile usability
+---
+
+## [Iteration 5] 2026-01-17 - US-005
+**Story**: UI page compte - ExportUrl et design épuré
+
+### What was implemented:
+- Enhanced account detail page following Vercel Web Interface Guidelines
+- Header with bank color accent (left border) and bank logo initials
+- Account description displayed in header when available
+- Export URL section as a dedicated Card component:
+  - Clickable link with text-primary styling and external link icon
+  - Opens in new tab with rel='noopener noreferrer'
+  - Edit pencil icon to enable inline editing
+  - If no URL: subtle "Ajouter un lien d'export" link
+- Inline edit mode for export URL:
+  - Input field with current URL value
+  - Save button (check icon) with green hover state
+  - Cancel button (X icon) with red hover state
+  - Smooth transitions between view/edit modes
+- Updated Account interface to include description field
+- Mobile responsive design (tested at 375px)
+
+### Files changed:
+- src/app/dashboard/accounts/[id]/page.tsx (enhanced with export URL section and better header)
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ Browser test on desktop: clean header, export URL clickable, edit mode works
+- ✅ Browser test on mobile (375px): responsive layout, all sections visible
+- ✅ Edit mode: input appears, save/cancel work correctly
+
+### Screenshots:
+- us005-account-detail-desktop.png - Desktop view of the full page
+- us005-account-detail-mobile.png - Mobile view of the full page
+- us005-export-url-edit-mobile.png - Mobile view of export URL in edit mode
+
+### Learnings for future iterations:
+- Bank color accent on cards: use borderLeftWidth + borderLeftColor inline styles
+- Export URL inline editing: use state trio (isEditing, inputValue, isSaving) for smooth UX
+- Link icon from lucide-react conflicts with Next.js Link - rename import as LinkIcon
+---
+
+## [Iteration 6] 2026-01-17 - US-006
+**Story**: UI upload logo banque - Design minimal
+
+### What was implemented:
+- Created `src/components/banks/BankLogo.tsx` component for bank logo display and upload
+- Features:
+  - Shows logo image or colored initials placeholder (rounded-lg, bank color background)
+  - Hover overlay with camera icon appears on hover (subtle black overlay)
+  - Click opens file picker (hidden input triggered programmatically)
+  - Client-side validation: PNG/JPG/SVG only, max 5MB
+  - Upload progress: spinner overlay replaces content during upload
+  - Success: new logo fades in smoothly via state update
+  - Error: toast notification with Sonner (subtle red accent)
+- Added Sonner toast component (`src/components/ui/sonner.tsx`)
+- Integrated Toaster in root layout (`src/app/layout.tsx`)
+- Replaced inline logo divs in banks page with BankLogo component
+- Added `bankLogos` state to track logo updates after upload
+
+### Files changed:
+- src/components/banks/BankLogo.tsx (new)
+- src/components/ui/sonner.tsx (new)
+- src/app/layout.tsx (added Toaster provider)
+- src/app/dashboard/banks/page.tsx (integrated BankLogo component)
+- package.json (added sonner dependency)
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ Browser test on desktop: hover effect shows camera icon
+- ✅ Browser test on mobile (375px): responsive, logos display correctly
+- ✅ Screenshots: us006-banks-desktop.png, us006-banks-mobile.png, us006-logo-hover.png
+
+### Learnings for future iterations:
+- API expects `logo` field name in FormData, not `file`
+- API returns `{ bank: {...}, logo: { path, publicUrl } }` - use publicUrl for display
+- Add cache-busting query param (`?t=${Date.now()}`) to force image refresh after upload
+- Use `onError` on img tag to fallback to initials if logo fails to load
+- Sonner integrates well with shadcn/ui theme via toastOptions.classNames
+---
+
+## [Iteration 7] 2026-01-17 - US-006b
+**Story**: Historique imports avec statut sur page compte
+
+### What was implemented:
+- Added `skippedCount` to RawImport interface and UpdateRawImportDTO in repository
+- Added `getByAccountId()` and `countByAccountId()` methods to raw-import-repository
+- Updated GET /api/imports to support accountId filter parameter
+- Modified account page to filter imports by accountId (not bankKey) on API side
+- Added "Voir tout" toggle button when more than 5 imports exist
+- Import history displays: filename, date, status badge, transaction count, skipped count
+
+### Files changed:
+- src/server/repositories/raw-import-repository.ts (added skippedCount, getByAccountId, countByAccountId)
+- src/app/api/imports/route.ts (added accountId filter)
+- src/app/dashboard/accounts/[id]/page.tsx (showAllImports state, filter by accountId, "Voir tout" link)
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ npm run build passes
+- ✅ Browser test on desktop: import workflow works, history displayed correctly
+- ✅ Browser test on mobile (375px): responsive, all sections visible
+- ✅ Deduplication verified: re-importing same file shows "0 transactions, 53 doublons"
+- ✅ Screenshots: us006b-import-desktop.png, us006b-import-mobile.png, us006b-dedup-result.png
+
+### Learnings for future iterations:
+- Import history was already implemented in the account page - just needed accountId filtering
+- Use repository methods for accountId-based queries to keep filtering on server side
+- The RawImport interface in the repository must match the Prisma model fields
+- "Voir tout" pattern: show first N items by default, toggle to show all
+---
+
+## [Iteration 8] 2026-01-17 - US-007
+**Story**: Test E2E: Créer compte Caisse d'Épargne avec membres
+
+### What was tested:
+Complete E2E test of account creation flow using Chrome DevTools MCP tools.
+
+### Test steps executed:
+1. ✅ Navigate to /dashboard/banks using mcp__chrome-devtools__navigate_page
+2. ✅ Take snapshot to identify page elements
+3. ✅ Click "Ajouter" button on Caisse d'Épargne bank
+4. ✅ Fill form with mcp__chrome-devtools__fill_form:
+   - name: "Test E2E CE"
+   - description: "Compte de test pour validation E2E"
+   - exportUrl: "https://www.caisse-epargne.fr/espace-client/compte"
+5. ✅ Select members Mathieu and Ninon by clicking their buttons
+6. ✅ Submit form - observed loading state "Création..."
+7. ✅ Verified account appears in bank list with correct info
+8. ✅ Navigated to account detail page
+9. ✅ Verified all info displayed correctly:
+   - Account name: "Test E2E CE"
+   - Bank: "Caisse d'Épargne"
+   - Type: "Compte courant"
+   - Description shown in header
+   - Titulaires: Mathieu (50%), Ninon (50%)
+   - Export URL: clickable link with correct URL
+10. ✅ Tested mobile view (375px) - responsive and usable
+11. ✅ UI matches Vercel design guidelines (clean, minimal, proper spacing)
+
+### Screenshots taken:
+- us007-banks-initial.png - Banks page before test
+- us007-dialog-empty.png - Empty account creation dialog
+- us007-dialog-filled.png - Filled form with members selected
+- us007-banks-after-create.png - Banks page showing new account
+- us007-account-detail.png - Account detail page (desktop)
+- us007-account-detail-mobile.png - Account detail page (mobile 375px)
+
+### Verification:
+- ✅ npx tsc --noEmit passes
+- ✅ All acceptance criteria met
+
+### Learnings for future iterations:
+- mcp__chrome-devtools__fill_form can fill multiple fields at once
+- Member selection buttons toggle state on click
+- Dialog shows "Création..." loading state during submission
+- wait_for can be used to wait for elements after page transitions
+- resize_page with width:375 height:812 simulates iPhone viewport
+---
