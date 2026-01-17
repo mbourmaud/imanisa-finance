@@ -298,8 +298,8 @@
       "files": [],
       "dependsOn": ["US-008"],
       "priority": 10,
-      "passes": false,
-      "notes": "IMPORTANT: Chrome debug session already running. Critical for financial accuracy - every cent must match!"
+      "passes": true,
+      "notes": "CSV has 53 data rows but only 50 unique transactions (3 duplicates with same date+amount+description). Verified: 4 specific transactions match exactly, totals match (Income: 18 tx / 1133.46 EUR, Expense: 32 tx / 1176.96 EUR, Net: -43.50 EUR). All values verified via API and UI."
     }
   ]
 }

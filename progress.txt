@@ -400,3 +400,56 @@ E2E verification of import deduplication using Chrome DevTools MCP.
 - Deduplication can be verified through import history without new upload
 - Import history format: "X transactions (Y doublons)"
 ---
+
+## [Iteration 11] 2026-01-17 - US-010
+**Story**: Test E2E: Vérification valeurs import vs CSV
+
+### What was tested:
+Complete verification of imported transaction values against source CSV file using Chrome DevTools MCP.
+
+### CSV Analysis:
+- CSV file: /Users/fr162241/Downloads/04402691469_01112025_17012026.csv
+- Total lines: 54 (1 header + 53 data rows)
+- Unique transactions: 50 (3 duplicates detected)
+- Duplicates:
+  - Line 3 duplicates line 2: 16/01/2026 | 100.00 | VIREMENT VERS MR BOURMAUD
+  - Line 22 duplicates line 21: 03/01/2026 | 100.00 | VIREMENT VERS MR BOURMAUD
+  - Line 51 duplicates line 50: 11/12/2025 | 13.90 | FRAIS BANCAIRES
+
+### Expected totals (after deduplication):
+- Total: 50 transactions
+- Income: 18 transactions, 1133.46 EUR
+- Expense: 32 transactions, 1176.96 EUR
+- Net balance: -43.50 EUR
+
+### Verification of 4 specific transactions:
+| # | CSV | Expected | UI Result | Match |
+|---|-----|----------|-----------|-------|
+| 1 | Line 2 | 16/01/2026, VIREMENT VERS MR BOURMAUD, +100.00 | 16 janv., +100,00 € | ✅ |
+| 2 | Line 4 | 16/01/2026, UBR PENDING.UB, -12.95 | 16 janv., -12,95 € | ✅ |
+| 3 | Line 53 | 17/11/2025, EDF, -68.00 | 17 nov., -68,00 € | ✅ |
+| 4 | Line 54 | 05/11/2025, MLE NINON LOQUET, +100.00 | 5 nov., +100,00 € | ✅ |
+
+### API verification:
+- ✅ GET /api/transactions returned 50 transactions
+- ✅ Income: 18 tx, 1133.46 EUR (matches expected)
+- ✅ Expense: 32 tx, 1176.96 EUR (matches expected)
+- ✅ Net: -43.50 EUR (matches expected)
+
+### Screenshots taken:
+- us010-page1-desktop.png - Page 1 transactions (January)
+- us010-page2-desktop.png - Page 2 transactions (December)
+- us010-page3-nov-transactions.png - Page 3 with November transactions (EDF, MLE NINON LOQUET)
+
+### Verification:
+- ✅ All 4 specific transactions verified against CSV
+- ✅ Total count matches (50 unique from 53 rows)
+- ✅ Sum of amounts matches expected totals exactly
+- ✅ All acceptance criteria met
+
+### Learnings for future iterations:
+- CSV deduplication key: [accountId, date, amount, description]
+- CSV can have duplicate rows (same date + amount + description) - these are correctly filtered
+- API response uses `items` field, not `transactions`
+- To verify financial accuracy: compare both individual transactions AND aggregate totals
+---
