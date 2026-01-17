@@ -351,11 +351,11 @@ export default function ImportPage() {
 						<div className="space-y-4">
 							{/* Bank selector */}
 							<div className="space-y-2">
-								<label className="text-sm font-medium">
+								<label htmlFor="import-bank-select" className="text-sm font-medium">
 									1. Banque <span className="text-muted-foreground">*</span>
 								</label>
 								<Select value={selectedBankId} onValueChange={setSelectedBankId}>
-									<SelectTrigger className="w-full">
+									<SelectTrigger id="import-bank-select" className="w-full">
 										<SelectValue placeholder="Sélectionner une banque..." />
 									</SelectTrigger>
 									<SelectContent>
@@ -381,7 +381,7 @@ export default function ImportPage() {
 
 							{/* Account selector */}
 							<div className="space-y-2">
-								<label className="text-sm font-medium">
+								<label htmlFor="import-account-select" className="text-sm font-medium">
 									2. Compte <span className="text-muted-foreground">*</span>
 								</label>
 								<Select
@@ -389,7 +389,7 @@ export default function ImportPage() {
 									onValueChange={setSelectedAccountId}
 									disabled={!selectedBankId}
 								>
-									<SelectTrigger className="w-full">
+									<SelectTrigger id="import-account-select" className="w-full">
 										<SelectValue
 											placeholder={
 												selectedBankId
@@ -418,7 +418,7 @@ export default function ImportPage() {
 
 							{/* Drop zone */}
 							<div className="space-y-2">
-								<label className="text-sm font-medium">3. Fichier</label>
+								<label htmlFor="import-file-input" className="text-sm font-medium">3. Fichier</label>
 								<div
 									onDragEnter={handleDrag}
 									onDragLeave={handleDrag}
@@ -445,8 +445,9 @@ export default function ImportPage() {
 									<p className="mt-1 text-center text-sm text-muted-foreground max-w-xs">
 										Glissez votre fichier ici ou cliquez pour sélectionner
 									</p>
-									<label className="mt-4">
+									<label htmlFor="import-file-input" className="mt-4">
 										<input
+											id="import-file-input"
 											type="file"
 											accept=".csv,.xlsx,.xls"
 											onChange={handleFileSelect}
