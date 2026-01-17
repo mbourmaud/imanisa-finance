@@ -84,7 +84,7 @@ export function useUpdateLoanMutation() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: ({ id, propertyId, input }: { id: string; propertyId: string; input: UpdateLoanInput }) =>
+		mutationFn: ({ id, input }: { id: string; propertyId: string; input: UpdateLoanInput }) =>
 			loanService.update(id, input),
 		onSuccess: (data, variables) => {
 			queryClient.setQueryData(loanKeys.detail(variables.id), data)

@@ -87,7 +87,7 @@ export function useUpdateUtilityContractMutation() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: ({ id, propertyId, input }: { id: string; propertyId: string; input: UpdateUtilityContractInput }) =>
+		mutationFn: ({ id, input }: { id: string; propertyId: string; input: UpdateUtilityContractInput }) =>
 			utilityContractService.update(id, input),
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: propertyKeys.detail(variables.propertyId) })
@@ -103,7 +103,7 @@ export function useDeleteUtilityContractMutation() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: ({ id, propertyId }: { id: string; propertyId: string }) =>
+		mutationFn: ({ id }: { id: string; propertyId: string }) =>
 			utilityContractService.delete(id),
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: propertyKeys.detail(variables.propertyId) })

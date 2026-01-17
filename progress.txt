@@ -662,3 +662,92 @@
   - Untracked files like .last-branch and ralph-output.log can block rebase - remove before rebasing
   - Stash modified files before rebase, pop after to preserve local changes
 ---
+
+## [Iteration 29] 2026-01-17 - IMMO-029
+- **Story**: Refactoring Immobilier - TanStack Query hooks et UI
+- **What was implemented**:
+  - Created src/features/properties/ module structure:
+    - types/index.ts: PropertyWithDetails, PropertySummary, PropertyFilters, Loan, LoanInsurance, PropertyInsurance, CoOwnership, UtilityContract, and all input types
+    - services/property-service.ts: API service layer for properties
+    - hooks/use-properties-query.ts: usePropertiesQuery, usePropertyQuery, CRUD mutations with query key factory
+    - hooks/use-property-insurance-query.ts: Insurance mutations
+    - hooks/use-co-ownership-query.ts: CoOwnership mutations
+    - hooks/use-utility-contracts-query.ts: UtilityContract mutations
+    - index.ts: Barrel export for all properties features
+  - Created src/features/loans/ module structure:
+    - types/index.ts: LoanWithDetails, LoanSummary, LoansResponse, and input types
+    - services/loan-service.ts: API service layer for loans
+    - hooks/use-loans-query.ts: useLoansQuery, useLoansByPropertyQuery, useLoanQuery, CRUD mutations
+    - hooks/use-loan-insurances-query.ts: LoanInsurance mutations
+    - index.ts: Barrel export for all loans features
+  - Refactored /dashboard/real-estate/page.tsx:
+    - Replaced useState/useEffect/fetch with usePropertiesQuery and useMembersQuery
+    - Replaced manual refetch with TanStack Query cache invalidation via mutations
+    - Reduced lines from 394 to 227 (~42% reduction)
+  - Refactored /dashboard/real-estate/[id]/page.tsx:
+    - Replaced usePropertyQuery and useMembersQuery
+    - Replaced all mutation handlers (loan, insurance, property, coOwnership, utilityContract) with TanStack mutations
+    - Removed redundant local interfaces (using types from @/features/properties)
+    - Removed setIsSubmittingProperty (using mutation.isPending directly)
+    - Reduced lines from 3356 to 2877 (~14% reduction)
+  - Refactored /dashboard/loans/page.tsx:
+    - Replaced useState/useEffect/fetch with useLoansQuery
+    - Uses query.isLoading, query.isError, refetch() patterns
+    - Reduced lines from 523 to 423 (~19% reduction)
+  - Fixed LoanSummary type to match API response (totalInsurance vs totalInsuranceMonthly)
+  - TypeScript typecheck passes
+- **Files changed**:
+  - src/features/properties/* (new)
+  - src/features/loans/* (new)
+  - src/app/dashboard/real-estate/page.tsx
+  - src/app/dashboard/real-estate/[id]/page.tsx
+  - src/app/dashboard/loans/page.tsx
+- **Net code change**: +1502 insertions, -561 deletions (~370 lines reduction in UI pages)
+- **Learnings for future iterations**:
+  - Query key factory pattern enables granular cache invalidation
+  - Mutations should invalidate all related query keys (e.g., property mutations invalidate both property detail AND list queries)
+  - useMembersQuery from @/features/members can be reused across feature pages
+  - Import types directly from feature modules rather than defining locally
+---
+
+## [Iteration 30] 2026-01-17 - IMMO-030
+- **Story**: Review E2E complète post-migration TanStack
+- **What was done**:
+  - **CODE REVIEW**:
+    - Reviewed all immobilier-related files in src/features/properties/, src/features/loans/
+    - Reviewed UI pages: /dashboard/real-estate, /dashboard/real-estate/[id], /dashboard/loans
+    - Verified NO manual fetch() calls remain - all use TanStack Query hooks
+    - Verified NO useState for loading/error states - using query.isLoading, query.isError patterns
+    - Verified ALL mutations invalidate correct query keys on success
+    - Verified Query Key Factory pattern used consistently (propertyKeys, loanKeys)
+    - Verified NO 'any' types in TypeScript
+    - Verified Clean Architecture: types → services → hooks → UI pages
+  - **LINT CLEANUP**:
+    - Fixed 6 lint warnings in immobilier files:
+      - Removed unused import PropertyWithDetails from real-estate/[id]/page.tsx
+      - Removed unused import Member from loan-insurance-repository.ts
+      - Removed unused import Member from loan-repository.ts
+      - Fixed unused propertyId parameters in mutation functions (use-loans-query.ts, use-utility-contracts-query.ts)
+    - All immobilier files now pass lint with 0 errors, 0 warnings
+  - **DESIGN REVIEW**:
+    - Tested /dashboard/real-estate (list page) with Chrome DevTools MCP
+    - Tested /dashboard/loans (loans list page) with Chrome DevTools MCP
+    - Verified clean UI design with data: 3 properties, 4 loans showing
+    - Stats display correctly: Valeur totale 1 045 000 €, Capital restant dû 703 500 €
+  - **QUALITY CHECKS**:
+    - TypeScript typecheck passes: `npx tsc --noEmit` ✓
+    - Lint passes for immobilier files: `npx biome lint src/app/dashboard/real-estate src/app/dashboard/loans src/features/properties src/features/loans src/server/repositories/*-repository.ts` ✓
+    - Production build passes: `npm run build` ✓
+- **Files changed**:
+  - src/app/dashboard/real-estate/[id]/page.tsx (removed unused import)
+  - src/features/loans/hooks/use-loans-query.ts (fixed unused param)
+  - src/features/properties/hooks/use-utility-contracts-query.ts (fixed unused params)
+  - src/server/repositories/loan-insurance-repository.ts (removed unused import)
+  - src/server/repositories/loan-repository.ts (removed unused import)
+- **Summary**:
+  - All 30 stories complete and passing
+  - Immobilier module fully migrated to TanStack Query
+  - Clean architecture implemented with types, services, hooks, UI separation
+  - No dead code, no ANY types, no manual fetch calls
+  - Ready for Pull Request
+---

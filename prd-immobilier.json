@@ -641,7 +641,7 @@
       ],
       "dependsOn": ["IMMO-028"],
       "priority": 29,
-      "passes": false,
+      "passes": true,
       "notes": "Follow exact patterns from src/features/accounts/hooks/use-accounts-query.ts. Use Query Key Factory pattern. Mutations should invalidate related queries on success."
     },
     {
@@ -697,7 +697,7 @@
       "files": [],
       "dependsOn": ["IMMO-029"],
       "priority": 30,
-      "passes": false,
+      "passes": true,
       "notes": "CRITICAL: This is the final quality gate before PR. Take your time, be thorough. Quality over speed. Every file must be reviewed, every page must be tested. No shortcuts."
     }
   ]

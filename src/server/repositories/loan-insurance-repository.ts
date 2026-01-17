@@ -4,7 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import type { LoanInsurance, Member } from '@prisma/client';
+import type { LoanInsurance } from '@prisma/client';
 
 // Types
 export interface LoanInsuranceWithMember extends LoanInsurance {

@@ -93,7 +93,6 @@ import { useMembersQuery } from '@/features/members/hooks/use-members-query'
 import type {
 	Loan,
 	UtilityContract as PropertyUtilityContract,
-	PropertyWithDetails,
 	MemberShare,
 } from '@/features/properties'
 
