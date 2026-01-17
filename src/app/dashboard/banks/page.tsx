@@ -341,55 +341,82 @@ export default function BanksPage() {
 					</div>
 				) : (
 					<div className="space-y-3">
-						{data?.bankAccounts.map((bank) => (
-							<div
-								key={bank.id}
-								className="bg-card rounded-lg border border-border/60 p-4 border-l-4"
-								style={{ borderLeftColor: bank.color }}
-							>
-								{/* Bank header */}
-								<div className="flex items-center gap-4">
-									<BankLogo
-										bankId={bank.id}
-										bankName={bank.name}
-										bankColor={bank.color}
-										logo={bankLogos[bank.id] ?? bank.logo}
-										size="lg"
-										onLogoChange={(url) => handleLogoChange(bank.id, url)}
-									/>
-									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-2">
-											<h3 className="text-lg font-semibold">{bank.name}</h3>
-											{bank.accountCount > 0 && (
-												<Badge variant="secondary" className="text-xs">
-													{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-												</Badge>
+						{data?.bankAccounts.map((bank) => {
+							const hasAccounts = bank.accountCount > 0;
+
+							return (
+								<div
+									key={bank.id}
+									className={`rounded-lg p-4 border-l-4 transition-colors ${
+										hasAccounts
+											? 'bg-card border border-border/60'
+											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
+									}`}
+									style={{ borderLeftColor: bank.color }}
+									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
+								>
+									{/* Bank header */}
+									<div className="flex items-center gap-4">
+										<BankLogo
+											bankId={bank.id}
+											bankName={bank.name}
+											bankColor={bank.color}
+											logo={bankLogos[bank.id] ?? bank.logo}
+											size="lg"
+											onLogoChange={(url) => handleLogoChange(bank.id, url)}
+										/>
+										<div className="flex-1 min-w-0">
+											<div className="flex items-center gap-2">
+												<h3 className={`text-lg font-semibold ${!hasAccounts && 'text-muted-foreground'}`}>{bank.name}</h3>
+												{hasAccounts ? (
+													<Badge variant="secondary" className="text-xs">
+														{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
+													</Badge>
+												) : (
+													<span className="text-xs text-muted-foreground italic">
+														Aucun compte
+													</span>
+												)}
+											</div>
+											{bank.description && (
+												<p className="text-sm text-muted-foreground mt-0.5">
+													{bank.description}
+												</p>
 											)}
 										</div>
-										{bank.description && (
-											<p className="text-sm text-muted-foreground mt-0.5">
-												{bank.description}
-											</p>
+										{hasAccounts ? (
+											<>
+												<p className="text-lg font-semibold tabular-nums">
+													{formatCurrency(bank.totalBalance)}
+												</p>
+												<Button
+													variant="ghost"
+													size="sm"
+													className="gap-1 text-muted-foreground hover:text-foreground"
+													onClick={() => handleAddAccountClick(bank)}
+												>
+													<Plus className="h-4 w-4" />
+													<span className="hidden sm:inline">Ajouter</span>
+												</Button>
+											</>
+										) : (
+											<Button
+												variant="default"
+												size="sm"
+												className="gap-1"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleAddAccountClick(bank);
+												}}
+											>
+												<Plus className="h-4 w-4" />
+												Ajouter un compte
+											</Button>
 										)}
 									</div>
-									{bank.accountCount > 0 && (
-										<p className="text-lg font-semibold tabular-nums">
-											{formatCurrency(bank.totalBalance)}
-										</p>
-									)}
-									<Button
-										variant="ghost"
-										size="sm"
-										className="gap-1 text-muted-foreground hover:text-foreground"
-										onClick={() => handleAddAccountClick(bank)}
-									>
-										<Plus className="h-4 w-4" />
-										<span className="hidden sm:inline">Ajouter</span>
-									</Button>
-								</div>
 
-								{/* Accounts list */}
-								{bank.accounts.length > 0 && (
+									{/* Accounts list */}
+									{bank.accounts.length > 0 && (
 									<div className="mt-4 ml-16 space-y-2">
 										{bank.accounts.map((account) => (
 											<Link
@@ -438,8 +465,9 @@ export default function BanksPage() {
 										))}
 									</div>
 								)}
-							</div>
-						))}
+								</div>
+							);
+						})}
 					</div>
 				)}
 			</div>
@@ -460,55 +488,82 @@ export default function BanksPage() {
 					</div>
 				) : (
 					<div className="space-y-3">
-						{data?.investmentAccounts.map((bank) => (
-							<div
-								key={bank.id}
-								className="bg-card rounded-lg border border-border/60 p-4 border-l-4"
-								style={{ borderLeftColor: bank.color }}
-							>
-								{/* Bank header */}
-								<div className="flex items-center gap-4">
-									<BankLogo
-										bankId={bank.id}
-										bankName={bank.name}
-										bankColor={bank.color}
-										logo={bankLogos[bank.id] ?? bank.logo}
-										size="lg"
-										onLogoChange={(url) => handleLogoChange(bank.id, url)}
-									/>
-									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-2">
-											<h3 className="text-lg font-semibold">{bank.name}</h3>
-											{bank.accountCount > 0 && (
-												<Badge variant="secondary" className="text-xs">
-													{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-												</Badge>
+						{data?.investmentAccounts.map((bank) => {
+							const hasAccounts = bank.accountCount > 0;
+
+							return (
+								<div
+									key={bank.id}
+									className={`rounded-lg p-4 border-l-4 transition-colors ${
+										hasAccounts
+											? 'bg-card border border-border/60'
+											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
+									}`}
+									style={{ borderLeftColor: bank.color }}
+									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
+								>
+									{/* Bank header */}
+									<div className="flex items-center gap-4">
+										<BankLogo
+											bankId={bank.id}
+											bankName={bank.name}
+											bankColor={bank.color}
+											logo={bankLogos[bank.id] ?? bank.logo}
+											size="lg"
+											onLogoChange={(url) => handleLogoChange(bank.id, url)}
+										/>
+										<div className="flex-1 min-w-0">
+											<div className="flex items-center gap-2">
+												<h3 className={`text-lg font-semibold ${!hasAccounts && 'text-muted-foreground'}`}>{bank.name}</h3>
+												{hasAccounts ? (
+													<Badge variant="secondary" className="text-xs">
+														{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
+													</Badge>
+												) : (
+													<span className="text-xs text-muted-foreground italic">
+														Aucun compte
+													</span>
+												)}
+											</div>
+											{bank.description && (
+												<p className="text-sm text-muted-foreground mt-0.5">
+													{bank.description}
+												</p>
 											)}
 										</div>
-										{bank.description && (
-											<p className="text-sm text-muted-foreground mt-0.5">
-												{bank.description}
-											</p>
+										{hasAccounts ? (
+											<>
+												<p className="text-lg font-semibold tabular-nums">
+													{formatCurrency(bank.totalBalance)}
+												</p>
+												<Button
+													variant="ghost"
+													size="sm"
+													className="gap-1 text-muted-foreground hover:text-foreground"
+													onClick={() => handleAddAccountClick(bank)}
+												>
+													<Plus className="h-4 w-4" />
+													<span className="hidden sm:inline">Ajouter</span>
+												</Button>
+											</>
+										) : (
+											<Button
+												variant="default"
+												size="sm"
+												className="gap-1"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleAddAccountClick(bank);
+												}}
+											>
+												<Plus className="h-4 w-4" />
+												Ajouter un compte
+											</Button>
 										)}
 									</div>
-									{bank.accountCount > 0 && (
-										<p className="text-lg font-semibold tabular-nums">
-											{formatCurrency(bank.totalBalance)}
-										</p>
-									)}
-									<Button
-										variant="ghost"
-										size="sm"
-										className="gap-1 text-muted-foreground hover:text-foreground"
-										onClick={() => handleAddAccountClick(bank)}
-									>
-										<Plus className="h-4 w-4" />
-										<span className="hidden sm:inline">Ajouter</span>
-									</Button>
-								</div>
 
-								{/* Accounts list */}
-								{bank.accounts.length > 0 && (
+									{/* Accounts list */}
+									{bank.accounts.length > 0 && (
 									<div className="mt-4 ml-16 space-y-2">
 										{bank.accounts.map((account) => (
 											<Link
@@ -557,8 +612,9 @@ export default function BanksPage() {
 										))}
 									</div>
 								)}
-							</div>
-						))}
+								</div>
+							);
+						})}
 					</div>
 				)}
 			</div>
