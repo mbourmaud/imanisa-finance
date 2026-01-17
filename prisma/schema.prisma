@@ -204,29 +204,32 @@ model InvestmentTransaction {
 }
 
 model Property {
-  id              String           @id @default(uuid())
-  name            String
-  type            PropertyType
-  usage           PropertyUsage
-  address         String
-  address2        String?
-  city            String
-  postalCode      String
-  surface         Float
-  rooms           Int?
-  bedrooms        Int?
-  purchasePrice   Float
-  purchaseDate    DateTime
-  notaryFees      Float
-  agencyFees      Float?
-  currentValue    Float
-  rentAmount      Float?
-  rentCharges     Float?
-  notes           String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  loans           Loan[]
-  propertyMembers PropertyMember[]
+  id               String             @id @default(uuid())
+  name             String
+  type             PropertyType
+  usage            PropertyUsage
+  address          String
+  address2         String?
+  city             String
+  postalCode       String
+  surface          Float
+  rooms            Int?
+  bedrooms         Int?
+  purchasePrice    Float
+  purchaseDate     DateTime
+  notaryFees       Float
+  agencyFees       Float?
+  currentValue     Float
+  rentAmount       Float?
+  rentCharges      Float?
+  notes            String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  coOwnership      CoOwnership?
+  loans            Loan[]
+  insurance        PropertyInsurance?
+  propertyMembers  PropertyMember[]
+  utilityContracts UtilityContract[]
 }
 
 model PropertyMember {
@@ -286,6 +289,54 @@ model LoanInsurance {
 
   @@index([loanId])
   @@index([memberId])
+}
+
+/// PropertyInsurance: Insurance for a property (PNO or MRH), 1:1 with Property
+model PropertyInsurance {
+  id             String        @id @default(uuid())
+  propertyId     String        @unique
+  type           InsuranceType
+  provider       String
+  contractNumber String?
+  monthlyPremium Float
+  startDate      DateTime
+  endDate        DateTime?
+  coverage       String?
+  link           String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  property       Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+/// CoOwnership: Syndic/copropriété info for a property, 1:1 with Property
+model CoOwnership {
+  id              String   @id @default(uuid())
+  propertyId      String   @unique
+  name            String
+  quarterlyAmount Float
+  link            String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+/// UtilityContract: Utility contracts (EDF, GDF, etc.) for a property, 1:N with Property
+model UtilityContract {
+  id             String      @id @default(uuid())
+  propertyId     String
+  type           UtilityType
+  provider       String
+  contractNumber String?
+  monthlyAmount  Float
+  link           String?
+  notes          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  property       Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
 }
 
 model RawImport {
@@ -422,4 +473,17 @@ enum PropertyUsage {
   PRIMARY
   SECONDARY
   RENTAL
+}
+
+enum InsuranceType {
+  PNO
+  MRH
+}
+
+enum UtilityType {
+  ELECTRICITY
+  GAS
+  WATER
+  INTERNET
+  OTHER
 }
