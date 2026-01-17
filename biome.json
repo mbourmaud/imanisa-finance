@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
 	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
 	"files": {
 		"includes": ["src/**", "*.json", "*.ts", "*.mts", "!**/public/mockServiceWorker.js"]
@@ -38,7 +38,8 @@
 	},
 	"css": {
 		"parser": {
-			"cssModules": true
+			"cssModules": true,
+			"tailwindDirectives": true
 		},
 		"linter": {
 			"enabled": true

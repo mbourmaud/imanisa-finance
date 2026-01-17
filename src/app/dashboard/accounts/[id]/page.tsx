@@ -1249,6 +1249,7 @@ export default function AccountDetailPage() {
 
 				{/* Content */}
 				<div
+					role="presentation"
 					onDragEnter={handleDrag}
 					onDragLeave={handleDrag}
 					onDragOver={handleDrag}

@@ -420,6 +420,7 @@ export default function ImportPage() {
 							<div className="space-y-2">
 								<label htmlFor="import-file-input" className="text-sm font-medium">3. Fichier</label>
 								<div
+									role="presentation"
 									onDragEnter={handleDrag}
 									onDragLeave={handleDrag}
 									onDragOver={handleDrag}
