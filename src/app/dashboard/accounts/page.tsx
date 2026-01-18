@@ -7,25 +7,24 @@
  * Uses TanStack Query for data fetching.
  */
 
-import Link from 'next/link';
 import { useMemo } from 'react';
 import {
-	Building,
+	AccountListItem,
+	AccountTypeHeader,
 	Button,
-	ChevronRight,
 	CreditCard,
 	EmptyState,
 	GlassCard,
-	Loader2,
+	LoadingSpinner,
 	PageHeader,
 	PiggyBank,
 	Plus,
+	Stack,
 	StatCard,
 	StatCardGrid,
 	TrendingUp,
 	Wallet,
 } from '@/components';
-import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 import { useAccountsQuery } from '@/features/accounts';
 import { formatMoneyCompact } from '@/shared/utils';
 
@@ -128,30 +127,7 @@ export default function AccountsPage() {
 		return (
 			<EmptyState
 				title="Chargement des comptes..."
-				iconElement={
-					<div className="relative">
-						<div
-							className="h-12 w-12 rounded-full"
-							style={{
-								background:
-									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
-								animation: 'pulse 2s ease-in-out infinite',
-							}}
-						/>
-						<Loader2
-							style={{
-								height: '1.5rem',
-								width: '1.5rem',
-								animation: 'spin 1s linear infinite',
-								color: 'hsl(var(--primary))',
-								position: 'absolute',
-								top: '50%',
-								left: '50%',
-								transform: 'translate(-50%, -50%)',
-							}}
-						/>
-					</div>
-				}
+				iconElement={<LoadingSpinner size="md" />}
 				size="md"
 			/>
 		);
@@ -169,7 +145,7 @@ export default function AccountsPage() {
 	}
 
 	return (
-		<div className="flex flex-col gap-8">
+		<Stack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Comptes"
@@ -214,93 +190,32 @@ export default function AccountsPage() {
 			</StatCardGrid>
 
 			{/* Accounts by Type */}
-			<div className="flex flex-col gap-6">
-				{accountGroups.map((group) => {
-					const Icon = group.icon;
-					return (
-						<GlassCard key={group.type} padding="lg">
-							{/* Group Header */}
-							<div className="flex items-center gap-3 mb-4">
-								<div
-									className="flex items-center justify-center h-10 w-10 rounded-xl"
-									style={{
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										color: 'hsl(var(--primary))',
-									}}
-								>
-									<Icon style={{ height: '1.25rem', width: '1.25rem' }} />
-								</div>
-								<div className="flex flex-col">
-									<h3 className="text-lg font-semibold tracking-tight">{group.label}</h3>
-									<p className="text-sm text-muted-foreground">
-										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
-									</p>
-								</div>
-							</div>
+			<Stack gap="lg">
+				{accountGroups.map((group) => (
+					<GlassCard key={group.type} padding="lg">
+						{/* Group Header */}
+						<AccountTypeHeader
+							icon={group.icon}
+							title={group.label}
+							count={group.accounts.length}
+						/>
 
-							{/* Account List */}
-							<div className="flex flex-col gap-3">
-								{group.accounts.map((account) => (
-									<Link
-										key={account.id}
-										href={`/dashboard/accounts/${account.id}`}
-										style={{
-											display: 'flex',
-											justifyContent: 'space-between',
-											alignItems: 'center',
-											borderRadius: '0.75rem',
-											padding: '1rem',
-											border: '1px solid hsl(var(--border) / 0.2)',
-											backgroundColor: 'hsl(var(--background) / 0.5)',
-											transition: 'all 0.2s',
-										}}
-									>
-										<div className="flex items-center gap-4">
-											<div
-												className="flex items-center justify-center h-10 w-10 rounded-lg"
-												style={{
-													backgroundColor: account.bank?.color
-														? `${account.bank.color}20`
-														: undefined,
-												}}
-											>
-												<Building
-													style={{
-														height: '1.25rem',
-														width: '1.25rem',
-														color: account.bank?.color || undefined,
-													}}
-												/>
-											</div>
-											<div className="flex flex-col">
-												<p className="font-medium">{account.name}</p>
-												<p className="text-xs text-muted-foreground">
-													{account.bank?.name || 'Banque'}
-												</p>
-											</div>
-										</div>
-										<div className="flex items-center gap-4">
-											<MoneyDisplay
-												amount={account.balance}
-												format="compact"
-												size="md"
-												weight="semibold"
-											/>
-											<ChevronRight
-												style={{
-													height: '1rem',
-													width: '1rem',
-													color: 'hsl(var(--muted-foreground) / 0.5)',
-													transition: 'color 0.2s',
-												}}
-											/>
-										</div>
-									</Link>
-								))}
-							</div>
-						</GlassCard>
-					);
-				})}
+						{/* Account List */}
+						<Stack gap="sm">
+							{group.accounts.map((account) => (
+								<AccountListItem
+									key={account.id}
+									id={account.id}
+									name={account.name}
+									bankName={account.bank?.name}
+									bankColor={account.bank?.color}
+									balance={account.balance}
+									currency={account.currency}
+								/>
+							))}
+						</Stack>
+					</GlassCard>
+				))}
 
 				{/* Empty state */}
 				{accountGroups.length === 0 && (
@@ -317,7 +232,7 @@ export default function AccountsPage() {
 						}
 					/>
 				)}
-			</div>
-		</div>
+			</Stack>
+		</Stack>
 	);
 }
