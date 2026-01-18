@@ -1,29 +1,25 @@
-'use client';
+'use client'
 
 import {
-	BudgetCategoryCard,
-	Button,
+	BudgetCategoryGrid,
+	BudgetChartSection,
+	BudgetHeader,
+	BudgetProgress,
 	Car,
 	Coffee,
 	CreditCard,
 	Film,
 	Flex,
-	GlassCard,
 	Heart,
 	Home,
-	PageHeader,
 	PieChart,
-	Plus,
-	Progress,
-	Settings,
 	ShoppingBag,
 	ShoppingCart,
 	StatCard,
 	StatCardGrid,
 	Utensils,
 	Zap,
-} from '@/components';
-import { ChartLegend, DonutChart } from '@/components/charts';
+} from '@/components'
 
 const categories = [
 	{
@@ -98,51 +94,32 @@ const categories = [
 		budget: 50,
 		spent: 0,
 	},
-];
+]
 
-const totalBudget = categories.reduce((s, c) => s + c.budget, 0);
-const totalSpent = categories.reduce((s, c) => s + c.spent, 0);
-const remaining = totalBudget - totalSpent;
+const totalBudget = categories.reduce((s, c) => s + c.budget, 0)
+const totalSpent = categories.reduce((s, c) => s + c.spent, 0)
+const remaining = totalBudget - totalSpent
 
-// Chart data: only categories with spending
 const chartData = categories
 	.filter((c) => c.spent > 0)
 	.map((c) => ({
 		name: c.name,
 		value: c.spent,
 		color: c.color,
-	}));
+	}))
 
 function formatCurrency(amount: number): string {
 	return new Intl.NumberFormat('fr-FR', {
 		style: 'currency',
 		currency: 'EUR',
-	}).format(amount);
+	}).format(amount)
 }
 
 export default function BudgetPage() {
 	return (
 		<Flex direction="col" gap="xl">
-			{/* Header */}
-			<PageHeader
-				title="Budget"
-				description="Suivez vos dépenses par catégorie"
-				actions={
-					<Flex direction="row" gap="sm">
-						<Button
-							variant="outline"
-							iconLeft={<Settings style={{ height: '1rem', width: '1rem' }} />}
-						>
-							Règles
-						</Button>
-						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
-							Nouvelle catégorie
-						</Button>
-					</Flex>
-				}
-			/>
+			<BudgetHeader />
 
-			{/* Stats Overview */}
 			<StatCardGrid columns={3}>
 				<StatCard label="Budget mensuel" value={formatCurrency(totalBudget)} icon={PieChart} />
 				<StatCard
@@ -161,64 +138,15 @@ export default function BudgetPage() {
 				/>
 			</StatCardGrid>
 
-			{/* Global Progress */}
-			<GlassCard padding="lg">
-				<Flex direction="row" justify="between" align="center">
-					<span className="font-medium">Progression du mois</span>
-					<span className="text-sm text-muted-foreground">
-						{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
-					</span>
-				</Flex>
-				<Progress value={(totalSpent / totalBudget) * 100} style={{ height: '0.75rem', marginTop: '0.5rem' }} />
-				<span className="text-xs text-muted-foreground" style={{ display: 'block', marginTop: '0.5rem' }}>
-					Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
-				</span>
-			</GlassCard>
+			<BudgetProgress
+				totalBudget={totalBudget}
+				totalSpent={totalSpent}
+				formatCurrency={formatCurrency}
+			/>
 
-			{/* Categories Grid */}
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-					gap: '1rem',
-				}}
-			>
-				{categories.map((category) => (
-					<BudgetCategoryCard
-						key={category.id}
-						name={category.name}
-						icon={category.icon}
-						color={category.color}
-						budget={category.budget}
-						spent={category.spent}
-						formatCurrency={formatCurrency}
-					/>
-				))}
-			</div>
+			<BudgetCategoryGrid categories={categories} formatCurrency={formatCurrency} />
 
-			{/* Chart */}
-			<GlassCard padding="lg">
-				<Flex direction="col" gap="md">
-					<Flex direction="col" gap="xs">
-						<h3 className="text-md font-semibold">
-							Répartition des dépenses
-						</h3>
-						<span className="text-sm text-muted-foreground">
-							Vue graphique par catégorie
-						</span>
-					</Flex>
-					<div
-						style={{
-							display: 'grid',
-							gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-							gap: '1.5rem',
-						}}
-					>
-						<DonutChart data={chartData} height="lg" />
-						<ChartLegend items={chartData} total={totalSpent} />
-					</div>
-				</Flex>
-			</GlassCard>
+			<BudgetChartSection chartData={chartData} totalSpent={totalSpent} />
 		</Flex>
-	);
+	)
 }

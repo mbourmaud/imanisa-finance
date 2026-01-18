@@ -413,6 +413,10 @@ export { TransactionListItem } from './transactions/TransactionListItem';
 
 export type { BudgetCategoryCardProps } from './budget/BudgetCategoryCard';
 export { BudgetCategoryCard } from './budget/BudgetCategoryCard';
+export { BudgetCategoryGrid } from './budget/BudgetCategoryGrid';
+export { BudgetChartSection } from './budget/BudgetChartSection';
+export { BudgetHeader } from './budget/BudgetHeader';
+export { BudgetProgress } from './budget/BudgetProgress';
 
 // =============================================================================
 // INDICATOR COMPONENTS
