@@ -90,17 +90,22 @@ interface ContentSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 const ContentSkeleton = forwardRef<HTMLDivElement, ContentSkeletonProps>(
 	({ variant = 'text', size = 'md', width, height, className, style, ...props }, ref) => {
 		const dimensions = sizeMap[variant][size]
+		const dimensionStyle = {
+			'--skeleton-height': height ?? dimensions.height,
+			'--skeleton-width': width ?? dimensions.width,
+			...style,
+		} as React.CSSProperties
 
 		return (
 			<div
 				ref={ref}
 				data-slot="content-skeleton"
-				className={cn('bg-muted animate-pulse', variantClasses[variant], className)}
-				style={{
-					height: height ?? dimensions.height,
-					width: width ?? dimensions.width,
-					...style,
-				}}
+				className={cn(
+					'bg-muted animate-pulse h-[var(--skeleton-height)] w-[var(--skeleton-width)]',
+					variantClasses[variant],
+					className,
+				)}
+				style={dimensionStyle}
 				{...props}
 			/>
 		)
