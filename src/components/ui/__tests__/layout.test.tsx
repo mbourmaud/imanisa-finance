@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { Container, Section, Page } from '../layout';
+import { Container, Page, Section } from '../layout';
 
 describe('Container', () => {
 	it('renders with default props', () => {
@@ -106,7 +106,7 @@ describe('Section', () => {
 		const { container } = render(
 			<Section title="Title" description="Description text">
 				Content
-			</Section>
+			</Section>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<section

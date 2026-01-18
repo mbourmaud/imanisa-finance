@@ -62,7 +62,7 @@ describe('Grid', () => {
 		const { container } = render(
 			<Grid cols={1} colsSm={2} colsMd={3} colsLg={4} colsXl={6}>
 				Content
-			</Grid>
+			</Grid>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<div
@@ -143,7 +143,7 @@ describe('Grid', () => {
 		const { container } = render(
 			<Grid gapX="lg" gapY="sm">
 				Content
-			</Grid>
+			</Grid>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<div

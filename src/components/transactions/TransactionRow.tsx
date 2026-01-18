@@ -7,18 +7,11 @@
  * Supports income/expense styling, category badges, and interactive states.
  */
 
+import { ArrowDownLeft, ArrowRightLeft, Check, CreditCard, type LucideIcon } from 'lucide-react';
 import * as React from 'react';
 import { forwardRef } from 'react';
-import {
-	ArrowDownLeft,
-	ArrowRightLeft,
-	ArrowUpRight,
-	CreditCard,
-	Check,
-	type LucideIcon,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
 
 // Types
 
@@ -122,8 +115,7 @@ const iconInnerSizeClasses: Record<TransactionIconSize, string> = {
 	lg: 'h-6 w-6',
 };
 
-export interface TransactionIconProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface TransactionIconProps extends React.HTMLAttributes<HTMLDivElement> {
 	type: TransactionType;
 	size?: TransactionIconSize;
 	customIcon?: LucideIcon;
@@ -142,21 +134,20 @@ export const TransactionIcon = forwardRef<HTMLDivElement, TransactionIconProps>(
 					'flex items-center justify-center rounded-lg',
 					iconSizeClasses[size],
 					config.bgClass,
-					className
+					className,
 				)}
 				{...props}
 			>
 				<Icon className={cn(iconInnerSizeClasses[size], config.textClass)} />
 			</div>
 		);
-	}
+	},
 );
 TransactionIcon.displayName = 'TransactionIcon';
 
 // CategoryBadge Component
 
-export interface CategoryBadgeProps
-	extends React.HTMLAttributes<HTMLSpanElement> {
+export interface CategoryBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 	category: TransactionCategory;
 	size?: 'sm' | 'md';
 }
@@ -171,12 +162,10 @@ export const CategoryBadge = forwardRef<HTMLSpanElement, CategoryBadgeProps>(
 					'inline-flex items-center rounded-full font-medium',
 					size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-sm',
 					'bg-muted text-muted-foreground',
-					className
+					className,
 				)}
 				style={{
-					backgroundColor: category.color
-						? `${category.color}20`
-						: undefined,
+					backgroundColor: category.color ? `${category.color}20` : undefined,
 					color: category.color || undefined,
 				}}
 				{...props}
@@ -184,14 +173,13 @@ export const CategoryBadge = forwardRef<HTMLSpanElement, CategoryBadgeProps>(
 				{category.name}
 			</span>
 		);
-	}
+	},
 );
 CategoryBadge.displayName = 'CategoryBadge';
 
 // TransactionAmount Component
 
-export interface TransactionAmountProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface TransactionAmountProps extends React.HTMLAttributes<HTMLDivElement> {
 	amount: number;
 	currency?: string;
 	type: TransactionType;
@@ -205,22 +193,8 @@ const amountSizeClasses: Record<'sm' | 'md' | 'lg', string> = {
 	lg: 'text-lg',
 };
 
-export const TransactionAmount = forwardRef<
-	HTMLDivElement,
-	TransactionAmountProps
->(
-	(
-		{
-			className,
-			amount,
-			currency = 'EUR',
-			type,
-			showSign = true,
-			size = 'md',
-			...props
-		},
-		ref
-	) => {
+export const TransactionAmount = forwardRef<HTMLDivElement, TransactionAmountProps>(
+	({ className, amount, currency = 'EUR', type, showSign = true, size = 'md', ...props }, ref) => {
 		const isPositive = type === 'income';
 		const sign = showSign ? (isPositive ? '+' : '-') : '';
 
@@ -233,7 +207,7 @@ export const TransactionAmount = forwardRef<
 					amountSizeClasses[size],
 					isPositive && 'value-positive',
 					type === 'expense' && amount < 0 && 'value-negative',
-					className
+					className,
 				)}
 				{...props}
 			>
@@ -241,7 +215,7 @@ export const TransactionAmount = forwardRef<
 				{formatCurrency(amount, currency)}
 			</div>
 		);
-	}
+	},
 );
 TransactionAmount.displayName = 'TransactionAmount';
 
@@ -287,7 +261,7 @@ export const TransactionRow = forwardRef<HTMLDivElement, TransactionRowProps>(
 			onTransactionClick,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const handleClick = () => {
 			if (interactive && onTransactionClick) {
@@ -296,11 +270,7 @@ export const TransactionRow = forwardRef<HTMLDivElement, TransactionRowProps>(
 		};
 
 		const handleKeyDown = (e: React.KeyboardEvent) => {
-			if (
-				interactive &&
-				onTransactionClick &&
-				(e.key === 'Enter' || e.key === ' ')
-			) {
+			if (interactive && onTransactionClick && (e.key === 'Enter' || e.key === ' ')) {
 				e.preventDefault();
 				onTransactionClick();
 			}
@@ -321,7 +291,7 @@ export const TransactionRow = forwardRef<HTMLDivElement, TransactionRowProps>(
 					rowVariantClasses[variant],
 					interactive && 'cursor-pointer hover:bg-muted/30',
 					selected && 'bg-muted/50',
-					className
+					className,
 				)}
 				onClick={handleClick}
 				onKeyDown={handleKeyDown}
@@ -341,10 +311,7 @@ export const TransactionRow = forwardRef<HTMLDivElement, TransactionRowProps>(
 					)}
 
 					{showIcon && (
-						<TransactionIcon
-							type={transaction.type}
-							size={variant === 'compact' ? 'sm' : 'md'}
-						/>
+						<TransactionIcon type={transaction.type} size={variant === 'compact' ? 'sm' : 'md'} />
 					)}
 
 					<div className="min-w-0 flex-1">
@@ -388,21 +355,18 @@ export const TransactionRow = forwardRef<HTMLDivElement, TransactionRowProps>(
 						size={variant === 'compact' ? 'sm' : 'md'}
 					/>
 					{showDate && (
-						<p className="text-xs text-muted-foreground mt-0.5">
-							{formatDate(transaction.date)}
-						</p>
+						<p className="text-xs text-muted-foreground mt-0.5">{formatDate(transaction.date)}</p>
 					)}
 				</div>
 			</div>
 		);
-	}
+	},
 );
 TransactionRow.displayName = 'TransactionRow';
 
 // TransactionList Component
 
-export interface TransactionListProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface TransactionListProps extends React.HTMLAttributes<HTMLDivElement> {
 	transactions: TransactionData[];
 	variant?: TransactionRowVariant;
 	showCategory?: boolean;
@@ -433,7 +397,7 @@ export const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(
 			groupByDate = false,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const handleSelect = (transactionId: string, selected: boolean) => {
 			if (!onSelectionChange) return;
@@ -451,8 +415,7 @@ export const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(
 
 			const groups: Record<string, TransactionData[]> = {};
 			for (const tx of transactions) {
-				const dateKey =
-					typeof tx.date === 'string' ? tx.date : tx.date.toISOString().split('T')[0];
+				const dateKey = typeof tx.date === 'string' ? tx.date : tx.date.toISOString().split('T')[0];
 				if (!groups[dateKey]) {
 					groups[dateKey] = [];
 				}
@@ -484,14 +447,10 @@ export const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(
 									showDate={false}
 									selectable={selectable}
 									selected={selectedIds.includes(transaction.id)}
-									onSelectChange={(selected: boolean) =>
-										handleSelect(transaction.id, selected)
-									}
+									onSelectChange={(selected: boolean) => handleSelect(transaction.id, selected)}
 									interactive={interactive}
 									onTransactionClick={
-										onTransactionClick
-											? () => onTransactionClick(transaction)
-											: undefined
+										onTransactionClick ? () => onTransactionClick(transaction) : undefined
 									}
 								/>
 							))}
@@ -502,12 +461,7 @@ export const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(
 		}
 
 		return (
-			<div
-				ref={ref}
-				data-slot="transaction-list"
-				className={cn('space-y-1', className)}
-				{...props}
-			>
+			<div ref={ref} data-slot="transaction-list" className={cn('space-y-1', className)} {...props}>
 				{transactions.map((transaction) => (
 					<TransactionRow
 						key={transaction.id}
@@ -521,57 +475,50 @@ export const TransactionList = forwardRef<HTMLDivElement, TransactionListProps>(
 						onSelectChange={(selected: boolean) => handleSelect(transaction.id, selected)}
 						interactive={interactive}
 						onTransactionClick={
-							onTransactionClick
-								? () => onTransactionClick(transaction)
-								: undefined
+							onTransactionClick ? () => onTransactionClick(transaction) : undefined
 						}
 					/>
 				))}
 			</div>
 		);
-	}
+	},
 );
 TransactionList.displayName = 'TransactionList';
 
 // TransactionRowSkeleton Component
 
-export interface TransactionRowSkeletonProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface TransactionRowSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 	variant?: TransactionRowVariant;
 }
 
-export const TransactionRowSkeleton = forwardRef<
-	HTMLDivElement,
-	TransactionRowSkeletonProps
->(({ className, variant = 'default', ...props }, ref) => {
-	return (
-		<div
-			ref={ref}
-			data-slot="transaction-row-skeleton"
-			className={cn(
-				'flex items-center justify-between gap-4 rounded-xl animate-pulse',
-				rowVariantClasses[variant],
-				className
-			)}
-			{...props}
-		>
-			<div className="flex items-center gap-3 sm:gap-4">
-				<div
-					className={cn(
-						'rounded-lg bg-muted',
-						variant === 'compact' ? 'h-8 w-8' : 'h-10 w-10'
-					)}
-				/>
-				<div className="space-y-2">
-					<div className="h-4 w-36 bg-muted rounded" />
-					<div className="h-3 w-24 bg-muted rounded" />
+export const TransactionRowSkeleton = forwardRef<HTMLDivElement, TransactionRowSkeletonProps>(
+	({ className, variant = 'default', ...props }, ref) => {
+		return (
+			<div
+				ref={ref}
+				data-slot="transaction-row-skeleton"
+				className={cn(
+					'flex items-center justify-between gap-4 rounded-xl animate-pulse',
+					rowVariantClasses[variant],
+					className,
+				)}
+				{...props}
+			>
+				<div className="flex items-center gap-3 sm:gap-4">
+					<div
+						className={cn('rounded-lg bg-muted', variant === 'compact' ? 'h-8 w-8' : 'h-10 w-10')}
+					/>
+					<div className="space-y-2">
+						<div className="h-4 w-36 bg-muted rounded" />
+						<div className="h-3 w-24 bg-muted rounded" />
+					</div>
+				</div>
+				<div className="text-right space-y-2">
+					<div className="h-4 w-20 bg-muted rounded ml-auto" />
+					<div className="h-3 w-16 bg-muted rounded ml-auto" />
 				</div>
 			</div>
-			<div className="text-right space-y-2">
-				<div className="h-4 w-20 bg-muted rounded ml-auto" />
-				<div className="h-3 w-16 bg-muted rounded ml-auto" />
-			</div>
-		</div>
-	);
-});
+		);
+	},
+);
 TransactionRowSkeleton.displayName = 'TransactionRowSkeleton';

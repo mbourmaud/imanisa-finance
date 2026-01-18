@@ -37,12 +37,12 @@ const Container = forwardRef<HTMLDivElement, ContainerProps>(
 					containerMaxWidthClasses[maxWidth],
 					centered && 'mx-auto',
 					padded && 'px-4 sm:px-6',
-					className
+					className,
 				)}
 				{...props}
 			/>
 		);
-	}
+	},
 );
 Container.displayName = 'Container';
 
@@ -82,16 +82,11 @@ function Section({
 	...props
 }: SectionProps) {
 	return (
-		<Component
-			className={cn(sectionSpacingClasses[spacing], className)}
-			{...props}
-		>
+		<Component className={cn(sectionSpacingClasses[spacing], className)} {...props}>
 			{(title || description) && (
 				<div className="mb-4">
 					{title && <h2 className="text-lg font-semibold tracking-tight">{title}</h2>}
-					{description && (
-						<p className="mt-1 text-sm text-muted-foreground">{description}</p>
-					)}
+					{description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
 				</div>
 			)}
 			{children}
@@ -122,7 +117,7 @@ const Page = forwardRef<HTMLDivElement, PageProps>(
 					'flex-1',
 					scrollable && 'overflow-y-auto scrollbar-thin',
 					padded && 'py-6',
-					className
+					className,
 				)}
 				aria-label={title}
 				{...props}
@@ -130,7 +125,7 @@ const Page = forwardRef<HTMLDivElement, PageProps>(
 				{children}
 			</main>
 		);
-	}
+	},
 );
 Page.displayName = 'Page';
 

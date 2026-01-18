@@ -7,19 +7,31 @@
  * Supports infinite scroll for transactions, import management, and account settings.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
 	// Icons
 	AlertCircle,
 	ArrowLeft,
+	// Layout
+	Box,
+	// Form elements
+	Button,
 	Check,
 	CheckCircle2,
 	Clock,
+	// Feedback
+	EmptyState,
 	ExternalLink,
 	FileSpreadsheet,
+	Flex,
+	// Cards
+	GlassCard,
+	Heading,
+	HStack,
 	IconWrapper,
+	Input,
 	Loader2,
 	Pencil,
 	Plus,
@@ -27,55 +39,42 @@ import {
 	RotateCcw,
 	Search,
 	Settings,
-	Trash2,
-	Upload,
-	X,
-	// Layout
-	Box,
-	VStack,
-	HStack,
-	Flex,
-	// Typography
-	Text,
-	Heading,
-	// Cards
-	GlassCard,
-	// Form elements
-	Button,
-	Input,
 	// Sheet
 	Sheet,
 	SheetContent,
+	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-	SheetDescription,
-	// Feedback
-	EmptyState,
+	// Typography
+	Text,
+	Trash2,
+	Upload,
+	VStack,
+	X,
 } from '@/components';
+import { AccountTypeBadge } from '@/components/accounts/AccountCard';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { formatDate, formatRelativeTime } from '@/shared/utils';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
-import { AccountTypeBadge } from '@/components/accounts/AccountCard';
-
 // TanStack Query hooks
 import {
 	useAccountQuery,
-	useUpdateAccountMutation,
-	useDeleteAccountMutation,
-	useSyncAccountMutation,
 	useAddAccountMemberMutation,
+	useDeleteAccountMutation,
 	useRemoveAccountMemberMutation,
+	useSyncAccountMutation,
+	useUpdateAccountMutation,
 } from '@/features/accounts';
 import {
+	useDeleteImportMutation,
 	useImportsQuery,
-	useUploadImportMutation,
 	useProcessImportMutation,
 	useReprocessImportMutation,
-	useDeleteImportMutation,
+	useUploadImportMutation,
 } from '@/features/imports';
 import { useMembersQuery } from '@/features/members';
 import { useTransactionsQuery } from '@/features/transactions/hooks/use-transactions-query';
+import { formatDate, formatRelativeTime } from '@/shared/utils';
 
 // Types for data returned by API (more complete than domain types)
 interface AccountMember {
@@ -135,13 +134,28 @@ interface RawImport {
 function getStatusIcon(status: RawImport['status']) {
 	switch (status) {
 		case 'PROCESSED':
-			return <CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }} />;
+			return (
+				<CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }} />
+			);
 		case 'PROCESSING':
-			return <Loader2 style={{ height: '1rem', width: '1rem', color: 'hsl(var(--primary))', animation: 'spin 1s linear infinite' }} />;
+			return (
+				<Loader2
+					style={{
+						height: '1rem',
+						width: '1rem',
+						color: 'hsl(var(--primary))',
+						animation: 'spin 1s linear infinite',
+					}}
+				/>
+			);
 		case 'FAILED':
-			return <AlertCircle style={{ height: '1rem', width: '1rem', color: 'hsl(var(--destructive))' }} />;
+			return (
+				<AlertCircle style={{ height: '1rem', width: '1rem', color: 'hsl(var(--destructive))' }} />
+			);
 		default:
-			return <Clock style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />;
+			return (
+				<Clock style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+			);
 	}
 }
 
@@ -187,7 +201,7 @@ export default function AccountDetailPage() {
 		isFetching: isFetchingTransactions,
 	} = useTransactionsQuery(
 		{ accountId, search: searchQuery || undefined },
-		{ page: currentPage, pageSize }
+		{ page: currentPage, pageSize },
 	);
 
 	// ===== Mutations =====
@@ -294,7 +308,7 @@ export default function AccountDetailPage() {
 					loadMore();
 				}
 			},
-			{ threshold: 0.1, rootMargin: '100px' }
+			{ threshold: 0.1, rootMargin: '100px' },
 		);
 
 		observerRef.current.observe(currentRef);
@@ -320,7 +334,7 @@ export default function AccountDetailPage() {
 
 			if (result.process.skippedCount > 0) {
 				setError(
-					`${result.process.recordsCount} transactions importées, ${result.process.skippedCount} doublons ignorés`
+					`${result.process.recordsCount} transactions importées, ${result.process.skippedCount} doublons ignorés`,
 				);
 			}
 
@@ -425,8 +439,11 @@ export default function AccountDetailPage() {
 				id: accountId,
 				input: {
 					name: name.trim(),
-					description: (editDescription !== '' ? editDescription : account.description)?.trim() || undefined,
-					accountNumber: (editAccountNumber !== '' ? editAccountNumber : account.accountNumber)?.trim() || undefined,
+					description:
+						(editDescription !== '' ? editDescription : account.description)?.trim() || undefined,
+					accountNumber:
+						(editAccountNumber !== '' ? editAccountNumber : account.accountNumber)?.trim() ||
+						undefined,
 				},
 			});
 			setIsEditingAccount(false);
@@ -453,14 +470,19 @@ export default function AccountDetailPage() {
 	const saveInitialBalance = async () => {
 		if (!account) return;
 
-		const balanceStr = editInitialBalance !== '' ? editInitialBalance : account.initialBalance?.toString() || '0';
+		const balanceStr =
+			editInitialBalance !== '' ? editInitialBalance : account.initialBalance?.toString() || '0';
 		const balanceValue = parseFloat(balanceStr.replace(',', '.'));
 		if (Number.isNaN(balanceValue)) {
 			setError('Montant invalide');
 			return;
 		}
 
-		const dateValue = editInitialBalanceDate || (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '');
+		const dateValue =
+			editInitialBalanceDate ||
+			(account.initialBalanceDate
+				? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+				: '');
 
 		try {
 			await updateAccountMutation.mutateAsync({
@@ -501,7 +523,7 @@ export default function AccountDetailPage() {
 	const availableMembers = useMemo(() => {
 		if (!account) return [];
 		return (allMembers ?? []).filter(
-			(m) => !account.accountMembers.some((am) => am.memberId === m.id)
+			(m) => !account.accountMembers.some((am) => am.memberId === m.id),
 		);
 	}, [allMembers, account]);
 
@@ -512,8 +534,28 @@ export default function AccountDetailPage() {
 				title="Chargement du compte..."
 				iconElement={
 					<Box style={{ position: 'relative' }}>
-						<Box style={{ height: '3rem', width: '3rem', borderRadius: '9999px', background: 'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))', animation: 'pulse 2s ease-in-out infinite' }} />
-						<Loader2 style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--primary))', animation: 'spin 1s linear infinite', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+						<Box
+							style={{
+								height: '3rem',
+								width: '3rem',
+								borderRadius: '9999px',
+								background:
+									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
+								animation: 'pulse 2s ease-in-out infinite',
+							}}
+						/>
+						<Loader2
+							style={{
+								height: '1.5rem',
+								width: '1.5rem',
+								color: 'hsl(var(--primary))',
+								animation: 'spin 1s linear infinite',
+								position: 'absolute',
+								top: '50%',
+								left: '50%',
+								transform: 'translate(-50%, -50%)',
+							}}
+						/>
 					</Box>
 				}
 				size="md"
@@ -530,9 +572,7 @@ export default function AccountDetailPage() {
 				size="md"
 				action={
 					<Button variant="outline" iconLeft={<IconWrapper icon={ArrowLeft} size="sm" />} asChild>
-						<Link href="/dashboard/accounts">
-							Retour aux comptes
-						</Link>
+						<Link href="/dashboard/accounts">Retour aux comptes</Link>
 					</Button>
 				}
 			/>
@@ -542,7 +582,18 @@ export default function AccountDetailPage() {
 	return (
 		<VStack gap="lg">
 			{/* Back link */}
-			<Link href="/dashboard/banks" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', transition: 'all 0.2s', textDecoration: 'none' }}>
+			<Link
+				href="/dashboard/banks"
+				style={{
+					display: 'inline-flex',
+					alignItems: 'center',
+					gap: '0.5rem',
+					fontSize: '0.875rem',
+					color: 'hsl(var(--muted-foreground))',
+					transition: 'all 0.2s',
+					textDecoration: 'none',
+				}}
+			>
 				<ArrowLeft style={{ height: '1rem', width: '1rem', transition: 'transform 0.2s' }} />
 				<span>Retour aux banques</span>
 			</Link>
@@ -558,7 +609,7 @@ export default function AccountDetailPage() {
 						right: 0,
 						height: '0.25rem',
 						borderRadius: '1rem 1rem 0 0',
-						background: `linear-gradient(90deg, ${account.bank.color}, ${account.bank.color}88, transparent)`
+						background: `linear-gradient(90deg, ${account.bank.color}, ${account.bank.color}88, transparent)`,
 					}}
 				/>
 
@@ -566,7 +617,14 @@ export default function AccountDetailPage() {
 					{/* Bank logo with glow */}
 					<Box style={{ position: 'relative', flexShrink: 0 }}>
 						<Box
-							style={{ position: 'absolute', inset: 0, filter: 'blur(16px)', opacity: 0.4, borderRadius: '1rem', backgroundColor: account.bank.color }}
+							style={{
+								position: 'absolute',
+								inset: 0,
+								filter: 'blur(16px)',
+								opacity: 0.4,
+								borderRadius: '1rem',
+								backgroundColor: account.bank.color,
+							}}
 						/>
 						<Flex
 							align="center"
@@ -581,7 +639,7 @@ export default function AccountDetailPage() {
 								fontWeight: 700,
 								fontSize: '1.125rem',
 								transition: 'transform 0.2s',
-								background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)`
+								background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)`,
 							}}
 						>
 							{getBankShortName(account.bank.name)}
@@ -594,12 +652,21 @@ export default function AccountDetailPage() {
 						<HStack justify="between" align="start" gap="md">
 							<Box minW0>
 								<HStack gap="sm" align="center">
-									<Heading level={1} size="2xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>{account.name}</Heading>
+									<Heading level={1} size="2xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
+										{account.name}
+									</Heading>
 									<Button
 										variant="ghost"
 										size="icon"
 										onClick={startEditingAccount}
-										style={{ height: '2.25rem', width: '2.25rem', borderRadius: '0.75rem', color: 'hsl(var(--muted-foreground))', flexShrink: 0, transition: 'all 0.2s' }}
+										style={{
+											height: '2.25rem',
+											width: '2.25rem',
+											borderRadius: '0.75rem',
+											color: 'hsl(var(--muted-foreground))',
+											flexShrink: 0,
+											transition: 'all 0.2s',
+										}}
 									>
 										<Pencil style={{ height: '1rem', width: '1rem' }} />
 									</Button>
@@ -617,7 +684,8 @@ export default function AccountDetailPage() {
 										style={{ letterSpacing: '-0.025em' }}
 									/>
 									<Text size="xs" color="muted" weight="medium" style={{ marginTop: '0.25rem' }}>
-										{account._count.transactions} transaction{account._count.transactions !== 1 ? 's' : ''}
+										{account._count.transactions} transaction
+										{account._count.transactions !== 1 ? 's' : ''}
 									</Text>
 								</VStack>
 
@@ -627,7 +695,15 @@ export default function AccountDetailPage() {
 										variant="ghost"
 										size="icon"
 										onClick={() => setShowSettings(true)}
-										style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--background) / 0.5)', border: '1px solid hsl(var(--border) / 0.2)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', transition: 'all 0.2s' }}
+										style={{
+											height: '2.5rem',
+											width: '2.5rem',
+											borderRadius: '0.75rem',
+											backgroundColor: 'hsl(var(--background) / 0.5)',
+											border: '1px solid hsl(var(--border) / 0.2)',
+											boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+											transition: 'all 0.2s',
+										}}
 									>
 										<Settings style={{ height: '1rem', width: '1rem' }} />
 									</Button>
@@ -635,7 +711,16 @@ export default function AccountDetailPage() {
 										variant="ghost"
 										size="icon"
 										onClick={() => setDeleteAccountOpen(true)}
-										style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--background) / 0.5)', border: '1px solid hsl(var(--border) / 0.2)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', color: 'hsl(var(--muted-foreground))', transition: 'all 0.2s' }}
+										style={{
+											height: '2.5rem',
+											width: '2.5rem',
+											borderRadius: '0.75rem',
+											backgroundColor: 'hsl(var(--background) / 0.5)',
+											border: '1px solid hsl(var(--border) / 0.2)',
+											boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+											color: 'hsl(var(--muted-foreground))',
+											transition: 'all 0.2s',
+										}}
 									>
 										<Trash2 style={{ height: '1rem', width: '1rem' }} />
 									</Button>
@@ -645,22 +730,52 @@ export default function AccountDetailPage() {
 
 						{/* Bottom row: Bank info + Members */}
 						<Flex wrap="wrap" align="center" gap="sm" style={{ marginTop: '0.75rem' }}>
-							<Text as="span" size="xs" weight="medium" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.25rem 0.75rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--background) / 0.6)', color: 'hsl(var(--muted-foreground))' }}>
+							<Text
+								as="span"
+								size="xs"
+								weight="medium"
+								style={{
+									display: 'inline-flex',
+									alignItems: 'center',
+									gap: '0.375rem',
+									padding: '0.25rem 0.75rem',
+									borderRadius: '9999px',
+									backgroundColor: 'hsl(var(--background) / 0.6)',
+									color: 'hsl(var(--muted-foreground))',
+								}}
+							>
 								{account.bank.name}
 							</Text>
 							<AccountTypeBadge
 								type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
-								style={{ backgroundColor: 'hsl(var(--background) / 0.6)', borderRadius: '9999px', padding: '0.25rem 0.75rem' }}
+								style={{
+									backgroundColor: 'hsl(var(--background) / 0.6)',
+									borderRadius: '9999px',
+									padding: '0.25rem 0.75rem',
+								}}
 							/>
 							{account.accountNumber && (
-								<Text as="span" size="xs" style={{ display: 'none', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontFamily: 'monospace', backgroundColor: 'hsl(var(--background) / 0.6)', color: 'hsl(var(--muted-foreground))' }}>
+								<Text
+									as="span"
+									size="xs"
+									style={{
+										display: 'none',
+										padding: '0.25rem 0.75rem',
+										borderRadius: '9999px',
+										fontFamily: 'monospace',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										color: 'hsl(var(--muted-foreground))',
+									}}
+								>
 									{account.accountNumber}
 								</Text>
 							)}
 							{/* Members */}
 							{account.accountMembers.length > 0 && (
 								<>
-									<Text as="span" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>•</Text>
+									<Text as="span" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>
+										•
+									</Text>
 									<HStack gap="sm" align="center">
 										<MemberAvatarGroup
 											members={account.accountMembers.map((am) => ({
@@ -679,7 +794,9 @@ export default function AccountDetailPage() {
 							)}
 						</Flex>
 						{account.description && (
-							<Text size="sm" color="muted" style={{ marginTop: '0.75rem' }}>{account.description}</Text>
+							<Text size="sm" color="muted" style={{ marginTop: '0.75rem' }}>
+								{account.description}
+							</Text>
 						)}
 					</Flex>
 				</HStack>
@@ -687,24 +804,58 @@ export default function AccountDetailPage() {
 
 			{/* Account Edit Drawer */}
 			<Sheet open={isEditingAccount} onOpenChange={setIsEditingAccount}>
-				<SheetContent side="right" style={{ width: '100%', maxWidth: '420px', overflowY: 'auto', borderLeft: '1px solid hsl(var(--border) / 0.2)', background: 'linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background) / 0.95))' }}>
+				<SheetContent
+					side="right"
+					style={{
+						width: '100%',
+						maxWidth: '420px',
+						overflowY: 'auto',
+						borderLeft: '1px solid hsl(var(--border) / 0.2)',
+						background:
+							'linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background) / 0.95))',
+					}}
+				>
 					<SheetHeader style={{ paddingBottom: '1.5rem' }}>
-						<SheetTitle style={{ fontSize: '1.25rem', fontWeight: 700 }}>Modifier le compte</SheetTitle>
-						<SheetDescription>
-							Modifiez les informations du compte.
-						</SheetDescription>
+						<SheetTitle style={{ fontSize: '1.25rem', fontWeight: 700 }}>
+							Modifier le compte
+						</SheetTitle>
+						<SheetDescription>Modifiez les informations du compte.</SheetDescription>
 					</SheetHeader>
 
 					<VStack gap="lg">
 						{/* Bank logo centered with glow */}
-						<Box style={{ position: 'relative', width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
+						<Box
+							style={{
+								position: 'relative',
+								width: 'fit-content',
+								marginLeft: 'auto',
+								marginRight: 'auto',
+							}}
+						>
 							<Box
-								style={{ position: 'absolute', inset: 0, filter: 'blur(16px)', opacity: 0.5, borderRadius: '1rem', backgroundColor: account.bank.color }}
+								style={{
+									position: 'absolute',
+									inset: 0,
+									filter: 'blur(16px)',
+									opacity: 0.5,
+									borderRadius: '1rem',
+									backgroundColor: account.bank.color,
+								}}
 							/>
 							<Flex
 								align="center"
 								justify="center"
-								style={{ position: 'relative', height: '4rem', width: '4rem', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', color: 'white', fontWeight: 700, fontSize: '1.125rem', background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)` }}
+								style={{
+									position: 'relative',
+									height: '4rem',
+									width: '4rem',
+									borderRadius: '1rem',
+									boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+									color: 'white',
+									fontWeight: 700,
+									fontSize: '1.125rem',
+									background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)`,
+								}}
 							>
 								{getBankShortName(account.bank.name)}
 							</Flex>
@@ -712,7 +863,10 @@ export default function AccountDetailPage() {
 
 						<VStack gap="md">
 							<VStack gap="sm">
-								<label htmlFor="edit-account-name" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+								<label
+									htmlFor="edit-account-name"
+									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+								>
 									Nom du compte
 								</label>
 								<Input
@@ -720,33 +874,74 @@ export default function AccountDetailPage() {
 									value={editName}
 									onChange={(e) => setEditName(e.target.value)}
 									placeholder="Ex: Compte Joint"
-									style={{ height: '3rem', fontSize: '1rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--background) / 0.6)', borderColor: 'hsl(var(--border) / 0.3)' }}
+									style={{
+										height: '3rem',
+										fontSize: '1rem',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										borderColor: 'hsl(var(--border) / 0.3)',
+									}}
 								/>
 							</VStack>
 							<VStack gap="sm">
-								<label htmlFor="edit-account-number" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+								<label
+									htmlFor="edit-account-number"
+									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+								>
 									Numéro de compte
-									<span style={{ marginLeft: '0.25rem', fontSize: '0.75rem', fontWeight: 400, color: 'hsl(var(--muted-foreground))' }}>(optionnel)</span>
+									<span
+										style={{
+											marginLeft: '0.25rem',
+											fontSize: '0.75rem',
+											fontWeight: 400,
+											color: 'hsl(var(--muted-foreground))',
+										}}
+									>
+										(optionnel)
+									</span>
 								</label>
 								<Input
 									id="edit-account-number"
 									value={editAccountNumber}
 									onChange={(e) => setEditAccountNumber(e.target.value)}
 									placeholder="Ex: FR76 1234 5678 9012"
-									style={{ height: '3rem', fontFamily: 'monospace', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--background) / 0.6)', borderColor: 'hsl(var(--border) / 0.3)' }}
+									style={{
+										height: '3rem',
+										fontFamily: 'monospace',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										borderColor: 'hsl(var(--border) / 0.3)',
+									}}
 								/>
 							</VStack>
 							<VStack gap="sm">
-								<label htmlFor="edit-account-description" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+								<label
+									htmlFor="edit-account-description"
+									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+								>
 									Description
-									<span style={{ marginLeft: '0.25rem', fontSize: '0.75rem', fontWeight: 400, color: 'hsl(var(--muted-foreground))' }}>(optionnel)</span>
+									<span
+										style={{
+											marginLeft: '0.25rem',
+											fontSize: '0.75rem',
+											fontWeight: 400,
+											color: 'hsl(var(--muted-foreground))',
+										}}
+									>
+										(optionnel)
+									</span>
 								</label>
 								<Input
 									id="edit-account-description"
 									value={editDescription}
 									onChange={(e) => setEditDescription(e.target.value)}
 									placeholder="Ex: Compte pour les dépenses courantes"
-									style={{ height: '3rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--background) / 0.6)', borderColor: 'hsl(var(--border) / 0.3)' }}
+									style={{
+										height: '3rem',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										borderColor: 'hsl(var(--border) / 0.3)',
+									}}
 								/>
 							</VStack>
 						</VStack>
@@ -756,17 +951,35 @@ export default function AccountDetailPage() {
 								variant="outline"
 								onClick={cancelEditingAccount}
 								disabled={updateAccountMutation.isPending}
-								style={{ flex: 1, height: '3rem', borderRadius: '0.75rem', borderColor: 'hsl(var(--border) / 0.2)' }}
+								style={{
+									flex: 1,
+									height: '3rem',
+									borderRadius: '0.75rem',
+									borderColor: 'hsl(var(--border) / 0.2)',
+								}}
 							>
 								Annuler
 							</Button>
 							<Button
 								onClick={saveAccountDetails}
 								disabled={updateAccountMutation.isPending || !editName.trim()}
-								style={{ flex: 1, height: '3rem', borderRadius: '0.75rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', transition: 'all 0.2s' }}
+								style={{
+									flex: 1,
+									height: '3rem',
+									borderRadius: '0.75rem',
+									boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+									transition: 'all 0.2s',
+								}}
 							>
 								{updateAccountMutation.isPending ? (
-									<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite', marginRight: '0.5rem' }} />
+									<Loader2
+										style={{
+											height: '1rem',
+											width: '1rem',
+											animation: 'spin 1s linear infinite',
+											marginRight: '0.5rem',
+										}}
+									/>
 								) : (
 									<Check style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
 								)}
@@ -792,8 +1005,12 @@ export default function AccountDetailPage() {
 						animation: 'fadeIn 0.3s ease-out',
 						backdropFilter: 'blur(16px)',
 						WebkitBackdropFilter: 'blur(16px)',
-						backgroundColor: error.includes('importées') ? 'oklch(0.55 0.15 145 / 0.1)' : 'oklch(0.55 0.2 25 / 0.1)',
-						border: error.includes('importées') ? '1px solid oklch(0.55 0.15 145 / 0.2)' : '1px solid oklch(0.55 0.2 25 / 0.2)'
+						backgroundColor: error.includes('importées')
+							? 'oklch(0.55 0.15 145 / 0.1)'
+							: 'oklch(0.55 0.2 25 / 0.1)',
+						border: error.includes('importées')
+							? '1px solid oklch(0.55 0.15 145 / 0.2)'
+							: '1px solid oklch(0.55 0.2 25 / 0.2)',
 					}}
 				>
 					<HStack gap="sm" align="start">
@@ -805,20 +1022,39 @@ export default function AccountDetailPage() {
 								height: '2rem',
 								width: '2rem',
 								borderRadius: '0.75rem',
-								backgroundColor: error.includes('importées') ? 'oklch(0.55 0.15 145 / 0.2)' : 'oklch(0.55 0.2 25 / 0.2)'
+								backgroundColor: error.includes('importées')
+									? 'oklch(0.55 0.15 145 / 0.2)'
+									: 'oklch(0.55 0.2 25 / 0.2)',
 							}}
 						>
 							{error.includes('importées') ? (
-								<CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }} />
+								<CheckCircle2
+									style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }}
+								/>
 							) : (
-								<AlertCircle style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.2 25)' }} />
+								<AlertCircle
+									style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.2 25)' }}
+								/>
 							)}
 						</Flex>
 						<Flex direction="col" grow minW0>
-							<Text size="sm" weight="semibold" style={{ color: error.includes('importées') ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)' }}>
+							<Text
+								size="sm"
+								weight="semibold"
+								style={{
+									color: error.includes('importées')
+										? 'oklch(0.55 0.15 145)'
+										: 'oklch(0.55 0.2 25)',
+								}}
+							>
 								{error.includes('importées') ? 'Import réussi' : 'Erreur'}
 							</Text>
-							<Text size="sm" style={{ color: 'hsl(var(--foreground) / 0.8)', marginTop: '0.125rem' }}>{error}</Text>
+							<Text
+								size="sm"
+								style={{ color: 'hsl(var(--foreground) / 0.8)', marginTop: '0.125rem' }}
+							>
+								{error}
+							</Text>
 						</Flex>
 						<Button
 							variant="ghost"
@@ -834,9 +1070,28 @@ export default function AccountDetailPage() {
 
 			{/* Settings Drawer - 33% width on desktop */}
 			<Sheet open={showSettings} onOpenChange={setShowSettings}>
-				<SheetContent side="right" style={{ width: '100%', minWidth: '400px', maxWidth: '500px', overflowY: 'auto', backgroundColor: 'hsl(var(--background))', borderLeft: '1px solid hsl(var(--border))', padding: 0 }}>
+				<SheetContent
+					side="right"
+					style={{
+						width: '100%',
+						minWidth: '400px',
+						maxWidth: '500px',
+						overflowY: 'auto',
+						backgroundColor: 'hsl(var(--background))',
+						borderLeft: '1px solid hsl(var(--border))',
+						padding: 0,
+					}}
+				>
 					{/* Header */}
-					<Box style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid hsl(var(--border))' }}>
+					<Box
+						style={{
+							paddingLeft: '1rem',
+							paddingRight: '1rem',
+							paddingTop: '0.5rem',
+							paddingBottom: '0.5rem',
+							borderBottom: '1px solid hsl(var(--border))',
+						}}
+					>
 						<SheetHeader>
 							<SheetTitle style={{ fontSize: '1rem', fontWeight: 600 }}>Paramètres</SheetTitle>
 							<SheetDescription style={{ fontSize: '0.75rem' }}>
@@ -847,12 +1102,33 @@ export default function AccountDetailPage() {
 
 					<VStack gap="none">
 						{/* Section 1: Informations */}
-						<VStack gap="md" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1rem', paddingBottom: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
-							<Text size="xs" weight="semibold" color="muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Informations</Text>
+						<VStack
+							gap="md"
+							style={{
+								paddingLeft: '1rem',
+								paddingRight: '1rem',
+								paddingTop: '1rem',
+								paddingBottom: '1rem',
+								borderBottom: '1px solid hsl(var(--border))',
+							}}
+						>
+							<Text
+								size="xs"
+								weight="semibold"
+								color="muted"
+								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+							>
+								Informations
+							</Text>
 
 							{/* Account name */}
 							<VStack gap="xs">
-								<label htmlFor="settings-account-name" style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}>Nom du compte</label>
+								<label
+									htmlFor="settings-account-name"
+									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+								>
+									Nom du compte
+								</label>
 								<Input
 									id="settings-account-name"
 									value={editName || account.name}
@@ -872,10 +1148,15 @@ export default function AccountDetailPage() {
 
 							{/* Description */}
 							<VStack gap="xs">
-								<label htmlFor="settings-account-description" style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}>Description</label>
+								<label
+									htmlFor="settings-account-description"
+									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+								>
+									Description
+								</label>
 								<Input
 									id="settings-account-description"
-									value={editDescription !== '' ? editDescription : (account.description || '')}
+									value={editDescription !== '' ? editDescription : account.description || ''}
 									onChange={(e) => setEditDescription(e.target.value)}
 									onBlur={() => {
 										if (editDescription !== (account.description || '')) {
@@ -892,8 +1173,21 @@ export default function AccountDetailPage() {
 
 							{/* Owners - Multi-select */}
 							<VStack gap="xs">
-								<Text size="sm" color="muted">Titulaires</Text>
-								<Flex wrap="wrap" gap="sm" align="center" style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--background))', minHeight: '42px' }}>
+								<Text size="sm" color="muted">
+									Titulaires
+								</Text>
+								<Flex
+									wrap="wrap"
+									gap="sm"
+									align="center"
+									style={{
+										padding: '0.5rem',
+										borderRadius: '0.375rem',
+										border: '1px solid hsl(var(--border))',
+										backgroundColor: 'hsl(var(--background))',
+										minHeight: '42px',
+									}}
+								>
 									{account.accountMembers.map((am) => (
 										<HStack
 											key={am.id}
@@ -909,27 +1203,54 @@ export default function AccountDetailPage() {
 												borderRadius: '0.375rem',
 												backgroundColor: 'hsl(var(--muted))',
 												transition: 'opacity 0.2s',
-												opacity: removeMemberMutation.isPending && removeMemberMutation.variables?.memberId === am.memberId ? 0.5 : 1
+												opacity:
+													removeMemberMutation.isPending &&
+													removeMemberMutation.variables?.memberId === am.memberId
+														? 0.5
+														: 1,
 											}}
 										>
 											<Flex
 												align="center"
 												justify="center"
-												style={{ height: '1.25rem', width: '1.25rem', borderRadius: '9999px', color: 'white', fontSize: '0.75rem', fontWeight: 500, backgroundColor: am.member.color || '#6b7280' }}
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													borderRadius: '9999px',
+													color: 'white',
+													fontSize: '0.75rem',
+													fontWeight: 500,
+													backgroundColor: am.member.color || '#6b7280',
+												}}
 											>
-												{removeMemberMutation.isPending && removeMemberMutation.variables?.memberId === am.memberId ? (
-													<Loader2 style={{ height: '0.75rem', width: '0.75rem', animation: 'spin 1s linear infinite' }} />
+												{removeMemberMutation.isPending &&
+												removeMemberMutation.variables?.memberId === am.memberId ? (
+													<Loader2
+														style={{
+															height: '0.75rem',
+															width: '0.75rem',
+															animation: 'spin 1s linear infinite',
+														}}
+													/>
 												) : (
 													am.member.name.charAt(0).toUpperCase()
 												)}
 											</Flex>
-											<Text as="span" weight="medium">{am.member.name}</Text>
+											<Text as="span" weight="medium">
+												{am.member.name}
+											</Text>
 											<Button
 												variant="ghost"
 												size="icon"
 												onClick={() => removeMemberFromAccount(am.memberId)}
 												disabled={removeMemberMutation.isPending || addMemberMutation.isPending}
-												style={{ height: '1.25rem', width: '1.25rem', borderRadius: '0.25rem', color: 'hsl(var(--muted-foreground))', transition: 'all 0.2s' }}
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													borderRadius: '0.25rem',
+													color: 'hsl(var(--muted-foreground))',
+													transition: 'all 0.2s',
+												}}
 											>
 												<X style={{ height: '0.75rem', width: '0.75rem' }} />
 											</Button>
@@ -940,17 +1261,46 @@ export default function AccountDetailPage() {
 										<HStack
 											gap="xs"
 											align="center"
-											style={{ display: 'inline-flex', paddingLeft: '0.375rem', paddingRight: '0.5rem', paddingTop: '0.25rem', paddingBottom: '0.25rem', fontSize: '0.875rem', borderRadius: '0.375rem', backgroundColor: 'hsl(var(--muted) / 0.5)', animation: 'pulse 2s ease-in-out infinite' }}
+											style={{
+												display: 'inline-flex',
+												paddingLeft: '0.375rem',
+												paddingRight: '0.5rem',
+												paddingTop: '0.25rem',
+												paddingBottom: '0.25rem',
+												fontSize: '0.875rem',
+												borderRadius: '0.375rem',
+												backgroundColor: 'hsl(var(--muted) / 0.5)',
+												animation: 'pulse 2s ease-in-out infinite',
+											}}
 										>
 											<Flex
 												align="center"
 												justify="center"
-												style={{ height: '1.25rem', width: '1.25rem', borderRadius: '9999px', color: 'white', fontSize: '0.75rem', fontWeight: 500, backgroundColor: allMembers?.find(m => m.id === addMemberMutation.variables?.memberId)?.color || '#6b7280' }}
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													borderRadius: '9999px',
+													color: 'white',
+													fontSize: '0.75rem',
+													fontWeight: 500,
+													backgroundColor:
+														allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
+															?.color || '#6b7280',
+												}}
 											>
-												<Loader2 style={{ height: '0.75rem', width: '0.75rem', animation: 'spin 1s linear infinite' }} />
+												<Loader2
+													style={{
+														height: '0.75rem',
+														width: '0.75rem',
+														animation: 'spin 1s linear infinite',
+													}}
+												/>
 											</Flex>
 											<Text as="span" weight="medium" color="muted">
-												{allMembers?.find(m => m.id === addMemberMutation.variables?.memberId)?.name}
+												{
+													allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
+														?.name
+												}
 											</Text>
 										</HStack>
 									)}
@@ -961,25 +1311,66 @@ export default function AccountDetailPage() {
 											size="sm"
 											onClick={() => setShowMemberDropdown(!showMemberDropdown)}
 											disabled={addMemberMutation.isPending || removeMemberMutation.isPending}
-											style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.5rem', borderRadius: '0.375rem', fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', transition: 'all 0.2s' }}
+											style={{
+												display: 'inline-flex',
+												alignItems: 'center',
+												gap: '0.25rem',
+												padding: '0.25rem 0.5rem',
+												borderRadius: '0.375rem',
+												fontSize: '0.875rem',
+												color: 'hsl(var(--muted-foreground))',
+												transition: 'all 0.2s',
+											}}
 										>
 											<Plus style={{ height: '1rem', width: '1rem' }} />
 											Ajouter
 										</Button>
 										{showMemberDropdown && (
-											<Box style={{ position: 'absolute', top: '100%', left: 0, marginTop: '0.25rem', zIndex: 50, minWidth: '180px', padding: '0.25rem', borderRadius: '0.375rem', border: '1px solid hsl(var(--border))', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', backgroundColor: 'hsl(var(--popover))' }}>
+											<Box
+												style={{
+													position: 'absolute',
+													top: '100%',
+													left: 0,
+													marginTop: '0.25rem',
+													zIndex: 50,
+													minWidth: '180px',
+													padding: '0.25rem',
+													borderRadius: '0.375rem',
+													border: '1px solid hsl(var(--border))',
+													boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+													backgroundColor: 'hsl(var(--popover))',
+												}}
+											>
 												{availableMembers.map((member) => (
 													<Button
 														key={member.id}
 														variant="ghost"
 														onClick={() => addMemberToAccount(member.id)}
 														fullWidth
-														style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.875rem', justifyContent: 'flex-start', textAlign: 'left', transition: 'all 0.2s' }}
+														style={{
+															display: 'flex',
+															alignItems: 'center',
+															gap: '0.5rem',
+															padding: '0.375rem 0.5rem',
+															borderRadius: '0.25rem',
+															fontSize: '0.875rem',
+															justifyContent: 'flex-start',
+															textAlign: 'left',
+															transition: 'all 0.2s',
+														}}
 													>
 														<Flex
 															align="center"
 															justify="center"
-															style={{ height: '1.25rem', width: '1.25rem', borderRadius: '9999px', color: 'white', fontSize: '0.75rem', fontWeight: 500, backgroundColor: member.color || '#6b7280' }}
+															style={{
+																height: '1.25rem',
+																width: '1.25rem',
+																borderRadius: '9999px',
+																color: 'white',
+																fontSize: '0.75rem',
+																fontWeight: 500,
+																backgroundColor: member.color || '#6b7280',
+															}}
 														>
 															{member.name.charAt(0).toUpperCase()}
 														</Flex>
@@ -987,7 +1378,9 @@ export default function AccountDetailPage() {
 													</Button>
 												))}
 												{availableMembers.length === 0 && (
-													<Text size="sm" color="muted" style={{ padding: '0.25rem 0.5rem' }}>Tous les membres sont ajoutés</Text>
+													<Text size="sm" color="muted" style={{ padding: '0.25rem 0.5rem' }}>
+														Tous les membres sont ajoutés
+													</Text>
 												)}
 											</Box>
 										)}
@@ -998,13 +1391,25 @@ export default function AccountDetailPage() {
 							{/* Export URL */}
 							<VStack gap="xs">
 								<HStack justify="between" align="center">
-									<label htmlFor="settings-export-url" style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}>Lien d&apos;export banque</label>
+									<label
+										htmlFor="settings-export-url"
+										style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+									>
+										Lien d&apos;export banque
+									</label>
 									{account.exportUrl && (
 										<a
 											href={account.exportUrl}
 											target="_blank"
 											rel="noopener noreferrer"
-											style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'hsl(var(--primary))', textDecoration: 'none' }}
+											style={{
+												display: 'inline-flex',
+												alignItems: 'center',
+												gap: '0.25rem',
+												fontSize: '0.75rem',
+												color: 'hsl(var(--primary))',
+												textDecoration: 'none',
+											}}
 										>
 											<span>Ouvrir</span>
 											<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
@@ -1014,10 +1419,11 @@ export default function AccountDetailPage() {
 								<Input
 									id="settings-export-url"
 									type="url"
-									value={exportUrlInput !== '' ? exportUrlInput : (account.exportUrl || '')}
+									value={exportUrlInput !== '' ? exportUrlInput : account.exportUrl || ''}
 									onChange={(e) => setExportUrlInput(e.target.value)}
 									onBlur={() => {
-										const currentValue = exportUrlInput !== '' ? exportUrlInput : (account.exportUrl || '');
+										const currentValue =
+											exportUrlInput !== '' ? exportUrlInput : account.exportUrl || '';
 										if (currentValue !== (account.exportUrl || '')) {
 											saveExportUrl();
 										}
@@ -1032,17 +1438,31 @@ export default function AccountDetailPage() {
 
 							{/* Initial Balance */}
 							<VStack gap="xs">
-								<Text size="sm" color="muted">Solde initial</Text>
+								<Text size="sm" color="muted">
+									Solde initial
+								</Text>
 								<HStack gap="sm">
 									<Box grow style={{ position: 'relative' }}>
 										<Input
 											type="text"
-											value={editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0')}
+											value={
+												editInitialBalance !== ''
+													? editInitialBalance
+													: account.initialBalance?.toString() || '0'
+											}
 											onChange={(e) => setEditInitialBalance(e.target.value)}
 											onBlur={() => {
-												const currentValue = editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0');
-												if (currentValue !== (account.initialBalance?.toString() || '0') ||
-													editInitialBalanceDate !== (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '')) {
+												const currentValue =
+													editInitialBalance !== ''
+														? editInitialBalance
+														: account.initialBalance?.toString() || '0';
+												if (
+													currentValue !== (account.initialBalance?.toString() || '0') ||
+													editInitialBalanceDate !==
+														(account.initialBalanceDate
+															? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+															: '')
+												) {
 													saveInitialBalance();
 												}
 											}}
@@ -1050,24 +1470,61 @@ export default function AccountDetailPage() {
 												if (editInitialBalance === '') {
 													setEditInitialBalance(account.initialBalance?.toString() || '0');
 													if (account.initialBalanceDate) {
-														setEditInitialBalanceDate(new Date(account.initialBalanceDate).toISOString().split('T')[0]);
+														setEditInitialBalanceDate(
+															new Date(account.initialBalanceDate).toISOString().split('T')[0],
+														);
 													}
 												}
 											}}
 											placeholder="0,00"
-											style={{ height: '2.5rem', fontSize: '0.875rem', fontFamily: 'monospace', paddingRight: '3rem' }}
+											style={{
+												height: '2.5rem',
+												fontSize: '0.875rem',
+												fontFamily: 'monospace',
+												paddingRight: '3rem',
+											}}
 										/>
-										<span style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}>EUR</span>
+										<span
+											style={{
+												position: 'absolute',
+												right: '0.75rem',
+												top: '50%',
+												transform: 'translateY(-50%)',
+												fontSize: '0.875rem',
+												color: 'hsl(var(--muted-foreground))',
+											}}
+										>
+											EUR
+										</span>
 									</Box>
 									<Input
 										type="date"
-										value={editInitialBalanceDate !== '' ? editInitialBalanceDate : (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '')}
+										value={
+											editInitialBalanceDate !== ''
+												? editInitialBalanceDate
+												: account.initialBalanceDate
+													? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+													: ''
+										}
 										onChange={(e) => setEditInitialBalanceDate(e.target.value)}
 										onBlur={() => {
-											const currentBalanceDate = editInitialBalanceDate !== '' ? editInitialBalanceDate : (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '');
-											const currentBalance = editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0');
-											if (currentBalanceDate !== (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '') ||
-												currentBalance !== (account.initialBalance?.toString() || '0')) {
+											const currentBalanceDate =
+												editInitialBalanceDate !== ''
+													? editInitialBalanceDate
+													: account.initialBalanceDate
+														? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+														: '';
+											const currentBalance =
+												editInitialBalance !== ''
+													? editInitialBalance
+													: account.initialBalance?.toString() || '0';
+											if (
+												currentBalanceDate !==
+													(account.initialBalanceDate
+														? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+														: '') ||
+												currentBalance !== (account.initialBalance?.toString() || '0')
+											) {
 												saveInitialBalance();
 											}
 										}}
@@ -1075,7 +1532,9 @@ export default function AccountDetailPage() {
 											if (editInitialBalanceDate === '') {
 												setEditInitialBalance(account.initialBalance?.toString() || '0');
 												if (account.initialBalanceDate) {
-													setEditInitialBalanceDate(new Date(account.initialBalanceDate).toISOString().split('T')[0]);
+													setEditInitialBalanceDate(
+														new Date(account.initialBalanceDate).toISOString().split('T')[0],
+													);
 												}
 											}
 										}}
@@ -1086,12 +1545,30 @@ export default function AccountDetailPage() {
 						</VStack>
 
 						{/* Section 2: Imports */}
-						<VStack gap="sm" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1rem', paddingBottom: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
+						<VStack
+							gap="sm"
+							style={{
+								paddingLeft: '1rem',
+								paddingRight: '1rem',
+								paddingTop: '1rem',
+								paddingBottom: '1rem',
+								borderBottom: '1px solid hsl(var(--border))',
+							}}
+						>
 							<HStack justify="between" align="center">
-								<Text size="xs" weight="semibold" color="muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+								<Text
+									size="xs"
+									weight="semibold"
+									color="muted"
+									style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+								>
 									Imports
 									{accountImports.length > 0 && (
-										<span style={{ marginLeft: '0.25rem', color: 'hsl(var(--muted-foreground) / 0.6)' }}>({accountImports.length})</span>
+										<span
+											style={{ marginLeft: '0.25rem', color: 'hsl(var(--muted-foreground) / 0.6)' }}
+										>
+											({accountImports.length})
+										</span>
 									)}
 								</Text>
 								{accountImports.length > 5 && (
@@ -1107,9 +1584,29 @@ export default function AccountDetailPage() {
 							</HStack>
 
 							{accountImports.length === 0 ? (
-								<Box style={{ textAlign: 'center', paddingTop: '1.5rem', paddingBottom: '1.5rem', borderRadius: '0.5rem', border: '1px dashed hsl(var(--border))', backgroundColor: 'hsl(var(--muted) / 0.2)' }}>
-									<FileSpreadsheet style={{ height: '1.5rem', width: '1.5rem', marginLeft: 'auto', marginRight: 'auto', color: 'hsl(var(--muted-foreground) / 0.4)', marginBottom: '0.5rem' }} />
-									<Text size="xs" color="muted">Aucun import</Text>
+								<Box
+									style={{
+										textAlign: 'center',
+										paddingTop: '1.5rem',
+										paddingBottom: '1.5rem',
+										borderRadius: '0.5rem',
+										border: '1px dashed hsl(var(--border))',
+										backgroundColor: 'hsl(var(--muted) / 0.2)',
+									}}
+								>
+									<FileSpreadsheet
+										style={{
+											height: '1.5rem',
+											width: '1.5rem',
+											marginLeft: 'auto',
+											marginRight: 'auto',
+											color: 'hsl(var(--muted-foreground) / 0.4)',
+											marginBottom: '0.5rem',
+										}}
+									/>
+									<Text size="xs" color="muted">
+										Aucun import
+									</Text>
 								</Box>
 							) : (
 								<VStack gap="sm">
@@ -1123,8 +1620,12 @@ export default function AccountDetailPage() {
 												fontSize: '0.875rem',
 												borderRadius: '0.5rem',
 												border: '1px solid',
-												backgroundColor: imp.status === 'FAILED' ? 'hsl(var(--destructive) / 0.05)' : 'hsl(var(--muted) / 0.2)',
-												borderColor: imp.status === 'FAILED' ? 'hsl(var(--destructive) / 0.2)' : 'transparent'
+												backgroundColor:
+													imp.status === 'FAILED'
+														? 'hsl(var(--destructive) / 0.05)'
+														: 'hsl(var(--muted) / 0.2)',
+												borderColor:
+													imp.status === 'FAILED' ? 'hsl(var(--destructive) / 0.2)' : 'transparent',
 											}}
 										>
 											<Flex
@@ -1135,20 +1636,37 @@ export default function AccountDetailPage() {
 													width: '1.5rem',
 													flexShrink: 0,
 													borderRadius: '0.375rem',
-													backgroundColor: imp.status === 'PROCESSED' ? 'oklch(0.55 0.15 145 / 0.1)' :
-														imp.status === 'FAILED' ? 'hsl(var(--destructive) / 0.1)' :
-														imp.status === 'PROCESSING' ? 'hsl(var(--primary) / 0.1)' :
-														'hsl(var(--muted))'
+													backgroundColor:
+														imp.status === 'PROCESSED'
+															? 'oklch(0.55 0.15 145 / 0.1)'
+															: imp.status === 'FAILED'
+																? 'hsl(var(--destructive) / 0.1)'
+																: imp.status === 'PROCESSING'
+																	? 'hsl(var(--primary) / 0.1)'
+																	: 'hsl(var(--muted))',
 												}}
 											>
 												{getStatusIcon(imp.status)}
 											</Flex>
 											<Flex direction="col" grow minW0>
-												<Text size="xs" weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{imp.filename}</Text>
+												<Text
+													size="xs"
+													weight="medium"
+													style={{
+														overflow: 'hidden',
+														textOverflow: 'ellipsis',
+														whiteSpace: 'nowrap',
+													}}
+												>
+													{imp.filename}
+												</Text>
 												<Text style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))' }}>
 													{formatRelativeTime(imp.createdAt)}
 													{imp.recordsCount !== null && (
-														<Text as="span" style={{ color: 'oklch(0.5 0.15 145)' }}> • {imp.recordsCount} tx</Text>
+														<Text as="span" style={{ color: 'oklch(0.5 0.15 145)' }}>
+															{' '}
+															• {imp.recordsCount} tx
+														</Text>
 													)}
 												</Text>
 											</Flex>
@@ -1161,8 +1679,15 @@ export default function AccountDetailPage() {
 														disabled={processImportMutation.isPending}
 														style={{ height: '1.5rem', padding: '0 0.5rem', fontSize: '0.75rem' }}
 													>
-														{processImportMutation.isPending && processImportMutation.variables?.importId === imp.id ? (
-															<Loader2 style={{ height: '0.75rem', width: '0.75rem', animation: 'spin 1s linear infinite' }} />
+														{processImportMutation.isPending &&
+														processImportMutation.variables?.importId === imp.id ? (
+															<Loader2
+																style={{
+																	height: '0.75rem',
+																	width: '0.75rem',
+																	animation: 'spin 1s linear infinite',
+																}}
+															/>
 														) : (
 															'Traiter'
 														)}
@@ -1177,8 +1702,15 @@ export default function AccountDetailPage() {
 														disabled={reprocessImportMutation.isPending}
 														style={{ height: '1.5rem', width: '1.5rem' }}
 													>
-														{reprocessImportMutation.isPending && reprocessImportMutation.variables?.importId === imp.id ? (
-															<Loader2 style={{ height: '0.75rem', width: '0.75rem', animation: 'spin 1s linear infinite' }} />
+														{reprocessImportMutation.isPending &&
+														reprocessImportMutation.variables?.importId === imp.id ? (
+															<Loader2
+																style={{
+																	height: '0.75rem',
+																	width: '0.75rem',
+																	animation: 'spin 1s linear infinite',
+																}}
+															/>
 														) : (
 															<RotateCcw style={{ height: '0.75rem', width: '0.75rem' }} />
 														)}
@@ -1193,8 +1725,15 @@ export default function AccountDetailPage() {
 														disabled={processImportMutation.isPending}
 														style={{ height: '1.5rem', width: '1.5rem' }}
 													>
-														{processImportMutation.isPending && processImportMutation.variables?.importId === imp.id ? (
-															<Loader2 style={{ height: '0.75rem', width: '0.75rem', animation: 'spin 1s linear infinite' }} />
+														{processImportMutation.isPending &&
+														processImportMutation.variables?.importId === imp.id ? (
+															<Loader2
+																style={{
+																	height: '0.75rem',
+																	width: '0.75rem',
+																	animation: 'spin 1s linear infinite',
+																}}
+															/>
 														) : (
 															<RefreshCw style={{ height: '0.75rem', width: '0.75rem' }} />
 														)}
@@ -1205,10 +1744,20 @@ export default function AccountDetailPage() {
 													size="icon"
 													onClick={() => setDeleteImportId(imp.id)}
 													disabled={deleteImportMutation.isPending}
-													style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
+													style={{
+														height: '1.5rem',
+														width: '1.5rem',
+														color: 'hsl(var(--muted-foreground))',
+													}}
 												>
 													{deleteImportMutation.isPending && deleteImportId === imp.id ? (
-														<Loader2 style={{ height: '0.75rem', width: '0.75rem', animation: 'spin 1s linear infinite' }} />
+														<Loader2
+															style={{
+																height: '0.75rem',
+																width: '0.75rem',
+																animation: 'spin 1s linear infinite',
+															}}
+														/>
 													) : (
 														<Trash2 style={{ height: '0.75rem', width: '0.75rem' }} />
 													)}
@@ -1221,8 +1770,23 @@ export default function AccountDetailPage() {
 						</VStack>
 
 						{/* Section 3: Gestion du compte */}
-						<VStack gap="sm" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
-							<Text size="xs" weight="semibold" color="muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Gestion du compte</Text>
+						<VStack
+							gap="sm"
+							style={{
+								paddingLeft: '1rem',
+								paddingRight: '1rem',
+								paddingTop: '0.5rem',
+								paddingBottom: '0.5rem',
+							}}
+						>
+							<Text
+								size="xs"
+								weight="semibold"
+								color="muted"
+								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+							>
+								Gestion du compte
+							</Text>
 							<Button
 								variant="outline"
 								size="sm"
@@ -1231,14 +1795,28 @@ export default function AccountDetailPage() {
 									setShowSettings(false);
 									setDeleteAccountOpen(true);
 								}}
-								style={{ height: '2rem', fontSize: '0.75rem', color: 'hsl(var(--destructive))', borderColor: 'hsl(var(--destructive) / 0.3)' }}
+								style={{
+									height: '2rem',
+									fontSize: '0.75rem',
+									color: 'hsl(var(--destructive))',
+									borderColor: 'hsl(var(--destructive) / 0.3)',
+								}}
 							>
 								<Trash2 style={{ height: '0.75rem', width: '0.75rem', marginRight: '0.375rem' }} />
 								Supprimer le compte
 							</Button>
 							{account._count.transactions > 0 && (
-								<Text style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))', textAlign: 'center' }}>
-									{account._count.transactions} transaction{account._count.transactions > 1 ? 's' : ''} sera{account._count.transactions > 1 ? 'ont' : ''} également supprimée{account._count.transactions > 1 ? 's' : ''}
+								<Text
+									style={{
+										fontSize: '11px',
+										color: 'hsl(var(--muted-foreground))',
+										textAlign: 'center',
+									}}
+								>
+									{account._count.transactions} transaction
+									{account._count.transactions > 1 ? 's' : ''} sera
+									{account._count.transactions > 1 ? 'ont' : ''} également supprimée
+									{account._count.transactions > 1 ? 's' : ''}
 								</Text>
 							)}
 						</VStack>
@@ -1254,9 +1832,24 @@ export default function AccountDetailPage() {
 						{/* Title row */}
 						<HStack justify="between" align="center">
 							<HStack gap="sm" align="center">
-								<Heading level={2} size="xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>Transactions</Heading>
+								<Heading level={2} size="xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
+									Transactions
+								</Heading>
 								{totalTransactions > 0 && (
-									<Text as="span" size="xs" weight="semibold" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.125rem 0.625rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<Text
+										as="span"
+										size="xs"
+										weight="semibold"
+										style={{
+											display: 'inline-flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											padding: '0.125rem 0.625rem',
+											borderRadius: '9999px',
+											backgroundColor: 'hsl(var(--primary) / 0.1)',
+											color: 'hsl(var(--primary))',
+										}}
+									>
 										{totalTransactions}
 									</Text>
 								)}
@@ -1273,11 +1866,22 @@ export default function AccountDetailPage() {
 								<Button
 									disabled={isUploading}
 									asChild
-									style={{ gap: '0.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', transition: 'all 0.2s' }}
+									style={{
+										gap: '0.5rem',
+										borderRadius: '0.75rem',
+										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+										transition: 'all 0.2s',
+									}}
 								>
 									<span>
 										{isUploading ? (
-											<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
+											<Loader2
+												style={{
+													height: '1rem',
+													width: '1rem',
+													animation: 'spin 1s linear infinite',
+												}}
+											/>
 										) : (
 											<Upload style={{ height: '1rem', width: '1rem' }} />
 										)}
@@ -1288,12 +1892,32 @@ export default function AccountDetailPage() {
 						</HStack>
 						{/* Search row */}
 						<Box style={{ position: 'relative' }}>
-							<Search style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', height: '1.25rem', width: '1.25rem', color: 'hsl(var(--muted-foreground))', transition: 'color 0.2s' }} />
+							<Search
+								style={{
+									position: 'absolute',
+									left: '1rem',
+									top: '50%',
+									transform: 'translateY(-50%)',
+									height: '1.25rem',
+									width: '1.25rem',
+									color: 'hsl(var(--muted-foreground))',
+									transition: 'color 0.2s',
+								}}
+							/>
 							<Input
 								placeholder="Rechercher une transaction..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								style={{ paddingLeft: '3rem', height: '3rem', fontSize: '1rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--background) / 0.6)', borderColor: 'hsl(var(--border) / 0.3)', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+								style={{
+									paddingLeft: '3rem',
+									height: '3rem',
+									fontSize: '1rem',
+									borderRadius: '0.75rem',
+									backgroundColor: 'hsl(var(--background) / 0.6)',
+									borderColor: 'hsl(var(--border) / 0.3)',
+									transition: 'all 0.2s',
+									boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+								}}
 							/>
 						</Box>
 					</VStack>
@@ -1306,25 +1930,49 @@ export default function AccountDetailPage() {
 					onDragLeave={handleDrag}
 					onDragOver={handleDrag}
 					onDrop={handleDrop}
-					style={{ position: 'relative', paddingLeft: '1.5rem', paddingRight: '1.5rem', paddingBottom: '1.5rem', backgroundColor: dragActive ? 'hsl(var(--primary) / 0.05)' : 'transparent' }}
+					style={{
+						position: 'relative',
+						paddingLeft: '1.5rem',
+						paddingRight: '1.5rem',
+						paddingBottom: '1.5rem',
+						backgroundColor: dragActive ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+					}}
 				>
 					{/* Drag overlay */}
 					{dragActive && (
 						<Flex
 							align="center"
 							justify="center"
-							style={{ position: 'absolute', inset: 0, margin: '0.5rem', borderRadius: '1rem', background: 'linear-gradient(to bottom right, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.05))', border: '2px dashed hsl(var(--primary) / 0.5)', zIndex: 10 }}
+							style={{
+								position: 'absolute',
+								inset: 0,
+								margin: '0.5rem',
+								borderRadius: '1rem',
+								background:
+									'linear-gradient(to bottom right, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.05))',
+								border: '2px dashed hsl(var(--primary) / 0.5)',
+								zIndex: 10,
+							}}
 						>
 							<VStack gap="sm" align="center">
 								<Flex
 									align="center"
 									justify="center"
-									style={{ height: '4rem', width: '4rem', borderRadius: '1rem', backgroundColor: 'hsl(var(--primary) / 0.1)' }}
+									style={{
+										height: '4rem',
+										width: '4rem',
+										borderRadius: '1rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+									}}
 								>
 									<Upload style={{ height: '2rem', width: '2rem', color: 'hsl(var(--primary))' }} />
 								</Flex>
-								<Text size="sm" weight="semibold" style={{ color: 'hsl(var(--primary))' }}>Déposez votre fichier ici</Text>
-								<Text size="xs" style={{ color: 'hsl(var(--primary) / 0.7)' }}>CSV, XLSX ou XLS</Text>
+								<Text size="sm" weight="semibold" style={{ color: 'hsl(var(--primary))' }}>
+									Déposez votre fichier ici
+								</Text>
+								<Text size="xs" style={{ color: 'hsl(var(--primary) / 0.7)' }}>
+									CSV, XLSX ou XLS
+								</Text>
 							</VStack>
 						</Flex>
 					)}
@@ -1351,14 +1999,35 @@ export default function AccountDetailPage() {
 										borderRadius: '0.75rem',
 										transition: 'all 0.2s',
 										cursor: 'default',
-										animationDelay: `${Math.min(index, 10) * 20}ms`
+										animationDelay: `${Math.min(index, 10) * 20}ms`,
 									}}
 								>
 									<HStack gap="md" align="center" minW0>
 										{/* Date badge */}
 										<Box style={{ width: '4rem', flexShrink: 0 }}>
-											<VStack gap="none" align="center" style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem', paddingTop: '0.375rem', paddingBottom: '0.375rem', borderRadius: '0.5rem', backgroundColor: 'hsl(var(--muted) / 0.4)', display: 'inline-flex', transition: 'background-color 0.2s' }}>
-												<Text style={{ fontSize: '10px', fontWeight: 600, color: 'hsl(var(--muted-foreground))', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+											<VStack
+												gap="none"
+												align="center"
+												style={{
+													paddingLeft: '0.5rem',
+													paddingRight: '0.5rem',
+													paddingTop: '0.375rem',
+													paddingBottom: '0.375rem',
+													borderRadius: '0.5rem',
+													backgroundColor: 'hsl(var(--muted) / 0.4)',
+													display: 'inline-flex',
+													transition: 'background-color 0.2s',
+												}}
+											>
+												<Text
+													style={{
+														fontSize: '10px',
+														fontWeight: 600,
+														color: 'hsl(var(--muted-foreground))',
+														textTransform: 'uppercase',
+														letterSpacing: '0.05em',
+													}}
+												>
 													{formatDate(tx.date, 'MMM')}
 												</Text>
 												<Text size="sm" weight="bold" style={{ marginTop: '-0.125rem' }}>
@@ -1367,13 +2036,25 @@ export default function AccountDetailPage() {
 											</VStack>
 										</Box>
 										<VStack gap="none" minW0>
-											<Text weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', transition: 'color 0.2s' }}>
+											<Text
+												weight="medium"
+												style={{
+													overflow: 'hidden',
+													textOverflow: 'ellipsis',
+													whiteSpace: 'nowrap',
+													transition: 'color 0.2s',
+												}}
+											>
 												{tx.description}
 											</Text>
 											{tx.transactionCategory?.category && (
 												<HStack gap="xs" align="center" style={{ marginTop: '0.125rem' }}>
-													<Text as="span" size="xs" color="muted">{tx.transactionCategory.category.icon}</Text>
-													<Text as="span" size="xs" color="muted">{tx.transactionCategory.category.name}</Text>
+													<Text as="span" size="xs" color="muted">
+														{tx.transactionCategory.category.icon}
+													</Text>
+													<Text as="span" size="xs" color="muted">
+														{tx.transactionCategory.category.name}
+													</Text>
 												</HStack>
 											)}
 										</VStack>
@@ -1394,10 +2075,31 @@ export default function AccountDetailPage() {
 								{isLoadingMore ? (
 									<HStack gap="sm" justify="center" align="center">
 										<Box style={{ position: 'relative' }}>
-											<Box style={{ height: '2rem', width: '2rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--primary) / 0.1)', animation: 'pulse 2s ease-in-out infinite' }} />
-											<Loader2 style={{ height: '1.25rem', width: '1.25rem', animation: 'spin 1s linear infinite', color: 'hsl(var(--primary))', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+											<Box
+												style={{
+													height: '2rem',
+													width: '2rem',
+													borderRadius: '9999px',
+													backgroundColor: 'hsl(var(--primary) / 0.1)',
+													animation: 'pulse 2s ease-in-out infinite',
+												}}
+											/>
+											<Loader2
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													animation: 'spin 1s linear infinite',
+													color: 'hsl(var(--primary))',
+													position: 'absolute',
+													top: '50%',
+													left: '50%',
+													transform: 'translate(-50%, -50%)',
+												}}
+											/>
 										</Box>
-										<Text size="sm" color="muted" weight="medium">Chargement...</Text>
+										<Text size="sm" color="muted" weight="medium">
+											Chargement...
+										</Text>
 									</HStack>
 								) : hasMore ? (
 									<Flex direction="col" align="center" gap="sm">
@@ -1405,14 +2107,29 @@ export default function AccountDetailPage() {
 											variant="ghost"
 											size="sm"
 											onClick={loadMore}
-											style={{ color: 'hsl(var(--muted-foreground))', borderRadius: '0.75rem', transition: 'all 0.2s' }}
+											style={{
+												color: 'hsl(var(--muted-foreground))',
+												borderRadius: '0.75rem',
+												transition: 'all 0.2s',
+											}}
 										>
 											Charger plus de transactions
 										</Button>
 									</Flex>
 								) : allTransactions.length > 0 ? (
-									<HStack justify="center" align="center" gap="sm" style={{ paddingTop: '1rem', borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
-										<CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground) / 0.5)' }} />
+									<HStack
+										justify="center"
+										align="center"
+										gap="sm"
+										style={{ paddingTop: '1rem', borderTop: '1px solid hsl(var(--border) / 0.3)' }}
+									>
+										<CheckCircle2
+											style={{
+												height: '1rem',
+												width: '1rem',
+												color: 'hsl(var(--muted-foreground) / 0.5)',
+											}}
+										/>
 										<Text size="sm" color="muted">
 											{allTransactions.length} transactions affichées
 										</Text>

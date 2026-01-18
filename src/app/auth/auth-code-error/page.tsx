@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import {
 	AlertTriangle,
 	ArrowLeft,
-	RefreshCw,
-	Wallet,
 	Box,
-	VStack,
-	Flex,
-	Heading,
-	Text,
 	Button,
+	Flex,
 	GlassCard,
+	Heading,
+	RefreshCw,
+	Text,
+	VStack,
+	Wallet,
 } from '@/components';
 
 export default function AuthCodeErrorPage() {
@@ -72,7 +72,8 @@ export default function AuthCodeErrorPage() {
 							width: '4rem',
 							alignItems: 'center',
 							justifyContent: 'center',
-							background: 'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
+							background:
+								'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
 						}}
 					>
 						<Wallet style={{ height: '2rem', width: '2rem', color: 'white' }} />
@@ -95,7 +96,9 @@ export default function AuthCodeErrorPage() {
 									backgroundColor: 'oklch(0.9 0.05 25)',
 								}}
 							>
-								<AlertTriangle style={{ height: '2rem', width: '2rem', color: 'oklch(0.55 0.2 25)' }} />
+								<AlertTriangle
+									style={{ height: '2rem', width: '2rem', color: 'oklch(0.55 0.2 25)' }}
+								/>
 							</Box>
 
 							{/* Title */}
@@ -105,8 +108,8 @@ export default function AuthCodeErrorPage() {
 
 							{/* Description */}
 							<Text color="muted" align="center">
-								Une erreur s'est produite lors de la connexion avec Google.
-								Veuillez réessayer ou contacter le support si le problème persiste.
+								Une erreur s'est produite lors de la connexion avec Google. Veuillez réessayer ou
+								contacter le support si le problème persiste.
 							</Text>
 
 							{/* Actions */}

@@ -24,7 +24,7 @@ describe('Sidebar', () => {
 		const { container } = render(
 			<SidebarProvider>
 				<div data-testid="child">Content</div>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		expect(screen.getByTestId('child')).toBeInTheDocument();
 		expect(container.querySelector('[data-slot="sidebar-wrapper"]')).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('Sidebar', () => {
 				<Sidebar>
 					<SidebarHeader data-testid="header">Header Content</SidebarHeader>
 				</Sidebar>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		expect(screen.getByTestId('header')).toMatchInlineSnapshot(`
 			<div
@@ -56,7 +56,7 @@ describe('Sidebar', () => {
 				<Sidebar>
 					<SidebarContent data-testid="content">Content</SidebarContent>
 				</Sidebar>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		expect(screen.getByTestId('content')).toMatchInlineSnapshot(`
 			<div
@@ -76,7 +76,7 @@ describe('Sidebar', () => {
 				<Sidebar>
 					<SidebarFooter data-testid="footer">Footer Content</SidebarFooter>
 				</Sidebar>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		expect(screen.getByTestId('footer')).toMatchInlineSnapshot(`
 			<div
@@ -101,7 +101,7 @@ describe('Sidebar', () => {
 						</SidebarGroup>
 					</SidebarContent>
 				</Sidebar>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		expect(screen.getByTestId('label')).toMatchInlineSnapshot(`
 			<div
@@ -131,7 +131,7 @@ describe('Sidebar', () => {
 						</SidebarGroup>
 					</SidebarContent>
 				</Sidebar>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		expect(screen.getByTestId('menu')).toMatchInlineSnapshot(`
 			<ul
@@ -175,7 +175,7 @@ describe('Sidebar', () => {
 						</SidebarMenu>
 					</SidebarContent>
 				</Sidebar>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		expect(screen.getByTestId('active-button')).toHaveAttribute('data-active', 'true');
 	});
@@ -186,7 +186,7 @@ describe('Sidebar', () => {
 				<Sidebar>
 					<SidebarContent>Content</SidebarContent>
 				</Sidebar>
-			</SidebarProvider>
+			</SidebarProvider>,
 		);
 		const sidebarInner = container.querySelector('[data-slot="sidebar-inner"]');
 		expect(sidebarInner).toHaveClass('backdrop-blur-xl');

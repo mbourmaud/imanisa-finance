@@ -4,8 +4,8 @@
  * 1:1 relationship with Property
  */
 
-import { prisma } from '@/lib/prisma';
 import type { CoOwnership } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Types
 export interface CreateCoOwnershipDTO {

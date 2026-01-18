@@ -7,32 +7,32 @@
  * Uses TanStack Query for data fetching.
  */
 
-import { useMemo } from 'react';
 import Link from 'next/link';
+import { useMemo } from 'react';
 import {
+	Box,
 	Building,
+	Button,
 	ChevronRight,
 	CreditCard,
+	EmptyState,
+	Flex,
+	GlassCard,
+	Heading,
+	HStack,
 	Loader2,
+	PageHeader,
 	PiggyBank,
 	Plus,
-	TrendingUp,
-	Wallet,
-	Button,
-	PageHeader,
 	StatCard,
 	StatCardGrid,
-	EmptyState,
-	VStack,
-	HStack,
-	Box,
-	Flex,
 	Text,
-	Heading,
-	GlassCard,
+	TrendingUp,
+	VStack,
+	Wallet,
 } from '@/components';
-import { useAccountsQuery } from '@/features/accounts';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
+import { useAccountsQuery } from '@/features/accounts';
 import { formatMoneyCompact } from '@/shared/utils';
 
 // Account type returned by API
@@ -72,7 +72,11 @@ function getOwnerShare(account: ApiAccount): number {
 
 export default function AccountsPage() {
 	// Use TanStack Query for data fetching
-	const { data: accounts = [], isLoading, isError } = useAccountsQuery() as {
+	const {
+		data: accounts = [],
+		isLoading,
+		isError,
+	} = useAccountsQuery() as {
 		data: ApiAccount[] | undefined;
 		isLoading: boolean;
 		isError: boolean;
@@ -89,16 +93,13 @@ export default function AccountsPage() {
 				acc[type].push(account);
 				return acc;
 			},
-			{} as Record<string, ApiAccount[]>
+			{} as Record<string, ApiAccount[]>,
 		);
 	}, [accounts]);
 
 	// Calculate total balance
 	const totalBalance = useMemo(() => {
-		return accounts.reduce(
-			(sum, acc) => sum + acc.balance * (getOwnerShare(acc) / 100),
-			0
-		);
+		return accounts.reduce((sum, acc) => sum + acc.balance * (getOwnerShare(acc) / 100), 0);
 	}, [accounts]);
 
 	// Group accounts by type for display
@@ -135,8 +136,28 @@ export default function AccountsPage() {
 				title="Chargement des comptes..."
 				iconElement={
 					<Box position="relative">
-						<Box rounded="full" style={{ height: '3rem', width: '3rem', background: 'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))', animation: 'pulse 2s ease-in-out infinite' }} />
-						<Loader2 style={{ height: '1.5rem', width: '1.5rem', animation: 'spin 1s linear infinite', color: 'hsl(var(--primary))', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+						<Box
+							rounded="full"
+							style={{
+								height: '3rem',
+								width: '3rem',
+								background:
+									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
+								animation: 'pulse 2s ease-in-out infinite',
+							}}
+						/>
+						<Loader2
+							style={{
+								height: '1.5rem',
+								width: '1.5rem',
+								animation: 'spin 1s linear infinite',
+								color: 'hsl(var(--primary))',
+								position: 'absolute',
+								top: '50%',
+								left: '50%',
+								transform: 'translate(-50%, -50%)',
+							}}
+						/>
 					</Box>
 				}
 				size="md"
@@ -208,11 +229,23 @@ export default function AccountsPage() {
 						<GlassCard key={group.type} padding="lg">
 							{/* Group Header */}
 							<HStack gap="sm" align="center" style={{ marginBottom: '1rem' }}>
-								<Flex align="center" justify="center" style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										height: '2.5rem',
+										width: '2.5rem',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
 									<Icon style={{ height: '1.25rem', width: '1.25rem' }} />
 								</Flex>
 								<VStack gap="none">
-									<Heading level={3} size="lg" weight="semibold">{group.label}</Heading>
+									<Heading level={3} size="lg" weight="semibold">
+										{group.label}
+									</Heading>
 									<Text size="sm" color="muted">
 										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
 									</Text>
@@ -244,21 +277,41 @@ export default function AccountsPage() {
 													height: '2.5rem',
 													width: '2.5rem',
 													borderRadius: '0.5rem',
-													backgroundColor: account.bank?.color ? `${account.bank.color}20` : undefined,
+													backgroundColor: account.bank?.color
+														? `${account.bank.color}20`
+														: undefined,
 												}}
 											>
 												<Building
-													style={{ height: '1.25rem', width: '1.25rem', color: account.bank?.color || undefined }}
+													style={{
+														height: '1.25rem',
+														width: '1.25rem',
+														color: account.bank?.color || undefined,
+													}}
 												/>
 											</Flex>
 											<VStack gap="none">
 												<Text weight="medium">{account.name}</Text>
-												<Text size="xs" color="muted">{account.bank?.name || 'Banque'}</Text>
+												<Text size="xs" color="muted">
+													{account.bank?.name || 'Banque'}
+												</Text>
 											</VStack>
 										</HStack>
 										<HStack gap="md" align="center">
-											<MoneyDisplay amount={account.balance} format="compact" size="md" weight="semibold" />
-											<ChevronRight style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground) / 0.5)', transition: 'color 0.2s' }} />
+											<MoneyDisplay
+												amount={account.balance}
+												format="compact"
+												size="md"
+												weight="semibold"
+											/>
+											<ChevronRight
+												style={{
+													height: '1rem',
+													width: '1rem',
+													color: 'hsl(var(--muted-foreground) / 0.5)',
+													transition: 'color 0.2s',
+												}}
+											/>
 										</HStack>
 									</Link>
 								))}

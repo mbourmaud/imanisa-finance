@@ -3,32 +3,32 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
 	AlertCircle,
+	Box,
+	Button,
 	CheckCircle2,
 	Clock,
+	EmptyState,
 	FileSpreadsheet,
+	GlassCard,
+	Grid,
+	Heading,
+	HStack,
+	Label,
 	Loader2,
+	PageHeader,
 	RefreshCw,
 	RotateCcw,
-	Trash2,
-	Upload,
-	Button,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	PageHeader,
-	EmptyState,
 	StatCard,
 	StatCardGrid,
-	Box,
-	VStack,
-	HStack,
 	Text,
-	Heading,
-	GlassCard,
-	Grid,
-	Label,
+	Trash2,
+	Upload,
+	VStack,
 } from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
@@ -65,13 +65,26 @@ interface Account {
 function getStatusIcon(status: RawImport['status']) {
 	switch (status) {
 		case 'PROCESSED':
-			return <CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }} />;
+			return (
+				<CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }} />
+			);
 		case 'PROCESSING':
-			return <Loader2 style={{ height: '1rem', width: '1rem', color: 'hsl(var(--primary))', animation: 'spin 1s linear infinite' }} />;
+			return (
+				<Loader2
+					style={{
+						height: '1rem',
+						width: '1rem',
+						color: 'hsl(var(--primary))',
+						animation: 'spin 1s linear infinite',
+					}}
+				/>
+			);
 		case 'FAILED':
 			return <AlertCircle style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.2 25)' }} />;
 		default:
-			return <Clock style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />;
+			return (
+				<Clock style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+			);
 	}
 }
 
@@ -325,7 +338,11 @@ export default function ImportPage() {
 				title="Import"
 				description="Importez vos relevés bancaires et conservez les fichiers bruts"
 				actions={
-					<Button variant="outline" onClick={fetchData} iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}>
+					<Button
+						variant="outline"
+						onClick={fetchData}
+						iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
+					>
 						Actualiser
 					</Button>
 				}
@@ -365,7 +382,10 @@ export default function ImportPage() {
 						{/* Bank selector */}
 						<VStack gap="xs">
 							<Label htmlFor="import-bank-select">
-								1. Banque <Text as="span" color="muted">*</Text>
+								1. Banque{' '}
+								<Text as="span" color="muted">
+									*
+								</Text>
 							</Label>
 							<Select value={selectedBankId} onValueChange={setSelectedBankId}>
 								<SelectTrigger id="import-bank-select" style={{ width: '100%' }}>
@@ -386,8 +406,7 @@ export default function ImportPage() {
 							</Select>
 							{banks.length === 0 && !isLoading && (
 								<Text size="xs" color="muted">
-									Aucune banque configurée. Ajoutez d&apos;abord une banque dans les
-									paramètres.
+									Aucune banque configurée. Ajoutez d&apos;abord une banque dans les paramètres.
 								</Text>
 							)}
 						</VStack>
@@ -395,7 +414,10 @@ export default function ImportPage() {
 						{/* Account selector */}
 						<VStack gap="xs">
 							<Label htmlFor="import-account-select">
-								2. Compte <Text as="span" color="muted">*</Text>
+								2. Compte{' '}
+								<Text as="span" color="muted">
+									*
+								</Text>
 							</Label>
 							<Select
 								value={selectedAccountId}
@@ -407,7 +429,7 @@ export default function ImportPage() {
 										placeholder={
 											selectedBankId
 												? 'Sélectionner un compte...'
-												: 'Sélectionnez d\'abord une banque'
+												: "Sélectionnez d'abord une banque"
 										}
 									/>
 								</SelectTrigger>
@@ -473,7 +495,13 @@ export default function ImportPage() {
 									}}
 								>
 									{isUploading ? (
-										<Loader2 style={{ height: '1.75rem', width: '1.75rem', animation: 'spin 1s linear infinite' }} />
+										<Loader2
+											style={{
+												height: '1.75rem',
+												width: '1.75rem',
+												animation: 'spin 1s linear infinite',
+											}}
+										/>
 									) : (
 										<FileSpreadsheet style={{ height: '1.75rem', width: '1.75rem' }} />
 									)}
@@ -481,7 +509,12 @@ export default function ImportPage() {
 								<Heading level={3} size="md" style={{ marginTop: '0.5rem' }}>
 									{isUploading ? 'Upload en cours...' : 'Import CSV / Excel'}
 								</Heading>
-								<Text size="sm" color="muted" align="center" style={{ marginTop: '0.25rem', maxWidth: '20rem' }}>
+								<Text
+									size="sm"
+									color="muted"
+									align="center"
+									style={{ marginTop: '0.25rem', maxWidth: '20rem' }}
+								>
 									Glissez votre fichier ici ou cliquez pour sélectionner
 								</Text>
 								<label htmlFor="import-file-input" style={{ marginTop: '1rem' }}>
@@ -493,7 +526,11 @@ export default function ImportPage() {
 										style={{ display: 'none' }}
 										disabled={!canUpload}
 									/>
-									<Button disabled={!canUpload} asChild iconLeft={<Upload style={{ height: '1rem', width: '1rem' }} />}>
+									<Button
+										disabled={!canUpload}
+										asChild
+										iconLeft={<Upload style={{ height: '1rem', width: '1rem' }} />}
+									>
 										<span>Sélectionner un fichier</span>
 									</Button>
 								</label>
@@ -508,23 +545,13 @@ export default function ImportPage() {
 				{/* Stats */}
 				<GlassCard padding="lg">
 					<VStack gap="md">
-						<Heading level={3} size="md">Statistiques d&apos;import</Heading>
+						<Heading level={3} size="md">
+							Statistiques d&apos;import
+						</Heading>
 						<StatCardGrid columns={3}>
-							<StatCard
-								label="Fichiers"
-								value={String(imports.length)}
-								icon={FileSpreadsheet}
-							/>
-							<StatCard
-								label="Traités"
-								value={String(processedCount)}
-								icon={CheckCircle2}
-							/>
-							<StatCard
-								label="Transactions"
-								value={String(totalRecords)}
-								icon={RefreshCw}
-							/>
+							<StatCard label="Fichiers" value={String(imports.length)} icon={FileSpreadsheet} />
+							<StatCard label="Traités" value={String(processedCount)} icon={CheckCircle2} />
+							<StatCard label="Transactions" value={String(totalRecords)} icon={RefreshCw} />
 						</StatCardGrid>
 
 						{pendingCount > 0 && (
@@ -540,23 +567,56 @@ export default function ImportPage() {
 								<HStack gap="sm" align="center" style={{ color: 'oklch(0.7 0.15 75)' }}>
 									<Clock style={{ height: '1rem', width: '1rem' }} />
 									<Text size="sm" weight="medium">
-										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de
-										traitement
+										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de traitement
 									</Text>
 								</HStack>
 							</Box>
 						)}
 
 						<Box
-							style={{ borderRadius: '0.5rem', padding: '1rem', backgroundColor: 'hsl(0 0% 100% / 0.5)' }}
+							style={{
+								borderRadius: '0.5rem',
+								padding: '1rem',
+								backgroundColor: 'hsl(0 0% 100% / 0.5)',
+							}}
 						>
-							<Text weight="medium" style={{ marginBottom: '0.5rem' }}>Comment ça marche ?</Text>
-							<ol style={{ listStyleType: 'decimal', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-								<li><Text size="sm" color="muted">Sélectionnez la banque source</Text></li>
-								<li><Text size="sm" color="muted">Choisissez le compte cible</Text></li>
-								<li><Text size="sm" color="muted">Uploadez votre fichier CSV/Excel</Text></li>
-								<li><Text size="sm" color="muted">Le fichier brut est stocké dans le cloud</Text></li>
-								<li><Text size="sm" color="muted">Les transactions sont importées automatiquement</Text></li>
+							<Text weight="medium" style={{ marginBottom: '0.5rem' }}>
+								Comment ça marche ?
+							</Text>
+							<ol
+								style={{
+									listStyleType: 'decimal',
+									paddingLeft: '1.25rem',
+									display: 'flex',
+									flexDirection: 'column',
+									gap: '0.25rem',
+								}}
+							>
+								<li>
+									<Text size="sm" color="muted">
+										Sélectionnez la banque source
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Choisissez le compte cible
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Uploadez votre fichier CSV/Excel
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Le fichier brut est stocké dans le cloud
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Les transactions sont importées automatiquement
+									</Text>
+								</li>
 							</ol>
 						</Box>
 					</VStack>
@@ -567,15 +627,28 @@ export default function ImportPage() {
 			<GlassCard padding="lg">
 				<VStack gap="md">
 					<VStack gap="xs">
-						<Heading level={3} size="md">Historique des imports</Heading>
+						<Heading level={3} size="md">
+							Historique des imports
+						</Heading>
 						<Text size="sm" color="muted">
 							Fichiers bruts stockés et leur statut de traitement
 						</Text>
 					</VStack>
 					<VStack gap="xs">
 						{isLoading ? (
-							<Box display="flex" py="xl" style={{ alignItems: 'center', justifyContent: 'center' }}>
-								<Loader2 style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))', animation: 'spin 1s linear infinite' }} />
+							<Box
+								display="flex"
+								py="xl"
+								style={{ alignItems: 'center', justifyContent: 'center' }}
+							>
+								<Loader2
+									style={{
+										height: '1.5rem',
+										width: '1.5rem',
+										color: 'hsl(var(--muted-foreground))',
+										animation: 'spin 1s linear infinite',
+									}}
+								/>
 							</Box>
 						) : imports.length === 0 ? (
 							<EmptyState
@@ -593,12 +666,11 @@ export default function ImportPage() {
 									style={{
 										borderRadius: '0.75rem',
 										transition: 'background-color 0.2s',
-										backgroundColor: imp.status === 'FAILED'
-											? 'oklch(0.55 0.2 25 / 0.05)'
-											: 'hsl(0 0% 100% / 0.5)',
-										border: imp.status === 'FAILED'
-											? '1px solid oklch(0.55 0.2 25 / 0.2)'
-											: 'none',
+										backgroundColor:
+											imp.status === 'FAILED'
+												? 'oklch(0.55 0.2 25 / 0.05)'
+												: 'hsl(0 0% 100% / 0.5)',
+										border: imp.status === 'FAILED' ? '1px solid oklch(0.55 0.2 25 / 0.2)' : 'none',
 									}}
 								>
 									<HStack gap="md" align="center">
@@ -610,18 +682,20 @@ export default function ImportPage() {
 												width: '2.5rem',
 												alignItems: 'center',
 												justifyContent: 'center',
-												backgroundColor: imp.status === 'FAILED'
-													? 'oklch(0.55 0.2 25 / 0.1)'
-													: 'hsl(var(--background))',
+												backgroundColor:
+													imp.status === 'FAILED'
+														? 'oklch(0.55 0.2 25 / 0.1)'
+														: 'hsl(var(--background))',
 											}}
 										>
 											<FileSpreadsheet
 												style={{
 													height: '1.25rem',
 													width: '1.25rem',
-													color: imp.status === 'FAILED'
-														? 'oklch(0.55 0.2 25)'
-														: 'hsl(var(--muted-foreground))',
+													color:
+														imp.status === 'FAILED'
+															? 'oklch(0.55 0.2 25)'
+															: 'hsl(var(--muted-foreground))',
 												}}
 											/>
 										</Box>
@@ -637,20 +711,22 @@ export default function ImportPage() {
 														alignItems: 'center',
 														gap: '0.25rem',
 														fontSize: '0.75rem',
-														backgroundColor: imp.status === 'PROCESSED'
-															? 'oklch(0.55 0.15 145 / 0.1)'
-															: imp.status === 'PROCESSING'
-																? 'hsl(var(--primary) / 0.1)'
-																: imp.status === 'FAILED'
-																	? 'oklch(0.55 0.2 25 / 0.1)'
-																	: 'hsl(var(--muted))',
-														color: imp.status === 'PROCESSED'
-															? 'oklch(0.55 0.15 145)'
-															: imp.status === 'PROCESSING'
-																? 'hsl(var(--primary))'
-																: imp.status === 'FAILED'
-																	? 'oklch(0.55 0.2 25)'
-																	: 'hsl(var(--muted-foreground))',
+														backgroundColor:
+															imp.status === 'PROCESSED'
+																? 'oklch(0.55 0.15 145 / 0.1)'
+																: imp.status === 'PROCESSING'
+																	? 'hsl(var(--primary) / 0.1)'
+																	: imp.status === 'FAILED'
+																		? 'oklch(0.55 0.2 25 / 0.1)'
+																		: 'hsl(var(--muted))',
+														color:
+															imp.status === 'PROCESSED'
+																? 'oklch(0.55 0.15 145)'
+																: imp.status === 'PROCESSING'
+																	? 'hsl(var(--primary))'
+																	: imp.status === 'FAILED'
+																		? 'oklch(0.55 0.2 25)'
+																		: 'hsl(var(--muted-foreground))',
 													}}
 												>
 													{getStatusIcon(imp.status)}
@@ -659,8 +735,8 @@ export default function ImportPage() {
 											</HStack>
 											<Text size="xs" color="muted">
 												{getBankNameForImport(imp.bankKey)}
-												{imp.account && ` → ${imp.account.name}`} ·{' '}
-												{formatFileSize(imp.fileSize)} · {formatDate(imp.createdAt)}
+												{imp.account && ` → ${imp.account.name}`} · {formatFileSize(imp.fileSize)} ·{' '}
+												{formatDate(imp.createdAt)}
 												{imp.recordsCount !== null && (
 													<Text as="span" style={{ color: 'oklch(0.55 0.15 145)' }}>
 														{' '}
@@ -711,7 +787,11 @@ export default function ImportPage() {
 											variant="ghost"
 											size="icon"
 											onClick={() => setDeleteImportId(imp.id)}
-											style={{ height: '2rem', width: '2rem', color: 'hsl(var(--muted-foreground))' }}
+											style={{
+												height: '2rem',
+												width: '2rem',
+												color: 'hsl(var(--muted-foreground))',
+											}}
 										>
 											<Trash2 style={{ height: '1rem', width: '1rem' }} />
 										</Button>

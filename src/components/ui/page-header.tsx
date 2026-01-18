@@ -1,9 +1,9 @@
 'use client';
 
-import { forwardRef } from 'react';
-import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 // =============================================================================
 // PAGE HEADER TYPES
@@ -58,19 +58,7 @@ interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
-	(
-		{
-			className,
-			title,
-			description,
-			size = 'md',
-			breadcrumbs,
-			actions,
-			icon,
-			...props
-		},
-		ref,
-	) => {
+	({ className, title, description, size = 'md', breadcrumbs, actions, icon, ...props }, ref) => {
 		return (
 			<div
 				ref={ref}
@@ -80,21 +68,13 @@ const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
 			>
 				{/* Breadcrumbs */}
 				{breadcrumbs && breadcrumbs.length > 0 && (
-					<nav
-						aria-label="Breadcrumb"
-						className="mb-2"
-					>
+					<nav aria-label="Breadcrumb" className="mb-2">
 						<ol className="flex items-center gap-1 text-sm text-muted-foreground">
 							{breadcrumbs.map((item, index) => (
 								<li key={index} className="flex items-center">
-									{index > 0 && (
-										<ChevronRight className="h-4 w-4 mx-1 text-muted-foreground/50" />
-									)}
+									{index > 0 && <ChevronRight className="h-4 w-4 mx-1 text-muted-foreground/50" />}
 									{item.href ? (
-										<Link
-											href={item.href}
-											className="hover:text-foreground transition-colors"
-										>
+										<Link href={item.href} className="hover:text-foreground transition-colors">
 											{item.label}
 										</Link>
 									) : (
@@ -110,12 +90,8 @@ const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
 				<div className="flex items-start justify-between gap-4">
 					<div className="space-y-1 min-w-0">
 						<div className="flex items-center gap-3">
-							{icon && (
-								<div className="flex-shrink-0">{icon}</div>
-							)}
-							<h1 className={cn('font-bold tracking-tight', titleSizeClasses[size])}>
-								{title}
-							</h1>
+							{icon && <div className="flex-shrink-0">{icon}</div>}
+							<h1 className={cn('font-bold tracking-tight', titleSizeClasses[size])}>{title}</h1>
 						</div>
 						{description && (
 							<p className={cn('text-muted-foreground', descriptionSizeClasses[size])}>
@@ -123,11 +99,7 @@ const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
 							</p>
 						)}
 					</div>
-					{actions && (
-						<div className="flex items-center gap-2 flex-shrink-0">
-							{actions}
-						</div>
-					)}
+					{actions && <div className="flex items-center gap-2 flex-shrink-0">{actions}</div>}
 				</div>
 			</div>
 		);
@@ -202,11 +174,7 @@ function SectionHeader({
 						</p>
 					)}
 				</div>
-				{action && (
-					<div className="flex items-center gap-2 flex-shrink-0">
-						{action}
-					</div>
-				)}
+				{action && <div className="flex items-center gap-2 flex-shrink-0">{action}</div>}
 			</div>
 		</div>
 	);

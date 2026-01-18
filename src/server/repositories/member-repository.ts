@@ -3,8 +3,8 @@
  * Handles data access for household members
  */
 
-import { prisma } from '@/lib/prisma';
 import type { Member } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export interface MemberWithAccounts extends Member {
 	accountMembers: {

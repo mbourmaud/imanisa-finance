@@ -4,8 +4,8 @@
  * 1:1 relationship with Property
  */
 
+import type { InsuranceType, PropertyInsurance } from '@/lib/prisma';
 import { prisma } from '@/lib/prisma';
-import type { PropertyInsurance, InsuranceType } from '@/lib/prisma';
 
 // Types
 export interface CreatePropertyInsuranceDTO {

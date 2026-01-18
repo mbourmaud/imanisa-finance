@@ -55,19 +55,14 @@ export function ChartLegend({ items, total }: { items: LegendItem[]; total: numb
 				return (
 					<div key={item.name} className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
-							<div
-								className="h-3 w-3 rounded-full"
-								style={{ backgroundColor: item.color }}
-							/>
+							<div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
 							<span className="text-sm">{item.name}</span>
 						</div>
 						<div className="flex items-center gap-3">
 							<span className="text-sm font-medium number-display">
 								{formatMoneyCompact(item.value)}
 							</span>
-							<span className="text-xs text-muted-foreground w-12 text-right">
-								{percentage}%
-							</span>
+							<span className="text-xs text-muted-foreground w-12 text-right">{percentage}%</span>
 						</div>
 					</div>
 				);

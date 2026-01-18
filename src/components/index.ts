@@ -13,73 +13,81 @@
 // LAYOUT COMPONENTS
 // =============================================================================
 
-export { Box } from './ui/box';
 export type {
-	BoxProps,
-	SpacingSize,
-	DisplayType,
-	PositionType,
-	OverflowType,
 	BackgroundColor,
 	BorderStyle,
+	BoxProps,
+	DisplayType,
+	ElementType as BoxElementType,
+	OverflowType,
+	PositionType,
 	RoundedSize,
 	ShadowSize,
-	ElementType as BoxElementType,
+	SpacingSize,
 } from './ui/box';
-
-export { VStack, HStack } from './ui/stack';
+export { Box } from './ui/box';
 export type {
-	VStackProps,
-	HStackProps,
-	GapSize,
-	VStackAlign,
-	HStackAlign,
-	JustifyContent,
-	PaddingSize,
-} from './ui/stack';
-
-export { Flex } from './ui/flex';
-export type {
-	FlexProps,
-	FlexDirection,
 	FlexAlign,
+	FlexDirection,
 	FlexJustify,
+	FlexProps,
 	FlexWrap,
 } from './ui/flex';
-
+export { Flex } from './ui/flex';
+export type { GridAlign, GridCols, GridJustify, GridProps } from './ui/grid';
 export { Grid } from './ui/grid';
-export type { GridProps, GridCols, GridAlign, GridJustify } from './ui/grid';
-
-export { Spacer } from './ui/spacer';
+export type {
+	ContainerMaxWidth,
+	ContainerProps,
+	PageProps,
+	SectionProps,
+	SectionSpacing,
+} from './ui/layout';
+export { Container, Page, Section } from './ui/layout';
 export type { SpacerProps } from './ui/spacer';
-
-export { Container, Section, Page } from './ui/layout';
-export type { ContainerProps, ContainerMaxWidth, SectionProps, SectionSpacing, PageProps } from './ui/layout';
+export { Spacer } from './ui/spacer';
+export type {
+	GapSize,
+	HStackAlign,
+	HStackProps,
+	JustifyContent,
+	PaddingSize,
+	VStackAlign,
+	VStackProps,
+} from './ui/stack';
+export { HStack, VStack } from './ui/stack';
 
 // =============================================================================
 // TYPOGRAPHY
 // =============================================================================
 
-export { Heading, Text } from './ui/typography';
 export type {
-	HeadingProps,
-	HeadingLevel,
-	TextProps,
-	TextVariant,
-	TextSize,
-	TextColor,
 	FontWeight,
+	HeadingLevel,
+	HeadingProps,
 	TextAlign,
+	TextColor,
+	TextProps,
+	TextSize,
 	TextTruncate,
+	TextVariant,
 } from './ui/typography';
+export { Heading, Text } from './ui/typography';
 
 // =============================================================================
 // ICONS
 // =============================================================================
 
+export type {
+	IconColor,
+	IconName,
+	IconProps,
+	IconSize,
+	IconWrapperProps,
+	LucideIcon,
+	LucideProps,
+} from './ui/icon';
 export {
-	Icon,
-	IconWrapper,
 	// Re-exported Lucide icons
 	AlertCircle,
 	AlertTriangle,
@@ -135,6 +143,8 @@ export {
 	Grid as GridIcon,
 	Heart,
 	Home,
+	Icon,
+	IconWrapper,
 	Image,
 	Inbox,
 	Info,
@@ -188,37 +198,32 @@ export {
 	XCircle,
 	Zap,
 } from './ui/icon';
-export type {
-	IconProps,
-	IconWrapperProps,
-	IconSize,
-	IconColor,
-	IconName,
-	LucideIcon,
-	LucideProps,
-} from './ui/icon';
 
 // =============================================================================
 // BUTTONS
 // =============================================================================
 
-export { Button, buttonVariants } from './ui/button';
 export type { ButtonProps } from './ui/button';
+export { Button, buttonVariants } from './ui/button';
 
 // =============================================================================
 // FORM ELEMENTS
 // =============================================================================
 
-export { Input } from './ui/input';
-export type { InputProps } from './ui/input';
-
-export { Textarea } from './ui/textarea';
-export type { TextareaProps } from './ui/textarea';
-
 export { Checkbox } from './ui/checkbox';
-
-export { Switch } from './ui/switch';
-
+export {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+	useFormField,
+} from './ui/form';
+export type { InputProps } from './ui/input';
+export { Input } from './ui/input';
+export { Label } from './ui/label';
 export {
 	Select,
 	SelectContent,
@@ -231,64 +236,62 @@ export {
 	SelectTrigger,
 	SelectValue,
 } from './ui/select';
-
-export { Label } from './ui/label';
-
-export {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-	useFormField,
-} from './ui/form';
+export { Switch } from './ui/switch';
+export type { TextareaProps } from './ui/textarea';
+export { Textarea } from './ui/textarea';
 
 // =============================================================================
 // CARDS
 // =============================================================================
 
-export { GlassCard, GlassCardHeader, GlassCardContent, GlassCardFooter } from './ui/glass-card';
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 export type {
-	GlassCardProps,
-	GlassCardHeaderProps,
-	GlassCardVariant,
-	GlassCardPadding,
 	AccentColor,
+	GlassCardHeaderProps,
+	GlassCardPadding,
+	GlassCardProps,
+	GlassCardVariant,
 } from './ui/glass-card';
-
-export { StatCard, StatCardGrid, StatCardSkeleton } from './ui/stat-card';
+export { GlassCard, GlassCardContent, GlassCardFooter, GlassCardHeader } from './ui/glass-card';
 export type {
-	StatCardProps,
 	StatCardGridProps,
+	StatCardProps,
 	StatCardSkeletonProps,
 	StatCardVariant,
 	TrendDirection,
 } from './ui/stat-card';
-
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+export { StatCard, StatCardGrid, StatCardSkeleton } from './ui/stat-card';
 
 // =============================================================================
 // GLASS EFFECTS
 // =============================================================================
 
+export type { GlassPadding, GlassProps, GlassRadius, GlassVariant } from './ui/glass';
 export { Glass } from './ui/glass';
-export type { GlassProps, GlassVariant, GlassPadding, GlassRadius } from './ui/glass';
 
 // =============================================================================
 // NAVIGATION & LAYOUT
 // =============================================================================
 
-export { PageHeader, SectionHeader } from './ui/page-header';
 export type {
-	PageHeaderProps,
-	SectionHeaderProps,
-	PageHeaderSize,
-	SectionHeaderSize,
 	BreadcrumbItem,
+	PageHeaderProps,
+	PageHeaderSize,
+	SectionHeaderProps,
+	SectionHeaderSize,
 } from './ui/page-header';
-
+export { PageHeader, SectionHeader } from './ui/page-header';
+export {
+	Sheet,
+	SheetBody,
+	SheetClose,
+	SheetContent,
+	SheetDescription,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from './ui/sheet';
 export {
 	Sidebar,
 	SidebarContent,
@@ -316,24 +319,15 @@ export {
 	useSidebar,
 } from './ui/sidebar';
 
-export {
-	Sheet,
-	SheetTrigger,
-	SheetClose,
-	SheetContent,
-	SheetHeader,
-	SheetBody,
-	SheetFooter,
-	SheetTitle,
-	SheetDescription,
-} from './ui/sheet';
-
 // =============================================================================
 // DATA DISPLAY
 // =============================================================================
 
+export { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+export { Badge, badgeVariants } from './ui/badge';
 export { DataTable } from './ui/data-table';
-
+export { Progress } from './ui/progress';
+export { Skeleton } from './ui/skeleton';
 export {
 	Table,
 	TableBody,
@@ -345,33 +339,9 @@ export {
 	TableRow,
 } from './ui/table';
 
-export { Badge, badgeVariants } from './ui/badge';
-
-export { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-
-export { Progress } from './ui/progress';
-
-export { Skeleton } from './ui/skeleton';
-
 // =============================================================================
 // FEEDBACK
 // =============================================================================
-
-export {
-	EmptyState,
-	EmptyStateNoAccounts,
-	EmptyStateNoTransactions,
-	EmptyStateNoResults,
-	EmptyStateError,
-} from './ui/empty-state';
-export type {
-	EmptyStateProps,
-	EmptyStatePresetProps,
-	EmptyStateSize,
-	EmptyStateVariant,
-} from './ui/empty-state';
-
-export { Toaster } from './ui/sonner';
 
 export {
 	AlertDialog,
@@ -386,7 +356,6 @@ export {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from './ui/alert-dialog';
-
 export {
 	Dialog,
 	DialogClose,
@@ -399,20 +368,36 @@ export {
 	DialogTitle,
 	DialogTrigger,
 } from './ui/dialog';
+export type {
+	EmptyStatePresetProps,
+	EmptyStateProps,
+	EmptyStateSize,
+	EmptyStateVariant,
+} from './ui/empty-state';
+export {
+	EmptyState,
+	EmptyStateError,
+	EmptyStateNoAccounts,
+	EmptyStateNoResults,
+	EmptyStateNoTransactions,
+} from './ui/empty-state';
+export { Toaster } from './ui/sonner';
 
 // =============================================================================
 // OVERLAYS & POPOVERS
 // =============================================================================
 
 export {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from './ui/tooltip';
-
-export { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-
+	Command,
+	CommandDialog,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandSeparator,
+	CommandShortcut,
+} from './ui/command';
 export {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -430,26 +415,20 @@ export {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-
+export { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 export {
-	Command,
-	CommandDialog,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-	CommandList,
-	CommandSeparator,
-	CommandShortcut,
-} from './ui/command';
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from './ui/tooltip';
 
 // =============================================================================
 // TABS & ACCORDION
 // =============================================================================
 
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-
 export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 // =============================================================================
 // SCROLL & SEPARATOR

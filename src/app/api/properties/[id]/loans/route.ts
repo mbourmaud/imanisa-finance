@@ -5,7 +5,7 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { propertyRepository, loanRepository, memberRepository } from '@/server/repositories';
+import { loanRepository, memberRepository, propertyRepository } from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -63,19 +63,34 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
 		// Validate numeric fields
 		if (typeof initialAmount !== 'number' || initialAmount <= 0) {
-			return NextResponse.json({ error: 'initialAmount must be a positive number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'initialAmount must be a positive number' },
+				{ status: 400 },
+			);
 		}
 		if (typeof remainingAmount !== 'number' || remainingAmount < 0) {
-			return NextResponse.json({ error: 'remainingAmount must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'remainingAmount must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 		if (remainingAmount > initialAmount) {
-			return NextResponse.json({ error: 'remainingAmount cannot exceed initialAmount' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'remainingAmount cannot exceed initialAmount' },
+				{ status: 400 },
+			);
 		}
 		if (typeof rate !== 'number' || rate < 0 || rate > 100) {
-			return NextResponse.json({ error: 'rate must be a number between 0 and 100' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'rate must be a number between 0 and 100' },
+				{ status: 400 },
+			);
 		}
 		if (typeof monthlyPayment !== 'number' || monthlyPayment < 0) {
-			return NextResponse.json({ error: 'monthlyPayment must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'monthlyPayment must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 
 		// Validate startDate

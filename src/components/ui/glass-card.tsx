@@ -22,10 +22,7 @@ const variantClasses: Record<GlassCardVariant, string> = {
 		'shadow-[0_8px_32px_oklch(0.3_0.02_260/0.12),0_2px_8px_oklch(0.3_0.02_260/0.08)]',
 		'dark:shadow-[0_8px_32px_oklch(0_0_0/0.35),0_2px_8px_oklch(0_0_0/0.25)]',
 	),
-	flat: cn(
-		'rounded-2xl border border-border/40',
-		'bg-card/50 backdrop-blur-sm',
-	),
+	flat: cn('rounded-2xl border border-border/40', 'bg-card/50 backdrop-blur-sm'),
 	interactive: cn(
 		'glass-card',
 		'transition-all duration-200 cursor-pointer',
@@ -44,7 +41,8 @@ const paddingClasses: Record<GlassCardPadding, string> = {
 const accentColorClasses: Record<AccentColor, string> = {
 	coral: 'before:bg-gradient-to-r before:from-[oklch(0.65_0.18_25)] before:to-[oklch(0.7_0.2_15)]',
 	teal: 'before:bg-gradient-to-r before:from-[oklch(0.65_0.15_180)] before:to-[oklch(0.7_0.15_165)]',
-	purple: 'before:bg-gradient-to-r before:from-[oklch(0.6_0.18_290)] before:to-[oklch(0.65_0.2_280)]',
+	purple:
+		'before:bg-gradient-to-r before:from-[oklch(0.6_0.18_290)] before:to-[oklch(0.65_0.2_280)]',
 	gold: 'before:bg-gradient-to-r before:from-[oklch(0.75_0.15_85)] before:to-[oklch(0.8_0.18_60)]',
 	mint: 'before:bg-gradient-to-r before:from-[oklch(0.65_0.15_160)] before:to-[oklch(0.7_0.18_145)]',
 	primary: 'before:bg-gradient-to-r before:from-primary before:to-primary/80',
@@ -88,7 +86,7 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
 				{children}
 			</div>
 		);
-	}
+	},
 );
 GlassCard.displayName = 'GlassCard';
 
@@ -134,12 +132,8 @@ function GlassCardHeader({
 			{...props}
 		>
 			<div className="space-y-1 min-w-0">
-				{title && (
-					<h3 className="font-semibold leading-none tracking-tight">{title}</h3>
-				)}
-				{description && (
-					<p className="text-sm text-muted-foreground">{description}</p>
-				)}
+				{title && <h3 className="font-semibold leading-none tracking-tight">{title}</h3>}
+				{description && <p className="text-sm text-muted-foreground">{description}</p>}
 			</div>
 			{action && <div className="flex-shrink-0">{action}</div>}
 		</div>
@@ -150,27 +144,15 @@ function GlassCardHeader({
 // GLASS CARD CONTENT
 // =============================================================================
 
-function GlassCardContent({
-	className,
-	...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-	return (
-		<div
-			data-slot="glass-card-content"
-			className={cn('', className)}
-			{...props}
-		/>
-	);
+function GlassCardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+	return <div data-slot="glass-card-content" className={cn('', className)} {...props} />;
 }
 
 // =============================================================================
 // GLASS CARD FOOTER
 // =============================================================================
 
-function GlassCardFooter({
-	className,
-	...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function GlassCardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
 			data-slot="glass-card-footer"
@@ -185,4 +167,10 @@ function GlassCardFooter({
 // =============================================================================
 
 export { GlassCard, GlassCardHeader, GlassCardContent, GlassCardFooter };
-export type { GlassCardProps, GlassCardHeaderProps, GlassCardVariant, GlassCardPadding, AccentColor };
+export type {
+	GlassCardProps,
+	GlassCardHeaderProps,
+	GlassCardVariant,
+	GlassCardPadding,
+	AccentColor,
+};

@@ -1,14 +1,14 @@
-import { render, within, fireEvent } from '@testing-library/react';
+import { fireEvent, render, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import type { AccountData, AccountMember } from '../AccountCard';
 import {
-	AccountIcon,
-	AccountTypeBadge,
-	MemberBadge,
 	AccountCard,
 	AccountCardList,
 	AccountCardSkeleton,
+	AccountIcon,
+	AccountTypeBadge,
+	MemberBadge,
 } from '../AccountCard';
-import type { AccountData, AccountMember } from '../AccountCard';
 
 // Mock account data
 const mockAccount: AccountData = {
@@ -57,10 +57,7 @@ const mockMember: AccountMember = {
 
 const mockAccountWithMembers: AccountData = {
 	...mockAccount,
-	members: [
-		mockMember,
-		{ id: 'member-2', name: 'Marie Dupont', color: '#f43f5e', ownerShare: 50 },
-	],
+	members: [mockMember, { id: 'member-2', name: 'Marie Dupont', color: '#f43f5e', ownerShare: 50 }],
 };
 
 describe('AccountIcon', () => {
@@ -71,49 +68,37 @@ describe('AccountIcon', () => {
 	});
 
 	it('renders with bank color when showBankColor is true', () => {
-		const { container } = render(
-			<AccountIcon account={mockAccount} showBankColor />
-		);
+		const { container } = render(<AccountIcon account={mockAccount} showBankColor />);
 		const icon = container.querySelector('[data-slot="account-icon"]');
 		expect(icon).toHaveStyle({ backgroundColor: '#0066b320' });
 	});
 
 	it('renders without bank color when showBankColor is false', () => {
-		const { container } = render(
-			<AccountIcon account={mockAccount} showBankColor={false} />
-		);
+		const { container } = render(<AccountIcon account={mockAccount} showBankColor={false} />);
 		const icon = container.querySelector('[data-slot="account-icon"]');
 		expect(icon).not.toHaveStyle({ backgroundColor: '#0066b320' });
 	});
 
 	it('renders with size sm', () => {
-		const { container } = render(
-			<AccountIcon account={mockAccount} size="sm" />
-		);
+		const { container } = render(<AccountIcon account={mockAccount} size="sm" />);
 		const icon = container.querySelector('[data-slot="account-icon"]');
 		expect(icon).toHaveClass('h-8', 'w-8');
 	});
 
 	it('renders with size md (default)', () => {
-		const { container } = render(
-			<AccountIcon account={mockAccount} size="md" />
-		);
+		const { container } = render(<AccountIcon account={mockAccount} size="md" />);
 		const icon = container.querySelector('[data-slot="account-icon"]');
 		expect(icon).toHaveClass('h-10', 'w-10');
 	});
 
 	it('renders with size lg', () => {
-		const { container } = render(
-			<AccountIcon account={mockAccount} size="lg" />
-		);
+		const { container } = render(<AccountIcon account={mockAccount} size="lg" />);
 		const icon = container.querySelector('[data-slot="account-icon"]');
 		expect(icon).toHaveClass('h-12', 'w-12');
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(
-			<AccountIcon account={mockAccount} className="custom-class" />
-		);
+		const { container } = render(<AccountIcon account={mockAccount} className="custom-class" />);
 		const icon = container.querySelector('[data-slot="account-icon"]');
 		expect(icon).toHaveClass('custom-class');
 	});
@@ -140,25 +125,19 @@ describe('AccountTypeBadge', () => {
 	});
 
 	it('renders with variant default', () => {
-		const { container } = render(
-			<AccountTypeBadge type="CHECKING" variant="default" />
-		);
+		const { container } = render(<AccountTypeBadge type="CHECKING" variant="default" />);
 		const badge = container.querySelector('[data-slot="account-type-badge"]');
 		expect(badge).toHaveClass('bg-muted');
 	});
 
 	it('renders with variant subtle', () => {
-		const { container } = render(
-			<AccountTypeBadge type="CHECKING" variant="subtle" />
-		);
+		const { container } = render(<AccountTypeBadge type="CHECKING" variant="subtle" />);
 		const badge = container.querySelector('[data-slot="account-type-badge"]');
 		expect(badge).not.toHaveClass('bg-muted');
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(
-			<AccountTypeBadge type="CHECKING" className="custom-class" />
-		);
+		const { container } = render(<AccountTypeBadge type="CHECKING" className="custom-class" />);
 		const badge = container.querySelector('[data-slot="account-type-badge"]');
 		expect(badge).toHaveClass('custom-class');
 	});
@@ -184,9 +163,7 @@ describe('MemberBadge', () => {
 	});
 
 	it('hides share when showShare is false', () => {
-		const { container } = render(
-			<MemberBadge member={mockMember} showShare={false} />
-		);
+		const { container } = render(<MemberBadge member={mockMember} showShare={false} />);
 		const badge = container.querySelector('[data-slot="member-badge"]');
 		expect(badge).not.toHaveTextContent('50%');
 	});
@@ -205,9 +182,7 @@ describe('MemberBadge', () => {
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(
-			<MemberBadge member={mockMember} className="custom-class" />
-		);
+		const { container } = render(<MemberBadge member={mockMember} className="custom-class" />);
 		const badge = container.querySelector('[data-slot="member-badge"]');
 		expect(badge).toHaveClass('custom-class');
 	});
@@ -236,68 +211,50 @@ describe('AccountCard', () => {
 	});
 
 	it('renders with variant compact', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} variant="compact" />
-		);
+		const { container } = render(<AccountCard account={mockAccount} variant="compact" />);
 		const card = container.querySelector('[data-slot="account-card"]');
 		expect(card).toHaveClass('p-3');
 	});
 
 	it('renders with variant default', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} variant="default" />
-		);
+		const { container } = render(<AccountCard account={mockAccount} variant="default" />);
 		const card = container.querySelector('[data-slot="account-card"]');
 		expect(card).toHaveClass('p-4');
 	});
 
 	it('renders with variant detailed', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} variant="detailed" />
-		);
+		const { container } = render(<AccountCard account={mockAccount} variant="detailed" />);
 		const card = container.querySelector('[data-slot="account-card"]');
 		expect(card).toHaveClass('p-5');
 	});
 
 	it('shows bank name when showBank is true', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} showBank />
-		);
+		const { container } = render(<AccountCard account={mockAccount} showBank />);
 		const card = container.querySelector('[data-slot="account-card"]') as HTMLElement;
 		expect(within(card).getByText('Crédit Mutuel')).toBeInTheDocument();
 	});
 
 	it('hides bank name when showBank is false', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} showBank={false} />
-		);
+		const { container } = render(<AccountCard account={mockAccount} showBank={false} />);
 		const card = container.querySelector('[data-slot="account-card"]') as HTMLElement;
 		expect(within(card).queryByText('Crédit Mutuel')).not.toBeInTheDocument();
 	});
 
 	it('shows type badge when showType is true', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} showType />
-		);
+		const { container } = render(<AccountCard account={mockAccount} showType />);
 		const typeBadge = container.querySelector('[data-slot="account-type-badge"]');
 		expect(typeBadge).toBeInTheDocument();
 	});
 
 	it('hides type badge when showType is false', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} showType={false} />
-		);
+		const { container } = render(<AccountCard account={mockAccount} showType={false} />);
 		const typeBadge = container.querySelector('[data-slot="account-type-badge"]');
 		expect(typeBadge).not.toBeInTheDocument();
 	});
 
 	it('shows members when showMembers is true and variant is detailed', () => {
 		const { container } = render(
-			<AccountCard
-				account={mockAccountWithMembers}
-				variant="detailed"
-				showMembers
-			/>
+			<AccountCard account={mockAccountWithMembers} variant="detailed" showMembers />,
 		);
 		const memberBadges = container.querySelectorAll('[data-slot="member-badge"]');
 		expect(memberBadges).toHaveLength(2);
@@ -305,20 +262,14 @@ describe('AccountCard', () => {
 
 	it('hides members when showMembers is false', () => {
 		const { container } = render(
-			<AccountCard
-				account={mockAccountWithMembers}
-				variant="detailed"
-				showMembers={false}
-			/>
+			<AccountCard account={mockAccountWithMembers} variant="detailed" showMembers={false} />,
 		);
 		const memberBadges = container.querySelectorAll('[data-slot="member-badge"]');
 		expect(memberBadges).toHaveLength(0);
 	});
 
 	it('renders with interactive prop', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} interactive />
-		);
+		const { container } = render(<AccountCard account={mockAccount} interactive />);
 		const card = container.querySelector('[data-slot="account-card"]');
 		expect(card).toHaveClass('cursor-pointer');
 		expect(card).toHaveAttribute('role', 'button');
@@ -328,7 +279,7 @@ describe('AccountCard', () => {
 	it('calls onAccountClick when clicked', () => {
 		const handleClick = vi.fn();
 		const { container } = render(
-			<AccountCard account={mockAccount} interactive onAccountClick={handleClick} />
+			<AccountCard account={mockAccount} interactive onAccountClick={handleClick} />,
 		);
 		const card = container.querySelector('[data-slot="account-card"]') as HTMLElement;
 		fireEvent.click(card);
@@ -338,7 +289,7 @@ describe('AccountCard', () => {
 	it('calls onAccountClick on Enter key', () => {
 		const handleClick = vi.fn();
 		const { container } = render(
-			<AccountCard account={mockAccount} interactive onAccountClick={handleClick} />
+			<AccountCard account={mockAccount} interactive onAccountClick={handleClick} />,
 		);
 		const card = container.querySelector('[data-slot="account-card"]') as HTMLElement;
 		fireEvent.keyDown(card, { key: 'Enter' });
@@ -346,27 +297,20 @@ describe('AccountCard', () => {
 	});
 
 	it('shows chevron when interactive', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} interactive />
-		);
+		const { container } = render(<AccountCard account={mockAccount} interactive />);
 		const svg = container.querySelector('svg');
 		expect(svg).toBeInTheDocument();
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(
-			<AccountCard account={mockAccount} className="custom-class" />
-		);
+		const { container } = render(<AccountCard account={mockAccount} className="custom-class" />);
 		const card = container.querySelector('[data-slot="account-card"]');
 		expect(card).toHaveClass('custom-class');
 	});
 });
 
 describe('AccountCardList', () => {
-	const mockAccounts = [
-		{ account: mockAccount },
-		{ account: mockSavingsAccount },
-	];
+	const mockAccounts = [{ account: mockAccount }, { account: mockSavingsAccount }];
 
 	it('renders list of account cards', () => {
 		const { container } = render(<AccountCardList accounts={mockAccounts} />);
@@ -377,9 +321,7 @@ describe('AccountCardList', () => {
 	});
 
 	it('passes variant to all cards', () => {
-		const { container } = render(
-			<AccountCardList accounts={mockAccounts} variant="compact" />
-		);
+		const { container } = render(<AccountCardList accounts={mockAccounts} variant="compact" />);
 		const cards = container.querySelectorAll('[data-slot="account-card"]');
 		cards.forEach((card) => {
 			expect(card).toHaveClass('p-3');
@@ -387,9 +329,7 @@ describe('AccountCardList', () => {
 	});
 
 	it('passes interactive to all cards', () => {
-		const { container } = render(
-			<AccountCardList accounts={mockAccounts} interactive />
-		);
+		const { container } = render(<AccountCardList accounts={mockAccounts} interactive />);
 		const cards = container.querySelectorAll('[data-slot="account-card"]');
 		cards.forEach((card) => {
 			expect(card).toHaveClass('cursor-pointer');
@@ -399,7 +339,7 @@ describe('AccountCardList', () => {
 	it('calls onAccountClick with correct account', () => {
 		const handleClick = vi.fn();
 		const { container } = render(
-			<AccountCardList accounts={mockAccounts} interactive onAccountClick={handleClick} />
+			<AccountCardList accounts={mockAccounts} interactive onAccountClick={handleClick} />,
 		);
 		const cards = container.querySelectorAll('[data-slot="account-card"]');
 		fireEvent.click(cards[1]);
@@ -408,7 +348,7 @@ describe('AccountCardList', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<AccountCardList accounts={mockAccounts} className="custom-list" />
+			<AccountCardList accounts={mockAccounts} className="custom-list" />,
 		);
 		const list = container.querySelector('[data-slot="account-card-list"]');
 		expect(list).toHaveClass('custom-list');

@@ -107,7 +107,7 @@ const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
 			children,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const Tag = levelToTag[level];
 		const sizeClass = size ? sizeClasses[size] : levelDefaultSizeClasses[level];
@@ -122,14 +122,14 @@ const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
 					weightClasses[weight],
 					align && alignClasses[align],
 					truncate && truncateClasses[truncate],
-					className
+					className,
 				)}
 				{...props}
 			>
 				{children}
 			</Tag>
 		);
-	}
+	},
 );
 Heading.displayName = 'Heading';
 
@@ -206,7 +206,7 @@ function TextComponent(
 		children,
 		...props
 	}: TextProps,
-	ref: React.ForwardedRef<HTMLElement>
+	ref: React.ForwardedRef<HTMLElement>,
 ) {
 	// Determine the element to render
 	const Component = as || (asSpan ? 'span' : 'p');
@@ -217,11 +217,7 @@ function TextComponent(
 	const classes = cn(
 		// Use new props if any are specified, otherwise fall back to variant
 		useNewProps
-			? [
-					sizeClasses[size || 'md'],
-					color && colorClasses[color],
-					weight && weightClasses[weight],
-			  ]
+			? [sizeClasses[size || 'md'], color && colorClasses[color], weight && weightClasses[weight]]
 			: variant && variantClasses[variant],
 		// Additional styling props
 		align && alignClasses[align],
@@ -231,7 +227,7 @@ function TextComponent(
 		underline && 'underline underline-offset-2',
 		uppercase && 'uppercase tracking-wide',
 		leading && leadingClasses[leading],
-		className
+		className,
 	);
 
 	switch (Component) {

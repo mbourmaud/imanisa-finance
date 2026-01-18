@@ -183,7 +183,7 @@ describe('Glass', () => {
 		const { container } = render(
 			<Glass variant="subtle" padding="lg" radius="xl" interactive>
 				Content
-			</Glass>
+			</Glass>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<div

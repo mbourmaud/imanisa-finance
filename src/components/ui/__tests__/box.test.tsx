@@ -87,7 +87,7 @@ describe('Box', () => {
 			const { container } = render(
 				<Box px="lg" py="sm">
 					Content
-				</Box>
+				</Box>,
 			);
 			expect(container.firstChild).toMatchInlineSnapshot(`
 				<div
@@ -102,7 +102,7 @@ describe('Box', () => {
 			const { container } = render(
 				<Box pt="xs" pr="sm" pb="md" pl="lg">
 					Content
-				</Box>
+				</Box>,
 			);
 			expect(container.firstChild).toMatchInlineSnapshot(`
 				<div
@@ -130,7 +130,7 @@ describe('Box', () => {
 			const { container } = render(
 				<Box mx="lg" my="sm">
 					Content
-				</Box>
+				</Box>,
 			);
 			expect(container.firstChild).toMatchInlineSnapshot(`
 				<div
@@ -261,15 +261,9 @@ describe('Box', () => {
 	describe('combined props', () => {
 		it('renders with multiple props', () => {
 			const { container } = render(
-				<Box
-					p="md"
-					bg="card"
-					border="default"
-					rounded="lg"
-					shadow="sm"
-				>
+				<Box p="md" bg="card" border="default" rounded="lg" shadow="sm">
 					Card Content
-				</Box>
+				</Box>,
 			);
 			expect(container.firstChild).toMatchInlineSnapshot(`
 				<div
@@ -282,16 +276,9 @@ describe('Box', () => {
 
 		it('renders a typical card-like box', () => {
 			const { container } = render(
-				<Box
-					as="section"
-					p="lg"
-					bg="muted"
-					rounded="xl"
-					fullWidth
-					position="relative"
-				>
+				<Box as="section" p="lg" bg="muted" rounded="xl" fullWidth position="relative">
 					Section Content
-				</Box>
+				</Box>,
 			);
 			expect(container.firstChild).toMatchInlineSnapshot(`
 				<section

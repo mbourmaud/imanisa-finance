@@ -1,52 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import {
+	Box,
+	Button,
 	ChevronDown,
 	ChevronRight,
 	CreditCard,
-	Landmark,
-	Plus,
-	TrendingUp,
-	Wallet,
-} from '@/components';
-import { Button } from '@/components';
-import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from '@/components';
-import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@/components';
-import { Input } from '@/components';
-import { Label } from '@/components';
-import { Textarea } from '@/components';
-import {
+	Flex,
+	GlassCard,
+	Heading,
+	HStack,
+	Input,
+	Label,
+	Landmark,
+	PageHeader,
+	Plus,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+	StatCard,
+	StatCardGrid,
+	StatCardSkeleton,
+	Text,
+	Textarea,
+	TrendingUp,
+	VStack,
+	Wallet,
 } from '@/components';
-import { BankLogo } from '@/components/banks/BankLogo';
-import { PageHeader } from '@/components';
-import { StatCard, StatCardGrid, StatCardSkeleton } from '@/components';
-import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
 import { AccountTypeBadge } from '@/components/accounts/AccountCard';
+import { BankLogo } from '@/components/banks/BankLogo';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
-import { Box } from '@/components';
-import { VStack, HStack } from '@/components';
-import { Flex } from '@/components';
-import { Text, Heading } from '@/components';
-import { GlassCard } from '@/components';
+import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
 
 // =============================================================================
 // TYPES
@@ -109,12 +107,28 @@ function BankRowSkeleton() {
 	return (
 		<GlassCard padding="sm">
 			<HStack gap="md" align="center">
-				<Box rounded="xl" bg="muted" style={{ height: '3rem', width: '3rem', animation: 'pulse 2s ease-in-out infinite' }} />
+				<Box
+					rounded="xl"
+					bg="muted"
+					style={{ height: '3rem', width: '3rem', animation: 'pulse 2s ease-in-out infinite' }}
+				/>
 				<Flex direction="col" gap="xs" grow>
-					<Box rounded="md" bg="muted" style={{ height: '1.25rem', width: '8rem', animation: 'pulse 2s ease-in-out infinite' }} />
-					<Box rounded="md" bg="muted" style={{ height: '1rem', width: '5rem', animation: 'pulse 2s ease-in-out infinite' }} />
+					<Box
+						rounded="md"
+						bg="muted"
+						style={{ height: '1.25rem', width: '8rem', animation: 'pulse 2s ease-in-out infinite' }}
+					/>
+					<Box
+						rounded="md"
+						bg="muted"
+						style={{ height: '1rem', width: '5rem', animation: 'pulse 2s ease-in-out infinite' }}
+					/>
 				</Flex>
-				<Box rounded="md" bg="muted" style={{ height: '1.5rem', width: '6rem', animation: 'pulse 2s ease-in-out infinite' }} />
+				<Box
+					rounded="md"
+					bg="muted"
+					style={{ height: '1.5rem', width: '6rem', animation: 'pulse 2s ease-in-out infinite' }}
+				/>
 			</HStack>
 		</GlassCard>
 	);
@@ -131,12 +145,7 @@ interface SectionHeaderWithIconProps {
 	action?: React.ReactNode;
 }
 
-function SectionHeaderWithIcon({
-	icon,
-	title,
-	iconBgClass,
-	action,
-}: SectionHeaderWithIconProps) {
+function SectionHeaderWithIcon({ icon, title, iconBgClass, action }: SectionHeaderWithIconProps) {
 	return (
 		<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
 			<HStack gap="sm" align="center">
@@ -147,7 +156,9 @@ function SectionHeaderWithIcon({
 						height: '1.5rem',
 						width: '1.5rem',
 						borderRadius: '0.375rem',
-						backgroundColor: iconBgClass.includes('blue') ? 'hsl(var(--primary) / 0.1)' : 'hsl(270 60% 95%)',
+						backgroundColor: iconBgClass.includes('blue')
+							? 'hsl(var(--primary) / 0.1)'
+							: 'hsl(270 60% 95%)',
 					}}
 				>
 					{icon}
@@ -155,7 +166,14 @@ function SectionHeaderWithIcon({
 				<Heading level={2} size="sm" weight="semibold">
 					{title}
 				</Heading>
-				<Box grow style={{ marginLeft: '0.75rem', height: '1px', backgroundColor: 'hsl(var(--border) / 0.5)' }} />
+				<Box
+					grow
+					style={{
+						marginLeft: '0.75rem',
+						height: '1px',
+						backgroundColor: 'hsl(var(--border) / 0.5)',
+					}}
+				/>
 			</HStack>
 			{action}
 		</HStack>
@@ -174,13 +192,7 @@ interface BankRowProps {
 	animationDelay?: number;
 }
 
-function BankRow({
-	bank,
-	logo,
-	onAddAccount,
-	onLogoChange,
-	animationDelay = 0,
-}: BankRowProps) {
+function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }: BankRowProps) {
 	const hasAccounts = bank.accountCount > 0;
 
 	const animationStyles = {
@@ -212,7 +224,15 @@ function BankRow({
 							{bank.name}
 						</Heading>
 						{hasAccounts ? (
-							<Text size="xs" style={{ padding: '0.125rem 0.5rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }}>
+							<Text
+								size="xs"
+								style={{
+									padding: '0.125rem 0.5rem',
+									borderRadius: '9999px',
+									backgroundColor: 'hsl(var(--muted))',
+									color: 'hsl(var(--muted-foreground))',
+								}}
+							>
 								{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
 							</Text>
 						) : (
@@ -229,11 +249,7 @@ function BankRow({
 				</Flex>
 				{hasAccounts ? (
 					<>
-						<MoneyDisplay
-							amount={bank.totalBalance}
-							size="lg"
-							weight="semibold"
-						/>
+						<MoneyDisplay amount={bank.totalBalance} size="lg" weight="semibold" />
 						<Button
 							variant="ghost"
 							size="sm"
@@ -263,7 +279,15 @@ function BankRow({
 
 			{/* Accounts list */}
 			{bank.accounts.length > 0 && (
-				<VStack gap="sm" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingBottom: '1rem', marginLeft: '4rem' }}>
+				<VStack
+					gap="sm"
+					style={{
+						paddingLeft: '1rem',
+						paddingRight: '1rem',
+						paddingBottom: '1rem',
+						marginLeft: '4rem',
+					}}
+				>
 					{bank.accounts.map((account) => (
 						<AccountRowLink key={account.id} account={account} />
 					))}
@@ -353,24 +377,21 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 					</HStack>
 					{account.members.length > 0 && (
 						<Box style={{ marginTop: '0.375rem' }}>
-							<MemberAvatarGroup
-								members={memberData}
-								size="xs"
-								max={4}
-								spacing="normal"
-							/>
+							<MemberAvatarGroup members={memberData} size="xs" max={4} spacing="normal" />
 						</Box>
 					)}
 				</VStack>
 			</HStack>
 			<HStack gap="sm" align="center">
-				<MoneyDisplay
-					amount={account.balance}
-					size="sm"
-					weight="semibold"
-					autoColor
+				<MoneyDisplay amount={account.balance} size="sm" weight="semibold" autoColor />
+				<ChevronRight
+					style={{
+						height: '1rem',
+						width: '1rem',
+						color: 'hsl(var(--muted-foreground) / 0.4)',
+						transition: 'all 0.2s',
+					}}
 				/>
-				<ChevronRight style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground) / 0.4)', transition: 'all 0.2s' }} />
 			</HStack>
 		</Link>
 	);
@@ -397,10 +418,7 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" style={{ width: '12rem' }}>
 				{banks.map((bank) => (
-					<DropdownMenuItem
-						key={bank.id}
-						onClick={() => onSelectBank(bank)}
-					>
+					<DropdownMenuItem key={bank.id} onClick={() => onSelectBank(bank)}>
 						<HStack gap="sm" align="center">
 							<Box
 								rounded="full"
@@ -425,11 +443,7 @@ interface MemberSelectorChipsProps {
 	onToggle: (id: string) => void;
 }
 
-function MemberSelectorChips({
-	members,
-	selectedIds,
-	onToggle,
-}: MemberSelectorChipsProps) {
+function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorChipsProps) {
 	return (
 		<Flex wrap="wrap" gap="sm">
 			{members.map((member) => {
@@ -458,7 +472,11 @@ function MemberSelectorChips({
 					>
 						<Box
 							rounded="full"
-							style={{ width: '0.625rem', height: '0.625rem', backgroundColor: member.color || '#6b7280' }}
+							style={{
+								width: '0.625rem',
+								height: '0.625rem',
+								backgroundColor: member.color || '#6b7280',
+							}}
 						/>
 						<Text>{member.name}</Text>
 					</Button>
@@ -577,9 +595,7 @@ export default function BanksPage() {
 	// Toggle member selection
 	const toggleMember = (memberId: string) => {
 		setNewAccountMembers((prev) =>
-			prev.includes(memberId)
-				? prev.filter((id) => id !== memberId)
-				: [...prev, memberId]
+			prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId],
 		);
 	};
 
@@ -633,15 +649,16 @@ export default function BanksPage() {
 			{/* Bank accounts section */}
 			<Box mt="xl">
 				<SectionHeaderWithIcon
-					icon={<Landmark style={{ height: '0.875rem', width: '0.875rem', color: 'hsl(var(--primary))' }} />}
+					icon={
+						<Landmark
+							style={{ height: '0.875rem', width: '0.875rem', color: 'hsl(var(--primary))' }}
+						/>
+					}
 					iconBgClass="bg-blue-100"
 					title="Comptes bancaires"
 					action={
 						data?.bankAccounts && (
-							<AddBankDropdown
-								banks={data.bankAccounts}
-								onSelectBank={handleAddAccountClick}
-							/>
+							<AddBankDropdown banks={data.bankAccounts} onSelectBank={handleAddAccountClick} />
 						)
 					}
 				/>
@@ -671,7 +688,11 @@ export default function BanksPage() {
 			{/* Investments section */}
 			<Box mt="xl">
 				<SectionHeaderWithIcon
-					icon={<TrendingUp style={{ height: '0.875rem', width: '0.875rem', color: 'hsl(270 60% 50%)' }} />}
+					icon={
+						<TrendingUp
+							style={{ height: '0.875rem', width: '0.875rem', color: 'hsl(270 60% 50%)' }}
+						/>
+					}
 					iconBgClass="bg-purple-100"
 					title="Investissements"
 					action={
@@ -716,8 +737,17 @@ export default function BanksPage() {
 					<VStack gap="lg">
 						{/* Error message */}
 						{formError && (
-							<Box rounded="md" p="sm" style={{ backgroundColor: 'hsl(var(--destructive) / 0.1)', border: '1px solid hsl(var(--destructive) / 0.2)' }}>
-								<Text size="sm" color="danger">{formError}</Text>
+							<Box
+								rounded="md"
+								p="sm"
+								style={{
+									backgroundColor: 'hsl(var(--destructive) / 0.1)',
+									border: '1px solid hsl(var(--destructive) / 0.2)',
+								}}
+							>
+								<Text size="sm" color="danger">
+									{formError}
+								</Text>
 							</Box>
 						)}
 
@@ -725,7 +755,11 @@ export default function BanksPage() {
 						<VStack gap="sm">
 							<Label
 								htmlFor="accountName"
-								style={{ fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}
+								style={{
+									fontSize: '0.875rem',
+									fontWeight: 500,
+									color: 'hsl(var(--muted-foreground))',
+								}}
 							>
 								Nom du compte
 							</Label>
@@ -742,10 +776,16 @@ export default function BanksPage() {
 						<VStack gap="sm">
 							<Label
 								htmlFor="accountDescription"
-								style={{ fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}
+								style={{
+									fontSize: '0.875rem',
+									fontWeight: 500,
+									color: 'hsl(var(--muted-foreground))',
+								}}
 							>
 								Description
-								<Text size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>(optionnel)</Text>
+								<Text size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
+									(optionnel)
+								</Text>
 							</Label>
 							<Textarea
 								id="accountDescription"
@@ -760,7 +800,11 @@ export default function BanksPage() {
 						<VStack gap="sm">
 							<Label
 								htmlFor="accountType"
-								style={{ fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}
+								style={{
+									fontSize: '0.875rem',
+									fontWeight: 500,
+									color: 'hsl(var(--muted-foreground))',
+								}}
 							>
 								Type de compte
 							</Label>
@@ -781,10 +825,16 @@ export default function BanksPage() {
 						<VStack gap="sm">
 							<Label
 								htmlFor="accountExportUrl"
-								style={{ fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}
+								style={{
+									fontSize: '0.875rem',
+									fontWeight: 500,
+									color: 'hsl(var(--muted-foreground))',
+								}}
 							>
 								Lien d'export
-								<Text size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>(optionnel)</Text>
+								<Text size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
+									(optionnel)
+								</Text>
 							</Label>
 							<Input
 								id="accountExportUrl"
@@ -801,7 +851,13 @@ export default function BanksPage() {
 
 						{/* Member selection */}
 						<VStack gap="sm">
-							<Label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}>
+							<Label
+								style={{
+									fontSize: '0.875rem',
+									fontWeight: 500,
+									color: 'hsl(var(--muted-foreground))',
+								}}
+							>
 								Titulaires
 							</Label>
 							<MemberSelectorChips

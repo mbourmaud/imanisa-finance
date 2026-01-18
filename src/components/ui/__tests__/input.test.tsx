@@ -73,12 +73,7 @@ describe('Input', () => {
 
 	it('renders with all props combined', () => {
 		const { container } = render(
-			<Input
-				size="lg"
-				variant="glass"
-				type="email"
-				placeholder="email@example.com"
-			/>
+			<Input size="lg" variant="glass" type="email" placeholder="email@example.com" />,
 		);
 		const input = container.querySelector('input');
 		expect(input).toHaveClass('h-11', 'backdrop-blur-sm');

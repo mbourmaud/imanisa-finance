@@ -3,9 +3,9 @@
  * Handles data access for transactions with deduplication support
  */
 
-import { prisma } from '@/lib/prisma';
-import type { Transaction, TransactionType, Prisma } from '@/lib/prisma';
 import type { ParsedTransaction } from '@/features/import/parsers/types';
+import type { Prisma, Transaction, TransactionType } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Types
 export interface TransactionWithAccount extends Transaction {
@@ -372,7 +372,11 @@ export const transactionRepository = {
 	/**
 	 * Get transaction summary for a period
 	 */
-	async getSummary(startDate?: Date, endDate?: Date, accountId?: string): Promise<TransactionSummary> {
+	async getSummary(
+		startDate?: Date,
+		endDate?: Date,
+		accountId?: string,
+	): Promise<TransactionSummary> {
 		const where: Prisma.TransactionWhereInput = {
 			isInternal: false,
 			...(startDate && { date: { gte: startDate } }),
@@ -489,7 +493,6 @@ export const transactionRepository = {
 			where: { accountId },
 		});
 	},
-
 };
 
 // Re-export for backwards compatibility

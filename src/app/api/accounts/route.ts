@@ -5,8 +5,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { accountRepository, bankRepository } from '@/server/repositories';
 import type { AccountType } from '@/lib/prisma';
+import { accountRepository, bankRepository } from '@/server/repositories';
 
 export async function GET(request: NextRequest) {
 	try {
@@ -44,8 +44,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json();
-		const { name, bankId, type, description, accountNumber, balance, currency, exportUrl, memberIds, memberShares } =
-			body;
+		const {
+			name,
+			bankId,
+			type,
+			description,
+			accountNumber,
+			balance,
+			currency,
+			exportUrl,
+			memberIds,
+			memberShares,
+		} = body;
 
 		// Validate required fields
 		if (!name || typeof name !== 'string') {
@@ -53,19 +63,13 @@ export async function POST(request: NextRequest) {
 		}
 
 		if (!bankId || typeof bankId !== 'string') {
-			return NextResponse.json(
-				{ error: 'Missing required field: bankId' },
-				{ status: 400 },
-			);
+			return NextResponse.json({ error: 'Missing required field: bankId' }, { status: 400 });
 		}
 
 		// Validate that the bank exists
 		const bank = await bankRepository.getById(bankId);
 		if (!bank) {
-			return NextResponse.json(
-				{ error: `Bank not found: ${bankId}` },
-				{ status: 400 },
-			);
+			return NextResponse.json({ error: `Bank not found: ${bankId}` }, { status: 400 });
 		}
 
 		// Validate type if provided
@@ -84,7 +88,10 @@ export async function POST(request: NextRequest) {
 					);
 				}
 				if (share.ownerShare < 0 || share.ownerShare > 100) {
-					return NextResponse.json({ error: 'ownerShare must be between 0 and 100' }, { status: 400 });
+					return NextResponse.json(
+						{ error: 'ownerShare must be between 0 and 100' },
+						{ status: 400 },
+					);
 				}
 			}
 		}

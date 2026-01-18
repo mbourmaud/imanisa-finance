@@ -132,7 +132,10 @@ export async function getSignedUrl(
 
 		return { url: data.signedUrl, error: null };
 	} catch (err) {
-		return { url: null, error: err instanceof Error ? err : new Error('Failed to create signed URL') };
+		return {
+			url: null,
+			error: err instanceof Error ? err : new Error('Failed to create signed URL'),
+		};
 	}
 }
 
@@ -214,16 +217,16 @@ export async function validateImageDimensions(
 			const bytes = new Uint8Array(buffer);
 			let i = 0;
 			while (i < bytes.length - 9) {
-				if (bytes[i] === 0xFF) {
+				if (bytes[i] === 0xff) {
 					const marker = bytes[i + 1];
 					// SOF0, SOF1, SOF2 markers
-					if (marker >= 0xC0 && marker <= 0xC2) {
+					if (marker >= 0xc0 && marker <= 0xc2) {
 						height = (bytes[i + 5] << 8) | bytes[i + 6];
 						width = (bytes[i + 7] << 8) | bytes[i + 8];
 						break;
 					}
 					// Skip to next marker
-					if (marker !== 0x00 && marker !== 0xFF) {
+					if (marker !== 0x00 && marker !== 0xff) {
 						const length = (bytes[i + 2] << 8) | bytes[i + 3];
 						i += 2 + length;
 						continue;

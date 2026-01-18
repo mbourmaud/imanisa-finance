@@ -1,6 +1,11 @@
 // Types
-export * from './types';
 
+export {
+	createCompactTransactionColumns,
+	createTransactionColumns,
+} from './components/transaction-columns';
+// Components
+export { TransactionTable } from './components/transaction-table';
 // Hooks (Zustand-based)
 export {
 	useTransactionActions,
@@ -8,28 +13,22 @@ export {
 	useTransactionSummary,
 	useTransactions,
 } from './hooks/use-transactions';
-
 // Hooks (TanStack Query-based)
 export {
 	transactionKeys,
-	useTransactionsQuery,
+	useBulkCategorizeMutation,
+	useCreateTransactionMutation,
+	useDeleteTransactionMutation,
+	useOptimisticCreateTransaction,
+	usePrefetchTransactions,
+	useReconcileTransactionsMutation,
 	useTransactionQuery,
 	useTransactionSummaryQuery,
-	useCreateTransactionMutation,
+	useTransactionsQuery,
 	useUpdateTransactionMutation,
-	useDeleteTransactionMutation,
-	useBulkCategorizeMutation,
-	useReconcileTransactionsMutation,
-	usePrefetchTransactions,
-	useOptimisticCreateTransaction,
 } from './hooks/use-transactions-query';
-
-// Components
-export { TransactionTable } from './components/transaction-table';
-export { createTransactionColumns, createCompactTransactionColumns } from './components/transaction-columns';
-
 // Services
 export { transactionService } from './services/transaction-service';
-
 // Store
 export { transactionSelectors, useTransactionStore } from './stores/transaction-store';
+export * from './types';

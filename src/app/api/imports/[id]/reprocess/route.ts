@@ -6,12 +6,12 @@
  * - Useful after improving a parser
  */
 
-import { NextResponse, type NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/auth';
-import { downloadRawFile } from '@/lib/supabase/storage';
+import { type NextRequest, NextResponse } from 'next/server';
 import { parseImport } from '@/features/import/parsers';
-import { rawImportRepository, accountRepository } from '@/server/repositories';
+import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { downloadRawFile } from '@/lib/supabase/storage';
+import { accountRepository, rawImportRepository } from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -71,8 +71,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			const { data: fileBlob, error: downloadError } = await downloadRawFile(rawImport.storagePath);
 
 			if (downloadError || !fileBlob) {
-				await rawImportRepository.markFailed(id, downloadError?.message || 'Failed to download file');
-				return NextResponse.json({ error: 'Failed to download file from storage' }, { status: 500 });
+				await rawImportRepository.markFailed(
+					id,
+					downloadError?.message || 'Failed to download file',
+				);
+				return NextResponse.json(
+					{ error: 'Failed to download file from storage' },
+					{ status: 500 },
+				);
 			}
 
 			// Always pass ArrayBuffer to let the parser handle encoding
@@ -146,7 +152,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			});
 		} catch (processError) {
 			// Mark as failed if processing fails
-			const errorMsg = processError instanceof Error ? processError.message : 'Unknown processing error';
+			const errorMsg =
+				processError instanceof Error ? processError.message : 'Unknown processing error';
 			await rawImportRepository.markFailed(id, errorMsg);
 			throw processError;
 		}

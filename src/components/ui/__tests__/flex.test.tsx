@@ -51,7 +51,7 @@ describe('Flex', () => {
 		const { container } = render(
 			<Flex direction="col" directionSm="row" directionMd="row" directionLg="row">
 				Content
-			</Flex>
+			</Flex>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<div
@@ -275,7 +275,7 @@ describe('Flex', () => {
 		const { container } = render(
 			<Flex direction="col" align="center" justify="between" wrap="wrap" gap="lg">
 				Content
-			</Flex>
+			</Flex>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<div

@@ -1,14 +1,14 @@
-import { render, within, fireEvent } from '@testing-library/react';
+import { fireEvent, render, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import type { TransactionCategory, TransactionData } from '../TransactionRow';
 import {
-	TransactionIcon,
 	CategoryBadge,
 	TransactionAmount,
-	TransactionRow,
+	TransactionIcon,
 	TransactionList,
+	TransactionRow,
 	TransactionRowSkeleton,
 } from '../TransactionRow';
-import type { TransactionData, TransactionCategory } from '../TransactionRow';
 
 // Mock transaction data
 const mockCategory: TransactionCategory = {
@@ -20,7 +20,7 @@ const mockCategory: TransactionCategory = {
 const mockExpenseTransaction: TransactionData = {
 	id: 'tx-1',
 	description: 'Carrefour Market',
-	amount: -125.40,
+	amount: -125.4,
 	currency: 'EUR',
 	type: 'expense',
 	date: new Date('2025-01-16'),
@@ -32,7 +32,7 @@ const mockExpenseTransaction: TransactionData = {
 const mockIncomeTransaction: TransactionData = {
 	id: 'tx-2',
 	description: 'Virement Salaire',
-	amount: 3200.00,
+	amount: 3200.0,
 	currency: 'EUR',
 	type: 'income',
 	date: new Date('2025-01-15'),
@@ -44,7 +44,7 @@ const mockIncomeTransaction: TransactionData = {
 const mockTransferTransaction: TransactionData = {
 	id: 'tx-3',
 	description: 'Virement vers Livret A',
-	amount: -500.00,
+	amount: -500.0,
 	currency: 'EUR',
 	type: 'transfer',
 	date: new Date('2025-01-14'),
@@ -94,9 +94,7 @@ describe('TransactionIcon', () => {
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(
-			<TransactionIcon type="expense" className="custom-class" />
-		);
+		const { container } = render(<TransactionIcon type="expense" className="custom-class" />);
 		const icon = container.querySelector('[data-slot="transaction-icon"]');
 		expect(icon).toHaveClass('custom-class');
 	});
@@ -130,7 +128,7 @@ describe('CategoryBadge', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<CategoryBadge category={mockCategory} className="custom-class" />
+			<CategoryBadge category={mockCategory} className="custom-class" />,
 		);
 		const badge = container.querySelector('[data-slot="category-badge"]');
 		expect(badge).toHaveClass('custom-class');
@@ -139,9 +137,7 @@ describe('CategoryBadge', () => {
 
 describe('TransactionAmount', () => {
 	it('renders income with positive sign', () => {
-		const { container } = render(
-			<TransactionAmount amount={100} type="income" showSign />
-		);
+		const { container } = render(<TransactionAmount amount={100} type="income" showSign />);
 		const amount = container.querySelector('[data-slot="transaction-amount"]');
 		expect(amount).toBeInTheDocument();
 		expect(amount).toHaveTextContent('+');
@@ -149,40 +145,32 @@ describe('TransactionAmount', () => {
 	});
 
 	it('renders expense with negative sign', () => {
-		const { container } = render(
-			<TransactionAmount amount={-100} type="expense" showSign />
-		);
+		const { container } = render(<TransactionAmount amount={-100} type="expense" showSign />);
 		const amount = container.querySelector('[data-slot="transaction-amount"]');
 		expect(amount).toHaveTextContent('-');
 	});
 
 	it('renders without sign when showSign is false', () => {
-		const { container } = render(
-			<TransactionAmount amount={100} type="income" showSign={false} />
-		);
+		const { container } = render(<TransactionAmount amount={100} type="income" showSign={false} />);
 		const amount = container.querySelector('[data-slot="transaction-amount"]');
 		expect(amount?.textContent).not.toMatch(/^\+/);
 	});
 
 	it('renders with size sm', () => {
-		const { container } = render(
-			<TransactionAmount amount={100} type="income" size="sm" />
-		);
+		const { container } = render(<TransactionAmount amount={100} type="income" size="sm" />);
 		const amount = container.querySelector('[data-slot="transaction-amount"]');
 		expect(amount).toHaveClass('text-sm');
 	});
 
 	it('renders with size lg', () => {
-		const { container } = render(
-			<TransactionAmount amount={100} type="income" size="lg" />
-		);
+		const { container } = render(<TransactionAmount amount={100} type="income" size="lg" />);
 		const amount = container.querySelector('[data-slot="transaction-amount"]');
 		expect(amount).toHaveClass('text-lg');
 	});
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<TransactionAmount amount={100} type="income" className="custom-class" />
+			<TransactionAmount amount={100} type="income" className="custom-class" />,
 		);
 		const amount = container.querySelector('[data-slot="transaction-amount"]');
 		expect(amount).toHaveClass('custom-class');
@@ -199,11 +187,7 @@ describe('TransactionRow', () => {
 
 	it('shows category and account', () => {
 		const { container } = render(
-			<TransactionRow
-				transaction={mockExpenseTransaction}
-				showCategory
-				showAccount
-			/>
+			<TransactionRow transaction={mockExpenseTransaction} showCategory showAccount />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]') as HTMLElement;
 		expect(within(row).getByText('Courses')).toBeInTheDocument();
@@ -212,7 +196,7 @@ describe('TransactionRow', () => {
 
 	it('hides category when showCategory is false', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} showCategory={false} />
+			<TransactionRow transaction={mockExpenseTransaction} showCategory={false} />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]') as HTMLElement;
 		expect(within(row).queryByText('Courses')).not.toBeInTheDocument();
@@ -220,7 +204,7 @@ describe('TransactionRow', () => {
 
 	it('hides account when showAccount is false', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} showAccount={false} />
+			<TransactionRow transaction={mockExpenseTransaction} showAccount={false} />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]') as HTMLElement;
 		expect(within(row).queryByText('Compte principal')).not.toBeInTheDocument();
@@ -240,7 +224,7 @@ describe('TransactionRow', () => {
 
 	it('renders with variant compact', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} variant="compact" />
+			<TransactionRow transaction={mockExpenseTransaction} variant="compact" />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]');
 		expect(row).toHaveClass('p-3');
@@ -248,7 +232,7 @@ describe('TransactionRow', () => {
 
 	it('renders with variant default', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} variant="default" />
+			<TransactionRow transaction={mockExpenseTransaction} variant="default" />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]');
 		expect(row).toHaveClass('p-4');
@@ -256,7 +240,7 @@ describe('TransactionRow', () => {
 
 	it('renders with variant detailed', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} variant="detailed" />
+			<TransactionRow transaction={mockExpenseTransaction} variant="detailed" />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]');
 		expect(row).toHaveClass('p-5');
@@ -267,7 +251,7 @@ describe('TransactionRow', () => {
 
 	it('renders with selectable checkbox', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} selectable />
+			<TransactionRow transaction={mockExpenseTransaction} selectable />,
 		);
 		const checkbox = container.querySelector('[data-slot="checkbox"]');
 		expect(checkbox).toBeInTheDocument();
@@ -280,7 +264,7 @@ describe('TransactionRow', () => {
 				transaction={mockExpenseTransaction}
 				selectable
 				onSelectChange={handleSelect}
-			/>
+			/>,
 		);
 		const checkbox = container.querySelector('[data-slot="checkbox"]') as HTMLElement;
 		fireEvent.click(checkbox);
@@ -289,7 +273,7 @@ describe('TransactionRow', () => {
 
 	it('renders with interactive prop', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} interactive />
+			<TransactionRow transaction={mockExpenseTransaction} interactive />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]');
 		expect(row).toHaveClass('cursor-pointer');
@@ -303,7 +287,7 @@ describe('TransactionRow', () => {
 				transaction={mockExpenseTransaction}
 				interactive
 				onTransactionClick={handleClick}
-			/>
+			/>,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]') as HTMLElement;
 		fireEvent.click(row);
@@ -312,11 +296,7 @@ describe('TransactionRow', () => {
 
 	it('shows selected state', () => {
 		const { container } = render(
-			<TransactionRow
-				transaction={mockExpenseTransaction}
-				selectable
-				selected
-			/>
+			<TransactionRow transaction={mockExpenseTransaction} selectable selected />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]');
 		expect(row).toHaveClass('bg-muted/50');
@@ -324,7 +304,7 @@ describe('TransactionRow', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<TransactionRow transaction={mockExpenseTransaction} className="custom-class" />
+			<TransactionRow transaction={mockExpenseTransaction} className="custom-class" />,
 		);
 		const row = container.querySelector('[data-slot="transaction-row"]');
 		expect(row).toHaveClass('custom-class');
@@ -332,11 +312,7 @@ describe('TransactionRow', () => {
 });
 
 describe('TransactionList', () => {
-	const mockTransactions = [
-		mockExpenseTransaction,
-		mockIncomeTransaction,
-		mockTransferTransaction,
-	];
+	const mockTransactions = [mockExpenseTransaction, mockIncomeTransaction, mockTransferTransaction];
 
 	it('renders list of transactions', () => {
 		const { container } = render(<TransactionList transactions={mockTransactions} />);
@@ -348,7 +324,7 @@ describe('TransactionList', () => {
 
 	it('passes variant to all rows', () => {
 		const { container } = render(
-			<TransactionList transactions={mockTransactions} variant="compact" />
+			<TransactionList transactions={mockTransactions} variant="compact" />,
 		);
 		const rows = container.querySelectorAll('[data-slot="transaction-row"]');
 		rows.forEach((row) => {
@@ -364,7 +340,7 @@ describe('TransactionList', () => {
 				selectable
 				selectedIds={[]}
 				onSelectionChange={handleSelectionChange}
-			/>
+			/>,
 		);
 		const checkboxes = container.querySelectorAll('[data-slot="checkbox"]');
 		fireEvent.click(checkboxes[0]);
@@ -379,7 +355,7 @@ describe('TransactionList', () => {
 				selectable
 				selectedIds={['tx-1', 'tx-2']}
 				onSelectionChange={handleSelectionChange}
-			/>
+			/>,
 		);
 		const checkboxes = container.querySelectorAll('[data-slot="checkbox"]');
 		fireEvent.click(checkboxes[0]);
@@ -393,7 +369,7 @@ describe('TransactionList', () => {
 				transactions={mockTransactions}
 				interactive
 				onTransactionClick={handleClick}
-			/>
+			/>,
 		);
 		const rows = container.querySelectorAll('[data-slot="transaction-row"]');
 		fireEvent.click(rows[1]);
@@ -402,7 +378,7 @@ describe('TransactionList', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<TransactionList transactions={mockTransactions} className="custom-class" />
+			<TransactionList transactions={mockTransactions} className="custom-class" />,
 		);
 		const list = container.querySelector('[data-slot="transaction-list"]');
 		expect(list).toHaveClass('custom-class');

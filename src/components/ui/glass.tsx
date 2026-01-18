@@ -48,15 +48,8 @@ const radiusClasses: Record<GlassRadius, string> = {
 
 const Glass = forwardRef<HTMLDivElement, GlassProps>(
 	(
-		{
-			className,
-			variant = 'card',
-			padding = 'md',
-			radius = '2xl',
-			interactive = false,
-			...props
-		},
-		ref
+		{ className, variant = 'card', padding = 'md', radius = '2xl', interactive = false, ...props },
+		ref,
 	) => {
 		return (
 			<div
@@ -65,13 +58,14 @@ const Glass = forwardRef<HTMLDivElement, GlassProps>(
 					variantClasses[variant],
 					paddingClasses[padding],
 					radiusClasses[radius],
-					interactive && 'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg cursor-pointer',
-					className
+					interactive &&
+						'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg cursor-pointer',
+					className,
 				)}
 				{...props}
 			/>
 		);
-	}
+	},
 );
 Glass.displayName = 'Glass';
 

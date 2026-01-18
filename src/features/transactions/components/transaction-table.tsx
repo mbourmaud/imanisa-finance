@@ -7,28 +7,33 @@
  * Supports sorting, filtering, pagination, and row selection.
  */
 
-import { useMemo, useState, useCallback } from 'react';
-import type { PaginationState, RowSelectionState, SortingState, Updater } from '@tanstack/react-table';
+import type {
+	PaginationState,
+	RowSelectionState,
+	SortingState,
+	Updater,
+} from '@tanstack/react-table';
+import { useCallback, useMemo, useState } from 'react';
 import {
-	Search,
-	X,
-	DataTable,
-	Input,
+	Box,
 	Button,
+	DataTable,
+	Flex,
+	HStack,
+	Input,
+	Search,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	VStack,
-	HStack,
-	Box,
-	Flex,
 	Text,
+	VStack,
+	X,
 } from '@/components';
 import { useTransactionsQuery } from '../hooks/use-transactions-query';
-import { createTransactionColumns } from './transaction-columns';
 import type { Transaction, TransactionFilters, TransactionType } from '../types';
+import { createTransactionColumns } from './transaction-columns';
 
 interface TransactionTableProps {
 	/** Initial filters to apply */
@@ -148,7 +153,17 @@ export function TransactionTable({
 			{/* Filters */}
 			<Flex gap="md" style={{ flexDirection: 'column' }}>
 				<Box position="relative" style={{ flex: 1 }}>
-					<Search style={{ position: 'absolute', left: '0.75rem', top: '50%', height: '1rem', width: '1rem', transform: 'translateY(-50%)', color: 'hsl(var(--muted-foreground))' }} />
+					<Search
+						style={{
+							position: 'absolute',
+							left: '0.75rem',
+							top: '50%',
+							height: '1rem',
+							width: '1rem',
+							transform: 'translateY(-50%)',
+							color: 'hsl(var(--muted-foreground))',
+						}}
+					/>
 					<Input
 						placeholder="Rechercher une transaction..."
 						value={search}
@@ -157,7 +172,10 @@ export function TransactionTable({
 					/>
 				</Box>
 				<HStack gap="md">
-					<Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as TransactionType | 'all')}>
+					<Select
+						value={typeFilter}
+						onValueChange={(v) => setTypeFilter(v as TransactionType | 'all')}
+					>
 						<SelectTrigger style={{ width: '150px' }}>
 							<SelectValue placeholder="Type" />
 						</SelectTrigger>
@@ -168,7 +186,11 @@ export function TransactionTable({
 						</SelectContent>
 					</Select>
 					{hasActiveFilters && (
-						<Button variant="ghost" onClick={clearFilters} iconLeft={<X style={{ height: '1rem', width: '1rem' }} />}>
+						<Button
+							variant="ghost"
+							onClick={clearFilters}
+							iconLeft={<X style={{ height: '1rem', width: '1rem' }} />}
+						>
 							Effacer
 						</Button>
 					)}

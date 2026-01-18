@@ -10,30 +10,30 @@
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
+	Box,
+	Button,
 	Calendar,
 	CreditCard,
 	Download,
 	Filter,
-	Search,
-	Button,
+	GlassCard,
+	Heading,
+	HStack,
 	Input,
+	PageHeader,
+	Search,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	PageHeader,
 	StatCard,
 	StatCardGrid,
-	GlassCard,
-	Box,
-	VStack,
-	HStack,
 	Text,
-	Heading,
+	VStack,
 } from '@/components';
 import { MoneyDifference } from '@/components/common/MoneyDisplay';
-import { formatMoney, formatDate as formatDateUtil } from '@/shared/utils';
+import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
 
 // Mock transaction data
 const transactions = [
@@ -147,7 +147,10 @@ export default function TransactionsPage() {
 				title="Transactions"
 				description="Historique de toutes vos transactions"
 				actions={
-					<Button variant="outline" iconLeft={<Download style={{ height: '1rem', width: '1rem' }} />}>
+					<Button
+						variant="outline"
+						iconLeft={<Download style={{ height: '1rem', width: '1rem' }} />}
+					>
 						Exporter
 					</Button>
 				}
@@ -179,21 +182,20 @@ export default function TransactionsPage() {
 
 			{/* Filters */}
 			<GlassCard padding="md">
-				<Box
-					display="flex"
-					style={{ flexDirection: 'column', gap: '1rem' }}
-				>
+				<Box display="flex" style={{ flexDirection: 'column', gap: '1rem' }}>
 					<HStack gap="md" style={{ flexWrap: 'wrap' }}>
 						<Box style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
-							<Search style={{
-								position: 'absolute',
-								left: '0.75rem',
-								top: '50%',
-								transform: 'translateY(-50%)',
-								height: '1rem',
-								width: '1rem',
-								color: 'hsl(var(--muted-foreground))',
-							}} />
+							<Search
+								style={{
+									position: 'absolute',
+									left: '0.75rem',
+									top: '50%',
+									transform: 'translateY(-50%)',
+									height: '1rem',
+									width: '1rem',
+									color: 'hsl(var(--muted-foreground))',
+								}}
+							/>
 							<Input
 								placeholder="Rechercher une transaction..."
 								style={{
@@ -247,9 +249,18 @@ export default function TransactionsPage() {
 			{/* Transactions List */}
 			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
-				<HStack justify="between" align="center" p="md" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
-					<Heading level={3} size="md">Toutes les transactions</Heading>
-					<Text size="sm" color="muted">{transactions.length} opérations</Text>
+				<HStack
+					justify="between"
+					align="center"
+					p="md"
+					style={{ borderBottom: '1px solid hsl(var(--border))' }}
+				>
+					<Heading level={3} size="md">
+						Toutes les transactions
+					</Heading>
+					<Text size="sm" color="muted">
+						{transactions.length} opérations
+					</Text>
 				</HStack>
 
 				{/* List */}
@@ -274,13 +285,22 @@ export default function TransactionsPage() {
 										width: '2.5rem',
 										alignItems: 'center',
 										justifyContent: 'center',
-										backgroundColor: tx.amount > 0 ? 'oklch(0.55 0.15 145 / 0.1)' : 'hsl(var(--muted) / 0.3)',
+										backgroundColor:
+											tx.amount > 0 ? 'oklch(0.55 0.15 145 / 0.1)' : 'hsl(var(--muted) / 0.3)',
 									}}
 								>
 									{tx.amount > 0 ? (
-										<ArrowDownLeft style={{ height: '1.25rem', width: '1.25rem', color: 'oklch(0.55 0.15 145)' }} />
+										<ArrowDownLeft
+											style={{ height: '1.25rem', width: '1.25rem', color: 'oklch(0.55 0.15 145)' }}
+										/>
 									) : (
-										<CreditCard style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--muted-foreground))' }} />
+										<CreditCard
+											style={{
+												height: '1.25rem',
+												width: '1.25rem',
+												color: 'hsl(var(--muted-foreground))',
+											}}
+										/>
 									)}
 								</Box>
 								<VStack gap="none">
@@ -291,11 +311,10 @@ export default function TransactionsPage() {
 								</VStack>
 							</HStack>
 							<VStack gap="none" align="end">
-								<MoneyDifference
-									amount={tx.amount}
-									size="md"
-								/>
-								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>{formatDate(tx.date)}</Text>
+								<MoneyDifference amount={tx.amount} size="md" />
+								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
+									{formatDate(tx.date)}
+								</Text>
 							</VStack>
 						</HStack>
 					))}

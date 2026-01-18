@@ -193,7 +193,7 @@ const Grid = forwardRef<HTMLDivElement, GridProps>(
 			fullWidth,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		return (
 			<div
@@ -213,12 +213,12 @@ const Grid = forwardRef<HTMLDivElement, GridProps>(
 					justifyItems && justifyItemsClasses[justifyItems],
 					fullHeight && 'h-full',
 					fullWidth && 'w-full',
-					className
+					className,
 				)}
 				{...props}
 			/>
 		);
-	}
+	},
 );
 Grid.displayName = 'Grid';
 

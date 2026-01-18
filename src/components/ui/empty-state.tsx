@@ -1,8 +1,8 @@
 'use client';
 
+import type { LucideIcon } from 'lucide-react';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import type { LucideIcon } from 'lucide-react';
 
 // =============================================================================
 // EMPTY STATE TYPES
@@ -110,22 +110,14 @@ const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
 							iconContainerSizeClasses[size],
 						)}
 					>
-						{iconElement || (Icon && (
-							<Icon className={cn('text-muted-foreground', iconSizeClasses[size])} />
-						))}
+						{iconElement ||
+							(Icon && <Icon className={cn('text-muted-foreground', iconSizeClasses[size])} />)}
 					</div>
 				)}
 
 				{/* Text content */}
 				<div className={cn(isInline && 'flex-1')}>
-					<h3
-						className={cn(
-							'font-semibold text-foreground',
-							titleSizeClasses[size],
-						)}
-					>
-						{title}
-					</h3>
+					<h3 className={cn('font-semibold text-foreground', titleSizeClasses[size])}>{title}</h3>
 					{description && (
 						<p
 							className={cn(
@@ -140,11 +132,7 @@ const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
 				</div>
 
 				{/* Action */}
-				{action && (
-					<div className={cn('mt-4', isInline && 'ml-auto mt-0')}>
-						{action}
-					</div>
-				)}
+				{action && <div className={cn('mt-4', isInline && 'ml-auto mt-0')}>{action}</div>}
 			</div>
 		);
 	},
@@ -222,9 +210,4 @@ export {
 	EmptyStateNoResults,
 	EmptyStateError,
 };
-export type {
-	EmptyStateProps,
-	EmptyStatePresetProps,
-	EmptyStateSize,
-	EmptyStateVariant,
-};
+export type { EmptyStateProps, EmptyStatePresetProps, EmptyStateSize, EmptyStateVariant };

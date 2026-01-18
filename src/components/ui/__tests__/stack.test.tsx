@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { VStack, HStack } from '../stack';
 import { Spacer } from '../spacer';
+import { HStack, VStack } from '../stack';
 
 describe('VStack', () => {
 	it('renders with default props', () => {
@@ -333,7 +333,7 @@ describe('Spacer', () => {
 				<span>Left</span>
 				<Spacer />
 				<span>Right</span>
-			</HStack>
+			</HStack>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<div

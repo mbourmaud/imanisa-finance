@@ -1,16 +1,8 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
 import { useState } from 'react';
-import {
-	Wallet,
-	Box,
-	VStack,
-	Heading,
-	Text,
-	Button,
-	GlassCard,
-} from '@/components';
+import { Box, Button, GlassCard, Heading, Text, VStack, Wallet } from '@/components';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +31,15 @@ export default function LoginPage() {
 		<Box
 			display="flex"
 			p="lg"
-			style={{ position: 'relative', overflow: 'hidden', backgroundColor: 'hsl(var(--background))', minHeight: '100vh', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+			style={{
+				position: 'relative',
+				overflow: 'hidden',
+				backgroundColor: 'hsl(var(--background))',
+				minHeight: '100vh',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center',
+			}}
 		>
 			{/* Background gradient blobs */}
 			<Box style={{ position: 'absolute', overflow: 'hidden', inset: 0, zIndex: -10 }}>
@@ -86,7 +86,11 @@ export default function LoginPage() {
 			</Box>
 
 			{/* Logo */}
-			<VStack gap="lg" align="center" style={{ marginBottom: '1.5rem', animation: 'fadeIn 0.5s ease-out' }}>
+			<VStack
+				gap="lg"
+				align="center"
+				style={{ marginBottom: '1.5rem', animation: 'fadeIn 0.5s ease-out' }}
+			>
 				<Box style={{ position: 'relative' }}>
 					<Box
 						display="flex"
@@ -96,7 +100,8 @@ export default function LoginPage() {
 							width: '5rem',
 							alignItems: 'center',
 							justifyContent: 'center',
-							background: 'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
+							background:
+								'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
 							boxShadow: '0 25px 50px -12px hsl(var(--primary) / 0.4)',
 						}}
 					>
@@ -122,14 +127,17 @@ export default function LoginPage() {
 						style={{
 							fontWeight: 700,
 							letterSpacing: '-0.025em',
-							backgroundImage: 'linear-gradient(to right, hsl(var(--foreground)), hsl(var(--foreground) / 0.7))',
+							backgroundImage:
+								'linear-gradient(to right, hsl(var(--foreground)), hsl(var(--foreground) / 0.7))',
 							WebkitBackgroundClip: 'text',
 							backgroundClip: 'text',
 						}}
 					>
 						Imanisa
 					</Heading>
-					<Text color="muted" size="lg">Finance familiale</Text>
+					<Text color="muted" size="lg">
+						Finance familiale
+					</Text>
 				</VStack>
 			</VStack>
 
@@ -137,7 +145,9 @@ export default function LoginPage() {
 			<Box style={{ maxWidth: '24rem', width: '100%' }}>
 				<GlassCard padding="lg" variant="elevated">
 					<VStack gap="lg">
-						<Heading level={2} size="lg" align="center">Connexion</Heading>
+						<Heading level={2} size="lg" align="center">
+							Connexion
+						</Heading>
 
 						<Button
 							onClick={handleGoogleLogin}
@@ -153,7 +163,11 @@ export default function LoginPage() {
 								gap: '0.75rem',
 							}}
 						>
-							<svg style={{ height: '1.25rem', width: '1.25rem' }} viewBox="0 0 24 24" aria-hidden="true">
+							<svg
+								style={{ height: '1.25rem', width: '1.25rem' }}
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
 								<title>Logo Google</title>
 								<path
 									fill="#4285F4"

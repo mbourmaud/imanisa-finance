@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import { PiggyBank, TrendingUp, Users, Wallet } from 'lucide-react';
 import { describe, expect, it } from 'vitest';
-import { Wallet, TrendingUp, Users, PiggyBank } from 'lucide-react';
 import { StatCard, StatCardGrid, StatCardSkeleton } from '../stat-card';
 
 describe('StatCard', () => {
@@ -55,9 +55,7 @@ describe('StatCard', () => {
 	});
 
 	it('renders with icon', () => {
-		const { container } = render(
-			<StatCard label="Balance" value="$5,000" icon={Wallet} />
-		);
+		const { container } = render(<StatCard label="Balance" value="$5,000" icon={Wallet} />);
 		const icon = container.querySelector('.stat-card-icon');
 		expect(icon).toBeInTheDocument();
 		expect(container.querySelector('svg')).toBeInTheDocument();
@@ -70,7 +68,7 @@ describe('StatCard', () => {
 
 	it('renders with trend up', () => {
 		const { container } = render(
-			<StatCard label="Growth" value="$500" trend="up" trendValue="+12.5%" />
+			<StatCard label="Growth" value="$500" trend="up" trendValue="+12.5%" />,
 		);
 		expect(screen.getByText('+12.5%')).toBeInTheDocument();
 		// The trend value is inside a span with value-positive class
@@ -84,7 +82,7 @@ describe('StatCard', () => {
 
 	it('renders with trend down', () => {
 		const { container } = render(
-			<StatCard label="Expenses" value="$800" trend="down" trendValue="-5.2%" />
+			<StatCard label="Expenses" value="$800" trend="down" trendValue="-5.2%" />,
 		);
 		expect(screen.getByText('-5.2%')).toBeInTheDocument();
 		// The trend value is inside a span with value-negative class
@@ -94,9 +92,7 @@ describe('StatCard', () => {
 	});
 
 	it('renders with trend neutral (no indicator)', () => {
-		const { container } = render(
-			<StatCard label="Balance" value="$1,000" trend="neutral" />
-		);
+		const { container } = render(<StatCard label="Balance" value="$1,000" trend="neutral" />);
 		// Should not have trend icon when neutral
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toBeInTheDocument();
@@ -106,17 +102,13 @@ describe('StatCard', () => {
 	});
 
 	it('renders with interactive prop', () => {
-		const { container } = render(
-			<StatCard label="Click me" value="$100" interactive />
-		);
+		const { container } = render(<StatCard label="Click me" value="$100" interactive />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toHaveClass('cursor-pointer');
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(
-			<StatCard label="Test" value="100" className="custom-class" />
-		);
+		const { container } = render(<StatCard label="Test" value="100" className="custom-class" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toHaveClass('custom-class');
 	});
@@ -132,7 +124,7 @@ describe('StatCard', () => {
 				trend="up"
 				trendValue="+15%"
 				interactive
-			/>
+			/>,
 		);
 
 		const card = container.querySelector('[data-slot="stat-card"]');
@@ -150,7 +142,7 @@ describe('StatCardGrid', () => {
 			<StatCardGrid>
 				<StatCard label="A" value="1" />
 				<StatCard label="B" value="2" />
-			</StatCardGrid>
+			</StatCardGrid>,
 		);
 		const grid = container.querySelector('[data-slot="stat-card-grid"]');
 		expect(grid).toBeInTheDocument();
@@ -162,7 +154,7 @@ describe('StatCardGrid', () => {
 			<StatCardGrid columns={2}>
 				<StatCard label="A" value="1" />
 				<StatCard label="B" value="2" />
-			</StatCardGrid>
+			</StatCardGrid>,
 		);
 		const grid = container.querySelector('[data-slot="stat-card-grid"]');
 		expect(grid).toHaveClass('sm:grid-cols-2');
@@ -175,7 +167,7 @@ describe('StatCardGrid', () => {
 				<StatCard label="A" value="1" />
 				<StatCard label="B" value="2" />
 				<StatCard label="C" value="3" />
-			</StatCardGrid>
+			</StatCardGrid>,
 		);
 		const grid = container.querySelector('[data-slot="stat-card-grid"]');
 		expect(grid).toHaveClass('lg:grid-cols-3');
@@ -185,7 +177,7 @@ describe('StatCardGrid', () => {
 		const { container } = render(
 			<StatCardGrid className="custom-grid">
 				<StatCard label="A" value="1" />
-			</StatCardGrid>
+			</StatCardGrid>,
 		);
 		const grid = container.querySelector('[data-slot="stat-card-grid"]');
 		expect(grid).toHaveClass('custom-grid');
@@ -197,7 +189,7 @@ describe('StatCardGrid', () => {
 				<StatCard label="Card 1" value="100" />
 				<StatCard label="Card 2" value="200" />
 				<StatCard label="Card 3" value="300" />
-			</StatCardGrid>
+			</StatCardGrid>,
 		);
 		expect(screen.getByText('Card 1')).toBeInTheDocument();
 		expect(screen.getByText('Card 2')).toBeInTheDocument();
@@ -243,11 +235,25 @@ describe('StatCard composition', () => {
 	it('renders multiple cards in a grid', () => {
 		const { container } = render(
 			<StatCardGrid>
-				<StatCard variant="coral" icon={Wallet} label="Account Balance" value="$10,500" trend="up" trendValue="+5%" />
+				<StatCard
+					variant="coral"
+					icon={Wallet}
+					label="Account Balance"
+					value="$10,500"
+					trend="up"
+					trendValue="+5%"
+				/>
 				<StatCard variant="teal" icon={Users} label="Family Members" value="4" />
-				<StatCard variant="purple" icon={PiggyBank} label="Total Savings" value="$2,300" trend="down" trendValue="-2%" />
+				<StatCard
+					variant="purple"
+					icon={PiggyBank}
+					label="Total Savings"
+					value="$2,300"
+					trend="down"
+					trendValue="-2%"
+				/>
 				<StatCard variant="gold" icon={TrendingUp} label="Monthly Growth" value="12%" />
-			</StatCardGrid>
+			</StatCardGrid>,
 		);
 
 		// Use container queries to avoid multiple element issues from previous tests

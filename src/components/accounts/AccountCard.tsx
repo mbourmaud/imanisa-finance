@@ -7,18 +7,18 @@
  * Supports different variants, bank avatars, member badges, and interactive states.
  */
 
-import * as React from 'react';
-import { forwardRef } from 'react';
-import Link from 'next/link';
 import {
 	Building,
 	ChevronRight,
 	CreditCard,
+	type LucideIcon,
 	PiggyBank,
 	TrendingUp,
 	Wallet,
-	type LucideIcon,
 } from 'lucide-react';
+import Link from 'next/link';
+import type * as React from 'react';
+import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 // Types
@@ -67,10 +67,7 @@ export interface AccountData {
 
 // Account type configuration
 
-const accountTypeConfig: Record<
-	string,
-	{ label: string; labelShort: string; icon: LucideIcon }
-> = {
+const accountTypeConfig: Record<string, { label: string; labelShort: string; icon: LucideIcon }> = {
 	CHECKING: { label: 'Compte courant', labelShort: 'Courant', icon: Wallet },
 	SAVINGS: { label: 'Livret', labelShort: 'Épargne', icon: PiggyBank },
 	INVESTMENT: {
@@ -156,11 +153,10 @@ export const AccountIcon = forwardRef<HTMLDivElement, AccountIconProps>(
 				className={cn(
 					'flex items-center justify-center rounded-xl transition-colors',
 					iconSizeClasses[size],
-					className
+					className,
 				)}
 				style={{
-					backgroundColor:
-						showBankColor && bankColor ? `${bankColor}20` : undefined,
+					backgroundColor: showBankColor && bankColor ? `${bankColor}20` : undefined,
 				}}
 				{...props}
 			>
@@ -172,41 +168,37 @@ export const AccountIcon = forwardRef<HTMLDivElement, AccountIconProps>(
 				/>
 			</div>
 		);
-	}
+	},
 );
 AccountIcon.displayName = 'AccountIcon';
 
 // AccountTypeBadge Component
 
-export interface AccountTypeBadgeProps
-	extends React.HTMLAttributes<HTMLSpanElement> {
+export interface AccountTypeBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 	type: AccountType;
 	variant?: 'default' | 'subtle';
 }
 
-export const AccountTypeBadge = forwardRef<
-	HTMLSpanElement,
-	AccountTypeBadgeProps
->(({ className, type, variant = 'default', ...props }, ref) => {
-	const config = getAccountTypeConfig(type);
+export const AccountTypeBadge = forwardRef<HTMLSpanElement, AccountTypeBadgeProps>(
+	({ className, type, variant = 'default', ...props }, ref) => {
+		const config = getAccountTypeConfig(type);
 
-	return (
-		<span
-			ref={ref}
-			data-slot="account-type-badge"
-			className={cn(
-				'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
-				variant === 'default'
-					? 'bg-muted text-muted-foreground'
-					: 'text-muted-foreground',
-				className
-			)}
-			{...props}
-		>
-			{config.labelShort}
-		</span>
-	);
-});
+		return (
+			<span
+				ref={ref}
+				data-slot="account-type-badge"
+				className={cn(
+					'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
+					variant === 'default' ? 'bg-muted text-muted-foreground' : 'text-muted-foreground',
+					className,
+				)}
+				{...props}
+			>
+				{config.labelShort}
+			</span>
+		);
+	},
+);
 AccountTypeBadge.displayName = 'AccountTypeBadge';
 
 // MemberBadge Component (simplified, full version in UI-015)
@@ -246,7 +238,7 @@ export const MemberBadge = forwardRef<HTMLDivElement, MemberBadgeProps>(
 				)}
 			</div>
 		);
-	}
+	},
 );
 MemberBadge.displayName = 'MemberBadge';
 
@@ -285,7 +277,7 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 			onAccountClick,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const handleClick = () => {
 			if (interactive && onAccountClick) {
@@ -306,11 +298,7 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 					<AccountIcon
 						account={account}
 						size={variant === 'compact' ? 'sm' : 'md'}
-						className={
-							!account.bank?.color
-								? 'bg-muted/50 text-muted-foreground'
-								: undefined
-						}
+						className={!account.bank?.color ? 'bg-muted/50 text-muted-foreground' : undefined}
 					/>
 					<div className="min-w-0 flex-1">
 						<div className="flex items-center gap-2">
@@ -318,9 +306,7 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 							{showType && <AccountTypeBadge type={account.type} variant="subtle" />}
 						</div>
 						{showBank && account.bank && (
-							<p className="text-xs text-muted-foreground truncate">
-								{account.bank.name}
-							</p>
+							<p className="text-xs text-muted-foreground truncate">{account.bank.name}</p>
 						)}
 						{variant === 'detailed' && showMembers && account.members && (
 							<div className="flex flex-wrap gap-2 mt-2">
@@ -335,7 +321,7 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 					<p
 						className={cn(
 							'font-medium number-display whitespace-nowrap',
-							account.balance < 0 && 'value-negative'
+							account.balance < 0 && 'value-negative',
 						)}
 					>
 						{formatBalance(account.balance, account.currency)}
@@ -351,17 +337,13 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 			'glass-card flex items-center justify-between gap-4 transition-colors',
 			cardVariantClasses[variant],
 			interactive && 'cursor-pointer group hover:bg-muted/50',
-			className
+			className,
 		);
 
 		// If href is provided, render as Link
 		if (href) {
 			return (
-				<Link
-					href={href}
-					data-slot="account-card"
-					className={cardClasses}
-				>
+				<Link href={href} data-slot="account-card" className={cardClasses}>
 					{cardContent}
 				</Link>
 			);
@@ -381,7 +363,7 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 				{cardContent}
 			</div>
 		);
-	}
+	},
 );
 AccountCard.displayName = 'AccountCard';
 
@@ -392,8 +374,7 @@ export interface AccountCardListItem {
 	href?: string;
 }
 
-export interface AccountCardListProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface AccountCardListProps extends React.HTMLAttributes<HTMLDivElement> {
 	accounts: AccountCardListItem[];
 	variant?: AccountCardVariant;
 	interactive?: boolean;
@@ -414,7 +395,7 @@ export const AccountCardList = forwardRef<HTMLDivElement, AccountCardListProps>(
 			onAccountClick,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		return (
 			<div
@@ -437,46 +418,41 @@ export const AccountCardList = forwardRef<HTMLDivElement, AccountCardListProps>(
 				))}
 			</div>
 		);
-	}
+	},
 );
 AccountCardList.displayName = 'AccountCardList';
 
 // AccountCardSkeleton Component
 
-export interface AccountCardSkeletonProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface AccountCardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 	variant?: AccountCardVariant;
 }
 
-export const AccountCardSkeleton = forwardRef<
-	HTMLDivElement,
-	AccountCardSkeletonProps
->(({ className, variant = 'default', ...props }, ref) => {
-	return (
-		<div
-			ref={ref}
-			data-slot="account-card-skeleton"
-			className={cn(
-				'glass-card flex items-center justify-between gap-4 animate-pulse',
-				cardVariantClasses[variant],
-				className
-			)}
-			{...props}
-		>
-			<div className="flex items-center gap-3 sm:gap-4">
-				<div
-					className={cn(
-						'rounded-xl bg-muted',
-						variant === 'compact' ? 'h-8 w-8' : 'h-10 w-10'
-					)}
-				/>
-				<div className="space-y-2">
-					<div className="h-4 w-32 bg-muted rounded" />
-					<div className="h-3 w-24 bg-muted rounded" />
+export const AccountCardSkeleton = forwardRef<HTMLDivElement, AccountCardSkeletonProps>(
+	({ className, variant = 'default', ...props }, ref) => {
+		return (
+			<div
+				ref={ref}
+				data-slot="account-card-skeleton"
+				className={cn(
+					'glass-card flex items-center justify-between gap-4 animate-pulse',
+					cardVariantClasses[variant],
+					className,
+				)}
+				{...props}
+			>
+				<div className="flex items-center gap-3 sm:gap-4">
+					<div
+						className={cn('rounded-xl bg-muted', variant === 'compact' ? 'h-8 w-8' : 'h-10 w-10')}
+					/>
+					<div className="space-y-2">
+						<div className="h-4 w-32 bg-muted rounded" />
+						<div className="h-3 w-24 bg-muted rounded" />
+					</div>
 				</div>
+				<div className="h-4 w-20 bg-muted rounded" />
 			</div>
-			<div className="h-4 w-20 bg-muted rounded" />
-		</div>
-	);
-});
+		);
+	},
+);
 AccountCardSkeleton.displayName = 'AccountCardSkeleton';

@@ -55,23 +55,44 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 		// Validate numeric fields if provided
 		if (initialAmount !== undefined && (typeof initialAmount !== 'number' || initialAmount <= 0)) {
-			return NextResponse.json({ error: 'initialAmount must be a positive number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'initialAmount must be a positive number' },
+				{ status: 400 },
+			);
 		}
-		if (remainingAmount !== undefined && (typeof remainingAmount !== 'number' || remainingAmount < 0)) {
-			return NextResponse.json({ error: 'remainingAmount must be a non-negative number' }, { status: 400 });
+		if (
+			remainingAmount !== undefined &&
+			(typeof remainingAmount !== 'number' || remainingAmount < 0)
+		) {
+			return NextResponse.json(
+				{ error: 'remainingAmount must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 		if (rate !== undefined && (typeof rate !== 'number' || rate < 0 || rate > 100)) {
-			return NextResponse.json({ error: 'rate must be a number between 0 and 100' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'rate must be a number between 0 and 100' },
+				{ status: 400 },
+			);
 		}
-		if (monthlyPayment !== undefined && (typeof monthlyPayment !== 'number' || monthlyPayment < 0)) {
-			return NextResponse.json({ error: 'monthlyPayment must be a non-negative number' }, { status: 400 });
+		if (
+			monthlyPayment !== undefined &&
+			(typeof monthlyPayment !== 'number' || monthlyPayment < 0)
+		) {
+			return NextResponse.json(
+				{ error: 'monthlyPayment must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 
 		// Validate remaining vs initial (using existing values if not provided)
 		const effectiveInitial = initialAmount ?? existing.initialAmount;
 		const effectiveRemaining = remainingAmount ?? existing.remainingAmount;
 		if (effectiveRemaining > effectiveInitial) {
-			return NextResponse.json({ error: 'remainingAmount cannot exceed initialAmount' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'remainingAmount cannot exceed initialAmount' },
+				{ status: 400 },
+			);
 		}
 
 		// Validate memberId if provided

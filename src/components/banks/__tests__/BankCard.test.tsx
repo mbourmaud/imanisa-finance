@@ -1,7 +1,7 @@
-import { render, within, fireEvent } from '@testing-library/react';
+import { fireEvent, render, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { BankAvatar, BankCard, BankCardList, BankCardGrid } from '../BankCard';
 import type { SupportedBank } from '@/shared/constants/supported-banks';
+import { BankAvatar, BankCard, BankCardGrid, BankCardList } from '../BankCard';
 
 // Mock bank data
 const mockBank: SupportedBank = {
@@ -73,7 +73,7 @@ describe('BankAvatar', () => {
 
 	it('renders with logo URL', () => {
 		const { container } = render(
-			<BankAvatar bank={mockBank} logoUrl="https://example.com/logo.png" />
+			<BankAvatar bank={mockBank} logoUrl="https://example.com/logo.png" />,
 		);
 		const img = container.querySelector('img');
 		expect(img).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe('BankCard', () => {
 	it('calls onBankClick when clicked', () => {
 		const handleClick = vi.fn();
 		const { container } = render(
-			<BankCard bank={mockBank} interactive onBankClick={handleClick} />
+			<BankCard bank={mockBank} interactive onBankClick={handleClick} />,
 		);
 		const card = container.querySelector('[data-slot="bank-card"]') as HTMLElement;
 		fireEvent.click(card);
@@ -165,7 +165,7 @@ describe('BankCard', () => {
 	it('calls onBankClick on Enter key', () => {
 		const handleClick = vi.fn();
 		const { container } = render(
-			<BankCard bank={mockBank} interactive onBankClick={handleClick} />
+			<BankCard bank={mockBank} interactive onBankClick={handleClick} />,
 		);
 		const card = container.querySelector('[data-slot="bank-card"]') as HTMLElement;
 		fireEvent.keyDown(card, { key: 'Enter' });
@@ -225,7 +225,7 @@ describe('BankCardList', () => {
 	it('calls onBankClick with correct bank', () => {
 		const handleClick = vi.fn();
 		const { container } = render(
-			<BankCardList banks={mockBanks} interactive onBankClick={handleClick} />
+			<BankCardList banks={mockBanks} interactive onBankClick={handleClick} />,
 		);
 		const cards = container.querySelectorAll('[data-slot="bank-card"]');
 		fireEvent.click(cards[1]);

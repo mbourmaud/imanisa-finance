@@ -2,12 +2,12 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import {
 	Sheet,
-	SheetContent,
-	SheetHeader,
 	SheetBody,
-	SheetFooter,
-	SheetTitle,
+	SheetContent,
 	SheetDescription,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
 } from '../sheet';
 
 // Helper to get the visible (non aria-hidden) element from duplicates created by Radix portals
@@ -26,7 +26,7 @@ describe('Sheet', () => {
 						<SheetTitle>Title</SheetTitle>
 					</SheetHeader>
 				</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const headers = screen.getAllByTestId('header');
 		const header = getVisibleElement(headers);
@@ -41,7 +41,7 @@ describe('Sheet', () => {
 				<SheetContent>
 					<SheetBody data-testid="body">Content</SheetBody>
 				</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const bodies = screen.getAllByTestId('body');
 		const body = getVisibleElement(bodies);
@@ -56,7 +56,7 @@ describe('Sheet', () => {
 				<SheetContent>
 					<SheetFooter data-testid="footer">Footer</SheetFooter>
 				</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const footers = screen.getAllByTestId('footer');
 		const footer = getVisibleElement(footers);
@@ -73,7 +73,7 @@ describe('Sheet', () => {
 						<SheetTitle data-testid="title">Settings</SheetTitle>
 					</SheetHeader>
 				</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const titles = screen.getAllByTestId('title');
 		const title = getVisibleElement(titles);
@@ -88,12 +88,10 @@ describe('Sheet', () => {
 			<Sheet defaultOpen>
 				<SheetContent>
 					<SheetHeader>
-						<SheetDescription data-testid="description">
-							Configure your settings
-						</SheetDescription>
+						<SheetDescription data-testid="description">Configure your settings</SheetDescription>
 					</SheetHeader>
 				</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const descriptions = screen.getAllByTestId('description');
 		const description = getVisibleElement(descriptions);
@@ -107,7 +105,7 @@ describe('Sheet', () => {
 		render(
 			<Sheet defaultOpen>
 				<SheetContent data-testid="content">Content</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
@@ -119,7 +117,7 @@ describe('Sheet', () => {
 		render(
 			<Sheet defaultOpen>
 				<SheetContent data-testid="content">Content</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
@@ -129,8 +127,10 @@ describe('Sheet', () => {
 	it('renders with size md', () => {
 		render(
 			<Sheet defaultOpen>
-				<SheetContent size="md" data-testid="content">Content</SheetContent>
-			</Sheet>
+				<SheetContent size="md" data-testid="content">
+					Content
+				</SheetContent>
+			</Sheet>,
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
@@ -140,8 +140,10 @@ describe('Sheet', () => {
 	it('renders with size lg', () => {
 		render(
 			<Sheet defaultOpen>
-				<SheetContent size="lg" data-testid="content">Content</SheetContent>
-			</Sheet>
+				<SheetContent size="lg" data-testid="content">
+					Content
+				</SheetContent>
+			</Sheet>,
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
@@ -151,8 +153,10 @@ describe('Sheet', () => {
 	it('renders with side left', () => {
 		render(
 			<Sheet defaultOpen>
-				<SheetContent side="left" data-testid="content">Content</SheetContent>
-			</Sheet>
+				<SheetContent side="left" data-testid="content">
+					Content
+				</SheetContent>
+			</Sheet>,
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
@@ -175,7 +179,7 @@ describe('Sheet', () => {
 						<button type="button">Save</button>
 					</SheetFooter>
 				</SheetContent>
-			</Sheet>
+			</Sheet>,
 		);
 		const bodies = screen.getAllByTestId('body');
 		const footers = screen.getAllByTestId('footer');

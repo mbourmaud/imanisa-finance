@@ -102,10 +102,10 @@ export const creditMutuelParser: Parser = {
 			);
 			// Support both with and without accents: débit/debit, crédit/credit
 			const debitIndex = header.findIndex(
-				(h) => h.toLowerCase().includes('débit') || h.toLowerCase().includes('debit')
+				(h) => h.toLowerCase().includes('débit') || h.toLowerCase().includes('debit'),
 			);
 			const creditIndex = header.findIndex(
-				(h) => h.toLowerCase().includes('crédit') || h.toLowerCase().includes('credit')
+				(h) => h.toLowerCase().includes('crédit') || h.toLowerCase().includes('credit'),
 			);
 			const amountIndex = header.findIndex((h) => h.toLowerCase().includes('montant'));
 

@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { Textarea } from '../textarea';
 import { Checkbox } from '../checkbox';
 import { Switch } from '../switch';
+import { Textarea } from '../textarea';
 
 describe('Textarea', () => {
 	it('renders with default props', () => {

@@ -3,8 +3,8 @@
  * Handles data access for Bank records
  */
 
-import { prisma } from '@/lib/prisma';
 import type { BankType } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export interface Bank {
 	id: string;

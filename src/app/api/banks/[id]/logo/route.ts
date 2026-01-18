@@ -7,12 +7,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
+import { uploadBankLogo, validateImageDimensions, validateLogoFile } from '@/lib/supabase/storage';
 import { bankRepository } from '@/server/repositories';
-import {
-	uploadBankLogo,
-	validateLogoFile,
-	validateImageDimensions,
-} from '@/lib/supabase/storage';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;

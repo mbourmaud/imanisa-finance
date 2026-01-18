@@ -7,51 +7,50 @@
  * Uses the new component library with glassmorphism styling.
  */
 
+import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import {
 	Bell,
-	Database,
-	Download,
-	Globe,
-	Key,
-	Moon,
-	Palette,
-	Plus,
-	Shield,
-	Sun,
-	Upload,
-	User,
-	Users,
-	Pencil,
-	Trash2,
 	Button,
+	Database,
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+	Download,
+	EmptyState,
+	Flex,
+	GlassCard,
+	Globe,
+	Grid,
+	Heading,
+	HStack,
 	Input,
+	Key,
 	Label,
+	Moon,
+	PageHeader,
+	Palette,
+	Pencil,
+	Plus,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 	Separator,
-	Switch,
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
+	Shield,
 	Skeleton,
-	PageHeader,
-	EmptyState,
-	GlassCard,
-	VStack,
-	HStack,
-	Box,
-	Flex,
-	Grid,
+	Sun,
+	Switch,
 	Text,
-	Heading,
+	Trash2,
+	Upload,
+	User,
+	Users,
+	VStack,
 } from '@/components';
-import { useTheme } from 'next-themes';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { MemberAvatar } from '@/components/members/MemberAvatar';
 
@@ -83,7 +82,12 @@ const MEMBER_COLORS = [
 
 function MemberSkeleton() {
 	return (
-		<HStack justify="between" align="center" p="md" style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+		<HStack
+			justify="between"
+			align="center"
+			p="md"
+			style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+		>
 			<HStack gap="md" align="center">
 				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.5rem' }} />
 				<VStack gap="xs">
@@ -209,10 +213,7 @@ export default function SettingsPage() {
 	return (
 		<VStack gap="xl">
 			{/* Header */}
-			<PageHeader
-				title="Paramètres"
-				description="Configurez votre application"
-			/>
+			<PageHeader title="Paramètres" description="Configurez votre application" />
 
 			<Grid cols={1} colsLg={3} gap="lg">
 				{/* Main Settings Column */}
@@ -221,12 +222,26 @@ export default function SettingsPage() {
 					<GlassCard padding="lg">
 						<VStack gap="md">
 							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										borderRadius: '0.75rem',
+										height: '2.5rem',
+										width: '2.5rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
 									<User style={{ height: '1.25rem', width: '1.25rem' }} />
 								</Flex>
 								<VStack gap="none">
-									<Heading level={3} size="lg" weight="medium">Profil</Heading>
-									<Text size="sm" color="muted">Vos informations personnelles</Text>
+									<Heading level={3} size="lg" weight="medium">
+										Profil
+									</Heading>
+									<Text size="sm" color="muted">
+										Vos informations personnelles
+									</Text>
 								</VStack>
 							</HStack>
 							<Grid cols={1} colsSm={2} gap="md">
@@ -261,11 +276,23 @@ export default function SettingsPage() {
 						<VStack gap="md">
 							<HStack justify="between" align="center" style={{ paddingBottom: '0.5rem' }}>
 								<HStack gap="md" align="center">
-									<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<Flex
+										align="center"
+										justify="center"
+										style={{
+											borderRadius: '0.75rem',
+											height: '2.5rem',
+											width: '2.5rem',
+											backgroundColor: 'hsl(var(--primary) / 0.1)',
+											color: 'hsl(var(--primary))',
+										}}
+									>
 										<Users style={{ height: '1.25rem', width: '1.25rem' }} />
 									</Flex>
 									<VStack gap="none">
-										<Heading level={3} size="lg" weight="medium">Membres du foyer</Heading>
+										<Heading level={3} size="lg" weight="medium">
+											Membres du foyer
+										</Heading>
 										<Text size="sm" color="muted">
 											Gérez les membres associés aux comptes
 										</Text>
@@ -273,7 +300,11 @@ export default function SettingsPage() {
 								</HStack>
 								<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
 									<DialogTrigger asChild>
-										<Button variant="outline" size="sm" iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
+										<Button
+											variant="outline"
+											size="sm"
+											iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}
+										>
 											Ajouter
 										</Button>
 									</DialogTrigger>
@@ -305,7 +336,10 @@ export default function SettingsPage() {
 																width: '2rem',
 																backgroundColor: color.value,
 																transition: 'all 0.2s',
-																outline: newMemberColor === color.value ? '2px solid hsl(var(--primary))' : 'none',
+																outline:
+																	newMemberColor === color.value
+																		? '2px solid hsl(var(--primary))'
+																		: 'none',
 																outlineOffset: '2px',
 																border: 'none',
 																cursor: 'pointer',
@@ -319,7 +353,10 @@ export default function SettingsPage() {
 												<Button variant="outline" onClick={() => setShowAddMember(false)}>
 													Annuler
 												</Button>
-												<Button onClick={handleAddMember} disabled={savingMember || !newMemberName.trim()}>
+												<Button
+													onClick={handleAddMember}
+													disabled={savingMember || !newMemberName.trim()}
+												>
 													{savingMember ? 'Ajout...' : 'Ajouter'}
 												</Button>
 											</HStack>
@@ -367,12 +404,16 @@ export default function SettingsPage() {
 												<VStack gap="none">
 													<Text weight="medium">{member.name}</Text>
 													<Text size="xs" color="muted">
-														{member.accountMembers.length} compte{member.accountMembers.length !== 1 ? 's' : ''}
+														{member.accountMembers.length} compte
+														{member.accountMembers.length !== 1 ? 's' : ''}
 													</Text>
 												</VStack>
 											</HStack>
 											<HStack gap="sm" align="center">
-												<Dialog open={editingMember?.id === member.id} onOpenChange={(open) => !open && setEditingMember(null)}>
+												<Dialog
+													open={editingMember?.id === member.id}
+													onOpenChange={(open) => !open && setEditingMember(null)}
+												>
 													<DialogTrigger asChild>
 														<Button
 															variant="ghost"
@@ -415,7 +456,10 @@ export default function SettingsPage() {
 																					width: '2rem',
 																					backgroundColor: color.value,
 																					transition: 'all 0.2s',
-																					outline: editingMember.color === color.value ? '2px solid hsl(var(--primary))' : 'none',
+																					outline:
+																						editingMember.color === color.value
+																							? '2px solid hsl(var(--primary))'
+																							: 'none',
 																					outlineOffset: '2px',
 																					border: 'none',
 																					cursor: 'pointer',
@@ -440,7 +484,11 @@ export default function SettingsPage() {
 												<Button
 													variant="ghost"
 													size="icon"
-													style={{ height: '2rem', width: '2rem', color: 'hsl(var(--destructive))' }}
+													style={{
+														height: '2rem',
+														width: '2rem',
+														color: 'hsl(var(--destructive))',
+													}}
 													onClick={() => setDeleteMemberId(member.id)}
 												>
 													<Trash2 style={{ height: '1rem', width: '1rem' }} />
@@ -457,12 +505,26 @@ export default function SettingsPage() {
 					<GlassCard padding="lg">
 						<VStack gap="lg">
 							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										borderRadius: '0.75rem',
+										height: '2.5rem',
+										width: '2.5rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
 									<Palette style={{ height: '1.25rem', width: '1.25rem' }} />
 								</Flex>
 								<VStack gap="none">
-									<Heading level={3} size="lg" weight="medium">Apparence</Heading>
-									<Text size="sm" color="muted">Personnalisez l&apos;interface</Text>
+									<Heading level={3} size="lg" weight="medium">
+										Apparence
+									</Heading>
+									<Text size="sm" color="muted">
+										Personnalisez l&apos;interface
+									</Text>
 								</VStack>
 							</HStack>
 
@@ -480,14 +542,20 @@ export default function SettingsPage() {
 											gap: '0.5rem',
 											borderRadius: '0.75rem',
 											padding: '1rem',
-											border: mounted && theme === 'light' ? '2px solid hsl(var(--primary))' : '2px solid hsl(var(--border) / 0.6)',
-											backgroundColor: mounted && theme === 'light' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+											border:
+												mounted && theme === 'light'
+													? '2px solid hsl(var(--primary))'
+													: '2px solid hsl(var(--border) / 0.6)',
+											backgroundColor:
+												mounted && theme === 'light' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
 											transition: 'all 0.2s',
 											cursor: 'pointer',
 										}}
 									>
 										<Sun style={{ height: '1.25rem', width: '1.25rem' }} />
-										<Text size="sm" weight="medium">Clair</Text>
+										<Text size="sm" weight="medium">
+											Clair
+										</Text>
 									</button>
 									<button
 										type="button"
@@ -499,14 +567,20 @@ export default function SettingsPage() {
 											gap: '0.5rem',
 											borderRadius: '0.75rem',
 											padding: '1rem',
-											border: mounted && theme === 'dark' ? '2px solid hsl(var(--primary))' : '2px solid hsl(var(--border) / 0.6)',
-											backgroundColor: mounted && theme === 'dark' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+											border:
+												mounted && theme === 'dark'
+													? '2px solid hsl(var(--primary))'
+													: '2px solid hsl(var(--border) / 0.6)',
+											backgroundColor:
+												mounted && theme === 'dark' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
 											transition: 'all 0.2s',
 											cursor: 'pointer',
 										}}
 									>
 										<Moon style={{ height: '1.25rem', width: '1.25rem' }} />
-										<Text size="sm" weight="medium">Sombre</Text>
+										<Text size="sm" weight="medium">
+											Sombre
+										</Text>
 									</button>
 									<button
 										type="button"
@@ -518,14 +592,22 @@ export default function SettingsPage() {
 											gap: '0.5rem',
 											borderRadius: '0.75rem',
 											padding: '1rem',
-											border: mounted && theme === 'system' ? '2px solid hsl(var(--primary))' : '2px solid hsl(var(--border) / 0.6)',
-											backgroundColor: mounted && theme === 'system' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+											border:
+												mounted && theme === 'system'
+													? '2px solid hsl(var(--primary))'
+													: '2px solid hsl(var(--border) / 0.6)',
+											backgroundColor:
+												mounted && theme === 'system'
+													? 'hsl(var(--primary) / 0.05)'
+													: 'transparent',
 											transition: 'all 0.2s',
 											cursor: 'pointer',
 										}}
 									>
 										<Globe style={{ height: '1.25rem', width: '1.25rem' }} />
-										<Text size="sm" weight="medium">Système</Text>
+										<Text size="sm" weight="medium">
+											Système
+										</Text>
 									</button>
 								</Grid>
 							</VStack>
@@ -552,19 +634,41 @@ export default function SettingsPage() {
 					<GlassCard padding="lg">
 						<VStack gap="md">
 							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										borderRadius: '0.75rem',
+										height: '2.5rem',
+										width: '2.5rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
 									<Database style={{ height: '1.25rem', width: '1.25rem' }} />
 								</Flex>
 								<VStack gap="none">
-									<Heading level={3} size="lg" weight="medium">Données</Heading>
-									<Text size="sm" color="muted">Export et sauvegarde</Text>
+									<Heading level={3} size="lg" weight="medium">
+										Données
+									</Heading>
+									<Text size="sm" color="muted">
+										Export et sauvegarde
+									</Text>
 								</VStack>
 							</HStack>
 							<Flex gap="sm" style={{ flexDirection: 'column' }}>
-								<Button variant="outline" style={{ flex: 1 }} iconLeft={<Download style={{ height: '1rem', width: '1rem' }} />}>
+								<Button
+									variant="outline"
+									style={{ flex: 1 }}
+									iconLeft={<Download style={{ height: '1rem', width: '1rem' }} />}
+								>
 									Exporter les données
 								</Button>
-								<Button variant="outline" style={{ flex: 1 }} iconLeft={<Upload style={{ height: '1rem', width: '1rem' }} />}>
+								<Button
+									variant="outline"
+									style={{ flex: 1 }}
+									iconLeft={<Upload style={{ height: '1rem', width: '1rem' }} />}
+								>
 									Importer une sauvegarde
 								</Button>
 							</Flex>
@@ -582,15 +686,29 @@ export default function SettingsPage() {
 					<GlassCard padding="lg">
 						<VStack gap="md">
 							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										borderRadius: '0.75rem',
+										height: '2.5rem',
+										width: '2.5rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
 									<Bell style={{ height: '1.25rem', width: '1.25rem' }} />
 								</Flex>
-								<Heading level={3} size="lg" weight="medium">Notifications</Heading>
+								<Heading level={3} size="lg" weight="medium">
+									Notifications
+								</Heading>
 							</HStack>
 							<HStack justify="between" align="center">
 								<VStack gap="none">
 									<Text weight="medium">Alertes budget</Text>
-									<Text size="xs" color="muted">Dépassement de budget</Text>
+									<Text size="xs" color="muted">
+										Dépassement de budget
+									</Text>
 								</VStack>
 								<Switch defaultChecked />
 							</HStack>
@@ -598,7 +716,9 @@ export default function SettingsPage() {
 							<HStack justify="between" align="center">
 								<VStack gap="none">
 									<Text weight="medium">Transactions</Text>
-									<Text size="xs" color="muted">Nouvelles transactions</Text>
+									<Text size="xs" color="muted">
+										Nouvelles transactions
+									</Text>
 								</VStack>
 								<Switch />
 							</HStack>
@@ -606,7 +726,9 @@ export default function SettingsPage() {
 							<HStack justify="between" align="center">
 								<VStack gap="none">
 									<Text weight="medium">Rappels</Text>
-									<Text size="xs" color="muted">Échéances de prêts</Text>
+									<Text size="xs" color="muted">
+										Échéances de prêts
+									</Text>
 								</VStack>
 								<Switch defaultChecked />
 							</HStack>
@@ -617,18 +739,36 @@ export default function SettingsPage() {
 					<GlassCard padding="lg">
 						<VStack gap="md">
 							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										borderRadius: '0.75rem',
+										height: '2.5rem',
+										width: '2.5rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
 									<Shield style={{ height: '1.25rem', width: '1.25rem' }} />
 								</Flex>
-								<Heading level={3} size="lg" weight="medium">Sécurité</Heading>
+								<Heading level={3} size="lg" weight="medium">
+									Sécurité
+								</Heading>
 							</HStack>
-							<Button variant="outline" style={{ width: '100%', justifyContent: 'flex-start' }} iconLeft={<Key style={{ height: '1rem', width: '1rem' }} />}>
+							<Button
+								variant="outline"
+								style={{ width: '100%', justifyContent: 'flex-start' }}
+								iconLeft={<Key style={{ height: '1rem', width: '1rem' }} />}
+							>
 								Changer le mot de passe
 							</Button>
 							<HStack justify="between" align="center">
 								<VStack gap="none">
 									<Text weight="medium">2FA</Text>
-									<Text size="xs" color="muted">Authentification double facteur</Text>
+									<Text size="xs" color="muted">
+										Authentification double facteur
+									</Text>
 								</VStack>
 								<Switch />
 							</HStack>
@@ -636,7 +776,9 @@ export default function SettingsPage() {
 							<HStack justify="between" align="center">
 								<VStack gap="none">
 									<Text weight="medium">Sessions</Text>
-									<Text size="xs" color="muted">Déconnexion automatique</Text>
+									<Text size="xs" color="muted">
+										Déconnexion automatique
+									</Text>
 								</VStack>
 								<Switch defaultChecked />
 							</HStack>
@@ -647,7 +789,9 @@ export default function SettingsPage() {
 					<GlassCard padding="lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.2)' }}>
 						<Flex direction="col" align="center" style={{ textAlign: 'center' }}>
 							<Text weight="medium">Imanisa Finance</Text>
-							<Text size="sm" color="muted">Version 2.0.0</Text>
+							<Text size="sm" color="muted">
+								Version 2.0.0
+							</Text>
 							<Text size="xs" color="muted" style={{ marginTop: '1rem' }}>
 								Application open source de gestion de patrimoine personnel
 							</Text>

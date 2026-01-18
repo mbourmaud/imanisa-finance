@@ -1,14 +1,14 @@
-import { render, within, fireEvent } from '@testing-library/react';
+import { fireEvent, render, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import type { MemberData, MemberWithShare } from '../MemberAvatar';
 import {
 	MemberAvatar,
+	MemberAvatarGroup,
 	MemberAvatarWithName,
 	MemberBadge,
-	MemberAvatarGroup,
 	MemberList,
 	MemberSelector,
 } from '../MemberAvatar';
-import type { MemberData, MemberWithShare } from '../MemberAvatar';
 
 // Mock member data
 const mockMember: MemberData = {
@@ -105,9 +105,7 @@ describe('MemberAvatar', () => {
 	});
 
 	it('uses default color when member has no color', () => {
-		const { container } = render(
-			<MemberAvatar member={mockMemberNoColor} colorIndex={0} />
-		);
+		const { container } = render(<MemberAvatar member={mockMemberNoColor} colorIndex={0} />);
 		const fallback = container.querySelector('[data-slot="avatar-fallback"]');
 		// First default color is #6366f1
 		expect(fallback).toHaveStyle({ backgroundColor: '#6366f1' });
@@ -120,9 +118,7 @@ describe('MemberAvatar', () => {
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(
-			<MemberAvatar member={mockMember} className="custom-class" />
-		);
+		const { container } = render(<MemberAvatar member={mockMember} className="custom-class" />);
 		const avatar = container.querySelector('[data-slot="member-avatar"]');
 		expect(avatar).toHaveClass('custom-class');
 	});
@@ -137,15 +133,19 @@ describe('MemberAvatarWithName', () => {
 
 	it('displays member name', () => {
 		const { container } = render(<MemberAvatarWithName member={mockMember} />);
-		const component = container.querySelector('[data-slot="member-avatar-with-name"]') as HTMLElement;
+		const component = container.querySelector(
+			'[data-slot="member-avatar-with-name"]',
+		) as HTMLElement;
 		expect(within(component).getByText('Jean Dupont')).toBeInTheDocument();
 	});
 
 	it('displays description when provided', () => {
 		const { container } = render(
-			<MemberAvatarWithName member={mockMember} description="Administrateur" />
+			<MemberAvatarWithName member={mockMember} description="Administrateur" />,
 		);
-		const component = container.querySelector('[data-slot="member-avatar-with-name"]') as HTMLElement;
+		const component = container.querySelector(
+			'[data-slot="member-avatar-with-name"]',
+		) as HTMLElement;
 		expect(within(component).getByText('Administrateur')).toBeInTheDocument();
 	});
 
@@ -157,7 +157,7 @@ describe('MemberAvatarWithName', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<MemberAvatarWithName member={mockMember} className="custom-class" />
+			<MemberAvatarWithName member={mockMember} className="custom-class" />,
 		);
 		const component = container.querySelector('[data-slot="member-avatar-with-name"]');
 		expect(component).toHaveClass('custom-class');
@@ -172,25 +172,19 @@ describe('MemberBadge', () => {
 	});
 
 	it('displays first name in default variant', () => {
-		const { container } = render(
-			<MemberBadge member={mockMemberWithShare} variant="default" />
-		);
+		const { container } = render(<MemberBadge member={mockMemberWithShare} variant="default" />);
 		const badge = container.querySelector('[data-slot="member-badge"]') as HTMLElement;
 		expect(within(badge).getByText('Jean')).toBeInTheDocument();
 	});
 
 	it('shows ownership share when less than 100%', () => {
-		const { container } = render(
-			<MemberBadge member={mockMemberWithShare} showShare />
-		);
+		const { container } = render(<MemberBadge member={mockMemberWithShare} showShare />);
 		const badge = container.querySelector('[data-slot="member-badge"]') as HTMLElement;
 		expect(within(badge).getByText('50%')).toBeInTheDocument();
 	});
 
 	it('hides share when showShare is false', () => {
-		const { container } = render(
-			<MemberBadge member={mockMemberWithShare} showShare={false} />
-		);
+		const { container } = render(<MemberBadge member={mockMemberWithShare} showShare={false} />);
 		const badge = container.querySelector('[data-slot="member-badge"]') as HTMLElement;
 		expect(within(badge).queryByText('50%')).not.toBeInTheDocument();
 	});
@@ -203,24 +197,20 @@ describe('MemberBadge', () => {
 	});
 
 	it('renders with variant compact', () => {
-		const { container } = render(
-			<MemberBadge member={mockMemberWithShare} variant="compact" />
-		);
+		const { container } = render(<MemberBadge member={mockMemberWithShare} variant="compact" />);
 		const badge = container.querySelector('[data-slot="member-badge"]');
 		expect(badge).not.toHaveClass('bg-muted/50');
 	});
 
 	it('renders with variant default', () => {
-		const { container } = render(
-			<MemberBadge member={mockMemberWithShare} variant="default" />
-		);
+		const { container } = render(<MemberBadge member={mockMemberWithShare} variant="default" />);
 		const badge = container.querySelector('[data-slot="member-badge"]');
 		expect(badge).toHaveClass('bg-muted/50', 'rounded-full', 'px-2');
 	});
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<MemberBadge member={mockMemberWithShare} className="custom-class" />
+			<MemberBadge member={mockMemberWithShare} className="custom-class" />,
 		);
 		const badge = container.querySelector('[data-slot="member-badge"]');
 		expect(badge).toHaveClass('custom-class');
@@ -254,32 +244,26 @@ describe('MemberAvatarGroup', () => {
 	});
 
 	it('does not show overflow when all members fit', () => {
-		const { container } = render(
-			<MemberAvatarGroup members={mockMembers.slice(0, 2)} max={4} />
-		);
+		const { container } = render(<MemberAvatarGroup members={mockMembers.slice(0, 2)} max={4} />);
 		const overflow = container.querySelector('[data-slot="member-avatar-overflow"]');
 		expect(overflow).not.toBeInTheDocument();
 	});
 
 	it('renders with tight spacing', () => {
-		const { container } = render(
-			<MemberAvatarGroup members={mockMembers} spacing="tight" />
-		);
+		const { container } = render(<MemberAvatarGroup members={mockMembers} spacing="tight" />);
 		const group = container.querySelector('[data-slot="member-avatar-group"]');
 		expect(group).toHaveClass('-space-x-2');
 	});
 
 	it('renders with normal spacing', () => {
-		const { container } = render(
-			<MemberAvatarGroup members={mockMembers} spacing="normal" />
-		);
+		const { container } = render(<MemberAvatarGroup members={mockMembers} spacing="normal" />);
 		const group = container.querySelector('[data-slot="member-avatar-group"]');
 		expect(group).toHaveClass('-space-x-1');
 	});
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<MemberAvatarGroup members={mockMembers} className="custom-class" />
+			<MemberAvatarGroup members={mockMembers} className="custom-class" />,
 		);
 		const group = container.querySelector('[data-slot="member-avatar-group"]');
 		expect(group).toHaveClass('custom-class');
@@ -306,33 +290,27 @@ describe('MemberList', () => {
 	});
 
 	it('shows ownership share when showShare is true', () => {
-		const { container } = render(
-			<MemberList members={mockMembersWithShare} showShare />
-		);
+		const { container } = render(<MemberList members={mockMembersWithShare} showShare />);
 		const list = container.querySelector('[data-slot="member-list"]') as HTMLElement;
 		const shares = within(list).getAllByText('50% de propriété');
 		expect(shares).toHaveLength(2);
 	});
 
 	it('hides ownership share when showShare is false', () => {
-		const { container } = render(
-			<MemberList members={mockMembersWithShare} showShare={false} />
-		);
+		const { container } = render(<MemberList members={mockMembersWithShare} showShare={false} />);
 		const list = container.querySelector('[data-slot="member-list"]') as HTMLElement;
 		expect(within(list).queryByText('50% de propriété')).not.toBeInTheDocument();
 	});
 
 	it('renders with vertical variant', () => {
-		const { container } = render(
-			<MemberList members={mockMembersWithShare} variant="vertical" />
-		);
+		const { container } = render(<MemberList members={mockMembersWithShare} variant="vertical" />);
 		const list = container.querySelector('[data-slot="member-list"]');
 		expect(list).toHaveClass('flex-col');
 	});
 
 	it('renders with horizontal variant', () => {
 		const { container } = render(
-			<MemberList members={mockMembersWithShare} variant="horizontal" />
+			<MemberList members={mockMembersWithShare} variant="horizontal" />,
 		);
 		const list = container.querySelector('[data-slot="member-list"]');
 		expect(list).toHaveClass('flex-wrap');
@@ -341,11 +319,7 @@ describe('MemberList', () => {
 	it('calls onMemberClick when interactive', () => {
 		const handleClick = vi.fn();
 		const { container } = render(
-			<MemberList
-				members={mockMembersWithShare}
-				interactive
-				onMemberClick={handleClick}
-			/>
+			<MemberList members={mockMembersWithShare} interactive onMemberClick={handleClick} />,
 		);
 		const list = container.querySelector('[data-slot="member-list"]') as HTMLElement;
 		const memberItems = within(list).getAllByRole('button');
@@ -355,7 +329,7 @@ describe('MemberList', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<MemberList members={mockMembersWithShare} className="custom-class" />
+			<MemberList members={mockMembersWithShare} className="custom-class" />,
 		);
 		const list = container.querySelector('[data-slot="member-list"]');
 		expect(list).toHaveClass('custom-class');
@@ -364,17 +338,13 @@ describe('MemberList', () => {
 
 describe('MemberSelector', () => {
 	it('renders selector with members', () => {
-		const { container } = render(
-			<MemberSelector members={mockMembers} selectedIds={[]} />
-		);
+		const { container } = render(<MemberSelector members={mockMembers} selectedIds={[]} />);
 		const selector = container.querySelector('[data-slot="member-selector"]');
 		expect(selector).toBeInTheDocument();
 	});
 
 	it('displays all members as buttons', () => {
-		const { container } = render(
-			<MemberSelector members={mockMembers} selectedIds={[]} />
-		);
+		const { container } = render(<MemberSelector members={mockMembers} selectedIds={[]} />);
 		const selector = container.querySelector('[data-slot="member-selector"]') as HTMLElement;
 		const buttons = within(selector).getAllByRole('button');
 		expect(buttons).toHaveLength(5);
@@ -382,7 +352,7 @@ describe('MemberSelector', () => {
 
 	it('shows selected state for selected members', () => {
 		const { container } = render(
-			<MemberSelector members={mockMembers} selectedIds={['member-1']} />
+			<MemberSelector members={mockMembers} selectedIds={['member-1']} />,
 		);
 		const selector = container.querySelector('[data-slot="member-selector"]') as HTMLElement;
 		const buttons = within(selector).getAllByRole('button');
@@ -397,7 +367,7 @@ describe('MemberSelector', () => {
 				selectedIds={['member-1']}
 				onSelectionChange={handleChange}
 				multiple
-			/>
+			/>,
 		);
 		const selector = container.querySelector('[data-slot="member-selector"]') as HTMLElement;
 		const buttons = within(selector).getAllByRole('button');
@@ -415,7 +385,7 @@ describe('MemberSelector', () => {
 				selectedIds={['member-1', 'member-2']}
 				onSelectionChange={handleChange}
 				multiple
-			/>
+			/>,
 		);
 		const selector = container.querySelector('[data-slot="member-selector"]') as HTMLElement;
 		const buttons = within(selector).getAllByRole('button');
@@ -433,7 +403,7 @@ describe('MemberSelector', () => {
 				selectedIds={['member-1']}
 				onSelectionChange={handleChange}
 				multiple={false}
-			/>
+			/>,
 		);
 		const selector = container.querySelector('[data-slot="member-selector"]') as HTMLElement;
 		const buttons = within(selector).getAllByRole('button');
@@ -451,7 +421,7 @@ describe('MemberSelector', () => {
 				selectedIds={['member-1']}
 				onSelectionChange={handleChange}
 				multiple={false}
-			/>
+			/>,
 		);
 		const selector = container.querySelector('[data-slot="member-selector"]') as HTMLElement;
 		const buttons = within(selector).getAllByRole('button');
@@ -463,11 +433,7 @@ describe('MemberSelector', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<MemberSelector
-				members={mockMembers}
-				selectedIds={[]}
-				className="custom-class"
-			/>
+			<MemberSelector members={mockMembers} selectedIds={[]} className="custom-class" />,
 		);
 		const selector = container.querySelector('[data-slot="member-selector"]');
 		expect(selector).toHaveClass('custom-class');

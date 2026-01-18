@@ -1,5 +1,5 @@
+import { Box, HStack, SidebarInset, SidebarProvider, SidebarTrigger, Text } from '@/components';
 import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarInset, SidebarProvider, SidebarTrigger, Box, HStack, Text } from '@/components';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -29,12 +29,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 						<Text weight="semibold">Imanisa Finance</Text>
 					</HStack>
 				</Box>
-				<Box
-					as="main"
-					p="lg"
-					style={{ flex: 1, padding: '1.5rem' }}
-				>
-					<Box style={{ maxWidth: '80rem', marginLeft: 'auto', marginRight: 'auto', animation: 'fadeIn 0.3s ease-out' }}>
+				<Box as="main" p="lg" style={{ flex: 1, padding: '1.5rem' }}>
+					<Box
+						style={{
+							maxWidth: '80rem',
+							marginLeft: 'auto',
+							marginRight: 'auto',
+							animation: 'fadeIn 0.3s ease-out',
+						}}
+					>
 						{children}
 					</Box>
 				</Box>

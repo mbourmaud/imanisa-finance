@@ -140,7 +140,7 @@ const Flex = forwardRef<HTMLDivElement, FlexProps>(
 			minW0,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		return (
 			<div
@@ -161,12 +161,12 @@ const Flex = forwardRef<HTMLDivElement, FlexProps>(
 					grow && 'flex-1',
 					shrink === false && 'flex-shrink-0',
 					minW0 && 'min-w-0',
-					className
+					className,
 				)}
 				{...props}
 			/>
 		);
-	}
+	},
 );
 Flex.displayName = 'Flex';
 

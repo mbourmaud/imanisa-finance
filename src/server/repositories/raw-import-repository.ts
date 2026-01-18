@@ -4,8 +4,8 @@
  * This repository always uses Prisma (no demo mode) since it's for actual file storage tracking
  */
 
-import { prisma } from '@/lib/prisma';
 import type { RawImportStatus } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export interface CreateRawImportDTO {
 	userId: string;

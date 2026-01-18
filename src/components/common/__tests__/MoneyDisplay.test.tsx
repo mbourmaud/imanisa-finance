@@ -1,10 +1,10 @@
 import { render, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import {
-	MoneyDisplay,
-	MoneyDifference,
-	MoneyPercentChange,
 	BalanceDisplay,
+	MoneyDifference,
+	MoneyDisplay,
+	MoneyPercentChange,
 	MoneySplit,
 } from '../MoneyDisplay';
 
@@ -24,35 +24,27 @@ describe('MoneyDisplay', () => {
 	});
 
 	it('formats amount in USD', () => {
-		const { container } = render(
-			<MoneyDisplay amount={1234.56} currency="USD" locale="en-US" />
-		);
+		const { container } = render(<MoneyDisplay amount={1234.56} currency="USD" locale="en-US" />);
 		const display = container.querySelector('[data-slot="money-display"]');
 		expect(display?.textContent).toMatch(/\$1,234\.56/);
 	});
 
 	it('renders with format compact', () => {
-		const { container } = render(
-			<MoneyDisplay amount={1234.56} format="compact" />
-		);
+		const { container } = render(<MoneyDisplay amount={1234.56} format="compact" />);
 		const display = container.querySelector('[data-slot="money-display"]');
 		// Compact format should show without decimals
 		expect(display?.textContent).toMatch(/1[\s\u00A0]235[\s\u00A0]€/);
 	});
 
 	it('renders with format short', () => {
-		const { container } = render(
-			<MoneyDisplay amount={150000} format="short" />
-		);
+		const { container } = render(<MoneyDisplay amount={150000} format="short" />);
 		const display = container.querySelector('[data-slot="money-display"]');
 		// Short format uses compact notation for large amounts
 		expect(display?.textContent).toMatch(/k|K|150/);
 	});
 
 	it('renders with format withSign', () => {
-		const { container } = render(
-			<MoneyDisplay amount={100} format="withSign" />
-		);
+		const { container } = render(<MoneyDisplay amount={100} format="withSign" />);
 		const display = container.querySelector('[data-slot="money-display"]');
 		expect(display?.textContent).toMatch(/\+/);
 	});
@@ -230,9 +222,7 @@ describe('BalanceDisplay', () => {
 	});
 
 	it('shows label when provided', () => {
-		const { container } = render(
-			<BalanceDisplay amount={10000} label="Solde total" />
-		);
+		const { container } = render(<BalanceDisplay amount={10000} label="Solde total" />);
 		const display = container.querySelector('[data-slot="balance-display"]') as HTMLElement;
 		expect(within(display).getByText('Solde total')).toBeInTheDocument();
 	});
@@ -260,7 +250,7 @@ describe('BalanceDisplay', () => {
 
 	it('shows change when showChange is true and previousAmount provided', () => {
 		const { container } = render(
-			<BalanceDisplay amount={12000} previousAmount={10000} showChange />
+			<BalanceDisplay amount={12000} previousAmount={10000} showChange />,
 		);
 		const display = container.querySelector('[data-slot="balance-display"]') as HTMLElement;
 		// Should show both money difference and percent change
@@ -270,7 +260,7 @@ describe('BalanceDisplay', () => {
 
 	it('does not show change when showChange is false', () => {
 		const { container } = render(
-			<BalanceDisplay amount={12000} previousAmount={10000} showChange={false} />
+			<BalanceDisplay amount={12000} previousAmount={10000} showChange={false} />,
 		);
 		const display = container.querySelector('[data-slot="balance-display"]') as HTMLElement;
 		expect(display.querySelector('[data-slot="money-difference"]')).not.toBeInTheDocument();
@@ -309,9 +299,7 @@ describe('MoneySplit', () => {
 	});
 
 	it('shows percentages when showPercent is true', () => {
-		const { container } = render(
-			<MoneySplit total={1000} splits={mockSplits} showPercent />
-		);
+		const { container } = render(<MoneySplit total={1000} splits={mockSplits} showPercent />);
 		const display = container.querySelector('[data-slot="money-split"]') as HTMLElement;
 		expect(within(display).getByText('(60%)')).toBeInTheDocument();
 		expect(within(display).getByText('(40%)')).toBeInTheDocument();
@@ -319,7 +307,7 @@ describe('MoneySplit', () => {
 
 	it('hides percentages when showPercent is false', () => {
 		const { container } = render(
-			<MoneySplit total={1000} splits={mockSplits} showPercent={false} />
+			<MoneySplit total={1000} splits={mockSplits} showPercent={false} />,
 		);
 		const display = container.querySelector('[data-slot="money-split"]') as HTMLElement;
 		expect(within(display).queryByText('(60%)')).not.toBeInTheDocument();
@@ -327,7 +315,7 @@ describe('MoneySplit', () => {
 
 	it('accepts custom className', () => {
 		const { container } = render(
-			<MoneySplit total={1000} splits={mockSplits} className="custom-class" />
+			<MoneySplit total={1000} splits={mockSplits} className="custom-class" />,
 		);
 		const display = container.querySelector('[data-slot="money-split"]');
 		expect(display).toHaveClass('custom-class');

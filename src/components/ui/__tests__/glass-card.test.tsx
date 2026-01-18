@@ -1,11 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import {
-	GlassCard,
-	GlassCardHeader,
-	GlassCardContent,
-	GlassCardFooter,
-} from '../glass-card';
+import { GlassCard, GlassCardContent, GlassCardFooter, GlassCardHeader } from '../glass-card';
 
 describe('GlassCard', () => {
 	it('renders with default props', () => {
@@ -103,7 +98,11 @@ describe('GlassCard', () => {
 	});
 
 	it('renders children', () => {
-		render(<GlassCard><span data-testid="child">Child content</span></GlassCard>);
+		render(
+			<GlassCard>
+				<span data-testid="child">Child content</span>
+			</GlassCard>,
+		);
 		expect(screen.getByTestId('child')).toBeInTheDocument();
 	});
 });
@@ -137,8 +136,12 @@ describe('GlassCardHeader', () => {
 		render(
 			<GlassCardHeader
 				title="Title"
-				action={<button type="button" data-testid="action">Action</button>}
-			/>
+				action={
+					<button type="button" data-testid="action">
+						Action
+					</button>
+				}
+			/>,
 		);
 		expect(screen.getByTestId('action')).toBeInTheDocument();
 	});
@@ -147,7 +150,7 @@ describe('GlassCardHeader', () => {
 		render(
 			<GlassCardHeader>
 				<span data-testid="custom-header">Custom header content</span>
-			</GlassCardHeader>
+			</GlassCardHeader>,
 		);
 		expect(screen.getByTestId('custom-header')).toBeInTheDocument();
 	});
@@ -167,12 +170,18 @@ describe('GlassCardContent', () => {
 	});
 
 	it('renders children', () => {
-		render(<GlassCardContent><span data-testid="content">Body content</span></GlassCardContent>);
+		render(
+			<GlassCardContent>
+				<span data-testid="content">Body content</span>
+			</GlassCardContent>,
+		);
 		expect(screen.getByTestId('content')).toBeInTheDocument();
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(<GlassCardContent className="custom-class">Content</GlassCardContent>);
+		const { container } = render(
+			<GlassCardContent className="custom-class">Content</GlassCardContent>,
+		);
 		const content = container.querySelector('[data-slot="glass-card-content"]');
 		expect(content).toHaveClass('custom-class');
 	});
@@ -187,12 +196,18 @@ describe('GlassCardFooter', () => {
 	});
 
 	it('renders children', () => {
-		render(<GlassCardFooter><span data-testid="footer">Footer content</span></GlassCardFooter>);
+		render(
+			<GlassCardFooter>
+				<span data-testid="footer">Footer content</span>
+			</GlassCardFooter>,
+		);
 		expect(screen.getByTestId('footer')).toBeInTheDocument();
 	});
 
 	it('accepts custom className', () => {
-		const { container } = render(<GlassCardFooter className="custom-class">Footer</GlassCardFooter>);
+		const { container } = render(
+			<GlassCardFooter className="custom-class">Footer</GlassCardFooter>,
+		);
 		const footer = container.querySelector('[data-slot="glass-card-footer"]');
 		expect(footer).toHaveClass('custom-class');
 	});
@@ -207,9 +222,11 @@ describe('GlassCard composition', () => {
 					<p data-testid="main-content">Main content area</p>
 				</GlassCardContent>
 				<GlassCardFooter>
-					<button type="button" data-testid="footer-button">View Details</button>
+					<button type="button" data-testid="footer-button">
+						View Details
+					</button>
 				</GlassCardFooter>
-			</GlassCard>
+			</GlassCard>,
 		);
 
 		// Check main card
@@ -231,7 +248,7 @@ describe('GlassCard composition', () => {
 		const { container } = render(
 			<GlassCard variant="interactive">
 				<GlassCardContent>Click me</GlassCardContent>
-			</GlassCard>
+			</GlassCard>,
 		);
 
 		const card = container.querySelector('[data-slot="glass-card"]');

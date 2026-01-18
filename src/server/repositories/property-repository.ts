@@ -3,17 +3,17 @@
  * Handles data access for properties with members, loans, and related contracts
  */
 
-import { prisma } from '@/lib/prisma';
 import type {
+	CoOwnership,
+	Loan,
 	Property,
+	PropertyInsurance,
 	PropertyMember,
 	PropertyType,
 	PropertyUsage,
-	Loan,
-	PropertyInsurance,
-	CoOwnership,
 	UtilityContract,
 } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Types
 export interface PropertyMemberWithDetails {

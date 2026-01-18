@@ -7,10 +7,7 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import {
-	propertyRepository,
-	coOwnershipRepository,
-} from '@/server/repositories';
+import { coOwnershipRepository, propertyRepository } from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -35,10 +32,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 		});
 	} catch (error) {
 		console.error('Error fetching co-ownership:', error);
-		return NextResponse.json(
-			{ error: 'Failed to fetch co-ownership' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to fetch co-ownership' }, { status: 500 });
 	}
 }
 
@@ -69,10 +63,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			return NextResponse.json({ error: 'name is required' }, { status: 400 });
 		}
 		if (quarterlyAmount === undefined || typeof quarterlyAmount !== 'number') {
-			return NextResponse.json({ error: 'quarterlyAmount is required and must be a number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'quarterlyAmount is required and must be a number' },
+				{ status: 400 },
+			);
 		}
 		if (quarterlyAmount < 0) {
-			return NextResponse.json({ error: 'quarterlyAmount must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'quarterlyAmount must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 
 		const coOwnership = await coOwnershipRepository.create({
@@ -86,10 +86,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(coOwnership, { status: 201 });
 	} catch (error) {
 		console.error('Error creating co-ownership:', error);
-		return NextResponse.json(
-			{ error: 'Failed to create co-ownership' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to create co-ownership' }, { status: 500 });
 	}
 }
 
@@ -126,7 +123,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 				return NextResponse.json({ error: 'quarterlyAmount must be a number' }, { status: 400 });
 			}
 			if (quarterlyAmount < 0) {
-				return NextResponse.json({ error: 'quarterlyAmount must be a non-negative number' }, { status: 400 });
+				return NextResponse.json(
+					{ error: 'quarterlyAmount must be a non-negative number' },
+					{ status: 400 },
+				);
 			}
 		}
 
@@ -142,10 +142,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(coOwnership);
 	} catch (error) {
 		console.error('Error updating co-ownership:', error);
-		return NextResponse.json(
-			{ error: 'Failed to update co-ownership' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to update co-ownership' }, { status: 500 });
 	}
 }
 
@@ -170,9 +167,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json({ success: true });
 	} catch (error) {
 		console.error('Error deleting co-ownership:', error);
-		return NextResponse.json(
-			{ error: 'Failed to delete co-ownership' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to delete co-ownership' }, { status: 500 });
 	}
 }

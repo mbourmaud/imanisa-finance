@@ -7,24 +7,20 @@
  * Uses Dinero.js for precise currency handling.
  */
 
-import * as React from 'react';
+import type * as React from 'react';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import {
+	type CurrencyCode,
 	formatMoney,
 	formatMoneyCompact,
 	formatMoneyShort,
 	formatMoneyWithSign,
-	type CurrencyCode,
 } from '@/shared/utils/currency';
 
 // Types
 
-export type MoneyDisplayVariant =
-	| 'default'
-	| 'positive'
-	| 'negative'
-	| 'neutral';
+export type MoneyDisplayVariant = 'default' | 'positive' | 'negative' | 'neutral';
 export type MoneyDisplaySize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 export type MoneyDisplayFormat = 'full' | 'compact' | 'short' | 'withSign';
 
@@ -45,10 +41,7 @@ const variantClasses: Record<MoneyDisplayVariant, string> = {
 };
 
 // Helper to determine variant from amount
-function getVariantFromAmount(
-	amount: number,
-	autoColor: boolean
-): MoneyDisplayVariant {
+function getVariantFromAmount(amount: number, autoColor: boolean): MoneyDisplayVariant {
 	if (!autoColor) return 'default';
 	if (amount > 0) return 'positive';
 	if (amount < 0) return 'negative';
@@ -68,8 +61,7 @@ const formatters: Record<
 
 // MoneyDisplay Component
 
-export interface MoneyDisplayProps
-	extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
+export interface MoneyDisplayProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
 	amount: number;
 	currency?: CurrencyCode;
 	locale?: string;
@@ -102,7 +94,7 @@ export const MoneyDisplay = forwardRef<HTMLSpanElement, MoneyDisplayProps>(
 			weight = 'medium',
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const displayVariant = variant || getVariantFromAmount(amount, autoColor);
 		const formatter = formatters[format];
@@ -117,14 +109,14 @@ export const MoneyDisplay = forwardRef<HTMLSpanElement, MoneyDisplayProps>(
 					sizeClasses[size],
 					variantClasses[displayVariant],
 					weightClasses[weight],
-					className
+					className,
 				)}
 				{...props}
 			>
 				{formattedValue}
 			</span>
 		);
-	}
+	},
 );
 MoneyDisplay.displayName = 'MoneyDisplay';
 
@@ -150,7 +142,7 @@ export const MoneyDifference = forwardRef<HTMLSpanElement, MoneyDifferenceProps>
 			showIcon = false,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const variant = getVariantFromAmount(amount, true);
 		const sign = amount > 0 ? '+' : amount < 0 ? '' : '';
@@ -164,20 +156,16 @@ export const MoneyDifference = forwardRef<HTMLSpanElement, MoneyDifferenceProps>
 					'number-display inline-flex items-center gap-1',
 					sizeClasses[size],
 					variantClasses[variant],
-					className
+					className,
 				)}
 				{...props}
 			>
-				{showIcon && amount !== 0 && (
-					<span className="text-xs">
-						{amount > 0 ? '▲' : '▼'}
-					</span>
-				)}
+				{showIcon && amount !== 0 && <span className="text-xs">{amount > 0 ? '▲' : '▼'}</span>}
 				{sign}
 				{formattedValue}
 			</span>
 		);
-	}
+	},
 );
 MoneyDifference.displayName = 'MoneyDifference';
 
@@ -191,21 +179,8 @@ export interface MoneyPercentChangeProps
 	decimals?: number;
 }
 
-export const MoneyPercentChange = forwardRef<
-	HTMLSpanElement,
-	MoneyPercentChangeProps
->(
-	(
-		{
-			className,
-			value,
-			size = 'sm',
-			showIcon = false,
-			decimals = 1,
-			...props
-		},
-		ref
-	) => {
+export const MoneyPercentChange = forwardRef<HTMLSpanElement, MoneyPercentChangeProps>(
+	({ className, value, size = 'sm', showIcon = false, decimals = 1, ...props }, ref) => {
 		const variant = getVariantFromAmount(value, true);
 		const sign = value > 0 ? '+' : '';
 		const formattedValue = `${sign}${value.toFixed(decimals)}%`;
@@ -218,19 +193,15 @@ export const MoneyPercentChange = forwardRef<
 					'number-display inline-flex items-center gap-1',
 					sizeClasses[size],
 					variantClasses[variant],
-					className
+					className,
 				)}
 				{...props}
 			>
-				{showIcon && value !== 0 && (
-					<span className="text-xs">
-						{value > 0 ? '▲' : '▼'}
-					</span>
-				)}
+				{showIcon && value !== 0 && <span className="text-xs">{value > 0 ? '▲' : '▼'}</span>}
 				{formattedValue}
 			</span>
 		);
-	}
+	},
 );
 MoneyPercentChange.displayName = 'MoneyPercentChange';
 
@@ -264,31 +235,23 @@ export const BalanceDisplay = forwardRef<HTMLDivElement, BalanceDisplayProps>(
 			size = 'lg',
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const variant = getVariantFromAmount(amount, true);
-		const change =
-			previousAmount !== undefined ? amount - previousAmount : null;
+		const change = previousAmount !== undefined ? amount - previousAmount : null;
 		const percentChange =
 			previousAmount !== undefined && previousAmount !== 0
 				? ((amount - previousAmount) / Math.abs(previousAmount)) * 100
 				: null;
 
 		return (
-			<div
-				ref={ref}
-				data-slot="balance-display"
-				className={cn('space-y-1', className)}
-				{...props}
-			>
-				{label && (
-					<p className="text-sm text-muted-foreground font-medium">{label}</p>
-				)}
+			<div ref={ref} data-slot="balance-display" className={cn('space-y-1', className)} {...props}>
+				{label && <p className="text-sm text-muted-foreground font-medium">{label}</p>}
 				<p
 					className={cn(
 						'number-display font-bold tracking-tight',
 						balanceSizeClasses[size],
-						variant !== 'default' && variantClasses[variant]
+						variant !== 'default' && variantClasses[variant],
 					)}
 				>
 					{formatMoney(amount, currency)}
@@ -302,7 +265,7 @@ export const BalanceDisplay = forwardRef<HTMLDivElement, BalanceDisplayProps>(
 				)}
 			</div>
 		);
-	}
+	},
 );
 BalanceDisplay.displayName = 'BalanceDisplay';
 
@@ -315,8 +278,7 @@ export interface MoneySplitMember {
 	percent: number;
 }
 
-export interface MoneySplitProps
-	extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface MoneySplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
 	total: number;
 	currency?: CurrencyCode;
 	splits: MoneySplitMember[];
@@ -324,56 +286,26 @@ export interface MoneySplitProps
 }
 
 export const MoneySplit = forwardRef<HTMLDivElement, MoneySplitProps>(
-	(
-		{
-			className,
-			total,
-			currency = 'EUR',
-			splits,
-			showPercent = true,
-			...props
-		},
-		ref
-	) => {
+	({ className, total, currency = 'EUR', splits, showPercent = true, ...props }, ref) => {
 		return (
-			<div
-				ref={ref}
-				data-slot="money-split"
-				className={cn('space-y-2', className)}
-				{...props}
-			>
+			<div ref={ref} data-slot="money-split" className={cn('space-y-2', className)} {...props}>
 				{splits.map((split) => (
-					<div
-						key={split.id}
-						className="flex items-center justify-between text-sm"
-					>
+					<div key={split.id} className="flex items-center justify-between text-sm">
 						<span className="text-muted-foreground truncate">{split.name}</span>
 						<div className="flex items-center gap-2">
-							<MoneyDisplay
-								amount={split.amount}
-								currency={currency}
-								size="sm"
-								weight="medium"
-							/>
+							<MoneyDisplay amount={split.amount} currency={currency} size="sm" weight="medium" />
 							{showPercent && (
-								<span className="text-xs text-muted-foreground">
-									({split.percent}%)
-								</span>
+								<span className="text-xs text-muted-foreground">({split.percent}%)</span>
 							)}
 						</div>
 					</div>
 				))}
 				<div className="flex items-center justify-between border-t pt-2">
 					<span className="font-medium">Total</span>
-					<MoneyDisplay
-						amount={total}
-						currency={currency}
-						size="sm"
-						weight="semibold"
-					/>
+					<MoneyDisplay amount={total} currency={currency} size="sm" weight="semibold" />
 				</div>
 			</div>
 		);
-	}
+	},
 );
 MoneySplit.displayName = 'MoneySplit';

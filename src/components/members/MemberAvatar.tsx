@@ -7,10 +7,10 @@
  * Supports different sizes, custom colors, image avatars, and grouped display.
  */
 
-import * as React from 'react';
+import type * as React from 'react';
 import { forwardRef } from 'react';
-import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 // Types
 
@@ -78,8 +78,7 @@ const sizeClasses: Record<MemberAvatarSize, string> = {
 	xl: 'h-12 w-12 text-lg',
 };
 
-export interface MemberAvatarProps
-	extends React.HTMLAttributes<HTMLSpanElement> {
+export interface MemberAvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
 	member: MemberData;
 	size?: MemberAvatarSize;
 	colorIndex?: number;
@@ -87,10 +86,7 @@ export interface MemberAvatarProps
 }
 
 export const MemberAvatar = forwardRef<HTMLSpanElement, MemberAvatarProps>(
-	(
-		{ className, member, size = 'md', colorIndex = 0, showBorder = false, ...props },
-		ref
-	) => {
+	({ className, member, size = 'md', colorIndex = 0, showBorder = false, ...props }, ref) => {
 		const initials = getInitials(member.name);
 		const bgColor = member.color || getDefaultColor(colorIndex);
 		const textColor = getContrastColor(bgColor);
@@ -99,16 +95,10 @@ export const MemberAvatar = forwardRef<HTMLSpanElement, MemberAvatarProps>(
 			<Avatar
 				ref={ref}
 				data-slot="member-avatar"
-				className={cn(
-					sizeClasses[size],
-					showBorder && 'ring-2 ring-background',
-					className
-				)}
+				className={cn(sizeClasses[size], showBorder && 'ring-2 ring-background', className)}
 				{...props}
 			>
-				{member.avatarUrl && (
-					<AvatarImage src={member.avatarUrl} alt={member.name} />
-				)}
+				{member.avatarUrl && <AvatarImage src={member.avatarUrl} alt={member.name} />}
 				<AvatarFallback
 					className="font-medium"
 					style={{
@@ -120,28 +110,21 @@ export const MemberAvatar = forwardRef<HTMLSpanElement, MemberAvatarProps>(
 				</AvatarFallback>
 			</Avatar>
 		);
-	}
+	},
 );
 MemberAvatar.displayName = 'MemberAvatar';
 
 // MemberAvatarWithName Component
 
-export interface MemberAvatarWithNameProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface MemberAvatarWithNameProps extends React.HTMLAttributes<HTMLDivElement> {
 	member: MemberData;
 	size?: MemberAvatarSize;
 	colorIndex?: number;
 	description?: string;
 }
 
-export const MemberAvatarWithName = forwardRef<
-	HTMLDivElement,
-	MemberAvatarWithNameProps
->(
-	(
-		{ className, member, size = 'md', colorIndex = 0, description, ...props },
-		ref
-	) => {
+export const MemberAvatarWithName = forwardRef<HTMLDivElement, MemberAvatarWithNameProps>(
+	({ className, member, size = 'md', colorIndex = 0, description, ...props }, ref) => {
 		return (
 			<div
 				ref={ref}
@@ -152,13 +135,11 @@ export const MemberAvatarWithName = forwardRef<
 				<MemberAvatar member={member} size={size} colorIndex={colorIndex} />
 				<div className="min-w-0">
 					<p className="font-medium truncate text-sm">{member.name}</p>
-					{description && (
-						<p className="text-xs text-muted-foreground truncate">{description}</p>
-					)}
+					{description && <p className="text-xs text-muted-foreground truncate">{description}</p>}
 				</div>
 			</div>
 		);
-	}
+	},
 );
 MemberAvatarWithName.displayName = 'MemberAvatarWithName';
 
@@ -183,10 +164,9 @@ export const MemberBadge = forwardRef<HTMLDivElement, MemberBadgeProps>(
 			variant = 'default',
 			...props
 		},
-		ref
+		ref,
 	) => {
-		const hasPartialShare =
-			member.ownerShare !== undefined && member.ownerShare < 100;
+		const hasPartialShare = member.ownerShare !== undefined && member.ownerShare < 100;
 
 		return (
 			<div
@@ -195,7 +175,7 @@ export const MemberBadge = forwardRef<HTMLDivElement, MemberBadgeProps>(
 				className={cn(
 					'inline-flex items-center gap-1.5',
 					variant === 'default' && 'rounded-full bg-muted/50 px-2 py-0.5',
-					className
+					className,
 				)}
 				{...props}
 			>
@@ -206,20 +186,17 @@ export const MemberBadge = forwardRef<HTMLDivElement, MemberBadgeProps>(
 					</span>
 				)}
 				{showShare && hasPartialShare && (
-					<span className="text-xs text-muted-foreground">
-						{member.ownerShare}%
-					</span>
+					<span className="text-xs text-muted-foreground">{member.ownerShare}%</span>
 				)}
 			</div>
 		);
-	}
+	},
 );
 MemberBadge.displayName = 'MemberBadge';
 
 // MemberAvatarGroup Component
 
-export interface MemberAvatarGroupProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface MemberAvatarGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 	members: MemberData[];
 	size?: MemberAvatarSize;
 	max?: number;
@@ -231,21 +208,8 @@ const spacingClasses: Record<'tight' | 'normal', string> = {
 	normal: '-space-x-1',
 };
 
-export const MemberAvatarGroup = forwardRef<
-	HTMLDivElement,
-	MemberAvatarGroupProps
->(
-	(
-		{
-			className,
-			members,
-			size = 'sm',
-			max = 4,
-			spacing = 'tight',
-			...props
-		},
-		ref
-	) => {
+export const MemberAvatarGroup = forwardRef<HTMLDivElement, MemberAvatarGroupProps>(
+	({ className, members, size = 'sm', max = 4, spacing = 'tight', ...props }, ref) => {
 		const visibleMembers = members.slice(0, max);
 		const remainingCount = members.length - max;
 
@@ -272,7 +236,7 @@ export const MemberAvatarGroup = forwardRef<
 						data-slot="member-avatar-overflow"
 						className={cn(
 							'relative flex items-center justify-center rounded-full bg-muted ring-2 ring-background font-medium text-muted-foreground',
-							sizeClasses[size]
+							sizeClasses[size],
 						)}
 						style={{ zIndex: 0 }}
 					>
@@ -281,7 +245,7 @@ export const MemberAvatarGroup = forwardRef<
 				)}
 			</div>
 		);
-	}
+	},
 );
 MemberAvatarGroup.displayName = 'MemberAvatarGroup';
 
@@ -308,7 +272,7 @@ export const MemberList = forwardRef<HTMLDivElement, MemberListProps>(
 			onMemberClick,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const handleClick = (member: MemberWithShare) => {
 			if (interactive && onMemberClick) {
@@ -329,7 +293,7 @@ export const MemberList = forwardRef<HTMLDivElement, MemberListProps>(
 				data-slot="member-list"
 				className={cn(
 					variant === 'vertical' ? 'flex flex-col gap-2' : 'flex flex-wrap gap-2',
-					className
+					className,
 				)}
 				{...props}
 			>
@@ -339,7 +303,8 @@ export const MemberList = forwardRef<HTMLDivElement, MemberListProps>(
 						className={cn(
 							'flex items-center gap-2',
 							variant === 'vertical' && 'w-full',
-							interactive && 'cursor-pointer hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors'
+							interactive &&
+								'cursor-pointer hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors',
 						)}
 						onClick={() => handleClick(member)}
 						onKeyDown={(e) => handleKeyDown(e, member)}
@@ -350,23 +315,20 @@ export const MemberList = forwardRef<HTMLDivElement, MemberListProps>(
 						<div className="min-w-0 flex-1">
 							<p className="font-medium truncate text-sm">{member.name}</p>
 							{showShare && member.ownerShare !== undefined && (
-								<p className="text-xs text-muted-foreground">
-									{member.ownerShare}% de propriété
-								</p>
+								<p className="text-xs text-muted-foreground">{member.ownerShare}% de propriété</p>
 							)}
 						</div>
 					</div>
 				))}
 			</div>
 		);
-	}
+	},
 );
 MemberList.displayName = 'MemberList';
 
 // MemberSelector Component
 
-export interface MemberSelectorProps
-	extends React.HTMLAttributes<HTMLDivElement> {
+export interface MemberSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
 	members: MemberData[];
 	selectedIds: string[];
 	size?: MemberAvatarSize;
@@ -376,16 +338,8 @@ export interface MemberSelectorProps
 
 export const MemberSelector = forwardRef<HTMLDivElement, MemberSelectorProps>(
 	(
-		{
-			className,
-			members,
-			selectedIds,
-			size = 'md',
-			onSelectionChange,
-			multiple = true,
-			...props
-		},
-		ref
+		{ className, members, selectedIds, size = 'md', onSelectionChange, multiple = true, ...props },
+		ref,
 	) => {
 		const handleToggle = (memberId: string) => {
 			if (!onSelectionChange) return;
@@ -397,9 +351,7 @@ export const MemberSelector = forwardRef<HTMLDivElement, MemberSelectorProps>(
 					onSelectionChange([...selectedIds, memberId]);
 				}
 			} else {
-				onSelectionChange(
-					selectedIds.includes(memberId) ? [] : [memberId]
-				);
+				onSelectionChange(selectedIds.includes(memberId) ? [] : [memberId]);
 			}
 		};
 
@@ -430,7 +382,7 @@ export const MemberSelector = forwardRef<HTMLDivElement, MemberSelectorProps>(
 								'border-2',
 								isSelected
 									? 'border-primary bg-primary/10 text-foreground'
-									: 'border-transparent bg-muted/50 text-muted-foreground hover:bg-muted'
+									: 'border-transparent bg-muted/50 text-muted-foreground hover:bg-muted',
 							)}
 						>
 							<MemberAvatar member={member} size={size} colorIndex={index} />
@@ -440,6 +392,6 @@ export const MemberSelector = forwardRef<HTMLDivElement, MemberSelectorProps>(
 				})}
 			</div>
 		);
-	}
+	},
 );
 MemberSelector.displayName = 'MemberSelector';

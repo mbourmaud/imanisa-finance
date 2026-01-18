@@ -93,7 +93,7 @@ const VStack = forwardRef<HTMLDivElement, VStackProps>(
 			minW0,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		return (
 			<div
@@ -110,12 +110,12 @@ const VStack = forwardRef<HTMLDivElement, VStackProps>(
 					grow && 'flex-1',
 					shrink === false && 'shrink-0',
 					minW0 && 'min-w-0',
-					className
+					className,
 				)}
 				{...props}
 			/>
 		);
-	}
+	},
 );
 VStack.displayName = 'VStack';
 
@@ -173,7 +173,7 @@ const HStack = forwardRef<HTMLDivElement, HStackProps>(
 			minW0,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		return (
 			<div
@@ -190,12 +190,12 @@ const HStack = forwardRef<HTMLDivElement, HStackProps>(
 					grow && 'flex-1',
 					shrink === false && 'shrink-0',
 					minW0 && 'min-w-0',
-					className
+					className,
 				)}
 				{...props}
 			/>
 		);
-	}
+	},
 );
 HStack.displayName = 'HStack';
 

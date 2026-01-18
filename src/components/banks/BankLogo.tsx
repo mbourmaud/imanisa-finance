@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import Image from 'next/image';
 import { Camera, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 interface BankLogoProps {

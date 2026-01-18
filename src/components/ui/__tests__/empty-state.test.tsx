@@ -1,12 +1,12 @@
 import { render, within } from '@testing-library/react';
+import { Inbox, Search } from 'lucide-react';
 import { describe, expect, it } from 'vitest';
-import { Search, Inbox, AlertCircle } from 'lucide-react';
 import {
 	EmptyState,
-	EmptyStateNoAccounts,
-	EmptyStateNoTransactions,
-	EmptyStateNoResults,
 	EmptyStateError,
+	EmptyStateNoAccounts,
+	EmptyStateNoResults,
+	EmptyStateNoTransactions,
 } from '../empty-state';
 
 describe('EmptyState', () => {
@@ -19,23 +19,21 @@ describe('EmptyState', () => {
 
 	it('renders with description', () => {
 		const { container } = render(
-			<EmptyState title="No items" description="Add some items to get started" />
+			<EmptyState title="No items" description="Add some items to get started" />,
 		);
 		const emptyState = container.querySelector('[data-slot="empty-state"]') as HTMLElement;
 		expect(within(emptyState).getByText('Add some items to get started')).toBeInTheDocument();
 	});
 
 	it('renders with icon', () => {
-		const { container } = render(
-			<EmptyState title="No results" icon={Search} />
-		);
+		const { container } = render(<EmptyState title="No results" icon={Search} />);
 		const svg = container.querySelector('svg');
 		expect(svg).toBeInTheDocument();
 	});
 
 	it('renders with iconElement', () => {
 		const { container } = render(
-			<EmptyState title="No items" iconElement={<span data-testid="custom-icon">🎉</span>} />
+			<EmptyState title="No items" iconElement={<span data-testid="custom-icon">🎉</span>} />,
 		);
 		const icon = container.querySelector('[data-testid="custom-icon"]');
 		expect(icon).toBeInTheDocument();
@@ -88,8 +86,12 @@ describe('EmptyState', () => {
 		const { container } = render(
 			<EmptyState
 				title="No items"
-				action={<button type="button" data-testid="action-btn">Add Item</button>}
-			/>
+				action={
+					<button type="button" data-testid="action-btn">
+						Add Item
+					</button>
+				}
+			/>,
 		);
 		const actionBtn = container.querySelector('[data-testid="action-btn"]');
 		expect(actionBtn).toBeInTheDocument();
@@ -110,15 +112,21 @@ describe('EmptyState', () => {
 				description="When you receive messages, they will appear here."
 				size="lg"
 				variant="card"
-				action={<button type="button" data-testid="compose-btn">Compose</button>}
-			/>
+				action={
+					<button type="button" data-testid="compose-btn">
+						Compose
+					</button>
+				}
+			/>,
 		);
 
 		const emptyState = container.querySelector('[data-slot="empty-state"]') as HTMLElement;
 		expect(emptyState).toHaveClass('glass-card', 'p-8');
 		expect(container.querySelector('svg')).toBeInTheDocument();
 		expect(within(emptyState).getByText('Your inbox is empty')).toBeInTheDocument();
-		expect(within(emptyState).getByText('When you receive messages, they will appear here.')).toBeInTheDocument();
+		expect(
+			within(emptyState).getByText('When you receive messages, they will appear here.'),
+		).toBeInTheDocument();
 		expect(container.querySelector('[data-testid="compose-btn"]')).toBeInTheDocument();
 	});
 });
@@ -135,7 +143,13 @@ describe('EmptyState Presets', () => {
 
 		it('accepts action prop', () => {
 			const { container } = render(
-				<EmptyStateNoAccounts action={<button type="button" data-testid="add-account">Ajouter</button>} />
+				<EmptyStateNoAccounts
+					action={
+						<button type="button" data-testid="add-account">
+							Ajouter
+						</button>
+					}
+				/>,
 			);
 			expect(container.querySelector('[data-testid="add-account"]')).toBeInTheDocument();
 		});
@@ -172,7 +186,13 @@ describe('EmptyState Presets', () => {
 
 		it('accepts action prop for retry', () => {
 			const { container } = render(
-				<EmptyStateError action={<button type="button" data-testid="retry">Réessayer</button>} />
+				<EmptyStateError
+					action={
+						<button type="button" data-testid="retry">
+							Réessayer
+						</button>
+					}
+				/>,
 			);
 			expect(container.querySelector('[data-testid="retry"]')).toBeInTheDocument();
 		});

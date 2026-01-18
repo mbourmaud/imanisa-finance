@@ -4,30 +4,30 @@ import {
 	ArrowDownRight,
 	ArrowUpRight,
 	Bitcoin,
+	Box,
 	Briefcase,
 	Building,
-	MoreHorizontal,
-	Plus,
-	RefreshCw,
-	TrendingUp,
-	Wallet,
 	Button,
-	PageHeader,
-	StatCard,
-	StatCardGrid,
-	GlassCard,
-	Grid,
-	VStack,
-	HStack,
-	Box,
-	Flex,
-	Text,
-	Heading,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	Flex,
+	GlassCard,
+	Grid,
+	Heading,
+	HStack,
+	MoreHorizontal,
+	PageHeader,
+	Plus,
+	RefreshCw,
+	StatCard,
+	StatCardGrid,
+	Text,
+	TrendingUp,
+	VStack,
+	Wallet,
 } from '@/components';
 import { InvestmentPerformanceChart } from '@/components/charts';
 import { demoInvestmentPerformance } from '@/lib/demo';
@@ -159,7 +159,10 @@ export default function InvestmentsPage() {
 				description="PEA, CTO, Assurance-vie, Crypto"
 				actions={
 					<HStack gap="sm">
-						<Button variant="outline" iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}>
+						<Button
+							variant="outline"
+							iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
+						>
 							Actualiser
 						</Button>
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
@@ -207,7 +210,11 @@ export default function InvestmentsPage() {
 					const isPositive = gain >= 0;
 
 					return (
-						<GlassCard key={source.id} padding="md" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+						<GlassCard
+							key={source.id}
+							padding="md"
+							style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+						>
 							<HStack justify="between" align="start">
 								<Flex
 									align="center"
@@ -241,7 +248,9 @@ export default function InvestmentsPage() {
 										<DropdownMenuItem>Voir les positions</DropdownMenuItem>
 										<DropdownMenuItem>Ajouter une transaction</DropdownMenuItem>
 										<DropdownMenuSeparator />
-										<DropdownMenuItem style={{ color: 'hsl(var(--destructive))' }}>Supprimer</DropdownMenuItem>
+										<DropdownMenuItem style={{ color: 'hsl(var(--destructive))' }}>
+											Supprimer
+										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
 							</HStack>
@@ -276,7 +285,9 @@ export default function InvestmentsPage() {
 			<GlassCard padding="lg">
 				<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
 					<VStack gap="none">
-						<Heading level={3} size="lg" weight="medium">Positions</Heading>
+						<Heading level={3} size="lg" weight="medium">
+							Positions
+						</Heading>
 						<Text size="sm" color="muted">
 							Toutes vos positions d&apos;investissement
 						</Text>
@@ -324,16 +335,28 @@ export default function InvestmentsPage() {
 							</HStack>
 							<HStack gap="xl" align="center">
 								<Box style={{ display: 'none', textAlign: 'right' }} data-show-sm>
-									<Text size="xs" color="muted">Quantité</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{pos.quantity}</Text>
+									<Text size="xs" color="muted">
+										Quantité
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{pos.quantity}
+									</Text>
 								</Box>
 								<Box style={{ display: 'none', textAlign: 'right' }} data-show-md>
-									<Text size="xs" color="muted">PRU</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(pos.avgPrice)}</Text>
+									<Text size="xs" color="muted">
+										PRU
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{formatCurrency(pos.avgPrice)}
+									</Text>
 								</Box>
 								<Box style={{ textAlign: 'right' }}>
-									<Text size="xs" color="muted">Valeur</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(pos.value)}</Text>
+									<Text size="xs" color="muted">
+										Valeur
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{formatCurrency(pos.value)}
+									</Text>
 								</Box>
 								<Box style={{ textAlign: 'right', minWidth: '100px' }}>
 									<Text
@@ -348,7 +371,9 @@ export default function InvestmentsPage() {
 									</Text>
 									<Text
 										size="xs"
-										style={{ color: pos.gainPercent >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)' }}
+										style={{
+											color: pos.gainPercent >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
+										}}
 									>
 										{pos.gainPercent >= 0 ? '+' : ''}
 										{pos.gainPercent.toFixed(2)}%
@@ -364,15 +389,26 @@ export default function InvestmentsPage() {
 			<GlassCard padding="lg">
 				<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
 					<VStack gap="none">
-						<Heading level={3} size="lg" weight="medium">Évolution du portefeuille</Heading>
-						<Text size="sm" color="muted">Performance sur 12 mois</Text>
+						<Heading level={3} size="lg" weight="medium">
+							Évolution du portefeuille
+						</Heading>
+						<Text size="sm" color="muted">
+							Performance sur 12 mois
+						</Text>
 					</VStack>
 					<HStack gap="md" align="center">
 						<HStack gap="sm" align="center">
 							<Box
-								style={{ height: '0.5rem', width: '1rem', borderRadius: '0.125rem', backgroundColor: 'oklch(0.55 0.18 270)' }}
+								style={{
+									height: '0.5rem',
+									width: '1rem',
+									borderRadius: '0.125rem',
+									backgroundColor: 'oklch(0.55 0.18 270)',
+								}}
 							/>
-							<Text size="sm" color="muted">Valeur</Text>
+							<Text size="sm" color="muted">
+								Valeur
+							</Text>
 						</HStack>
 						<HStack gap="sm" align="center">
 							<Box
@@ -382,7 +418,9 @@ export default function InvestmentsPage() {
 									borderTop: '2px dashed oklch(0.5 0.01 280)',
 								}}
 							/>
-							<Text size="sm" color="muted">Investi</Text>
+							<Text size="sm" color="muted">
+								Investi
+							</Text>
 						</HStack>
 					</HStack>
 				</HStack>

@@ -6,9 +6,9 @@
 import { caisseEpargneParser } from './caisse-epargne';
 import { creditMutuelParser } from './credit-mutuel';
 import { genericParser } from './generic';
-import type { Parser, ParseResult } from './types';
+import type { ParseResult, Parser } from './types';
 
-export type { ParsedTransaction, ParsedPosition, ParseResult, Parser } from './types';
+export type { ParsedPosition, ParsedTransaction, ParseResult, Parser } from './types';
 
 /**
  * Registry of all available parsers
@@ -54,7 +54,9 @@ export function getAllParsers(): Parser[] {
 /**
  * Get parser info for a bank key
  */
-export function getParserInfo(bankKey: string): { name: string; supportedMimeTypes: string[] } | null {
+export function getParserInfo(
+	bankKey: string,
+): { name: string; supportedMimeTypes: string[] } | null {
 	const parser = parsers.get(bankKey);
 	if (!parser) return null;
 

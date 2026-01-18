@@ -10,7 +10,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
-	MoreHorizontal,
+	Box,
 	Button,
 	Checkbox,
 	DropdownMenu,
@@ -19,11 +19,11 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	VStack,
-	HStack,
-	Box,
 	Flex,
+	HStack,
+	MoreHorizontal,
 	Text,
+	VStack,
 } from '@/components';
 import type { Transaction } from '../types';
 
@@ -76,7 +76,9 @@ interface TransactionColumnsOptions {
 /**
  * Create transaction table columns
  */
-export function createTransactionColumns(options?: TransactionColumnsOptions): ColumnDef<Transaction>[] {
+export function createTransactionColumns(
+	options?: TransactionColumnsOptions,
+): ColumnDef<Transaction>[] {
 	return [
 		// Selection column
 		{
@@ -111,8 +113,12 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 				const date = row.getValue('date') as Date;
 				return (
 					<VStack gap="none">
-						<Text size="sm" weight="medium">{formatRelativeDate(date)}</Text>
-						<Text size="xs" color="muted">{formatDate(date)}</Text>
+						<Text size="sm" weight="medium">
+							{formatRelativeDate(date)}
+						</Text>
+						<Text size="xs" color="muted">
+							{formatDate(date)}
+						</Text>
 					</VStack>
 				);
 			},
@@ -140,13 +146,22 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 							}}
 						>
 							{isIncome ? (
-								<ArrowDownLeft style={{ height: '1rem', width: '1rem', color: 'rgb(16, 185, 129)' }} />
+								<ArrowDownLeft
+									style={{ height: '1rem', width: '1rem', color: 'rgb(16, 185, 129)' }}
+								/>
 							) : (
-								<ArrowUpRight style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+								<ArrowUpRight
+									style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
+								/>
 							)}
 						</Flex>
 						<VStack gap="none" style={{ minWidth: 0 }}>
-							<Text weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{transaction.description}</Text>
+							<Text
+								weight="medium"
+								style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+							>
+								{transaction.description}
+							</Text>
 							<Text size="xs" color="muted">
 								{transaction.category || 'Non catégorisé'}
 							</Text>
@@ -161,7 +176,11 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 			header: 'Compte',
 			cell: ({ row }) => {
 				const accountName = row.getValue('accountName') as string;
-				return <Text size="sm" color="muted">{accountName}</Text>;
+				return (
+					<Text size="sm" color="muted">
+						{accountName}
+					</Text>
+				);
 			},
 		},
 		// Amount column
@@ -189,8 +208,10 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 				);
 			},
 			sortingFn: (rowA, rowB) => {
-				const amountA = rowA.original.type === 'income' ? rowA.original.amount : -rowA.original.amount;
-				const amountB = rowB.original.type === 'income' ? rowB.original.amount : -rowB.original.amount;
+				const amountA =
+					rowA.original.type === 'income' ? rowA.original.amount : -rowA.original.amount;
+				const amountB =
+					rowB.original.type === 'income' ? rowB.original.amount : -rowB.original.amount;
 				return amountA - amountB;
 			},
 		},
@@ -204,8 +225,27 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 				return (
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" style={{ height: '2rem', width: '2rem' }} onClick={(e) => e.stopPropagation()}>
-								<span style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>Ouvrir le menu</span>
+							<Button
+								variant="ghost"
+								size="icon"
+								style={{ height: '2rem', width: '2rem' }}
+								onClick={(e) => e.stopPropagation()}
+							>
+								<span
+									style={{
+										position: 'absolute',
+										width: '1px',
+										height: '1px',
+										padding: 0,
+										margin: '-1px',
+										overflow: 'hidden',
+										clip: 'rect(0,0,0,0)',
+										whiteSpace: 'nowrap',
+										border: 0,
+									}}
+								>
+									Ouvrir le menu
+								</span>
 								<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
 							</Button>
 						</DropdownMenuTrigger>
@@ -252,7 +292,11 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			header: 'Date',
 			cell: ({ row }) => {
 				const date = row.getValue('date') as Date;
-				return <Text size="sm" color="muted">{formatRelativeDate(date)}</Text>;
+				return (
+					<Text size="sm" color="muted">
+						{formatRelativeDate(date)}
+					</Text>
+				);
 			},
 			sortingFn: 'datetime',
 			size: 100,
@@ -265,9 +309,17 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 				const transaction = row.original;
 				return (
 					<VStack gap="none" style={{ minWidth: 0 }}>
-						<Text size="sm" weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{transaction.description}</Text>
+						<Text
+							size="sm"
+							weight="medium"
+							style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+						>
+							{transaction.description}
+						</Text>
 						{transaction.category && (
-							<Text size="xs" color="muted">{transaction.category}</Text>
+							<Text size="xs" color="muted">
+								{transaction.category}
+							</Text>
 						)}
 					</VStack>
 				);

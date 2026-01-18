@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import type { LucideProps } from 'lucide-react';
 import {
 	AlertCircle,
@@ -110,6 +109,7 @@ import {
 	XCircle,
 	Zap,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // =============================================================================
 // ICON COMPONENT
@@ -296,11 +296,7 @@ function IconWrapper({
 }: IconWrapperProps) {
 	return (
 		<IconComponent
-			className={cn(
-				sizeClasses[size],
-				color !== 'inherit' && colorClasses[color],
-				className
-			)}
+			className={cn(sizeClasses[size], color !== 'inherit' && colorClasses[color], className)}
 			aria-label={ariaLabel}
 			aria-hidden={ariaHidden}
 			{...props}
@@ -461,11 +457,7 @@ function Icon({
 
 	return (
 		<IconComponent
-			className={cn(
-				sizeClasses[size],
-				color !== 'inherit' && colorClasses[color],
-				className
-			)}
+			className={cn(sizeClasses[size], color !== 'inherit' && colorClasses[color], className)}
 			aria-label={ariaLabel}
 			aria-hidden={ariaHidden}
 		/>

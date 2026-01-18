@@ -284,7 +284,7 @@ describe('Text', () => {
 		const { container } = render(
 			<Text variant="small" color="primary">
 				Content
-			</Text>
+			</Text>,
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<p

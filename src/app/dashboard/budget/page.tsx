@@ -1,39 +1,39 @@
 'use client';
 
 import {
+	Box,
+	Button,
 	Car,
 	Coffee,
 	CreditCard,
-	Film,
-	Heart,
-	Home,
-	MoreHorizontal,
-	PieChart,
-	Plus,
-	Settings,
-	ShoppingBag,
-	ShoppingCart,
-	Utensils,
-	Zap,
-	Button,
-	PageHeader,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	Progress,
-	Box,
-	VStack,
-	HStack,
-	Text,
-	Heading,
+	Film,
 	GlassCard,
 	Grid,
+	Heading,
+	Heart,
+	Home,
+	HStack,
+	MoreHorizontal,
+	PageHeader,
+	PieChart,
+	Plus,
+	Progress,
+	Settings,
+	ShoppingBag,
+	ShoppingCart,
 	StatCard,
 	StatCardGrid,
+	Text,
+	Utensils,
+	VStack,
+	Zap,
 } from '@/components';
-import { DonutChart, ChartLegend } from '@/components/charts';
+import { ChartLegend, DonutChart } from '@/components/charts';
 
 const categories = [
 	{
@@ -139,7 +139,10 @@ export default function BudgetPage() {
 				description="Suivez vos dépenses par catégorie"
 				actions={
 					<HStack gap="sm">
-						<Button variant="outline" iconLeft={<Settings style={{ height: '1rem', width: '1rem' }} />}>
+						<Button
+							variant="outline"
+							iconLeft={<Settings style={{ height: '1rem', width: '1rem' }} />}
+						>
 							Règles
 						</Button>
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
@@ -151,11 +154,7 @@ export default function BudgetPage() {
 
 			{/* Stats Overview */}
 			<StatCardGrid columns={3}>
-				<StatCard
-					label="Budget mensuel"
-					value={formatCurrency(totalBudget)}
-					icon={PieChart}
-				/>
+				<StatCard label="Budget mensuel" value={formatCurrency(totalBudget)} icon={PieChart} />
 				<StatCard
 					label="Dépensé"
 					value={formatCurrency(totalSpent)}
@@ -213,7 +212,9 @@ export default function BudgetPage() {
 											<category.icon style={{ height: '1.25rem', width: '1.25rem' }} />
 										</Box>
 										<VStack gap="none">
-											<Text size="md" weight="medium">{category.name}</Text>
+											<Text size="md" weight="medium">
+												{category.name}
+											</Text>
 											<Text size="xs" color="muted">
 												{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
 											</Text>
@@ -221,11 +222,7 @@ export default function BudgetPage() {
 									</HStack>
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												size="icon"
-												style={{ height: '2rem', width: '2rem' }}
-											>
+											<Button variant="ghost" size="icon" style={{ height: '2rem', width: '2rem' }}>
 												<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
 											</Button>
 										</DropdownMenuTrigger>
@@ -233,7 +230,9 @@ export default function BudgetPage() {
 											<DropdownMenuItem>Voir les transactions</DropdownMenuItem>
 											<DropdownMenuItem>Modifier le budget</DropdownMenuItem>
 											<DropdownMenuSeparator />
-											<DropdownMenuItem style={{ color: 'hsl(var(--destructive))' }}>Supprimer</DropdownMenuItem>
+											<DropdownMenuItem style={{ color: 'hsl(var(--destructive))' }}>
+												Supprimer
+											</DropdownMenuItem>
 										</DropdownMenuContent>
 									</DropdownMenu>
 								</HStack>
@@ -242,7 +241,10 @@ export default function BudgetPage() {
 										value={Math.min(percentage, 100)}
 										style={{
 											height: '0.5rem',
-											...(isOverBudget && { '--progress-foreground': 'hsl(var(--destructive))' } as React.CSSProperties),
+											...(isOverBudget &&
+												({
+													'--progress-foreground': 'hsl(var(--destructive))',
+												} as React.CSSProperties)),
 										}}
 									/>
 									<HStack justify="between">
@@ -256,7 +258,9 @@ export default function BudgetPage() {
 												? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
 												: `Reste ${formatCurrency(remainingBudget)}`}
 										</Text>
-										<Text size="xs" color="muted">{Math.round(percentage)}%</Text>
+										<Text size="xs" color="muted">
+											{Math.round(percentage)}%
+										</Text>
 									</HStack>
 								</VStack>
 							</VStack>
@@ -269,8 +273,12 @@ export default function BudgetPage() {
 			<GlassCard padding="lg">
 				<VStack gap="md">
 					<VStack gap="xs">
-						<Heading level={3} size="md">Répartition des dépenses</Heading>
-						<Text size="sm" color="muted">Vue graphique par catégorie</Text>
+						<Heading level={3} size="md">
+							Répartition des dépenses
+						</Heading>
+						<Text size="sm" color="muted">
+							Vue graphique par catégorie
+						</Text>
 					</VStack>
 					<Grid cols={2} gap="xl" style={{ alignItems: 'center' }}>
 						<DonutChart data={chartData} height="lg" />

@@ -24,7 +24,7 @@ const Spacer = forwardRef<HTMLDivElement, SpacerProps>(
 				{...props}
 			/>
 		);
-	}
+	},
 );
 Spacer.displayName = 'Spacer';
 

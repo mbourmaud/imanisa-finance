@@ -1,8 +1,8 @@
 'use client';
 
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { SupportedBank } from '@/shared/constants/supported-banks';
 
 // =============================================================================
@@ -45,11 +45,7 @@ const BankAvatar = forwardRef<HTMLDivElement, BankAvatarProps>(
 				{...props}
 			>
 				{logoUrl ? (
-					<img
-						src={logoUrl}
-						alt={`Logo ${bank.name}`}
-						className="h-full w-full object-cover"
-					/>
+					<img src={logoUrl} alt={`Logo ${bank.name}`} className="h-full w-full object-cover" />
 				) : (
 					<span>{bank.shortName}</span>
 				)}
@@ -110,16 +106,21 @@ const BankCard = forwardRef<HTMLDivElement, BankCardProps>(
 				className={cn(
 					'glass-card',
 					isCompact ? 'p-3' : 'p-4',
-					interactive && 'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg',
+					interactive &&
+						'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg',
 					className,
 				)}
 				onClick={interactive ? onBankClick : undefined}
-				onKeyDown={interactive ? (e) => {
-					if (e.key === 'Enter' || e.key === ' ') {
-						e.preventDefault();
-						onBankClick?.();
-					}
-				} : undefined}
+				onKeyDown={
+					interactive
+						? (e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									onBankClick?.();
+								}
+							}
+						: undefined
+				}
 				tabIndex={interactive ? 0 : undefined}
 				role={interactive ? 'button' : undefined}
 				{...props}
@@ -135,22 +136,19 @@ const BankCard = forwardRef<HTMLDivElement, BankCardProps>(
 					{/* Bank Info */}
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-2">
-							<h3 className={cn(
-								'font-semibold truncate',
-								isCompact ? 'text-sm' : 'text-base',
-							)}>
+							<h3 className={cn('font-semibold truncate', isCompact ? 'text-sm' : 'text-base')}>
 								{bank.name}
 							</h3>
 							{bank.type === 'investment' && (
-								<span className="badge-fun badge-purple text-[10px] px-1.5">
-									Invest
-								</span>
+								<span className="badge-fun badge-purple text-[10px] px-1.5">Invest</span>
 							)}
 						</div>
 
 						{!isCompact && accountCount !== undefined && (
 							<p className="text-xs text-muted-foreground mt-0.5">
-								{accountCount === 0 ? 'Aucun compte' : `${accountCount} compte${accountCount > 1 ? 's' : ''}`}
+								{accountCount === 0
+									? 'Aucun compte'
+									: `${accountCount} compte${accountCount > 1 ? 's' : ''}`}
 							</p>
 						)}
 
@@ -164,10 +162,9 @@ const BankCard = forwardRef<HTMLDivElement, BankCardProps>(
 					{/* Balance (if provided) */}
 					{totalBalance && (
 						<div className="text-right flex-shrink-0">
-							<span className={cn(
-								'font-semibold number-display',
-								isCompact ? 'text-sm' : 'text-base',
-							)}>
+							<span
+								className={cn('font-semibold number-display', isCompact ? 'text-sm' : 'text-base')}
+							>
 								{totalBalance}
 							</span>
 						</div>
@@ -225,11 +222,7 @@ function BankCardList({
 	...props
 }: BankCardListProps) {
 	return (
-		<div
-			data-slot="bank-card-list"
-			className={cn('space-y-3', className)}
-			{...props}
-		>
+		<div data-slot="bank-card-list" className={cn('space-y-3', className)} {...props}>
 			{banks.map((item) => (
 				<BankCard
 					key={item.bank.key}

@@ -23,14 +23,14 @@
 // Use these for margins, paddings, and gaps
 
 export const spacing = {
-	xs: '0.25rem',    // 4px
-	sm: '0.5rem',     // 8px
-	md: '1rem',       // 16px
-	lg: '1.5rem',     // 24px
-	xl: '2rem',       // 32px
-	'2xl': '3rem',    // 48px
-	'3xl': '4rem',    // 64px
-} as const
+	xs: '0.25rem', // 4px
+	sm: '0.5rem', // 8px
+	md: '1rem', // 16px
+	lg: '1.5rem', // 24px
+	xl: '2rem', // 32px
+	'2xl': '3rem', // 48px
+	'3xl': '4rem', // 64px
+} as const;
 
 // Numeric values (in pixels) for calculations
 export const spacingPx = {
@@ -41,7 +41,7 @@ export const spacingPx = {
 	xl: 32,
 	'2xl': 48,
 	'3xl': 64,
-} as const
+} as const;
 
 // =============================================================================
 // CONTAINER MAX-WIDTHS
@@ -54,7 +54,7 @@ export const containerMaxWidth = {
 	lg: '1024px',
 	xl: '1280px',
 	'2xl': '1536px',
-} as const
+} as const;
 
 // =============================================================================
 // BORDER RADIUS SCALE
@@ -63,13 +63,13 @@ export const containerMaxWidth = {
 
 export const borderRadius = {
 	none: '0',
-	sm: '0.25rem',    // 4px
-	md: '0.5rem',     // 8px
-	lg: '0.75rem',    // 12px
-	xl: '1rem',       // 16px
-	'2xl': '1.5rem',  // 24px
+	sm: '0.25rem', // 4px
+	md: '0.5rem', // 8px
+	lg: '0.75rem', // 12px
+	xl: '1rem', // 16px
+	'2xl': '1.5rem', // 24px
 	full: '9999px',
-} as const
+} as const;
 
 // =============================================================================
 // LAYOUT TOKENS
@@ -79,22 +79,22 @@ export const borderRadius = {
 export const layout = {
 	// Page gutter (horizontal padding)
 	pageGutter: {
-		mobile: '1rem',    // 16px
+		mobile: '1rem', // 16px
 		desktop: '1.5rem', // 24px
 	},
 	// Vertical spacing between sections
-	sectionGap: '2rem',    // 32px
+	sectionGap: '2rem', // 32px
 	// Card internal padding
 	cardPadding: {
-		sm: '1rem',        // 16px
-		md: '1.5rem',      // 24px
+		sm: '1rem', // 16px
+		md: '1.5rem', // 24px
 	},
-} as const
+} as const;
 
 // =============================================================================
 // TYPE EXPORTS
 // =============================================================================
 
-export type SpacingKey = keyof typeof spacing
-export type ContainerKey = keyof typeof containerMaxWidth
-export type RadiusKey = keyof typeof borderRadius
+export type SpacingKey = keyof typeof spacing;
+export type ContainerKey = keyof typeof containerMaxWidth;
+export type RadiusKey = keyof typeof borderRadius;

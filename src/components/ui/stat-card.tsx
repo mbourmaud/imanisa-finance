@@ -1,8 +1,8 @@
 'use client';
 
+import { type LucideIcon, TrendingDown, TrendingUp } from 'lucide-react';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
 
 // =============================================================================
 // STAT CARD TYPES
@@ -76,25 +76,17 @@ const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
 			<div
 				ref={ref}
 				data-slot="stat-card"
-				className={cn(
-					cardVariantClasses[variant],
-					interactive && 'cursor-pointer',
-					className,
-				)}
+				className={cn(cardVariantClasses[variant], interactive && 'cursor-pointer', className)}
 				{...props}
 			>
 				<div className="stat-card-content">
 					<div className="stat-card-text">
-						<p className="text-xs sm:text-sm font-medium text-muted-foreground">
-							{label}
-						</p>
+						<p className="text-xs sm:text-sm font-medium text-muted-foreground">{label}</p>
 						<p className="stat-card-value">{value}</p>
 						{(description || trend) && (
 							<div className="mt-1 flex items-center gap-2">
 								{description && (
-									<span className="text-xs text-muted-foreground">
-										{description}
-									</span>
+									<span className="text-xs text-muted-foreground">{description}</span>
 								)}
 								{trend && trend !== 'neutral' && (
 									<span
@@ -136,12 +128,7 @@ interface StatCardGridProps extends React.HTMLAttributes<HTMLDivElement> {
 	columns?: 2 | 3 | 4;
 }
 
-function StatCardGrid({
-	className,
-	columns = 4,
-	children,
-	...props
-}: StatCardGridProps) {
+function StatCardGrid({ className, columns = 4, children, ...props }: StatCardGridProps) {
 	const columnClasses = {
 		2: 'grid-cols-1 sm:grid-cols-2',
 		3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
@@ -168,11 +155,7 @@ interface StatCardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 	variant?: StatCardVariant;
 }
 
-function StatCardSkeleton({
-	className,
-	variant = 'default',
-	...props
-}: StatCardSkeletonProps) {
+function StatCardSkeleton({ className, variant = 'default', ...props }: StatCardSkeletonProps) {
 	return (
 		<div
 			data-slot="stat-card-skeleton"

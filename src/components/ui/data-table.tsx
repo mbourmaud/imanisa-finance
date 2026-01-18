@@ -8,31 +8,32 @@
  */
 
 import {
+	type ColumnDef,
+	type ColumnFiltersState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
 	getPaginationRowModel,
 	getSortedRowModel,
-	useReactTable,
-	type ColumnDef,
-	type ColumnFiltersState,
 	type OnChangeFn,
 	type PaginationState,
 	type RowSelectionState,
 	type SortingState,
 	type Table as TableType,
+	useReactTable,
 } from '@tanstack/react-table';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+	ChevronDown,
+	ChevronLeft,
+	ChevronRight,
+	ChevronsLeft,
+	ChevronsRight,
+	ChevronUp,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './button';
 import { Checkbox } from './checkbox';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from './select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
@@ -196,12 +197,16 @@ export function DataTable<TData, TValue>({
 										onRowClick ? 'cursor-pointer' : ''
 									}`}
 									onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-									onKeyDown={onRowClick ? (e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											onRowClick(row.original);
-										}
-									} : undefined}
+									onKeyDown={
+										onRowClick
+											? (e) => {
+													if (e.key === 'Enter' || e.key === ' ') {
+														e.preventDefault();
+														onRowClick(row.original);
+													}
+												}
+											: undefined
+									}
 									tabIndex={onRowClick ? 0 : undefined}
 								>
 									{row.getVisibleCells().map((cell) => (

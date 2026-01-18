@@ -85,7 +85,9 @@ describe('Icon', () => {
 		});
 
 		it('renders with aria-label', () => {
-			const { container } = render(<IconWrapper icon={Plus} aria-label="Add item" aria-hidden={false} />);
+			const { container } = render(
+				<IconWrapper icon={Plus} aria-label="Add item" aria-hidden={false} />,
+			);
 			const svg = container.querySelector('svg');
 			expect(svg?.getAttribute('aria-label')).toBe('Add item');
 			expect(svg?.getAttribute('aria-hidden')).toBe('false');

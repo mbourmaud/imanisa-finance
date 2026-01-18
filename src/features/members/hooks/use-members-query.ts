@@ -4,7 +4,7 @@
  * These hooks provide data fetching, caching, and mutations for household members.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Member {
 	id: string;

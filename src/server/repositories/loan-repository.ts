@@ -3,8 +3,8 @@
  * Handles data access for loans with property, member, and insurance details
  */
 
-import { prisma } from '@/lib/prisma';
 import type { Loan, LoanInsurance, Property } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Types
 export interface LoanInsuranceWithMember extends LoanInsurance {

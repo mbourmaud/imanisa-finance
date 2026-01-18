@@ -1,17 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { Box, Button, ChevronRight, Heading, Text, User, VStack, Wallet } from '@/components';
 import { useEntityStore } from '@/shared/stores/entity-store';
-import {
-	User,
-	Wallet,
-	ChevronRight,
-	Box,
-	VStack,
-	Heading,
-	Text,
-	Button,
-} from '@/components';
 
 export default function HomePage() {
 	const router = useRouter();
@@ -29,7 +20,15 @@ export default function HomePage() {
 		<Box
 			display="flex"
 			p="lg"
-			style={{ position: 'relative', overflow: 'hidden', backgroundColor: 'hsl(var(--background))', minHeight: '100vh', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+			style={{
+				position: 'relative',
+				overflow: 'hidden',
+				backgroundColor: 'hsl(var(--background))',
+				minHeight: '100vh',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center',
+			}}
 		>
 			{/* Background gradient blobs */}
 			<Box style={{ position: 'absolute', overflow: 'hidden', inset: 0, zIndex: -10 }}>
@@ -76,7 +75,11 @@ export default function HomePage() {
 			</Box>
 
 			{/* Logo */}
-			<VStack gap="lg" align="center" style={{ marginBottom: '4rem', animation: 'fadeIn 0.5s ease-out' }}>
+			<VStack
+				gap="lg"
+				align="center"
+				style={{ marginBottom: '4rem', animation: 'fadeIn 0.5s ease-out' }}
+			>
 				<Box style={{ position: 'relative' }}>
 					<Box
 						display="flex"
@@ -86,7 +89,8 @@ export default function HomePage() {
 							width: '5rem',
 							alignItems: 'center',
 							justifyContent: 'center',
-							background: 'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
+							background:
+								'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
 							boxShadow: '0 25px 50px -12px hsl(var(--primary) / 0.4)',
 						}}
 					>
@@ -112,20 +116,25 @@ export default function HomePage() {
 						style={{
 							fontWeight: 700,
 							letterSpacing: '-0.025em',
-							backgroundImage: 'linear-gradient(to right, hsl(var(--foreground)), hsl(var(--foreground) / 0.7))',
+							backgroundImage:
+								'linear-gradient(to right, hsl(var(--foreground)), hsl(var(--foreground) / 0.7))',
 							WebkitBackgroundClip: 'text',
 							backgroundClip: 'text',
 						}}
 					>
 						Imanisa
 					</Heading>
-					<Text color="muted" size="lg">Finance familiale</Text>
+					<Text color="muted" size="lg">
+						Finance familiale
+					</Text>
 				</VStack>
 			</VStack>
 
 			{/* Profile selector */}
 			<Box style={{ width: '100%', maxWidth: '24rem' }}>
-				<Text size="xl" weight="semibold" align="center" style={{ marginBottom: '1.5rem' }}>Qui êtes-vous ?</Text>
+				<Text size="xl" weight="semibold" align="center" style={{ marginBottom: '1.5rem' }}>
+					Qui êtes-vous ?
+				</Text>
 
 				<VStack gap="md">
 					{individualEntities.map((entity, index) => (
@@ -155,15 +164,20 @@ export default function HomePage() {
 									width: '4rem',
 									alignItems: 'center',
 									justifyContent: 'center',
-									background: 'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1), oklch(0.6 0.2 30 / 0.2))',
+									background:
+										'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1), oklch(0.6 0.2 30 / 0.2))',
 									boxShadow: '0 10px 15px -3px hsl(var(--primary) / 0.1)',
 								}}
 							>
 								<User style={{ height: '2rem', width: '2rem', color: 'hsl(var(--primary))' }} />
 							</Box>
 							<Box style={{ flex: 1, textAlign: 'left' }}>
-								<Text size="lg" weight="semibold">{entity.name}</Text>
-								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>Accéder à mon espace</Text>
+								<Text size="lg" weight="semibold">
+									{entity.name}
+								</Text>
+								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+									Accéder à mon espace
+								</Text>
 							</Box>
 							<Box
 								display="flex"
@@ -176,7 +190,9 @@ export default function HomePage() {
 									backgroundColor: 'hsl(var(--primary) / 0.1)',
 								}}
 							>
-								<ChevronRight style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }} />
+								<ChevronRight
+									style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }}
+								/>
 							</Box>
 						</Button>
 					))}

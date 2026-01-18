@@ -56,7 +56,10 @@ interface InvestmentPerformanceChartProps {
 	height?: ChartHeight;
 }
 
-export function InvestmentPerformanceChart({ data, height = 'lg' }: InvestmentPerformanceChartProps) {
+export function InvestmentPerformanceChart({
+	data,
+	height = 'lg',
+}: InvestmentPerformanceChartProps) {
 	// Transform data for Tremor format
 	const chartData = data.map((item) => ({
 		date: item.label || item.date,

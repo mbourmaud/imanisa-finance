@@ -22,11 +22,28 @@ type SpacingSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 type DisplayType = 'block' | 'flex' | 'inline' | 'inline-flex' | 'inline-block' | 'grid' | 'hidden';
 type PositionType = 'relative' | 'absolute' | 'fixed' | 'sticky';
 type OverflowType = 'hidden' | 'auto' | 'scroll' | 'visible';
-type BackgroundColor = 'transparent' | 'muted' | 'card' | 'background' | 'primary' | 'secondary' | 'destructive' | 'accent';
+type BackgroundColor =
+	| 'transparent'
+	| 'muted'
+	| 'card'
+	| 'background'
+	| 'primary'
+	| 'secondary'
+	| 'destructive'
+	| 'accent';
 type BorderStyle = 'none' | 'default' | 'muted' | 'strong' | 'dashed';
 type RoundedSize = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl';
-type ElementType = 'div' | 'section' | 'article' | 'aside' | 'main' | 'nav' | 'header' | 'footer' | 'span';
+type ElementType =
+	| 'div'
+	| 'section'
+	| 'article'
+	| 'aside'
+	| 'main'
+	| 'nav'
+	| 'header'
+	| 'footer'
+	| 'span';
 
 // =============================================================================
 // STYLE MAPPINGS
@@ -199,7 +216,10 @@ function getSpacingClass(prefix: string, value: SpacingSize | undefined): string
 	return `${prefix}-${spacingClasses[value]}`;
 }
 
-function getOverflowClass(axis: '' | 'x' | 'y', value: OverflowType | undefined): string | undefined {
+function getOverflowClass(
+	axis: '' | 'x' | 'y',
+	value: OverflowType | undefined,
+): string | undefined {
 	if (!value) return undefined;
 	const prefix = axis ? `overflow-${axis}` : 'overflow';
 	return `${prefix}-${value === 'hidden' ? 'hidden' : value === 'auto' ? 'auto' : value === 'scroll' ? 'scroll' : 'visible'}`;
@@ -249,7 +269,7 @@ const Box = forwardRef<HTMLElement, BoxProps>(
 			children,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		return (
 			<Component
@@ -304,14 +324,14 @@ const Box = forwardRef<HTMLElement, BoxProps>(
 					// Z-Index
 					zIndex !== undefined && `z-${zIndex}`,
 
-					className
+					className,
 				)}
 				{...props}
 			>
 				{children}
 			</Component>
 		);
-	}
+	},
 );
 Box.displayName = 'Box';
 

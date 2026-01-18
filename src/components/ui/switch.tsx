@@ -32,41 +32,40 @@ interface SwitchProps extends React.ComponentProps<typeof SwitchPrimitive.Root> 
 	size?: SwitchSize;
 }
 
-const Switch = forwardRef<
-	React.ElementRef<typeof SwitchPrimitive.Root>,
-	SwitchProps
->(({ className, size = 'md', ...props }, ref) => (
-	<SwitchPrimitive.Root
-		ref={ref}
-		data-slot="switch"
-		className={cn(
-			// Base styles
-			'peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-xs',
-			// Transition
-			'transition-colors duration-200',
-			// Focus styles
-			'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-			// Disabled styles
-			'disabled:cursor-not-allowed disabled:opacity-50',
-			// State styles
-			'data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
-			// Size variant
-			switchSizeClasses[size],
-			className,
-		)}
-		{...props}
-	>
-		<SwitchPrimitive.Thumb
-			data-slot="switch-thumb"
+const Switch = forwardRef<React.ElementRef<typeof SwitchPrimitive.Root>, SwitchProps>(
+	({ className, size = 'md', ...props }, ref) => (
+		<SwitchPrimitive.Root
+			ref={ref}
+			data-slot="switch"
 			className={cn(
-				'pointer-events-none block rounded-full bg-background shadow-lg ring-0',
-				'transition-transform duration-200',
-				'data-[state=unchecked]:translate-x-0',
-				switchThumbSizeClasses[size],
+				// Base styles
+				'peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-xs',
+				// Transition
+				'transition-colors duration-200',
+				// Focus styles
+				'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+				// Disabled styles
+				'disabled:cursor-not-allowed disabled:opacity-50',
+				// State styles
+				'data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
+				// Size variant
+				switchSizeClasses[size],
+				className,
 			)}
-		/>
-	</SwitchPrimitive.Root>
-));
+			{...props}
+		>
+			<SwitchPrimitive.Thumb
+				data-slot="switch-thumb"
+				className={cn(
+					'pointer-events-none block rounded-full bg-background shadow-lg ring-0',
+					'transition-transform duration-200',
+					'data-[state=unchecked]:translate-x-0',
+					switchThumbSizeClasses[size],
+				)}
+			/>
+		</SwitchPrimitive.Root>
+	),
+);
 Switch.displayName = SwitchPrimitive.Root.displayName;
 
 export { Switch };

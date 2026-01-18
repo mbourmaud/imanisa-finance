@@ -71,11 +71,7 @@ function Button({
 				data-slot="button"
 				data-variant={variant}
 				data-size={size}
-				className={cn(
-					buttonVariants({ variant, size }),
-					fullWidth && 'w-full',
-					className
-				)}
+				className={cn(buttonVariants({ variant, size }), fullWidth && 'w-full', className)}
 				{...props}
 			/>
 		);
@@ -87,11 +83,7 @@ function Button({
 			data-variant={variant}
 			data-size={size}
 			disabled={disabled || loading}
-			className={cn(
-				buttonVariants({ variant, size }),
-				fullWidth && 'w-full',
-				className
-			)}
+			className={cn(buttonVariants({ variant, size }), fullWidth && 'w-full', className)}
 			{...props}
 		>
 			{loading ? (

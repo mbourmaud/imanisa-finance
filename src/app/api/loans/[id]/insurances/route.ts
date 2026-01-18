@@ -5,11 +5,7 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import {
-	loanRepository,
-	loanInsuranceRepository,
-	memberRepository,
-} from '@/server/repositories';
+import { loanInsuranceRepository, loanRepository, memberRepository } from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -34,10 +30,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 		});
 	} catch (error) {
 		console.error('Error fetching loan insurances:', error);
-		return NextResponse.json(
-			{ error: 'Failed to fetch loan insurances' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to fetch loan insurances' }, { status: 500 });
 	}
 }
 
@@ -52,7 +45,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			return NextResponse.json({ error: 'Loan not found' }, { status: 404 });
 		}
 
-		const { memberId, name, provider, contractNumber, coveragePercent, monthlyPremium, link, notes } = body;
+		const {
+			memberId,
+			name,
+			provider,
+			contractNumber,
+			coveragePercent,
+			monthlyPremium,
+			link,
+			notes,
+		} = body;
 
 		// Validate required fields
 		if (!memberId) {
@@ -65,16 +67,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			return NextResponse.json({ error: 'provider is required' }, { status: 400 });
 		}
 		if (coveragePercent === undefined || typeof coveragePercent !== 'number') {
-			return NextResponse.json({ error: 'coveragePercent is required and must be a number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'coveragePercent is required and must be a number' },
+				{ status: 400 },
+			);
 		}
 		if (coveragePercent < 0 || coveragePercent > 100) {
-			return NextResponse.json({ error: 'coveragePercent must be between 0 and 100' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'coveragePercent must be between 0 and 100' },
+				{ status: 400 },
+			);
 		}
 		if (monthlyPremium === undefined || typeof monthlyPremium !== 'number') {
-			return NextResponse.json({ error: 'monthlyPremium is required and must be a number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'monthlyPremium is required and must be a number' },
+				{ status: 400 },
+			);
 		}
 		if (monthlyPremium < 0) {
-			return NextResponse.json({ error: 'monthlyPremium must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'monthlyPremium must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 
 		// Verify member exists
@@ -98,9 +112,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(insurance, { status: 201 });
 	} catch (error) {
 		console.error('Error creating loan insurance:', error);
-		return NextResponse.json(
-			{ error: 'Failed to create loan insurance' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to create loan insurance' }, { status: 500 });
 	}
 }

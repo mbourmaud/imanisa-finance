@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
-import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
 	const { searchParams, origin } = new URL(request.url);
@@ -13,7 +13,9 @@ export async function GET(request: Request) {
 
 		if (!error) {
 			// Get the authenticated user
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
 
 			if (user) {
 				// Sync user to Prisma database
@@ -23,7 +25,9 @@ export async function GET(request: Request) {
 				const avatarUrl = user.user_metadata?.avatar_url || null;
 
 				const existingUserById = await prisma.user.findUnique({ where: { id: user.id } });
-				const existingUserByEmail = email ? await prisma.user.findUnique({ where: { email } }) : null;
+				const existingUserByEmail = email
+					? await prisma.user.findUnique({ where: { email } })
+					: null;
 
 				if (existingUserById) {
 					await prisma.user.update({

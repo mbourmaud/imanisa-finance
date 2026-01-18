@@ -5,11 +5,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import {
-	propertyRepository,
-	utilityContractRepository,
-} from '@/server/repositories';
 import type { UtilityType } from '@/lib/prisma';
+import { propertyRepository, utilityContractRepository } from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -28,10 +25,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 		const contracts = await utilityContractRepository.getByProperty(propertyId);
 
 		// Calculate total monthly amount
-		const totalMonthlyAmount = contracts.reduce(
-			(sum, contract) => sum + contract.monthlyAmount,
-			0
-		);
+		const totalMonthlyAmount = contracts.reduce((sum, contract) => sum + contract.monthlyAmount, 0);
 
 		return NextResponse.json({
 			propertyId,
@@ -44,10 +38,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 		});
 	} catch (error) {
 		console.error('Error fetching utility contracts:', error);
-		return NextResponse.json(
-			{ error: 'Failed to fetch utility contracts' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to fetch utility contracts' }, { status: 500 });
 	}
 }
 
@@ -72,17 +63,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 		if (!validTypes.includes(type)) {
 			return NextResponse.json(
 				{ error: `Invalid type: ${type}. Must be one of: ${validTypes.join(', ')}` },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 		if (!provider || typeof provider !== 'string' || provider.trim() === '') {
 			return NextResponse.json({ error: 'provider is required' }, { status: 400 });
 		}
 		if (monthlyAmount === undefined || typeof monthlyAmount !== 'number') {
-			return NextResponse.json({ error: 'monthlyAmount is required and must be a number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'monthlyAmount is required and must be a number' },
+				{ status: 400 },
+			);
 		}
 		if (monthlyAmount < 0) {
-			return NextResponse.json({ error: 'monthlyAmount must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'monthlyAmount must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 
 		const contract = await utilityContractRepository.create({
@@ -98,9 +95,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(contract, { status: 201 });
 	} catch (error) {
 		console.error('Error creating utility contract:', error);
-		return NextResponse.json(
-			{ error: 'Failed to create utility contract' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to create utility contract' }, { status: 500 });
 	}
 }
