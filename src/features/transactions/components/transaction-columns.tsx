@@ -7,16 +7,23 @@
  */
 
 import type { ColumnDef } from '@tanstack/react-table';
-import { ArrowDownLeft, ArrowUpRight, MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components';
-import { Checkbox } from '@/components';
 import {
+	ArrowDownLeft,
+	ArrowUpRight,
+	MoreHorizontal,
+	Button,
+	Checkbox,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	VStack,
+	HStack,
+	Box,
+	Flex,
+	Text,
 } from '@/components';
 import type { Transaction } from '../types';
 
@@ -103,10 +110,10 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 			cell: ({ row }) => {
 				const date = row.getValue('date') as Date;
 				return (
-					<div className="text-sm">
-						<div className="font-medium">{formatRelativeDate(date)}</div>
-						<div className="text-xs text-muted-foreground">{formatDate(date)}</div>
-					</div>
+					<VStack gap="none">
+						<Text size="sm" weight="medium">{formatRelativeDate(date)}</Text>
+						<Text size="xs" color="muted">{formatDate(date)}</Text>
+					</VStack>
 				);
 			},
 			sortingFn: 'datetime',
@@ -120,25 +127,31 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 				const isIncome = transaction.type === 'income';
 
 				return (
-					<div className="flex items-center gap-3">
-						<div
-							className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-								isIncome ? 'bg-emerald-500/10' : 'bg-muted'
-							}`}
+					<HStack gap="md" align="center">
+						<Flex
+							align="center"
+							justify="center"
+							style={{
+								borderRadius: '0.5rem',
+								height: '2.25rem',
+								width: '2.25rem',
+								flexShrink: 0,
+								backgroundColor: isIncome ? 'rgba(16, 185, 129, 0.1)' : 'hsl(var(--muted))',
+							}}
 						>
 							{isIncome ? (
-								<ArrowDownLeft className="h-4 w-4 text-emerald-500" />
+								<ArrowDownLeft style={{ height: '1rem', width: '1rem', color: 'rgb(16, 185, 129)' }} />
 							) : (
-								<ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+								<ArrowUpRight style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
 							)}
-						</div>
-						<div className="min-w-0">
-							<div className="truncate font-medium">{transaction.description}</div>
-							<div className="text-xs text-muted-foreground">
+						</Flex>
+						<VStack gap="none" style={{ minWidth: 0 }}>
+							<Text weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{transaction.description}</Text>
+							<Text size="xs" color="muted">
 								{transaction.category || 'Non catégorisé'}
-							</div>
-						</div>
-					</div>
+							</Text>
+						</VStack>
+					</HStack>
 				);
 			},
 		},
@@ -148,13 +161,13 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 			header: 'Compte',
 			cell: ({ row }) => {
 				const accountName = row.getValue('accountName') as string;
-				return <div className="text-sm text-muted-foreground">{accountName}</div>;
+				return <Text size="sm" color="muted">{accountName}</Text>;
 			},
 		},
 		// Amount column
 		{
 			accessorKey: 'amount',
-			header: () => <div className="text-right">Montant</div>,
+			header: () => <Box style={{ textAlign: 'right' }}>Montant</Box>,
 			cell: ({ row }) => {
 				const transaction = row.original;
 				const amount = transaction.amount;
@@ -162,10 +175,17 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 				const displayAmount = isIncome ? amount : -amount;
 
 				return (
-					<div className={`text-right font-medium tabular-nums ${isIncome ? 'text-emerald-600' : ''}`}>
+					<Text
+						weight="medium"
+						style={{
+							textAlign: 'right',
+							fontVariantNumeric: 'tabular-nums',
+							color: isIncome ? 'rgb(5, 150, 105)' : undefined,
+						}}
+					>
 						{isIncome ? '+' : ''}
 						{formatCurrency(displayAmount)}
-					</div>
+					</Text>
 				);
 			},
 			sortingFn: (rowA, rowB) => {
@@ -184,9 +204,9 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 				return (
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
-								<span className="sr-only">Ouvrir le menu</span>
-								<MoreHorizontal className="h-4 w-4" />
+							<Button variant="ghost" size="icon" style={{ height: '2rem', width: '2rem' }} onClick={(e) => e.stopPropagation()}>
+								<span style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>Ouvrir le menu</span>
+								<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
@@ -208,7 +228,7 @@ export function createTransactionColumns(options?: TransactionColumnsOptions): C
 							{options?.onDelete && (
 								<DropdownMenuItem
 									onClick={() => options.onDelete?.(transaction)}
-									className="text-destructive focus:text-destructive"
+									style={{ color: 'hsl(var(--destructive))' }}
 								>
 									Supprimer
 								</DropdownMenuItem>
@@ -232,7 +252,7 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			header: 'Date',
 			cell: ({ row }) => {
 				const date = row.getValue('date') as Date;
-				return <div className="text-sm text-muted-foreground">{formatRelativeDate(date)}</div>;
+				return <Text size="sm" color="muted">{formatRelativeDate(date)}</Text>;
 			},
 			sortingFn: 'datetime',
 			size: 100,
@@ -244,19 +264,19 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			cell: ({ row }) => {
 				const transaction = row.original;
 				return (
-					<div className="min-w-0">
-						<div className="truncate font-medium text-sm">{transaction.description}</div>
+					<VStack gap="none" style={{ minWidth: 0 }}>
+						<Text size="sm" weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{transaction.description}</Text>
 						{transaction.category && (
-							<div className="text-xs text-muted-foreground">{transaction.category}</div>
+							<Text size="xs" color="muted">{transaction.category}</Text>
 						)}
-					</div>
+					</VStack>
 				);
 			},
 		},
 		// Amount column (compact)
 		{
 			accessorKey: 'amount',
-			header: () => <div className="text-right">Montant</div>,
+			header: () => <Box style={{ textAlign: 'right' }}>Montant</Box>,
 			cell: ({ row }) => {
 				const transaction = row.original;
 				const amount = transaction.amount;
@@ -264,10 +284,18 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 				const displayAmount = isIncome ? amount : -amount;
 
 				return (
-					<div className={`text-right font-medium tabular-nums text-sm ${isIncome ? 'text-emerald-600' : ''}`}>
+					<Text
+						size="sm"
+						weight="medium"
+						style={{
+							textAlign: 'right',
+							fontVariantNumeric: 'tabular-nums',
+							color: isIncome ? 'rgb(5, 150, 105)' : undefined,
+						}}
+					>
 						{isIncome ? '+' : ''}
 						{formatCurrency(displayAmount)}
-					</div>
+					</Text>
 				);
 			},
 			size: 120,

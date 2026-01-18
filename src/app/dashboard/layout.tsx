@@ -1,19 +1,43 @@
 import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components';
+import { SidebarInset, SidebarProvider, SidebarTrigger, Box, HStack, Text } from '@/components';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-			<SidebarInset className="bg-muted/30">
+			<SidebarInset style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
 				{/* Mobile header with sidebar trigger */}
-				<header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-6 md:hidden">
-					<SidebarTrigger />
-					<span className="font-semibold">Imanisa Finance</span>
-				</header>
-				<main className="flex-1 p-6 md:p-8 lg:p-10">
-					<div className="mx-auto max-w-7xl animate-fade-in">{children}</div>
-				</main>
+				<Box
+					as="header"
+					display="flex"
+					style={{
+						position: 'sticky',
+						top: 0,
+						zIndex: 10,
+						height: '3.5rem',
+						alignItems: 'center',
+						gap: '1rem',
+						paddingLeft: '1.5rem',
+						paddingRight: '1.5rem',
+						borderBottom: '1px solid hsl(var(--border))',
+						backgroundColor: 'hsl(var(--background) / 0.8)',
+						backdropFilter: 'blur(8px)',
+					}}
+				>
+					<HStack gap="md" align="center" style={{ display: 'flex' }} data-hide-desktop>
+						<SidebarTrigger />
+						<Text weight="semibold">Imanisa Finance</Text>
+					</HStack>
+				</Box>
+				<Box
+					as="main"
+					p="lg"
+					style={{ flex: 1, padding: '1.5rem' }}
+				>
+					<Box style={{ maxWidth: '80rem', marginLeft: 'auto', marginRight: 'auto', animation: 'fadeIn 0.3s ease-out' }}>
+						{children}
+					</Box>
+				</Box>
 			</SidebarInset>
 		</SidebarProvider>
 	);

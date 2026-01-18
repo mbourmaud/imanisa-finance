@@ -12,20 +12,30 @@ import {
 	MoreHorizontal,
 	Percent,
 	TrendingDown,
-} from '@/components'
-import { Button } from '@/components'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components'
-import { PageHeader } from '@/components'
-import { EmptyState as EmptyStateComponent } from '@/components'
-import {
+	Button,
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	PageHeader,
+	EmptyState as EmptyStateComponent,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	Progress,
+	Skeleton,
+	StatCard,
+	StatCardGrid,
+	GlassCard,
+	VStack,
+	HStack,
+	Box,
+	Flex,
+	Text,
+	Grid,
 } from '@/components'
-import { Progress } from '@/components'
-import { Skeleton } from '@/components'
 import { useLoansQuery } from '@/features/loans'
 import type { PropertyType } from '@/lib/prisma'
 
@@ -74,64 +84,66 @@ function formatRemainingTime(endDate: string | null): string {
 // Loading skeleton components
 function StatsCardSkeleton() {
 	return (
-		<div className="stat-card">
-			<div className="stat-card-content">
-				<div className="stat-card-text">
-					<Skeleton className="h-4 w-24 mb-2" />
-					<Skeleton className="h-8 w-32" />
-					<Skeleton className="h-3 w-20 mt-2" />
-				</div>
-				<Skeleton className="h-10 w-10 rounded-xl" />
-			</div>
-		</div>
+		<GlassCard padding="md">
+			<HStack justify="between" align="start">
+				<VStack gap="sm">
+					<Skeleton style={{ height: '1rem', width: '6rem' }} />
+					<Skeleton style={{ height: '2rem', width: '8rem' }} />
+					<Skeleton style={{ height: '0.75rem', width: '5rem' }} />
+				</VStack>
+				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem' }} />
+			</HStack>
+		</GlassCard>
 	)
 }
 
 function LoanCardSkeleton() {
 	return (
-		<Card className="border-border/60">
-			<CardHeader className="pb-3">
-				<div className="flex items-start justify-between">
-					<div className="flex items-center gap-4">
-						<Skeleton className="h-12 w-12 rounded-xl" />
-						<div>
-							<Skeleton className="h-5 w-40 mb-2" />
-							<Skeleton className="h-4 w-32" />
-						</div>
-					</div>
-					<div className="text-right hidden sm:block">
-						<Skeleton className="h-8 w-28 mb-1" />
-						<Skeleton className="h-3 w-20" />
-					</div>
-				</div>
+		<Card style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
+			<CardHeader style={{ paddingBottom: '0.75rem' }}>
+				<HStack justify="between" align="start">
+					<HStack gap="md" align="center">
+						<Skeleton style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem' }} />
+						<VStack gap="sm">
+							<Skeleton style={{ height: '1.25rem', width: '10rem' }} />
+							<Skeleton style={{ height: '1rem', width: '8rem' }} />
+						</VStack>
+					</HStack>
+					<Box style={{ display: 'none', textAlign: 'right' }} data-show-sm>
+						<Skeleton style={{ height: '2rem', width: '7rem', marginBottom: '0.25rem' }} />
+						<Skeleton style={{ height: '0.75rem', width: '5rem' }} />
+					</Box>
+				</HStack>
 			</CardHeader>
-			<CardContent className="space-y-4">
-				<div>
-					<Skeleton className="h-3 w-full mb-2" />
-					<Skeleton className="h-2 w-full" />
-				</div>
-				<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-border/40">
-					<div className="rounded-xl bg-muted/30 p-3">
-						<Skeleton className="h-3 w-16 mb-2" />
-						<Skeleton className="h-5 w-20" />
-						<Skeleton className="h-3 w-14 mt-1" />
-					</div>
-					<div className="rounded-xl bg-muted/30 p-3">
-						<Skeleton className="h-3 w-16 mb-2" />
-						<Skeleton className="h-5 w-20" />
-						<Skeleton className="h-3 w-14 mt-1" />
-					</div>
-					<div className="rounded-xl bg-muted/30 p-3">
-						<Skeleton className="h-3 w-16 mb-2" />
-						<Skeleton className="h-5 w-20" />
-						<Skeleton className="h-3 w-14 mt-1" />
-					</div>
-					<div className="rounded-xl bg-muted/30 p-3">
-						<Skeleton className="h-3 w-16 mb-2" />
-						<Skeleton className="h-5 w-20" />
-						<Skeleton className="h-3 w-14 mt-1" />
-					</div>
-				</div>
+			<CardContent>
+				<VStack gap="md">
+					<VStack gap="sm">
+						<Skeleton style={{ height: '0.75rem', width: '100%' }} />
+						<Skeleton style={{ height: '0.5rem', width: '100%' }} />
+					</VStack>
+					<Grid cols={2} colsSm={4} gap="md" style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
+							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
+							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
+						</Box>
+						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
+							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
+							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
+						</Box>
+						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
+							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
+							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
+						</Box>
+						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
+							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
+							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
+						</Box>
+					</Grid>
+				</VStack>
 			</CardContent>
 		</Card>
 	)
@@ -147,7 +159,7 @@ function EmptyState() {
 			action={
 				<Button asChild variant="outline" size="sm">
 					<Link href="/dashboard/real-estate">
-						<Building2 className="h-4 w-4 mr-2" />
+						<Building2 style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
 						Voir les biens
 					</Link>
 				</Button>
@@ -166,7 +178,7 @@ export default function LoansPage() {
 	const totalMonthly = summary ? summary.totalMonthlyPayment + summary.totalInsurance : 0
 
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Crédits"
@@ -176,33 +188,33 @@ export default function LoansPage() {
 			{/* Loading State */}
 			{isLoading && (
 				<>
-					<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
+					<StatCardGrid columns={4}>
 						<StatsCardSkeleton />
 						<StatsCardSkeleton />
 						<StatsCardSkeleton />
 						<StatsCardSkeleton />
-					</div>
-					<div className="space-y-4">
+					</StatCardGrid>
+					<VStack gap="md">
 						<LoanCardSkeleton />
 						<LoanCardSkeleton />
 						<LoanCardSkeleton />
-					</div>
+					</VStack>
 				</>
 			)}
 
 			{/* Error State */}
 			{isError && !isLoading && (
-				<Card className="border-destructive/50">
-					<CardContent className="py-8">
-						<div className="flex flex-col items-center justify-center text-center">
-							<p className="text-destructive mb-4">
+				<Card style={{ borderColor: 'hsl(var(--destructive) / 0.5)' }}>
+					<CardContent style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+						<VStack gap="md" align="center" style={{ textAlign: 'center' }}>
+							<Text style={{ color: 'hsl(var(--destructive))' }}>
 								{error instanceof Error ? error.message : 'Une erreur est survenue'}
-							</p>
+							</Text>
 							<Button onClick={() => refetch()} variant="outline" size="sm">
-								<Loader2 className="h-4 w-4 mr-2" />
+								<Loader2 style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
 								Réessayer
 							</Button>
-						</div>
+						</VStack>
 					</CardContent>
 				</Card>
 			)}
@@ -215,67 +227,43 @@ export default function LoansPage() {
 					<>
 							{/* Stats Overview */}
 							{summary && (
-								<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
-									<div className="stat-card">
-										<div className="stat-card-content">
-											<div className="stat-card-text">
-												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Capital restant dû</p>
-												<p className="stat-card-value">{formatCurrency(summary.totalRemaining)}</p>
-												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-													{summary.totalLoans} crédit{summary.totalLoans > 1 ? 's' : ''} actif{summary.totalLoans > 1 ? 's' : ''}
-												</p>
-											</div>
-											<div className="stat-card-icon bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]">
-												<TrendingDown className="h-4 w-4 sm:h-5 sm:w-5" />
-											</div>
-										</div>
-									</div>
+								<StatCardGrid columns={4}>
+									<StatCard
+										label="Capital restant dû"
+										value={formatCurrency(summary.totalRemaining)}
+										description={`${summary.totalLoans} crédit${summary.totalLoans > 1 ? 's' : ''} actif${summary.totalLoans > 1 ? 's' : ''}`}
+										icon={TrendingDown}
+										variant="coral"
+									/>
 
-									<div className="stat-card">
-										<div className="stat-card-content">
-											<div className="stat-card-text">
-												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Mensualités</p>
-												<p className="stat-card-value">{formatCurrency(totalMonthly)}</p>
-												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-													Dont {formatCurrency(summary.totalInsurance)} assurance
-												</p>
-											</div>
-											<div className="stat-card-icon">
-												<Euro className="h-4 w-4 sm:h-5 sm:w-5" />
-											</div>
-										</div>
-									</div>
+									<StatCard
+										label="Mensualités"
+										value={formatCurrency(totalMonthly)}
+										description={`Dont ${formatCurrency(summary.totalInsurance)} assurance`}
+										icon={Euro}
+										variant="default"
+									/>
 
-									<div className="stat-card">
-										<div className="stat-card-content">
-											<div className="stat-card-text">
-												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Taux moyen</p>
-												<p className="stat-card-value">{summary.averageRate.toFixed(2)}%</p>
-												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Sur capital restant</p>
-											</div>
-											<div className="stat-card-icon">
-												<Percent className="h-4 w-4 sm:h-5 sm:w-5" />
-											</div>
-										</div>
-									</div>
+									<StatCard
+										label="Taux moyen"
+										value={`${summary.averageRate.toFixed(2)}%`}
+										description="Sur capital restant"
+										icon={Percent}
+										variant="default"
+									/>
 
-									<div className="stat-card">
-										<div className="stat-card-content">
-											<div className="stat-card-text">
-												<p className="text-xs sm:text-sm font-medium text-muted-foreground">Coût annuel</p>
-												<p className="stat-card-value">{formatCurrency(totalMonthly * 12)}</p>
-												<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Remboursements/an</p>
-											</div>
-											<div className="stat-card-icon">
-												<Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-											</div>
-										</div>
-									</div>
-								</div>
+									<StatCard
+										label="Coût annuel"
+										value={formatCurrency(totalMonthly * 12)}
+										description="Remboursements/an"
+										icon={Calendar}
+										variant="default"
+									/>
+								</StatCardGrid>
 							)}
 
 							{/* Loans List */}
-							<div className="space-y-4">
+							<VStack gap="md">
 								{loans.map((loan) => {
 									const Icon = getPropertyIcon(loan.property.type)
 									const progress = ((loan.initialAmount - loan.remainingAmount) / loan.initialAmount) * 100
@@ -283,42 +271,64 @@ export default function LoansPage() {
 									const loanInsuranceTotal = loan.loanInsurances.reduce((sum, ins) => sum + ins.monthlyPremium, 0)
 
 									return (
-										<Card key={loan.id} className="border-border/60 group">
-											<CardHeader className="pb-3">
-												<div className="flex items-start justify-between">
-													<div className="flex items-center gap-4">
-														<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-															<Icon className="h-6 w-6" />
-														</div>
-														<div>
-															<CardTitle className="text-lg font-medium">{loan.name}</CardTitle>
-															<p className="text-sm text-muted-foreground">
+										<Card key={loan.id} style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
+											<CardHeader style={{ paddingBottom: '0.75rem' }}>
+												<HStack justify="between" align="start">
+													<HStack gap="md" align="center">
+														<Flex
+															align="center"
+															justify="center"
+															style={{
+																height: '3rem',
+																width: '3rem',
+																borderRadius: '0.75rem',
+																backgroundColor: 'hsl(var(--primary) / 0.1)',
+																color: 'hsl(var(--primary))',
+															}}
+														>
+															<Icon style={{ height: '1.5rem', width: '1.5rem' }} />
+														</Flex>
+														<VStack gap="none">
+															<CardTitle style={{ fontSize: '1.125rem', fontWeight: 500 }}>{loan.name}</CardTitle>
+															<Text size="sm" color="muted">
 																{loan.lender || 'Prêt familial'} · {loan.rate}%
-															</p>
+															</Text>
 															<Link
 																href={`/dashboard/real-estate/${loan.propertyId}`}
-																className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
+																style={{
+																	fontSize: '0.75rem',
+																	color: 'hsl(var(--muted-foreground))',
+																	display: 'flex',
+																	alignItems: 'center',
+																	gap: '0.25rem',
+																	marginTop: '0.125rem',
+																}}
 															>
 																{loan.property.name}
-																<ExternalLink className="h-3 w-3" />
+																<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 															</Link>
-														</div>
-													</div>
-													<div className="flex items-center gap-4">
-														<div className="text-right hidden sm:block">
-															<p className="text-2xl font-semibold number-display">
+														</VStack>
+													</HStack>
+													<HStack gap="md" align="center">
+														<Box style={{ display: 'none', textAlign: 'right' }} data-show-sm>
+															<Text size="2xl" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 																{formatCurrency(loan.remainingAmount)}
-															</p>
-															<p className="text-xs text-muted-foreground">Capital restant</p>
-														</div>
+															</Text>
+															<Text size="xs" color="muted">Capital restant</Text>
+														</Box>
 														<DropdownMenu>
 															<DropdownMenuTrigger asChild>
 																<Button
 																	variant="ghost"
 																	size="icon"
-																	className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+																	style={{
+																		height: '2rem',
+																		width: '2rem',
+																		opacity: 0,
+																		transition: 'opacity 0.2s',
+																	}}
 																>
-																	<MoreHorizontal className="h-4 w-4" />
+																	<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
 																</Button>
 															</DropdownMenuTrigger>
 															<DropdownMenuContent align="end">
@@ -328,110 +338,118 @@ export default function LoansPage() {
 																	</Link>
 																</DropdownMenuItem>
 																<DropdownMenuSeparator />
-																<DropdownMenuItem className="text-muted-foreground">
+																<DropdownMenuItem style={{ color: 'hsl(var(--muted-foreground))' }}>
 																	Autres options à venir
 																</DropdownMenuItem>
 															</DropdownMenuContent>
 														</DropdownMenu>
-													</div>
-												</div>
+													</HStack>
+												</HStack>
 											</CardHeader>
-											<CardContent className="space-y-4">
-												{/* Mobile: Show remaining amount */}
-												<div className="sm:hidden">
-													<p className="text-2xl font-semibold number-display">
-														{formatCurrency(loan.remainingAmount)}
-													</p>
-													<p className="text-xs text-muted-foreground">Capital restant</p>
-												</div>
+											<CardContent>
+												<VStack gap="md">
+													{/* Mobile: Show remaining amount */}
+													<Box display="block" data-hide-sm>
+														<Text size="2xl" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+															{formatCurrency(loan.remainingAmount)}
+														</Text>
+														<Text size="xs" color="muted">Capital restant</Text>
+													</Box>
 
-												{/* Progress Bar */}
-												<div>
-													<div className="flex justify-between text-xs mb-2">
-														<span className="text-muted-foreground">
-															Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
-														</span>
-														<span className="font-medium">{progress.toFixed(1)}%</span>
-													</div>
-													<Progress value={progress} className="h-2" />
-												</div>
+													{/* Progress Bar */}
+													<VStack gap="sm">
+														<HStack justify="between">
+															<Text size="xs" color="muted">
+																Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
+															</Text>
+															<Text size="xs" weight="medium">{progress.toFixed(1)}%</Text>
+														</HStack>
+														<Progress value={progress} style={{ height: '0.5rem' }} />
+													</VStack>
 
-												{/* Info Grid */}
-												<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-border/40">
-													<div className="rounded-xl bg-muted/30 p-3">
-														<div className="flex items-center gap-1 text-muted-foreground mb-1">
-															<Euro className="h-3.5 w-3.5" />
-															<span className="text-xs">Mensualité</span>
-														</div>
-														<p className="font-semibold number-display">
-															{formatCurrency(loan.monthlyPayment)}
-														</p>
-														{loanInsuranceTotal > 0 && (
-															<p className="text-xs text-muted-foreground">
-																+ {formatCurrency(loanInsuranceTotal)} assurance
-															</p>
-														)}
-													</div>
-													<div className="rounded-xl bg-muted/30 p-3">
-														<div className="flex items-center gap-1 text-muted-foreground mb-1">
-															<Percent className="h-3.5 w-3.5" />
-															<span className="text-xs">Taux</span>
-														</div>
-														<p className="font-semibold">{loan.rate}%</p>
-														<p className="text-xs text-muted-foreground">Taux nominal</p>
-													</div>
-													<div className="rounded-xl bg-muted/30 p-3">
-														<div className="flex items-center gap-1 text-muted-foreground mb-1">
-															<Calendar className="h-3.5 w-3.5" />
-															<span className="text-xs">Durée restante</span>
-														</div>
-														<p className="font-semibold">{formatRemainingTime(loan.endDate)}</p>
-														{loan.endDate && (
-															<p className="text-xs text-muted-foreground">{remainingMonths} échéances</p>
-														)}
-													</div>
-													<div className="rounded-xl bg-muted/30 p-3">
-														<div className="flex items-center gap-1 text-muted-foreground mb-1">
-															<ArrowDown className="h-3.5 w-3.5" />
-															<span className="text-xs">Montant initial</span>
-														</div>
-														<p className="font-semibold number-display">
-															{formatCurrency(loan.initialAmount)}
-														</p>
-														<p className="text-xs text-muted-foreground">Emprunté</p>
-													</div>
-												</div>
+													{/* Info Grid */}
+													<Grid cols={2} colsSm={4} gap="md" style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+														<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+															<HStack gap="xs" align="center" style={{ color: 'hsl(var(--muted-foreground))', marginBottom: '0.25rem' }}>
+																<Euro style={{ height: '0.875rem', width: '0.875rem' }} />
+																<Text size="xs">Mensualité</Text>
+															</HStack>
+															<Text weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+																{formatCurrency(loan.monthlyPayment)}
+															</Text>
+															{loanInsuranceTotal > 0 && (
+																<Text size="xs" color="muted">
+																	+ {formatCurrency(loanInsuranceTotal)} assurance
+																</Text>
+															)}
+														</Box>
+														<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+															<HStack gap="xs" align="center" style={{ color: 'hsl(var(--muted-foreground))', marginBottom: '0.25rem' }}>
+																<Percent style={{ height: '0.875rem', width: '0.875rem' }} />
+																<Text size="xs">Taux</Text>
+															</HStack>
+															<Text weight="semibold">{loan.rate}%</Text>
+															<Text size="xs" color="muted">Taux nominal</Text>
+														</Box>
+														<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+															<HStack gap="xs" align="center" style={{ color: 'hsl(var(--muted-foreground))', marginBottom: '0.25rem' }}>
+																<Calendar style={{ height: '0.875rem', width: '0.875rem' }} />
+																<Text size="xs">Durée restante</Text>
+															</HStack>
+															<Text weight="semibold">{formatRemainingTime(loan.endDate)}</Text>
+															{loan.endDate && (
+																<Text size="xs" color="muted">{remainingMonths} échéances</Text>
+															)}
+														</Box>
+														<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+															<HStack gap="xs" align="center" style={{ color: 'hsl(var(--muted-foreground))', marginBottom: '0.25rem' }}>
+																<ArrowDown style={{ height: '0.875rem', width: '0.875rem' }} />
+																<Text size="xs">Montant initial</Text>
+															</HStack>
+															<Text weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+																{formatCurrency(loan.initialAmount)}
+															</Text>
+															<Text size="xs" color="muted">Emprunté</Text>
+														</Box>
+													</Grid>
+												</VStack>
 											</CardContent>
 										</Card>
 									)
 								})}
-							</div>
+							</VStack>
 
 							{/* Summary Card */}
 							{summary && totalMonthly > 0 && (
-								<Card className="border-border/60 bg-muted/20">
-									<CardContent className="pt-6">
-										<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-											<div>
-												<p className="font-medium">Total mensuel</p>
-												<p className="text-sm text-muted-foreground">Tous crédits confondus</p>
-											</div>
-											<div className="text-right">
-												<p className="text-3xl font-semibold number-display">
+								<Card style={{ borderColor: 'hsl(var(--border) / 0.6)', backgroundColor: 'hsl(var(--muted) / 0.2)' }}>
+									<CardContent style={{ paddingTop: '1.5rem' }}>
+										<HStack
+											justify="between"
+											align="center"
+											gap="md"
+											style={{ flexDirection: 'column' }}
+											data-sm-row
+										>
+											<VStack gap="none">
+												<Text weight="medium">Total mensuel</Text>
+												<Text size="sm" color="muted">Tous crédits confondus</Text>
+											</VStack>
+											<Box style={{ textAlign: 'right' }}>
+												<Text size="3xl" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 													{formatCurrency(totalMonthly)}
-												</p>
-												<p className="text-sm text-muted-foreground">
+												</Text>
+												<Text size="sm" color="muted">
 													{formatCurrency(summary.totalMonthlyPayment)} capital +{' '}
 													{formatCurrency(summary.totalInsurance)} assurance
-												</p>
-											</div>
-										</div>
+												</Text>
+											</Box>
+										</HStack>
 									</CardContent>
 								</Card>
 							)}
 					</>
 				)
 			)}
-		</div>
+		</VStack>
 	)
 }

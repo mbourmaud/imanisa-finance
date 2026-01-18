@@ -24,31 +24,35 @@ import {
 	Users,
 	Pencil,
 	Trash2,
-} from '@/components';
-import { useTheme } from 'next-themes';
-import { Button } from '@/components';
-import { Input } from '@/components';
-import { Label } from '@/components';
-import {
+	Button,
+	Input,
+	Label,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components';
-import { Separator } from '@/components';
-import { Switch } from '@/components';
-import {
+	Separator,
+	Switch,
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	Skeleton,
+	PageHeader,
+	EmptyState,
+	GlassCard,
+	VStack,
+	HStack,
+	Box,
+	Flex,
+	Grid,
+	Text,
+	Heading,
 } from '@/components';
-import { Skeleton } from '@/components';
+import { useTheme } from 'next-themes';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { PageHeader } from '@/components';
-import { EmptyState } from '@/components';
 import { MemberAvatar } from '@/components/members/MemberAvatar';
 
 interface Member {
@@ -79,16 +83,16 @@ const MEMBER_COLORS = [
 
 function MemberSkeleton() {
 	return (
-		<div className="flex items-center justify-between rounded-xl bg-muted/30 p-4">
-			<div className="flex items-center gap-3">
-				<Skeleton className="h-10 w-10 rounded-lg" />
-				<div>
-					<Skeleton className="h-5 w-24 mb-1" />
-					<Skeleton className="h-4 w-16" />
-				</div>
-			</div>
-			<Skeleton className="h-8 w-8" />
-		</div>
+		<HStack justify="between" align="center" p="md" style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+			<HStack gap="md" align="center">
+				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.5rem' }} />
+				<VStack gap="xs">
+					<Skeleton style={{ height: '1.25rem', width: '6rem' }} />
+					<Skeleton style={{ height: '1rem', width: '4rem' }} />
+				</VStack>
+			</HStack>
+			<Skeleton style={{ height: '2rem', width: '2rem' }} />
+		</HStack>
 	);
 }
 
@@ -203,416 +207,462 @@ export default function SettingsPage() {
 	const memberToDelete = members.find((m) => m.id === deleteMemberId);
 
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Paramètres"
 				description="Configurez votre application"
 			/>
 
-			<div className="grid gap-6 lg:grid-cols-3">
+			<Grid cols={1} colsLg={3} gap="lg">
 				{/* Main Settings Column */}
-				<div className="space-y-6 lg:col-span-2">
+				<VStack gap="lg" style={{ gridColumn: 'span 2' }}>
 					{/* Profile */}
-					<div className="glass-card p-6 space-y-4">
-						<div className="flex items-center gap-3 pb-2">
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-								<User className="h-5 w-5" />
-							</div>
-							<div>
-								<h3 className="text-lg font-medium">Profil</h3>
-								<p className="text-sm text-muted-foreground">Vos informations personnelles</p>
-							</div>
-						</div>
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div className="space-y-2">
-								<Label htmlFor="name">Nom</Label>
-								<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
-							</div>
-							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
-								<Input id="email" type="email" placeholder="votre@email.com" />
-							</div>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="currency">Devise par défaut</Label>
-							<Select defaultValue="eur">
-								<SelectTrigger id="currency" className="w-full sm:w-[200px]">
-									<SelectValue placeholder="Sélectionner" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="eur">EUR</SelectItem>
-									<SelectItem value="usd">USD ($)</SelectItem>
-									<SelectItem value="gbp">GBP</SelectItem>
-									<SelectItem value="chf">CHF</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-					</div>
+					<GlassCard padding="lg">
+						<VStack gap="md">
+							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
+								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<User style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<VStack gap="none">
+									<Heading level={3} size="lg" weight="medium">Profil</Heading>
+									<Text size="sm" color="muted">Vos informations personnelles</Text>
+								</VStack>
+							</HStack>
+							<Grid cols={1} colsSm={2} gap="md">
+								<VStack gap="xs">
+									<Label htmlFor="name">Nom</Label>
+									<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
+								</VStack>
+								<VStack gap="xs">
+									<Label htmlFor="email">Email</Label>
+									<Input id="email" type="email" placeholder="votre@email.com" />
+								</VStack>
+							</Grid>
+							<VStack gap="xs">
+								<Label htmlFor="currency">Devise par défaut</Label>
+								<Select defaultValue="eur">
+									<SelectTrigger id="currency" style={{ width: '100%', maxWidth: '200px' }}>
+										<SelectValue placeholder="Sélectionner" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="eur">EUR</SelectItem>
+										<SelectItem value="usd">USD ($)</SelectItem>
+										<SelectItem value="gbp">GBP</SelectItem>
+										<SelectItem value="chf">CHF</SelectItem>
+									</SelectContent>
+								</Select>
+							</VStack>
+						</VStack>
+					</GlassCard>
 
 					{/* Members (Household) */}
-					<div className="glass-card p-6 space-y-4">
-						<div className="flex items-center justify-between pb-2">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-									<Users className="h-5 w-5" />
-								</div>
-								<div>
-									<h3 className="text-lg font-medium">Membres du foyer</h3>
-									<p className="text-sm text-muted-foreground">
-										Gérez les membres associés aux comptes
-									</p>
-								</div>
-							</div>
-							<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
-								<DialogTrigger asChild>
-									<Button variant="outline" size="sm" className="gap-2">
-										<Plus className="h-4 w-4" />
-										Ajouter
-									</Button>
-								</DialogTrigger>
-								<DialogContent>
-									<DialogHeader>
-										<DialogTitle>Ajouter un membre</DialogTitle>
-									</DialogHeader>
-									<div className="space-y-4 pt-4">
-										<div className="space-y-2">
-											<Label htmlFor="memberName">Nom</Label>
-											<Input
-												id="memberName"
-												placeholder="Prénom"
-												value={newMemberName}
-												onChange={(e) => setNewMemberName(e.target.value)}
-											/>
-										</div>
-										<div className="space-y-2">
-											<Label>Couleur</Label>
-											<div className="flex gap-2 flex-wrap">
-												{MEMBER_COLORS.map((color) => (
-													<button
-														key={color.value}
-														type="button"
-														onClick={() => setNewMemberColor(color.value)}
-														className={`h-8 w-8 rounded-full transition-all ${
-															newMemberColor === color.value
-																? 'ring-2 ring-offset-2 ring-primary'
-																: 'hover:scale-110'
-														}`}
-														style={{ backgroundColor: color.value }}
-														title={color.name}
-													/>
-												))}
-											</div>
-										</div>
-										<div className="flex justify-end gap-2 pt-4">
-											<Button variant="outline" onClick={() => setShowAddMember(false)}>
-												Annuler
-											</Button>
-											<Button onClick={handleAddMember} disabled={savingMember || !newMemberName.trim()}>
-												{savingMember ? 'Ajout...' : 'Ajouter'}
-											</Button>
-										</div>
-									</div>
-								</DialogContent>
-							</Dialog>
-						</div>
-						<div className="space-y-2">
-							{loadingMembers ? (
-								<>
-									<MemberSkeleton />
-									<MemberSkeleton />
-									<MemberSkeleton />
-								</>
-							) : members.length === 0 ? (
-								<EmptyState
-									icon={Users}
-									title="Aucun membre"
-									description="Ajoutez votre premier membre pour commencer"
-									size="sm"
-								/>
-							) : (
-								members.map((member) => (
-									<div
-										key={member.id}
-										className="flex items-center justify-between rounded-xl bg-white/50 dark:bg-white/5 p-4 transition-colors hover:bg-white/80 dark:hover:bg-white/10"
-									>
-										<div className="flex items-center gap-3">
-											<MemberAvatar
-												member={{
-													id: member.id,
-													name: member.name,
-													color: member.color,
-													avatarUrl: member.avatarUrl,
-												}}
-												size="md"
-											/>
-											<div>
-												<p className="font-medium">{member.name}</p>
-												<p className="text-xs text-muted-foreground">
-													{member.accountMembers.length} compte{member.accountMembers.length !== 1 ? 's' : ''}
-												</p>
-											</div>
-										</div>
-										<div className="flex items-center gap-2">
-											<Dialog open={editingMember?.id === member.id} onOpenChange={(open) => !open && setEditingMember(null)}>
-												<DialogTrigger asChild>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8"
-														onClick={() => setEditingMember(member)}
-													>
-														<Pencil className="h-4 w-4" />
-													</Button>
-												</DialogTrigger>
-												<DialogContent>
-													<DialogHeader>
-														<DialogTitle>Modifier le membre</DialogTitle>
-													</DialogHeader>
-													{editingMember && (
-														<div className="space-y-4 pt-4">
-															<div className="space-y-2">
-																<Label htmlFor="editMemberName">Nom</Label>
-																<Input
-																	id="editMemberName"
-																	value={editingMember.name}
-																	onChange={(e) =>
-																		setEditingMember({ ...editingMember, name: e.target.value })
-																	}
-																/>
-															</div>
-															<div className="space-y-2">
-																<Label>Couleur</Label>
-																<div className="flex gap-2 flex-wrap">
-																	{MEMBER_COLORS.map((color) => (
-																		<button
-																			key={color.value}
-																			type="button"
-																			onClick={() =>
-																				setEditingMember({ ...editingMember, color: color.value })
-																			}
-																			className={`h-8 w-8 rounded-full transition-all ${
-																				editingMember.color === color.value
-																					? 'ring-2 ring-offset-2 ring-primary'
-																					: 'hover:scale-110'
-																			}`}
-																			style={{ backgroundColor: color.value }}
-																			title={color.name}
-																		/>
-																	))}
-																</div>
-															</div>
-															<div className="flex justify-end gap-2 pt-4">
-																<Button variant="outline" onClick={() => setEditingMember(null)}>
-																	Annuler
-																</Button>
-																<Button onClick={handleUpdateMember} disabled={savingMember}>
-																	{savingMember ? 'Sauvegarde...' : 'Sauvegarder'}
-																</Button>
-															</div>
-														</div>
-													)}
-												</DialogContent>
-											</Dialog>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="h-8 w-8 text-destructive hover:text-destructive"
-												onClick={() => setDeleteMemberId(member.id)}
-											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</div>
-									</div>
-								))
-							)}
-						</div>
-					</div>
+					<GlassCard padding="lg">
+						<VStack gap="md">
+							<HStack justify="between" align="center" style={{ paddingBottom: '0.5rem' }}>
+								<HStack gap="md" align="center">
+									<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+										<Users style={{ height: '1.25rem', width: '1.25rem' }} />
+									</Flex>
+									<VStack gap="none">
+										<Heading level={3} size="lg" weight="medium">Membres du foyer</Heading>
+										<Text size="sm" color="muted">
+											Gérez les membres associés aux comptes
+										</Text>
+									</VStack>
+								</HStack>
+								<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
+									<DialogTrigger asChild>
+										<Button variant="outline" size="sm" iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
+											Ajouter
+										</Button>
+									</DialogTrigger>
+									<DialogContent>
+										<DialogHeader>
+											<DialogTitle>Ajouter un membre</DialogTitle>
+										</DialogHeader>
+										<VStack gap="md" style={{ paddingTop: '1rem' }}>
+											<VStack gap="xs">
+												<Label htmlFor="memberName">Nom</Label>
+												<Input
+													id="memberName"
+													placeholder="Prénom"
+													value={newMemberName}
+													onChange={(e) => setNewMemberName(e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="xs">
+												<Label>Couleur</Label>
+												<HStack gap="sm" style={{ flexWrap: 'wrap' }}>
+													{MEMBER_COLORS.map((color) => (
+														<button
+															key={color.value}
+															type="button"
+															onClick={() => setNewMemberColor(color.value)}
+															style={{
+																borderRadius: '9999px',
+																height: '2rem',
+																width: '2rem',
+																backgroundColor: color.value,
+																transition: 'all 0.2s',
+																outline: newMemberColor === color.value ? '2px solid hsl(var(--primary))' : 'none',
+																outlineOffset: '2px',
+																border: 'none',
+																cursor: 'pointer',
+															}}
+															title={color.name}
+														/>
+													))}
+												</HStack>
+											</VStack>
+											<HStack justify="end" gap="sm" style={{ paddingTop: '1rem' }}>
+												<Button variant="outline" onClick={() => setShowAddMember(false)}>
+													Annuler
+												</Button>
+												<Button onClick={handleAddMember} disabled={savingMember || !newMemberName.trim()}>
+													{savingMember ? 'Ajout...' : 'Ajouter'}
+												</Button>
+											</HStack>
+										</VStack>
+									</DialogContent>
+								</Dialog>
+							</HStack>
+							<VStack gap="xs">
+								{loadingMembers ? (
+									<>
+										<MemberSkeleton />
+										<MemberSkeleton />
+										<MemberSkeleton />
+									</>
+								) : members.length === 0 ? (
+									<EmptyState
+										icon={Users}
+										title="Aucun membre"
+										description="Ajoutez votre premier membre pour commencer"
+										size="sm"
+									/>
+								) : (
+									members.map((member) => (
+										<HStack
+											key={member.id}
+											justify="between"
+											align="center"
+											p="md"
+											style={{
+												borderRadius: '0.75rem',
+												backgroundColor: 'hsl(var(--background) / 0.5)',
+												transition: 'background-color 0.2s',
+											}}
+										>
+											<HStack gap="md" align="center">
+												<MemberAvatar
+													member={{
+														id: member.id,
+														name: member.name,
+														color: member.color,
+														avatarUrl: member.avatarUrl,
+													}}
+													size="md"
+												/>
+												<VStack gap="none">
+													<Text weight="medium">{member.name}</Text>
+													<Text size="xs" color="muted">
+														{member.accountMembers.length} compte{member.accountMembers.length !== 1 ? 's' : ''}
+													</Text>
+												</VStack>
+											</HStack>
+											<HStack gap="sm" align="center">
+												<Dialog open={editingMember?.id === member.id} onOpenChange={(open) => !open && setEditingMember(null)}>
+													<DialogTrigger asChild>
+														<Button
+															variant="ghost"
+															size="icon"
+															style={{ height: '2rem', width: '2rem' }}
+															onClick={() => setEditingMember(member)}
+														>
+															<Pencil style={{ height: '1rem', width: '1rem' }} />
+														</Button>
+													</DialogTrigger>
+													<DialogContent>
+														<DialogHeader>
+															<DialogTitle>Modifier le membre</DialogTitle>
+														</DialogHeader>
+														{editingMember && (
+															<VStack gap="md" style={{ paddingTop: '1rem' }}>
+																<VStack gap="xs">
+																	<Label htmlFor="editMemberName">Nom</Label>
+																	<Input
+																		id="editMemberName"
+																		value={editingMember.name}
+																		onChange={(e) =>
+																			setEditingMember({ ...editingMember, name: e.target.value })
+																		}
+																	/>
+																</VStack>
+																<VStack gap="xs">
+																	<Label>Couleur</Label>
+																	<HStack gap="sm" style={{ flexWrap: 'wrap' }}>
+																		{MEMBER_COLORS.map((color) => (
+																			<button
+																				key={color.value}
+																				type="button"
+																				onClick={() =>
+																					setEditingMember({ ...editingMember, color: color.value })
+																				}
+																				style={{
+																					borderRadius: '9999px',
+																					height: '2rem',
+																					width: '2rem',
+																					backgroundColor: color.value,
+																					transition: 'all 0.2s',
+																					outline: editingMember.color === color.value ? '2px solid hsl(var(--primary))' : 'none',
+																					outlineOffset: '2px',
+																					border: 'none',
+																					cursor: 'pointer',
+																				}}
+																				title={color.name}
+																			/>
+																		))}
+																	</HStack>
+																</VStack>
+																<HStack justify="end" gap="sm" style={{ paddingTop: '1rem' }}>
+																	<Button variant="outline" onClick={() => setEditingMember(null)}>
+																		Annuler
+																	</Button>
+																	<Button onClick={handleUpdateMember} disabled={savingMember}>
+																		{savingMember ? 'Sauvegarde...' : 'Sauvegarder'}
+																	</Button>
+																</HStack>
+															</VStack>
+														)}
+													</DialogContent>
+												</Dialog>
+												<Button
+													variant="ghost"
+													size="icon"
+													style={{ height: '2rem', width: '2rem', color: 'hsl(var(--destructive))' }}
+													onClick={() => setDeleteMemberId(member.id)}
+												>
+													<Trash2 style={{ height: '1rem', width: '1rem' }} />
+												</Button>
+											</HStack>
+										</HStack>
+									))
+								)}
+							</VStack>
+						</VStack>
+					</GlassCard>
 
 					{/* Appearance */}
-					<div className="glass-card p-6 space-y-6">
-						<div className="flex items-center gap-3 pb-2">
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-								<Palette className="h-5 w-5" />
-							</div>
-							<div>
-								<h3 className="text-lg font-medium">Apparence</h3>
-								<p className="text-sm text-muted-foreground">Personnalisez l&apos;interface</p>
-							</div>
-						</div>
+					<GlassCard padding="lg">
+						<VStack gap="lg">
+							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
+								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<Palette style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<VStack gap="none">
+									<Heading level={3} size="lg" weight="medium">Apparence</Heading>
+									<Text size="sm" color="muted">Personnalisez l&apos;interface</Text>
+								</VStack>
+							</HStack>
 
-						{/* Theme Selection */}
-						<div className="space-y-3">
-							<Label>Thème</Label>
-							<div className="grid grid-cols-3 gap-3">
-								<button
-									type="button"
-									onClick={() => setTheme('light')}
-									className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
-										mounted && theme === 'light'
-											? 'border-primary bg-primary/5'
-											: 'border-border/60 hover:border-border'
-									}`}
-								>
-									<Sun className="h-5 w-5" />
-									<span className="text-sm font-medium">Clair</span>
-								</button>
-								<button
-									type="button"
-									onClick={() => setTheme('dark')}
-									className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
-										mounted && theme === 'dark'
-											? 'border-primary bg-primary/5'
-											: 'border-border/60 hover:border-border'
-									}`}
-								>
-									<Moon className="h-5 w-5" />
-									<span className="text-sm font-medium">Sombre</span>
-								</button>
-								<button
-									type="button"
-									onClick={() => setTheme('system')}
-									className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
-										mounted && theme === 'system'
-											? 'border-primary bg-primary/5'
-											: 'border-border/60 hover:border-border'
-									}`}
-								>
-									<Globe className="h-5 w-5" />
-									<span className="text-sm font-medium">Système</span>
-								</button>
-							</div>
-						</div>
+							{/* Theme Selection */}
+							<VStack gap="sm">
+								<Label>Thème</Label>
+								<Grid cols={3} gap="sm">
+									<button
+										type="button"
+										onClick={() => setTheme('light')}
+										style={{
+											display: 'flex',
+											flexDirection: 'column',
+											alignItems: 'center',
+											gap: '0.5rem',
+											borderRadius: '0.75rem',
+											padding: '1rem',
+											border: mounted && theme === 'light' ? '2px solid hsl(var(--primary))' : '2px solid hsl(var(--border) / 0.6)',
+											backgroundColor: mounted && theme === 'light' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+											transition: 'all 0.2s',
+											cursor: 'pointer',
+										}}
+									>
+										<Sun style={{ height: '1.25rem', width: '1.25rem' }} />
+										<Text size="sm" weight="medium">Clair</Text>
+									</button>
+									<button
+										type="button"
+										onClick={() => setTheme('dark')}
+										style={{
+											display: 'flex',
+											flexDirection: 'column',
+											alignItems: 'center',
+											gap: '0.5rem',
+											borderRadius: '0.75rem',
+											padding: '1rem',
+											border: mounted && theme === 'dark' ? '2px solid hsl(var(--primary))' : '2px solid hsl(var(--border) / 0.6)',
+											backgroundColor: mounted && theme === 'dark' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+											transition: 'all 0.2s',
+											cursor: 'pointer',
+										}}
+									>
+										<Moon style={{ height: '1.25rem', width: '1.25rem' }} />
+										<Text size="sm" weight="medium">Sombre</Text>
+									</button>
+									<button
+										type="button"
+										onClick={() => setTheme('system')}
+										style={{
+											display: 'flex',
+											flexDirection: 'column',
+											alignItems: 'center',
+											gap: '0.5rem',
+											borderRadius: '0.75rem',
+											padding: '1rem',
+											border: mounted && theme === 'system' ? '2px solid hsl(var(--primary))' : '2px solid hsl(var(--border) / 0.6)',
+											backgroundColor: mounted && theme === 'system' ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+											transition: 'all 0.2s',
+											cursor: 'pointer',
+										}}
+									>
+										<Globe style={{ height: '1.25rem', width: '1.25rem' }} />
+										<Text size="sm" weight="medium">Système</Text>
+									</button>
+								</Grid>
+							</VStack>
 
-						<Separator />
+							<Separator />
 
-						{/* Language */}
-						<div className="space-y-2">
-							<Label htmlFor="language">Langue</Label>
-							<Select defaultValue="fr">
-								<SelectTrigger id="language" className="w-full sm:w-[200px]">
-									<SelectValue placeholder="Sélectionner" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="fr">Français</SelectItem>
-									<SelectItem value="en">English</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-					</div>
+							{/* Language */}
+							<VStack gap="xs">
+								<Label htmlFor="language">Langue</Label>
+								<Select defaultValue="fr">
+									<SelectTrigger id="language" style={{ width: '100%', maxWidth: '200px' }}>
+										<SelectValue placeholder="Sélectionner" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="fr">Français</SelectItem>
+										<SelectItem value="en">English</SelectItem>
+									</SelectContent>
+								</Select>
+							</VStack>
+						</VStack>
+					</GlassCard>
 
 					{/* Data & Privacy */}
-					<div className="glass-card p-6 space-y-4">
-						<div className="flex items-center gap-3 pb-2">
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-								<Database className="h-5 w-5" />
-							</div>
-							<div>
-								<h3 className="text-lg font-medium">Données</h3>
-								<p className="text-sm text-muted-foreground">Export et sauvegarde</p>
-							</div>
-						</div>
-						<div className="flex flex-col sm:flex-row gap-3">
-							<Button variant="outline" className="flex-1 gap-2">
-								<Download className="h-4 w-4" />
-								Exporter les données
-							</Button>
-							<Button variant="outline" className="flex-1 gap-2">
-								<Upload className="h-4 w-4" />
-								Importer une sauvegarde
-							</Button>
-						</div>
-						<p className="text-xs text-muted-foreground">
-							Vos données sont stockées localement sur votre serveur. Effectuez des sauvegardes
-							régulières pour éviter toute perte de données.
-						</p>
-					</div>
-				</div>
+					<GlassCard padding="lg">
+						<VStack gap="md">
+							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
+								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<Database style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<VStack gap="none">
+									<Heading level={3} size="lg" weight="medium">Données</Heading>
+									<Text size="sm" color="muted">Export et sauvegarde</Text>
+								</VStack>
+							</HStack>
+							<Flex gap="sm" style={{ flexDirection: 'column' }}>
+								<Button variant="outline" style={{ flex: 1 }} iconLeft={<Download style={{ height: '1rem', width: '1rem' }} />}>
+									Exporter les données
+								</Button>
+								<Button variant="outline" style={{ flex: 1 }} iconLeft={<Upload style={{ height: '1rem', width: '1rem' }} />}>
+									Importer une sauvegarde
+								</Button>
+							</Flex>
+							<Text size="xs" color="muted">
+								Vos données sont stockées localement sur votre serveur. Effectuez des sauvegardes
+								régulières pour éviter toute perte de données.
+							</Text>
+						</VStack>
+					</GlassCard>
+				</VStack>
 
 				{/* Sidebar Settings */}
-				<div className="space-y-6">
+				<VStack gap="lg">
 					{/* Notifications */}
-					<div className="glass-card p-6 space-y-4">
-						<div className="flex items-center gap-3 pb-2">
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-								<Bell className="h-5 w-5" />
-							</div>
-							<h3 className="text-lg font-medium">Notifications</h3>
-						</div>
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="font-medium">Alertes budget</p>
-								<p className="text-xs text-muted-foreground">Dépassement de budget</p>
-							</div>
-							<Switch defaultChecked />
-						</div>
-						<Separator />
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="font-medium">Transactions</p>
-								<p className="text-xs text-muted-foreground">Nouvelles transactions</p>
-							</div>
-							<Switch />
-						</div>
-						<Separator />
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="font-medium">Rappels</p>
-								<p className="text-xs text-muted-foreground">Échéances de prêts</p>
-							</div>
-							<Switch defaultChecked />
-						</div>
-					</div>
+					<GlassCard padding="lg">
+						<VStack gap="md">
+							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
+								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<Bell style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<Heading level={3} size="lg" weight="medium">Notifications</Heading>
+							</HStack>
+							<HStack justify="between" align="center">
+								<VStack gap="none">
+									<Text weight="medium">Alertes budget</Text>
+									<Text size="xs" color="muted">Dépassement de budget</Text>
+								</VStack>
+								<Switch defaultChecked />
+							</HStack>
+							<Separator />
+							<HStack justify="between" align="center">
+								<VStack gap="none">
+									<Text weight="medium">Transactions</Text>
+									<Text size="xs" color="muted">Nouvelles transactions</Text>
+								</VStack>
+								<Switch />
+							</HStack>
+							<Separator />
+							<HStack justify="between" align="center">
+								<VStack gap="none">
+									<Text weight="medium">Rappels</Text>
+									<Text size="xs" color="muted">Échéances de prêts</Text>
+								</VStack>
+								<Switch defaultChecked />
+							</HStack>
+						</VStack>
+					</GlassCard>
 
 					{/* Security */}
-					<div className="glass-card p-6 space-y-4">
-						<div className="flex items-center gap-3 pb-2">
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-								<Shield className="h-5 w-5" />
-							</div>
-							<h3 className="text-lg font-medium">Sécurité</h3>
-						</div>
-						<Button variant="outline" className="w-full justify-start gap-2">
-							<Key className="h-4 w-4" />
-							Changer le mot de passe
-						</Button>
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="font-medium">2FA</p>
-								<p className="text-xs text-muted-foreground">Authentification double facteur</p>
-							</div>
-							<Switch />
-						</div>
-						<Separator />
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="font-medium">Sessions</p>
-								<p className="text-xs text-muted-foreground">Déconnexion automatique</p>
-							</div>
-							<Switch defaultChecked />
-						</div>
-					</div>
+					<GlassCard padding="lg">
+						<VStack gap="md">
+							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
+								<Flex align="center" justify="center" style={{ borderRadius: '0.75rem', height: '2.5rem', width: '2.5rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<Shield style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<Heading level={3} size="lg" weight="medium">Sécurité</Heading>
+							</HStack>
+							<Button variant="outline" style={{ width: '100%', justifyContent: 'flex-start' }} iconLeft={<Key style={{ height: '1rem', width: '1rem' }} />}>
+								Changer le mot de passe
+							</Button>
+							<HStack justify="between" align="center">
+								<VStack gap="none">
+									<Text weight="medium">2FA</Text>
+									<Text size="xs" color="muted">Authentification double facteur</Text>
+								</VStack>
+								<Switch />
+							</HStack>
+							<Separator />
+							<HStack justify="between" align="center">
+								<VStack gap="none">
+									<Text weight="medium">Sessions</Text>
+									<Text size="xs" color="muted">Déconnexion automatique</Text>
+								</VStack>
+								<Switch defaultChecked />
+							</HStack>
+						</VStack>
+					</GlassCard>
 
 					{/* App Info */}
-					<div className="glass-card p-6 bg-muted/20">
-						<div className="text-center">
-							<p className="font-medium">Imanisa Finance</p>
-							<p className="text-sm text-muted-foreground">Version 2.0.0</p>
-							<p className="mt-4 text-xs text-muted-foreground">
+					<GlassCard padding="lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.2)' }}>
+						<Flex direction="col" align="center" style={{ textAlign: 'center' }}>
+							<Text weight="medium">Imanisa Finance</Text>
+							<Text size="sm" color="muted">Version 2.0.0</Text>
+							<Text size="xs" color="muted" style={{ marginTop: '1rem' }}>
 								Application open source de gestion de patrimoine personnel
-							</p>
+							</Text>
 							<a
 								href="https://github.com/mbourmaud/imanisa-finance"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="mt-2 text-xs text-primary hover:underline inline-block"
+								style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'hsl(var(--primary))' }}
 							>
 								Voir sur GitHub
 							</a>
-						</div>
-					</div>
-				</div>
-			</div>
+						</Flex>
+					</GlassCard>
+				</VStack>
+			</Grid>
 
 			<ConfirmDialog
 				open={deleteMemberId !== null}
@@ -627,6 +677,6 @@ export default function SettingsPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteMember}
 			/>
-		</div>
+		</VStack>
 	);
 }

@@ -15,18 +15,25 @@ import {
 	ShoppingCart,
 	Utensils,
 	Zap,
-} from '@/components';
-import { Button } from '@/components';
-import { DonutChart, ChartLegend } from '@/components/charts';
-import { PageHeader } from '@/components';
-import {
+	Button,
+	PageHeader,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	Progress,
+	Box,
+	VStack,
+	HStack,
+	Text,
+	Heading,
+	GlassCard,
+	Grid,
+	StatCard,
+	StatCardGrid,
 } from '@/components';
-import { Progress } from '@/components';
+import { DonutChart, ChartLegend } from '@/components/charts';
 
 const categories = [
 	{
@@ -125,162 +132,152 @@ function formatCurrency(amount: number): string {
 
 export default function BudgetPage() {
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Budget"
 				description="Suivez vos dépenses par catégorie"
 				actions={
-					<div className="flex gap-2">
-						<Button variant="outline" className="gap-2">
-							<Settings className="h-4 w-4" />
+					<HStack gap="sm">
+						<Button variant="outline" iconLeft={<Settings style={{ height: '1rem', width: '1rem' }} />}>
 							Règles
 						</Button>
-						<Button className="gap-2">
-							<Plus className="h-4 w-4" />
+						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 							Nouvelle catégorie
 						</Button>
-					</div>
+					</HStack>
 				}
 			/>
 
 			{/* Stats Overview */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-2 sm:grid-cols-3 stagger-children">
-				<div className="stat-card col-span-2 sm:col-span-1">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Budget mensuel</p>
-							<p className="stat-card-value">{formatCurrency(totalBudget)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<PieChart className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Dépensé</p>
-							<p className="stat-card-value">{formatCurrency(totalSpent)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-								{Math.round((totalSpent / totalBudget) * 100)}% du budget
-							</p>
-						</div>
-						<div className="stat-card-icon bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]">
-							<CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Restant</p>
-							<p className="stat-card-value value-positive">{formatCurrency(remaining)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-								{Math.round((remaining / totalBudget) * 100)}% disponible
-							</p>
-						</div>
-						<div className="stat-card-icon bg-[oklch(0.55_0.15_145)]/10 text-[oklch(0.55_0.15_145)]">
-							<PieChart className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-			</div>
+			<StatCardGrid columns={3}>
+				<StatCard
+					label="Budget mensuel"
+					value={formatCurrency(totalBudget)}
+					icon={PieChart}
+				/>
+				<StatCard
+					label="Dépensé"
+					value={formatCurrency(totalSpent)}
+					description={`${Math.round((totalSpent / totalBudget) * 100)}% du budget`}
+					icon={CreditCard}
+					variant="coral"
+				/>
+				<StatCard
+					label="Restant"
+					value={formatCurrency(remaining)}
+					description={`${Math.round((remaining / totalBudget) * 100)}% disponible`}
+					icon={PieChart}
+					variant="teal"
+				/>
+			</StatCardGrid>
 
 			{/* Global Progress */}
-			<div className="glass-card p-6">
-				<div className="flex items-center justify-between mb-3">
-					<p className="font-medium">Progression du mois</p>
-					<p className="text-sm text-muted-foreground">
+			<GlassCard padding="lg">
+				<HStack justify="between" align="center" style={{ marginBottom: '0.5rem' }}>
+					<Text weight="medium">Progression du mois</Text>
+					<Text size="sm" color="muted">
 						{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
-					</p>
-				</div>
-				<Progress value={(totalSpent / totalBudget) * 100} className="h-3" />
-				<p className="mt-2 text-xs text-muted-foreground">
+					</Text>
+				</HStack>
+				<Progress value={(totalSpent / totalBudget) * 100} style={{ height: '0.75rem' }} />
+				<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
 					Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
-				</p>
-			</div>
+				</Text>
+			</GlassCard>
 
 			{/* Categories Grid */}
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<Grid cols={3} gap="md">
 				{categories.map((category) => {
 					const percentage = (category.spent / category.budget) * 100;
 					const isOverBudget = category.spent > category.budget;
 					const remainingBudget = category.budget - category.spent;
 
 					return (
-						<div key={category.id} className="glass-card p-4 space-y-3 group">
-							<div className="flex items-start justify-between">
-								<div className="flex items-center gap-3">
-									<div
-										className="flex h-10 w-10 items-center justify-center rounded-xl"
-										style={{ backgroundColor: `${category.color}20`, color: category.color }}
-									>
-										<category.icon className="h-5 w-5" />
-									</div>
-									<div>
-										<h4 className="text-base font-medium">{category.name}</h4>
-										<p className="text-xs text-muted-foreground">
-											{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
-										</p>
-									</div>
-								</div>
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button
-											variant="ghost"
-											size="icon"
-											className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+						<GlassCard key={category.id} padding="md">
+							<VStack gap="sm">
+								<HStack justify="between" align="start">
+									<HStack gap="sm" align="center">
+										<Box
+											display="flex"
+											rounded="xl"
+											style={{
+												height: '2.5rem',
+												width: '2.5rem',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor: `${category.color}20`,
+												color: category.color,
+											}}
 										>
-											<MoreHorizontal className="h-4 w-4" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuItem>Voir les transactions</DropdownMenuItem>
-										<DropdownMenuItem>Modifier le budget</DropdownMenuItem>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
-							<div className="space-y-2">
-								<Progress
-									value={Math.min(percentage, 100)}
-									className={`h-2 ${isOverBudget ? '[&>div]:bg-destructive' : ''}`}
-								/>
-								<div className="flex justify-between text-xs">
-									<span
-										className={
-											isOverBudget ? 'value-negative font-medium' : 'text-muted-foreground'
-										}
-									>
-										{isOverBudget
-											? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
-											: `Reste ${formatCurrency(remainingBudget)}`}
-									</span>
-									<span className="text-muted-foreground">{Math.round(percentage)}%</span>
-								</div>
-							</div>
-						</div>
+											<category.icon style={{ height: '1.25rem', width: '1.25rem' }} />
+										</Box>
+										<VStack gap="none">
+											<Text size="md" weight="medium">{category.name}</Text>
+											<Text size="xs" color="muted">
+												{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
+											</Text>
+										</VStack>
+									</HStack>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												style={{ height: '2rem', width: '2rem' }}
+											>
+												<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem>Voir les transactions</DropdownMenuItem>
+											<DropdownMenuItem>Modifier le budget</DropdownMenuItem>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem style={{ color: 'hsl(var(--destructive))' }}>Supprimer</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</HStack>
+								<VStack gap="xs">
+									<Progress
+										value={Math.min(percentage, 100)}
+										style={{
+											height: '0.5rem',
+											...(isOverBudget && { '--progress-foreground': 'hsl(var(--destructive))' } as React.CSSProperties),
+										}}
+									/>
+									<HStack justify="between">
+										<Text
+											size="xs"
+											weight={isOverBudget ? 'medium' : 'normal'}
+											style={{ color: isOverBudget ? 'oklch(0.55 0.2 25)' : undefined }}
+											color={isOverBudget ? undefined : 'muted'}
+										>
+											{isOverBudget
+												? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
+												: `Reste ${formatCurrency(remainingBudget)}`}
+										</Text>
+										<Text size="xs" color="muted">{Math.round(percentage)}%</Text>
+									</HStack>
+								</VStack>
+							</VStack>
+						</GlassCard>
 					);
 				})}
-			</div>
+			</Grid>
 
 			{/* Chart */}
-			<div className="glass-card p-6 space-y-4">
-				<div className="flex items-center justify-between pb-2">
-					<div>
-						<h3 className="text-lg font-medium">Répartition des dépenses</h3>
-						<p className="text-sm text-muted-foreground">Vue graphique par catégorie</p>
-					</div>
-				</div>
-				<div className="grid gap-8 md:grid-cols-2 items-center">
-					<DonutChart data={chartData} className="h-72" />
-					<ChartLegend items={chartData} total={totalSpent} />
-				</div>
-			</div>
-		</div>
+			<GlassCard padding="lg">
+				<VStack gap="md">
+					<VStack gap="xs">
+						<Heading level={3} size="md">Répartition des dépenses</Heading>
+						<Text size="sm" color="muted">Vue graphique par catégorie</Text>
+					</VStack>
+					<Grid cols={2} gap="xl" style={{ alignItems: 'center' }}>
+						<DonutChart data={chartData} height="lg" />
+						<ChartLegend items={chartData} total={totalSpent} />
+					</Grid>
+				</VStack>
+			</GlassCard>
+		</VStack>
 	);
 }

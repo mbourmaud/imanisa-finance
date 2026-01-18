@@ -26,9 +26,7 @@ import {
 	Wifi,
 	X,
 	Zap,
-} from '@/components'
-import { Button } from '@/components'
-import {
+	Button,
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -36,26 +34,20 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '@/components'
-import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components'
-import { Input } from '@/components'
-import { Label } from '@/components'
-import { Progress } from '@/components'
-import {
+	Input,
+	Label,
+	Progress,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components'
-import { Skeleton } from '@/components'
-import {
+	Skeleton,
 	AlertDialog,
 	AlertDialogAction,
 	AlertDialogCancel,
@@ -65,6 +57,16 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger,
+	VStack,
+	HStack,
+	Box,
+	Flex,
+	Grid,
+	Text,
+	Heading,
+	GlassCard,
+	StatCard,
+	StatCardGrid,
 } from '@/components'
 import {
 	usePropertyQuery,
@@ -343,23 +345,25 @@ function getUtilityTypeIcon(type: UtilityType): React.ElementType {
 
 function DetailItemSkeleton() {
 	return (
-		<div className="space-y-1">
-			<Skeleton className="h-3 w-16" />
-			<Skeleton className="h-5 w-24" />
-		</div>
+		<VStack gap="xs">
+			<Skeleton style={{ height: '0.75rem', width: '4rem' }} />
+			<Skeleton style={{ height: '1.25rem', width: '6rem' }} />
+		</VStack>
 	)
 }
 
 function SectionSkeleton() {
 	return (
-		<div className="glass-card p-6 space-y-4">
-			<Skeleton className="h-5 w-32" />
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				<DetailItemSkeleton />
-				<DetailItemSkeleton />
-				<DetailItemSkeleton />
-			</div>
-		</div>
+		<GlassCard padding="lg">
+			<VStack gap="md">
+				<Skeleton style={{ height: '1.25rem', width: '8rem' }} />
+				<Grid cols={1} colsSm={2} colsLg={3} gap="md">
+					<DetailItemSkeleton />
+					<DetailItemSkeleton />
+					<DetailItemSkeleton />
+				</Grid>
+			</VStack>
+		</GlassCard>
 	)
 }
 
@@ -380,168 +384,183 @@ function LoanCard({
 	const totalCoverage = loan.loanInsurances?.reduce((sum, ins) => sum + ins.coveragePercent, 0) || 0
 
 	return (
-		<div className="rounded-xl border border-border/60 p-4 space-y-4">
-			<div className="flex items-start justify-between gap-4">
-				<div className="min-w-0">
-					<h4 className="font-medium truncate">{loan.name}</h4>
-					{loan.lender && (
-						<p className="text-sm text-muted-foreground">{loan.lender}</p>
-					)}
-				</div>
-				<div className="text-right shrink-0">
-					<p className="text-lg font-semibold number-display">{formatCurrency(loan.remainingAmount)}</p>
-					<p className="text-xs text-muted-foreground">restant</p>
-				</div>
-			</div>
-
-			<div className="space-y-1.5">
-				<div className="flex justify-between text-xs">
-					<span className="text-muted-foreground">Progression du remboursement</span>
-					<span className="number-display">{paidPercent.toFixed(0)}%</span>
-				</div>
-				<Progress value={paidPercent} className="h-2" />
-			</div>
-
-			<div className="grid grid-cols-3 gap-4 pt-2 text-sm">
-				<div>
-					<p className="text-xs text-muted-foreground">Mensualité</p>
-					<p className="font-medium number-display">{formatCurrency(loan.monthlyPayment)}</p>
-				</div>
-				<div>
-					<p className="text-xs text-muted-foreground">Taux</p>
-					<p className="font-medium number-display">{loan.rate}%</p>
-				</div>
-				<div>
-					<p className="text-xs text-muted-foreground">Montant initial</p>
-					<p className="font-medium number-display">{formatCurrency(loan.initialAmount)}</p>
-				</div>
-			</div>
-
-			{loan.loanNumber && (
-				<p className="text-xs text-muted-foreground pt-2 border-t border-border/40">
-					N° contrat: {loan.loanNumber}
-				</p>
-			)}
-
-			{/* Insurance section */}
-			<div className="pt-3 border-t border-border/40">
-				<button
-					type="button"
-					onClick={() => setIsExpanded(!isExpanded)}
-					className="flex items-center justify-between w-full text-left"
-				>
-					<div className="flex items-center gap-2">
-						<Shield className="h-4 w-4 text-muted-foreground" />
-						<span className="text-sm font-medium">
-							Assurance emprunteur
-							{hasInsurances && (
-								<span className="ml-2 text-xs text-muted-foreground font-normal">
-									({loan.loanInsurances?.length} contrat{loan.loanInsurances && loan.loanInsurances.length > 1 ? 's' : ''})
-								</span>
-							)}
-						</span>
-					</div>
-					<div className="flex items-center gap-2">
-						{hasInsurances && (
-							<span className="text-xs text-muted-foreground">
-								{formatCurrency(totalInsurancePremium)}/mois · {totalCoverage}%
-							</span>
+		<Box rounded="xl" border="default" p="md" style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
+			<VStack gap="md">
+				<HStack justify="between" align="start" gap="md">
+					<Box style={{ minWidth: 0 }}>
+						<Text weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{loan.name}</Text>
+						{loan.lender && (
+							<Text size="sm" color="muted">{loan.lender}</Text>
 						)}
-						{isExpanded ? (
-							<ChevronUp className="h-4 w-4 text-muted-foreground" />
-						) : (
-							<ChevronDown className="h-4 w-4 text-muted-foreground" />
-						)}
-					</div>
-				</button>
+					</Box>
+					<Box style={{ textAlign: 'right', flexShrink: 0 }}>
+						<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(loan.remainingAmount)}</Text>
+						<Text size="xs" color="muted">restant</Text>
+					</Box>
+				</HStack>
 
-				{isExpanded && (
-					<div className="mt-3 space-y-3">
-						{hasInsurances ? (
-							<div className="space-y-2">
-								{loan.loanInsurances?.map((insurance) => (
-									<div
-										key={insurance.id}
-										className="flex items-center gap-3 p-3 rounded-lg bg-muted/30"
-									>
-										<div
-											className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0"
-											style={{ backgroundColor: insurance.member.color || '#6b7280' }}
-										>
-											{insurance.member.name.charAt(0).toUpperCase()}
-										</div>
-										<div className="flex-1 min-w-0">
-											<div className="flex items-center gap-2 flex-wrap">
-												<span className="text-sm font-medium truncate">{insurance.member.name}</span>
-												<span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
-													{insurance.coveragePercent}%
-												</span>
-											</div>
-											<p className="text-xs text-muted-foreground truncate">
-												{insurance.provider} · {formatCurrency(insurance.monthlyPremium)}/mois
-											</p>
-										</div>
-									</div>
-								))}
-							</div>
-						) : (
-							<div className="text-center py-3">
-								<p className="text-sm text-muted-foreground mb-2">
-									Aucune assurance emprunteur
-								</p>
-							</div>
-						)}
-						<Button
-							variant="outline"
-							size="sm"
-							className="w-full gap-2"
-							onClick={() => onAddInsurance(loan.id)}
-						>
-							<Plus className="h-3.5 w-3.5" />
-							Ajouter une assurance
-						</Button>
-					</div>
+				<VStack gap="xs">
+					<HStack justify="between">
+						<Text size="xs" color="muted">Progression du remboursement</Text>
+						<Text size="xs" style={{ fontVariantNumeric: 'tabular-nums' }}>{paidPercent.toFixed(0)}%</Text>
+					</HStack>
+					<Progress value={paidPercent} style={{ height: '0.5rem' }} />
+				</VStack>
+
+				<Grid cols={3} gap="md" style={{ paddingTop: '0.5rem', fontSize: '0.875rem' }}>
+					<VStack gap="none">
+						<Text size="xs" color="muted">Mensualité</Text>
+						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(loan.monthlyPayment)}</Text>
+					</VStack>
+					<VStack gap="none">
+						<Text size="xs" color="muted">Taux</Text>
+						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{loan.rate}%</Text>
+					</VStack>
+					<VStack gap="none">
+						<Text size="xs" color="muted">Montant initial</Text>
+						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(loan.initialAmount)}</Text>
+					</VStack>
+				</Grid>
+
+				{loan.loanNumber && (
+					<Text size="xs" color="muted" style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+						N° contrat: {loan.loanNumber}
+					</Text>
 				)}
-			</div>
-		</div>
+
+				{/* Insurance section */}
+				<Box style={{ paddingTop: '0.75rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+					<button
+						type="button"
+						onClick={() => setIsExpanded(!isExpanded)}
+						style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left' }}
+					>
+						<HStack gap="sm" align="center">
+							<Shield style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+							<Text size="sm" weight="medium">
+								Assurance emprunteur
+								{hasInsurances && (
+									<Text as="span" size="xs" color="muted" weight="normal" style={{ marginLeft: '0.5rem' }}>
+										({loan.loanInsurances?.length} contrat{loan.loanInsurances && loan.loanInsurances.length > 1 ? 's' : ''})
+									</Text>
+								)}
+							</Text>
+						</HStack>
+						<HStack gap="sm" align="center">
+							{hasInsurances && (
+								<Text size="xs" color="muted">
+									{formatCurrency(totalInsurancePremium)}/mois · {totalCoverage}%
+								</Text>
+							)}
+							{isExpanded ? (
+								<ChevronUp style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+							) : (
+								<ChevronDown style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+							)}
+						</HStack>
+					</button>
+
+					{isExpanded && (
+						<VStack gap="sm" style={{ marginTop: '0.75rem' }}>
+							{hasInsurances ? (
+								<VStack gap="sm">
+									{loan.loanInsurances?.map((insurance) => (
+										<HStack
+											key={insurance.id}
+											gap="sm"
+											align="center"
+											p="sm"
+											style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+										>
+											<Flex
+												align="center"
+												justify="center"
+												style={{
+													height: '2rem',
+													width: '2rem',
+													borderRadius: '9999px',
+													fontSize: '0.75rem',
+													fontWeight: 500,
+													color: 'white',
+													flexShrink: 0,
+													backgroundColor: insurance.member.color || '#6b7280',
+												}}
+											>
+												{insurance.member.name.charAt(0).toUpperCase()}
+											</Flex>
+											<Box style={{ flex: 1, minWidth: 0 }}>
+												<HStack gap="sm" align="center" style={{ flexWrap: 'wrap' }}>
+													<Text size="sm" weight="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{insurance.member.name}</Text>
+													<Text size="xs" style={{ padding: '0.125rem 0.375rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+														{insurance.coveragePercent}%
+													</Text>
+												</HStack>
+												<Text size="xs" color="muted" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+													{insurance.provider} · {formatCurrency(insurance.monthlyPremium)}/mois
+												</Text>
+											</Box>
+										</HStack>
+									))}
+								</VStack>
+							) : (
+								<Box style={{ textAlign: 'center', padding: '0.75rem 0' }}>
+									<Text size="sm" color="muted" style={{ marginBottom: '0.5rem' }}>
+										Aucune assurance emprunteur
+									</Text>
+								</Box>
+							)}
+							<Button
+								variant="outline"
+								size="sm"
+								style={{ width: '100%', gap: '0.5rem' }}
+								onClick={() => onAddInsurance(loan.id)}
+							>
+								<Plus style={{ height: '0.875rem', width: '0.875rem' }} />
+								Ajouter une assurance
+							</Button>
+						</VStack>
+					)}
+				</Box>
+			</VStack>
+		</Box>
 	)
 }
 
 function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
 	return (
-		<div className="flex flex-col items-center justify-center py-8 text-center">
-			<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
-				<CreditCard className="h-6 w-6 text-muted-foreground" />
-			</div>
-			<h4 className="font-medium mb-1">Aucun prêt</h4>
-			<p className="text-sm text-muted-foreground mb-4">
+		<Flex direction="col" align="center" justify="center" style={{ padding: '2rem 0', textAlign: 'center' }}>
+			<Flex align="center" justify="center" style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.5)', marginBottom: '0.75rem' }}>
+				<CreditCard style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }} />
+			</Flex>
+			<Text weight="medium" style={{ marginBottom: '0.25rem' }}>Aucun prêt</Text>
+			<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
 				Ajoutez les crédits immobiliers associés à ce bien.
-			</p>
-			<Button variant="outline" size="sm" className="gap-2" onClick={onAddClick}>
-				<Plus className="h-4 w-4" />
+			</Text>
+			<Button variant="outline" size="sm" style={{ gap: '0.5rem' }} onClick={onAddClick}>
+				<Plus style={{ height: '1rem', width: '1rem' }} />
 				Ajouter un prêt
 			</Button>
-		</div>
+		</Flex>
 	)
 }
 
 function DetailItem({ label, value }: { label: string; value: string | number | null | undefined }) {
 	if (value === null || value === undefined) return null
 	return (
-		<div className="space-y-0.5">
-			<p className="text-xs text-muted-foreground">{label}</p>
-			<p className="font-medium">{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}</p>
-		</div>
+		<VStack gap="none">
+			<Text size="xs" color="muted">{label}</Text>
+			<Text weight="medium">{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}</Text>
+		</VStack>
 	)
 }
 
 function CurrencyItem({ label, value }: { label: string; value: number | null | undefined }) {
 	if (value === null || value === undefined) return null
 	return (
-		<div className="space-y-0.5">
-			<p className="text-xs text-muted-foreground">{label}</p>
-			<p className="font-medium number-display">{formatCurrency(value)}</p>
-		</div>
+		<VStack gap="none">
+			<Text size="xs" color="muted">{label}</Text>
+			<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(value)}</Text>
+		</VStack>
 	)
 }
 
@@ -1183,41 +1202,41 @@ export default function PropertyDetailPage() {
 	// Loading state
 	if (loading) {
 		return (
-			<div className="space-y-6">
+			<VStack gap="lg">
 				{/* Header skeleton */}
-				<div className="flex items-center gap-4">
-					<Skeleton className="h-8 w-8" />
-					<div className="flex-1 space-y-2">
-						<Skeleton className="h-7 w-64" />
-						<Skeleton className="h-4 w-48" />
-					</div>
-				</div>
+				<HStack gap="md" align="center">
+					<Skeleton style={{ height: '2rem', width: '2rem' }} />
+					<VStack gap="sm" style={{ flex: 1 }}>
+						<Skeleton style={{ height: '1.75rem', width: '16rem' }} />
+						<Skeleton style={{ height: '1rem', width: '12rem' }} />
+					</VStack>
+				</HStack>
 
 				{/* Sections skeleton */}
 				<SectionSkeleton />
 				<SectionSkeleton />
-			</div>
+			</VStack>
 		)
 	}
 
 	// Error state
 	if (error || !property) {
 		return (
-			<div className="space-y-6">
+			<VStack gap="lg">
 				<Link
 					href="/dashboard/real-estate"
-					className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+					style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))', transition: 'color 0.2s' }}
 				>
-					<ArrowLeft className="h-4 w-4" />
+					<ArrowLeft style={{ height: '1rem', width: '1rem' }} />
 					Retour aux biens
 				</Link>
-				<div className="glass-card p-6 border-destructive/50 bg-destructive/5">
-					<p className="text-sm text-destructive">{error || 'Bien non trouvé'}</p>
-					<Button variant="outline" size="sm" className="mt-4" onClick={() => router.push('/dashboard/real-estate')}>
+				<GlassCard padding="lg" style={{ borderColor: 'hsl(var(--destructive) / 0.5)', backgroundColor: 'hsl(var(--destructive) / 0.05)' }}>
+					<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>{error || 'Bien non trouvé'}</Text>
+					<Button variant="outline" size="sm" style={{ marginTop: '1rem' }} onClick={() => router.push('/dashboard/real-estate')}>
 						Retour à la liste
 					</Button>
-				</div>
-			</div>
+				</GlassCard>
+			</VStack>
 		)
 	}
 
@@ -1228,167 +1247,133 @@ export default function PropertyDetailPage() {
 	const isRental = property.usage === 'RENTAL'
 
 	return (
-		<div className="space-y-6">
+		<VStack gap="lg">
 			{/* Header */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-				<div className="flex items-start gap-4">
-					<Link
-						href="/dashboard/real-estate"
-						className="mt-1 flex items-center justify-center h-8 w-8 rounded-lg border border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors shrink-0"
-					>
-						<ArrowLeft className="h-4 w-4" />
-					</Link>
-					<div className="min-w-0">
-						<div className="flex items-center gap-2 flex-wrap">
-							<h1 className="text-2xl font-semibold tracking-tight">{property.name}</h1>
-							<div className="flex gap-1.5">
-								<span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-									{getPropertyTypeLabel(property.type)}
-								</span>
-								<span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-									{getPropertyUsageLabel(property.usage)}
-								</span>
-							</div>
-						</div>
-						<div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-							<MapPin className="h-3.5 w-3.5 shrink-0" />
-							<span>
-								{property.address}
-								{property.address2 && `, ${property.address2}`}, {property.postalCode} {property.city}
-							</span>
-						</div>
-					</div>
-				</div>
-				<div className="flex items-center gap-2 sm:shrink-0">
-					<Button variant="outline" className="gap-2" onClick={openEditPropertyDialog}>
-						<Pencil className="h-4 w-4" />
-						Modifier
-					</Button>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon">
-								<MoreHorizontal className="h-4 w-4" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem>Exporter les données</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem
-								className="text-destructive"
-								onClick={() => setShowDeletePropertyDialog(true)}
-							>
-								<Trash2 className="h-4 w-4 mr-2" />
-								Supprimer
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
-			</div>
+			<Flex direction="col" gap="md">
+				<HStack justify="between" align="start" gap="md" style={{ flexWrap: 'wrap' }}>
+					<HStack gap="md" align="start">
+						<Link
+							href="/dashboard/real-estate"
+							style={{ marginTop: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '2rem', width: '2rem', borderRadius: '0.5rem', border: '1px solid hsl(var(--border) / 0.6)', color: 'hsl(var(--muted-foreground))', flexShrink: 0, transition: 'all 0.2s' }}
+						>
+							<ArrowLeft style={{ height: '1rem', width: '1rem' }} />
+						</Link>
+						<Box style={{ minWidth: 0 }}>
+							<HStack gap="sm" align="center" style={{ flexWrap: 'wrap' }}>
+								<Heading level={1} size="2xl" weight="semibold" style={{ letterSpacing: '-0.025em' }}>{property.name}</Heading>
+								<HStack gap="xs">
+									<Text size="xs" style={{ padding: '0.125rem 0.5rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+										{getPropertyTypeLabel(property.type)}
+									</Text>
+									<Text size="xs" style={{ padding: '0.125rem 0.5rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }}>
+										{getPropertyUsageLabel(property.usage)}
+									</Text>
+								</HStack>
+							</HStack>
+							<HStack gap="xs" align="center" style={{ marginTop: '0.25rem' }}>
+								<MapPin style={{ height: '0.875rem', width: '0.875rem', flexShrink: 0, color: 'hsl(var(--muted-foreground))' }} />
+								<Text size="sm" color="muted">
+									{property.address}
+									{property.address2 && `, ${property.address2}`}, {property.postalCode} {property.city}
+								</Text>
+							</HStack>
+						</Box>
+					</HStack>
+					<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
+						<Button variant="outline" style={{ gap: '0.5rem' }} onClick={openEditPropertyDialog}>
+							<Pencil style={{ height: '1rem', width: '1rem' }} />
+							Modifier
+						</Button>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" size="icon">
+									<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem>Exporter les données</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									style={{ color: 'hsl(var(--destructive))' }}
+									onClick={() => setShowDeletePropertyDialog(true)}
+								>
+									<Trash2 style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
+									Supprimer
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</HStack>
+				</HStack>
+			</Flex>
 
 			{/* Value Summary */}
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Valeur actuelle</p>
-							<p className="stat-card-value">{formatCurrency(property.currentValue)}</p>
-							<p
-								className={`mt-1 text-[10px] sm:text-xs font-medium ${
-									appreciation >= 0 ? 'value-positive' : 'value-negative'
-								}`}
-							>
-								{appreciation >= 0 ? '+' : ''}
-								{appreciation.toFixed(1)}% depuis l'achat
-							</p>
-						</div>
-						<div className="stat-card-icon">
-							<Building2 className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Équité</p>
-							<p className="stat-card-value value-positive">{formatCurrency(equity)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-								{property.currentValue > 0
-									? `${((equity / property.currentValue) * 100).toFixed(0)}% de la valeur`
-									: '-'}
-							</p>
-						</div>
-						<div className="stat-card-icon bg-[oklch(0.55_0.15_145)]/10 text-[oklch(0.55_0.15_145)]">
-							<Wallet className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Crédits restants</p>
-							<p className="stat-card-value">{formatCurrency(totalLoansRemaining)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-								{property._count.loans} prêt{property._count.loans !== 1 ? 's' : ''}
-							</p>
-						</div>
-						<div className="stat-card-icon">
-							<CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Investissement total</p>
-							<p className="stat-card-value">{formatCurrency(totalInvestment)}</p>
-							<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-								Prix + frais
-							</p>
-						</div>
-						<div className="stat-card-icon">
-							<Landmark className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-			</div>
+			<StatCardGrid columns={4}>
+				<StatCard
+					label="Valeur actuelle"
+					value={formatCurrency(property.currentValue)}
+					icon={Building2}
+					variant="default"
+					description={`${appreciation >= 0 ? '+' : ''}${appreciation.toFixed(1)}% depuis l'achat`}
+					trend={appreciation >= 0 ? 'up' : 'down'}
+				/>
+				<StatCard
+					label="Équité"
+					value={formatCurrency(equity)}
+					icon={Wallet}
+					variant="teal"
+					description={property.currentValue > 0 ? `${((equity / property.currentValue) * 100).toFixed(0)}% de la valeur` : '-'}
+				/>
+				<StatCard
+					label="Crédits restants"
+					value={formatCurrency(totalLoansRemaining)}
+					icon={CreditCard}
+					variant="default"
+					description={`${property._count.loans} prêt${property._count.loans !== 1 ? 's' : ''}`}
+				/>
+				<StatCard
+					label="Investissement total"
+					value={formatCurrency(totalInvestment)}
+					icon={Landmark}
+					variant="default"
+					description="Prix + frais"
+				/>
+			</StatCardGrid>
 
 			{/* Informations Section */}
-			<div className="glass-card p-6 space-y-4">
-				<h3 className="text-base font-medium flex items-center gap-2">
-					<Home className="h-4 w-4 text-muted-foreground" />
-					Informations
-				</h3>
-					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+			<GlassCard padding="lg">
+				<VStack gap="md">
+					<HStack gap="sm" align="center">
+						<Home style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+						<Heading level={3} size="md" weight="medium">Informations</Heading>
+					</HStack>
+					<Grid cols={1} colsSm={2} colsLg={3} gap="lg">
 						{/* Caractéristiques */}
-						<div className="space-y-3">
-							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Caractéristiques</p>
-							<div className="space-y-2.5">
+						<VStack gap="sm">
+							<Text size="xs" weight="medium" color="muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Caractéristiques</Text>
+							<VStack gap="sm">
 								<DetailItem label="Surface" value={`${property.surface} m²`} />
 								<DetailItem label="Pièces" value={property.rooms} />
 								<DetailItem label="Chambres" value={property.bedrooms} />
-							</div>
-						</div>
+							</VStack>
+						</VStack>
 
 						{/* Achat */}
-						<div className="space-y-3">
-							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Achat</p>
-							<div className="space-y-2.5">
+						<VStack gap="sm">
+							<Text size="xs" weight="medium" color="muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Achat</Text>
+							<VStack gap="sm">
 								<CurrencyItem label="Prix d'achat" value={property.purchasePrice} />
 								<CurrencyItem label="Frais de notaire" value={property.notaryFees} />
 								<CurrencyItem label="Frais d'agence" value={property.agencyFees} />
 								<DetailItem label="Date d'achat" value={formatDate(property.purchaseDate)} />
-							</div>
-						</div>
+							</VStack>
+						</VStack>
 
 						{/* Valeur & Rentabilité */}
-						<div className="space-y-3">
-							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+						<VStack gap="sm">
+							<Text size="xs" weight="medium" color="muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
 								{isRental ? 'Valeur & Revenus' : 'Valeur'}
-							</p>
-							<div className="space-y-2.5">
+							</Text>
+							<VStack gap="sm">
 								<CurrencyItem label="Valeur actuelle" value={property.currentValue} />
 								{isRental && (
 									<>
@@ -1396,85 +1381,100 @@ export default function PropertyDetailPage() {
 										<CurrencyItem label="Charges locatives" value={property.rentCharges} />
 									</>
 								)}
-							</div>
-						</div>
-					</div>
+							</VStack>
+						</VStack>
+					</Grid>
 
-				{/* Notes */}
-				{property.notes && (
-					<div className="mt-6 pt-6 border-t border-border/40">
-						<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Notes</p>
-						<p className="text-sm text-muted-foreground">{property.notes}</p>
-					</div>
-				)}
-			</div>
+					{/* Notes */}
+					{property.notes && (
+						<Box style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+							<Text size="xs" weight="medium" color="muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Notes</Text>
+							<Text size="sm" color="muted">{property.notes}</Text>
+						</Box>
+					)}
+				</VStack>
+			</GlassCard>
 
 			{/* Propriétaires Section */}
-			<div className="glass-card p-6 space-y-4">
-				<h3 className="text-base font-medium flex items-center gap-2">
-					<Users className="h-4 w-4 text-muted-foreground" />
-					Propriétaires
-				</h3>
-				{property.propertyMembers.length === 0 ? (
-					<p className="text-sm text-muted-foreground">Aucun propriétaire renseigné</p>
-				) : (
-					<div className="flex flex-wrap gap-3">
-						{property.propertyMembers.map((pm) => (
-							<div
-								key={pm.id}
-								className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/30"
-							>
-								<div
-									className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium text-white shrink-0"
-									style={{ backgroundColor: pm.member.color || '#6b7280' }}
+			<GlassCard padding="lg">
+				<VStack gap="md">
+					<HStack gap="sm" align="center">
+						<Users style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+						<Heading level={3} size="md" weight="medium">Propriétaires</Heading>
+					</HStack>
+					{property.propertyMembers.length === 0 ? (
+						<Text size="sm" color="muted">Aucun propriétaire renseigné</Text>
+					) : (
+						<Flex style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
+							{property.propertyMembers.map((pm) => (
+								<HStack
+									key={pm.id}
+									gap="sm"
+									align="center"
+									style={{ borderRadius: '0.75rem', padding: '0.75rem 1rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 								>
-									{pm.member.name.charAt(0).toUpperCase()}
-								</div>
-								<div>
-									<p className="font-medium">{pm.member.name}</p>
-									<p className="text-sm text-muted-foreground">{pm.ownershipShare}%</p>
-								</div>
-							</div>
-						))}
-					</div>
-				)}
-			</div>
+									<Flex
+										align="center"
+										justify="center"
+										style={{
+											height: '2.5rem',
+											width: '2.5rem',
+											borderRadius: '9999px',
+											fontSize: '0.875rem',
+											fontWeight: 500,
+											color: 'white',
+											flexShrink: 0,
+											backgroundColor: pm.member.color || '#6b7280',
+										}}
+									>
+										{pm.member.name.charAt(0).toUpperCase()}
+									</Flex>
+									<VStack gap="none">
+										<Text weight="medium">{pm.member.name}</Text>
+										<Text size="sm" color="muted">{pm.ownershipShare}%</Text>
+									</VStack>
+								</HStack>
+							))}
+						</Flex>
+					)}
+				</VStack>
+			</GlassCard>
 
 			{/* Prêts Section */}
-			<div className="glass-card p-6 space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-base font-medium flex items-center gap-2">
-						<CreditCard className="h-4 w-4 text-muted-foreground" />
+			<GlassCard padding="lg">
+				<HStack justify="between" align="center">
+					<Heading level={3} size="md" weight="medium" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+						<CreditCard style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
 						Prêts
-					</h3>
+					</Heading>
 					<Dialog open={isLoanDialogOpen} onOpenChange={(open) => {
 						setIsLoanDialogOpen(open)
 						if (!open) resetLoanForm()
 					}}>
 							<DialogTrigger asChild>
-								<Button variant="outline" size="sm" className="gap-2">
-									<Plus className="h-4 w-4" />
+								<Button variant="outline" size="sm" iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 									Ajouter un prêt
 								</Button>
 							</DialogTrigger>
-							<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+							<DialogContent style={{ maxWidth: '32rem', maxHeight: '90vh', overflowY: 'auto' }}>
 								<DialogHeader>
 									<DialogTitle>Ajouter un prêt</DialogTitle>
 									<DialogDescription>
 										Renseignez les informations du crédit immobilier.
 									</DialogDescription>
 								</DialogHeader>
-								<form onSubmit={handleLoanSubmit} className="space-y-4">
+								<form onSubmit={handleLoanSubmit}>
+									<VStack gap="md">
 									{/* Error message */}
 									{loanFormError && (
-										<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
-											<p className="text-sm text-destructive">{loanFormError}</p>
-										</div>
+										<Box p="sm" style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--destructive) / 0.1)', border: '1px solid hsl(var(--destructive) / 0.2)' }}>
+											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>{loanFormError}</Text>
+										</Box>
 									)}
 
 									{/* Basic info */}
-									<div className="space-y-4">
-										<div className="space-y-2">
+									<VStack gap="md">
+										<VStack gap="xs">
 											<Label htmlFor="loan-name">Nom du prêt *</Label>
 											<Input
 												id="loan-name"
@@ -1482,10 +1482,10 @@ export default function PropertyDetailPage() {
 												value={loanFormData.name}
 												onChange={(e) => handleLoanInputChange('name', e.target.value)}
 											/>
-										</div>
+										</VStack>
 
-										<div className="grid gap-4 sm:grid-cols-2">
-											<div className="space-y-2">
+										<Grid cols={1} colsSm={2} gap="md">
+											<VStack gap="xs">
 												<Label htmlFor="loan-lender">Organisme prêteur</Label>
 												<Input
 													id="loan-lender"
@@ -1493,8 +1493,8 @@ export default function PropertyDetailPage() {
 													value={loanFormData.lender}
 													onChange={(e) => handleLoanInputChange('lender', e.target.value)}
 												/>
-											</div>
-											<div className="space-y-2">
+											</VStack>
+											<VStack gap="xs">
 												<Label htmlFor="loan-number">N° de contrat</Label>
 												<Input
 													id="loan-number"
@@ -1502,15 +1502,15 @@ export default function PropertyDetailPage() {
 													value={loanFormData.loanNumber}
 													onChange={(e) => handleLoanInputChange('loanNumber', e.target.value)}
 												/>
-											</div>
-										</div>
-									</div>
+											</VStack>
+										</Grid>
+									</VStack>
 
 									{/* Amounts */}
-									<div className="space-y-4">
-										<h3 className="text-sm font-medium text-muted-foreground">Montants</h3>
-										<div className="grid gap-4 sm:grid-cols-2">
-											<div className="space-y-2">
+									<VStack gap="md">
+										<Text size="sm" weight="medium" color="muted">Montants</Text>
+										<Grid cols={1} colsSm={2} gap="md">
+											<VStack gap="xs">
 												<Label htmlFor="loan-initial">Montant initial (€) *</Label>
 												<Input
 													id="loan-initial"
@@ -1521,8 +1521,8 @@ export default function PropertyDetailPage() {
 													value={loanFormData.initialAmount}
 													onChange={(e) => handleLoanInputChange('initialAmount', e.target.value)}
 												/>
-											</div>
-											<div className="space-y-2">
+											</VStack>
+											<VStack gap="xs">
 												<Label htmlFor="loan-remaining">Capital restant (€) *</Label>
 												<Input
 													id="loan-remaining"
@@ -1533,13 +1533,13 @@ export default function PropertyDetailPage() {
 													value={loanFormData.remainingAmount}
 													onChange={(e) => handleLoanInputChange('remainingAmount', e.target.value)}
 												/>
-											</div>
-										</div>
-									</div>
+											</VStack>
+										</Grid>
+									</VStack>
 
 									{/* Rate and payment */}
-									<div className="grid gap-4 sm:grid-cols-2">
-										<div className="space-y-2">
+									<Grid cols={1} colsSm={2} gap="md">
+										<VStack gap="xs">
 											<Label htmlFor="loan-rate">Taux (%) *</Label>
 											<Input
 												id="loan-rate"
@@ -1551,8 +1551,8 @@ export default function PropertyDetailPage() {
 												value={loanFormData.rate}
 												onChange={(e) => handleLoanInputChange('rate', e.target.value)}
 											/>
-										</div>
-										<div className="space-y-2">
+										</VStack>
+										<VStack gap="xs">
 											<Label htmlFor="loan-monthly">Mensualité (€) *</Label>
 											<Input
 												id="loan-monthly"
@@ -1563,12 +1563,12 @@ export default function PropertyDetailPage() {
 												value={loanFormData.monthlyPayment}
 												onChange={(e) => handleLoanInputChange('monthlyPayment', e.target.value)}
 											/>
-										</div>
-									</div>
+										</VStack>
+									</Grid>
 
 									{/* Dates */}
-									<div className="grid gap-4 sm:grid-cols-2">
-										<div className="space-y-2">
+									<Grid cols={1} colsSm={2} gap="md">
+										<VStack gap="xs">
 											<Label htmlFor="loan-start">Date de début *</Label>
 											<Input
 												id="loan-start"
@@ -1576,8 +1576,8 @@ export default function PropertyDetailPage() {
 												value={loanFormData.startDate}
 												onChange={(e) => handleLoanInputChange('startDate', e.target.value)}
 											/>
-										</div>
-										<div className="space-y-2">
+										</VStack>
+										<VStack gap="xs">
 											<Label htmlFor="loan-end">Date de fin</Label>
 											<Input
 												id="loan-end"
@@ -1585,11 +1585,11 @@ export default function PropertyDetailPage() {
 												value={loanFormData.endDate}
 												onChange={(e) => handleLoanInputChange('endDate', e.target.value)}
 											/>
-										</div>
-									</div>
+										</VStack>
+									</Grid>
 
 									{/* Notes */}
-									<div className="space-y-2">
+									<VStack gap="xs">
 										<Label htmlFor="loan-notes">Notes</Label>
 										<Input
 											id="loan-notes"
@@ -1597,9 +1597,9 @@ export default function PropertyDetailPage() {
 											value={loanFormData.notes}
 											onChange={(e) => handleLoanInputChange('notes', e.target.value)}
 										/>
-									</div>
+									</VStack>
 
-									<DialogFooter className="pt-4">
+									<DialogFooter style={{ paddingTop: '1rem' }}>
 										<Button
 											type="button"
 											variant="outline"
@@ -1610,47 +1610,48 @@ export default function PropertyDetailPage() {
 										</Button>
 										<Button type="submit" disabled={isSubmittingLoan}>
 											{isSubmittingLoan ? (
-												<>
-													<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+												<HStack gap="sm" align="center">
+													<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 													Création...
-												</>
+												</HStack>
 											) : (
 												'Créer le prêt'
 											)}
 										</Button>
 									</DialogFooter>
+									</VStack>
 								</form>
 							</DialogContent>
 					</Dialog>
-				</div>
+				</HStack>
 				{property.loans.length === 0 ? (
 					<LoansEmptyState onAddClick={() => setIsLoanDialogOpen(true)} />
 				) : (
-					<div className="space-y-4">
+					<VStack gap="md">
 						{/* Summary stats */}
-						<div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-muted/30">
-							<div className="text-center">
-								<p className="text-xs text-muted-foreground">Capital restant</p>
-								<p className="text-lg font-semibold number-display">{formatCurrency(totalLoansRemaining)}</p>
-							</div>
-							<div className="text-center">
-								<p className="text-xs text-muted-foreground">Mensualités</p>
-								<p className="text-lg font-semibold number-display">
+						<Grid cols={3} gap="md" p="md" style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+							<Box style={{ textAlign: 'center' }}>
+								<Text size="xs" color="muted">Capital restant</Text>
+								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(totalLoansRemaining)}</Text>
+							</Box>
+							<Box style={{ textAlign: 'center' }}>
+								<Text size="xs" color="muted">Mensualités</Text>
+								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.loans.reduce((sum, l) => sum + l.monthlyPayment, 0))}
-								</p>
-							</div>
-							<div className="text-center">
-								<p className="text-xs text-muted-foreground">Taux moyen</p>
-								<p className="text-lg font-semibold number-display">
+								</Text>
+							</Box>
+							<Box style={{ textAlign: 'center' }}>
+								<Text size="xs" color="muted">Taux moyen</Text>
+								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{property.loans.length > 0
 										? (property.loans.reduce((sum, l) => sum + l.rate, 0) / property.loans.length).toFixed(2)
 										: 0}%
-								</p>
-							</div>
-						</div>
+								</Text>
+							</Box>
+						</Grid>
 
 						{/* Loan cards */}
-						<div className="space-y-3">
+						<VStack gap="sm">
 							{property.loans.map((loan) => (
 								<LoanCard
 									key={loan.id}
@@ -1658,67 +1659,66 @@ export default function PropertyDetailPage() {
 									onAddInsurance={handleOpenInsuranceDialog}
 								/>
 							))}
-						</div>
-					</div>
+						</VStack>
+					</VStack>
 				)}
-			</div>
+			</GlassCard>
 
 			{/* Assurance Section */}
-			<div className="glass-card p-6 space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-base font-medium flex items-center gap-2">
-						<Shield className="h-4 w-4 text-muted-foreground" />
+			<GlassCard padding="lg">
+				<HStack justify="between" align="center">
+					<Heading level={3} size="md" weight="medium" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+						<Shield style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
 						Assurance habitation
-					</h3>
+					</Heading>
 					{!property.insurance && (
 						<Button
 							variant="outline"
 							size="sm"
-							className="gap-2"
+							iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}
 							onClick={() => openPropertyInsuranceDialog(false)}
 						>
-							<Plus className="h-4 w-4" />
 							Ajouter une assurance
 						</Button>
 					)}
-				</div>
+				</HStack>
 				{property.insurance ? (
-						<div className="rounded-xl border border-border/60 p-4 space-y-4">
+						<VStack gap="md" p="md" style={{ borderRadius: '0.75rem', border: '1px solid hsl(var(--border) / 0.6)' }}>
 							{/* Header with type badge and actions */}
-							<div className="flex items-start justify-between gap-4">
-								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
-										<Shield className="h-5 w-5 text-primary" />
-									</div>
-									<div>
-										<div className="flex items-center gap-2">
-											<h4 className="font-medium">{property.insurance.provider}</h4>
-											<span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+							<HStack justify="between" align="start" gap="md">
+								<HStack gap="md" align="center">
+									<Flex align="center" justify="center" style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--primary) / 0.1)', flexShrink: 0 }}>
+										<Shield style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }} />
+									</Flex>
+									<VStack gap="none">
+										<HStack gap="sm" align="center">
+											<Text weight="medium">{property.insurance.provider}</Text>
+											<Text size="xs" style={{ padding: '0.125rem 0.5rem', borderRadius: '9999px', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
 												{getInsuranceTypeBadge(property.insurance.type)}
-											</span>
-										</div>
-										<p className="text-sm text-muted-foreground">
+											</Text>
+										</HStack>
+										<Text size="sm" color="muted">
 											{getInsuranceTypeLabel(property.insurance.type)}
-										</p>
-									</div>
-								</div>
-								<div className="flex items-center gap-2 shrink-0">
+										</Text>
+									</VStack>
+								</HStack>
+								<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
 									<Button
 										variant="ghost"
 										size="icon"
-										className="h-8 w-8"
+										style={{ height: '2rem', width: '2rem' }}
 										onClick={() => openPropertyInsuranceDialog(true)}
 									>
-										<Pencil className="h-4 w-4" />
+										<Pencil style={{ height: '1rem', width: '1rem' }} />
 									</Button>
 									<AlertDialog>
 										<AlertDialogTrigger asChild>
 											<Button
 												variant="ghost"
 												size="icon"
-												className="h-8 w-8 text-destructive hover:text-destructive"
+												style={{ height: '2rem', width: '2rem', color: 'hsl(var(--destructive))' }}
 											>
-												<Trash2 className="h-4 w-4" />
+												<Trash2 style={{ height: '1rem', width: '1rem' }} />
 											</Button>
 										</AlertDialogTrigger>
 										<AlertDialogContent>
@@ -1733,13 +1733,13 @@ export default function PropertyDetailPage() {
 												<AlertDialogAction
 													onClick={handleDeletePropertyInsurance}
 													disabled={isDeletingPropertyInsurance}
-													className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+													style={{ backgroundColor: 'hsl(var(--destructive))', color: 'hsl(var(--destructive-foreground))' }}
 												>
 													{isDeletingPropertyInsurance ? (
-														<>
-															<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+														<HStack gap="sm" align="center">
+															<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 															Suppression...
-														</>
+														</HStack>
 													) : (
 														'Supprimer'
 													)}
@@ -1747,135 +1747,133 @@ export default function PropertyDetailPage() {
 											</AlertDialogFooter>
 										</AlertDialogContent>
 									</AlertDialog>
-								</div>
-							</div>
+								</HStack>
+							</HStack>
 
 							{/* Insurance details */}
-							<div className="grid gap-4 sm:grid-cols-3 pt-2 border-t border-border/40">
-								<div>
-									<p className="text-xs text-muted-foreground">Prime mensuelle</p>
-									<p className="font-medium number-display">{formatCurrency(property.insurance.monthlyPremium)}</p>
-									<p className="text-xs text-muted-foreground mt-0.5">
+							<Grid cols={1} colsSm={3} gap="md" style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+								<Box>
+									<Text size="xs" color="muted">Prime mensuelle</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(property.insurance.monthlyPremium)}</Text>
+									<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
 										{formatCurrency(property.insurance.monthlyPremium * 12)}/an
-									</p>
-								</div>
-								<div>
-									<p className="text-xs text-muted-foreground">Date de début</p>
-									<p className="font-medium">{formatDate(property.insurance.startDate.toString())}</p>
-								</div>
+									</Text>
+								</Box>
+								<Box>
+									<Text size="xs" color="muted">Date de début</Text>
+									<Text weight="medium">{formatDate(property.insurance.startDate.toString())}</Text>
+								</Box>
 								{property.insurance.endDate && (
-									<div>
-										<p className="text-xs text-muted-foreground">Date de fin</p>
-										<p className="font-medium">{formatDate(property.insurance.endDate.toString())}</p>
-									</div>
+									<Box>
+										<Text size="xs" color="muted">Date de fin</Text>
+										<Text weight="medium">{formatDate(property.insurance.endDate.toString())}</Text>
+									</Box>
 								)}
-							</div>
+							</Grid>
 
 							{/* Additional info */}
 							{(property.insurance.contractNumber || property.insurance.coverage || property.insurance.link) && (
-								<div className="space-y-2 pt-2 border-t border-border/40">
+								<VStack gap="xs" style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
 									{property.insurance.contractNumber && (
-										<p className="text-xs text-muted-foreground">
-											N° contrat: <span className="text-foreground">{property.insurance.contractNumber}</span>
-										</p>
+										<Text size="xs" color="muted">
+											N° contrat: <Text as="span" style={{ color: 'hsl(var(--foreground))' }}>{property.insurance.contractNumber}</Text>
+										</Text>
 									)}
 									{property.insurance.coverage && (
-										<p className="text-xs text-muted-foreground">
-											Couverture: <span className="text-foreground">{property.insurance.coverage}</span>
-										</p>
+										<Text size="xs" color="muted">
+											Couverture: <Text as="span" style={{ color: 'hsl(var(--foreground))' }}>{property.insurance.coverage}</Text>
+										</Text>
 									)}
 									{property.insurance.link && (
 										<a
 											href={property.insurance.link}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+											style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'hsl(var(--primary))', textDecoration: 'none' }}
 										>
-											<ExternalLink className="h-3 w-3" />
+											<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 											Voir le contrat
 										</a>
 									)}
-								</div>
+								</VStack>
 							)}
 
 							{property.insurance.notes && (
-								<div className="pt-2 border-t border-border/40">
-									<p className="text-xs text-muted-foreground">Notes</p>
-									<p className="text-sm text-muted-foreground mt-0.5">{property.insurance.notes}</p>
-								</div>
+								<Box style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+									<Text size="xs" color="muted">Notes</Text>
+									<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>{property.insurance.notes}</Text>
+								</Box>
 							)}
-						</div>
+						</VStack>
 					) : (
-						<div className="flex flex-col items-center justify-center py-8 text-center">
-							<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
-								<Shield className="h-6 w-6 text-muted-foreground" />
-							</div>
-							<h4 className="font-medium mb-1">Aucune assurance</h4>
-							<p className="text-sm text-muted-foreground mb-4">
+						<Flex direction="col" align="center" justify="center" style={{ padding: '2rem 0', textAlign: 'center' }}>
+							<Flex align="center" justify="center" style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.5)', marginBottom: '0.75rem' }}>
+								<Shield style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }} />
+							</Flex>
+							<Text weight="medium" style={{ marginBottom: '0.25rem' }}>Aucune assurance</Text>
+							<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
 								Ajoutez l'assurance habitation de ce bien (MRH ou PNO).
-							</p>
+							</Text>
 							<Button
 								variant="outline"
 								size="sm"
-								className="gap-2"
+								iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}
 								onClick={() => openPropertyInsuranceDialog(false)}
 							>
-								<Plus className="h-4 w-4" />
 								Ajouter une assurance
 							</Button>
-					</div>
+					</Flex>
 				)}
-			</div>
+			</GlassCard>
 
 			{/* Copropriété Section */}
-			<div className="glass-card p-6 space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-base font-medium flex items-center gap-2">
-						<Building2 className="h-4 w-4 text-muted-foreground" />
+			<GlassCard padding="lg">
+				<HStack justify="between" align="center">
+					<Heading level={3} size="md" weight="medium" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+						<Building2 style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
 						Copropriété
-					</h3>
+					</Heading>
 					{!property.coOwnership && (
 						<Button
 							variant="outline"
 							size="sm"
-							className="gap-2"
+							iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}
 							onClick={() => openCoOwnershipDialog(false)}
 						>
-							<Plus className="h-4 w-4" />
 							Ajouter
 						</Button>
 					)}
-				</div>
+				</HStack>
 				{property.coOwnership ? (
-						<div className="rounded-xl border border-border/60 p-4 space-y-4">
+						<VStack gap="md" p="md" style={{ borderRadius: '0.75rem', border: '1px solid hsl(var(--border))', borderColor: 'hsl(var(--border) / 0.6)' }}>
 							{/* Header with syndic name and actions */}
-							<div className="flex items-start justify-between gap-4">
-								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
-										<Building2 className="h-5 w-5 text-primary" />
-									</div>
-									<div>
-										<h4 className="font-medium">{property.coOwnership.name}</h4>
-										<p className="text-sm text-muted-foreground">Syndic de copropriété</p>
-									</div>
-								</div>
-								<div className="flex items-center gap-2 shrink-0">
+							<HStack justify="between" align="start" gap="md">
+								<HStack gap="md" align="center">
+									<Flex align="center" justify="center" style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--primary) / 0.1)', flexShrink: 0 }}>
+										<Building2 style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }} />
+									</Flex>
+									<VStack gap="none">
+										<Text weight="medium">{property.coOwnership.name}</Text>
+										<Text size="sm" color="muted">Syndic de copropriété</Text>
+									</VStack>
+								</HStack>
+								<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
 									<Button
 										variant="ghost"
 										size="icon"
-										className="h-8 w-8"
+										style={{ height: '2rem', width: '2rem' }}
 										onClick={() => openCoOwnershipDialog(true)}
 									>
-										<Pencil className="h-4 w-4" />
+										<Pencil style={{ height: '1rem', width: '1rem' }} />
 									</Button>
 									<AlertDialog>
 										<AlertDialogTrigger asChild>
 											<Button
 												variant="ghost"
 												size="icon"
-												className="h-8 w-8 text-destructive hover:text-destructive"
+												style={{ height: '2rem', width: '2rem', color: 'hsl(var(--destructive))' }}
 											>
-												<Trash2 className="h-4 w-4" />
+												<Trash2 style={{ height: '1rem', width: '1rem' }} />
 											</Button>
 										</AlertDialogTrigger>
 										<AlertDialogContent>
@@ -1890,11 +1888,11 @@ export default function PropertyDetailPage() {
 												<AlertDialogAction
 													onClick={handleDeleteCoOwnership}
 													disabled={isDeletingCoOwnership}
-													className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+													style={{ backgroundColor: 'hsl(var(--destructive))', color: 'hsl(var(--destructive-foreground))' }}
 												>
 													{isDeletingCoOwnership ? (
 														<>
-															<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+															<Loader2 style={{ marginRight: '0.5rem', height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 															Suppression...
 														</>
 													) : (
@@ -1904,163 +1902,163 @@ export default function PropertyDetailPage() {
 											</AlertDialogFooter>
 										</AlertDialogContent>
 									</AlertDialog>
-								</div>
-							</div>
+								</HStack>
+							</HStack>
 
 							{/* Amounts */}
-							<div className="grid gap-4 sm:grid-cols-2 pt-2 border-t border-border/40">
-								<div>
-									<p className="text-xs text-muted-foreground">Charges trimestrielles</p>
-									<p className="font-medium number-display">{formatCurrency(property.coOwnership.quarterlyAmount)}</p>
-								</div>
-								<div>
-									<p className="text-xs text-muted-foreground">Charges annuelles</p>
-									<p className="font-medium number-display">{formatCurrency(property.coOwnership.quarterlyAmount * 4)}</p>
-								</div>
-							</div>
+							<Grid cols={1} colsSm={2} gap="md" style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+								<VStack gap="none">
+									<Text size="xs" color="muted">Charges trimestrielles</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(property.coOwnership.quarterlyAmount)}</Text>
+								</VStack>
+								<VStack gap="none">
+									<Text size="xs" color="muted">Charges annuelles</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(property.coOwnership.quarterlyAmount * 4)}</Text>
+								</VStack>
+							</Grid>
 
 							{/* Additional info */}
 							{property.coOwnership.link && (
-								<div className="pt-2 border-t border-border/40">
+								<Box style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
 									<a
 										href={property.coOwnership.link}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+										style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'hsl(var(--primary))' }}
 									>
-										<ExternalLink className="h-3 w-3" />
+										<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 										Voir les documents
 									</a>
-								</div>
+								</Box>
 							)}
 
 							{property.coOwnership.notes && (
-								<div className="pt-2 border-t border-border/40">
-									<p className="text-xs text-muted-foreground">Notes</p>
-									<p className="text-sm text-muted-foreground mt-0.5">{property.coOwnership.notes}</p>
-								</div>
+								<Box style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+									<Text size="xs" color="muted">Notes</Text>
+									<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>{property.coOwnership.notes}</Text>
+								</Box>
 							)}
-						</div>
+						</VStack>
 					) : (
-						<div className="flex flex-col items-center justify-center py-8 text-center">
-							<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
-								<Building2 className="h-6 w-6 text-muted-foreground" />
-							</div>
-							<h4 className="font-medium mb-1">Aucune copropriété</h4>
-							<p className="text-sm text-muted-foreground mb-4">
+						<Flex direction="col" align="center" justify="center" style={{ padding: '2rem 0', textAlign: 'center' }}>
+							<Flex align="center" justify="center" style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.5)', marginBottom: '0.75rem' }}>
+								<Building2 style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }} />
+							</Flex>
+							<Text weight="medium" style={{ marginBottom: '0.25rem' }}>Aucune copropriété</Text>
+							<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
 								Ajoutez les informations du syndic et des charges de copropriété.
-							</p>
+							</Text>
 							<Button
 								variant="outline"
 								size="sm"
-								className="gap-2"
+								iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}
 								onClick={() => openCoOwnershipDialog(false)}
 							>
-								<Plus className="h-4 w-4" />
 								Ajouter
 							</Button>
-					</div>
+					</Flex>
 				)}
-			</div>
+			</GlassCard>
 
 			{/* Contrats Section */}
-			<div className="glass-card p-6 space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-base font-medium flex items-center gap-2">
-						<Zap className="h-4 w-4 text-muted-foreground" />
+			<GlassCard padding="lg">
+				<HStack justify="between" align="center">
+					<Heading level={3} size="md" weight="medium" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+						<Zap style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
 						Contrats & Abonnements
-					</h3>
+					</Heading>
 					<Button
 						variant="outline"
 						size="sm"
-						className="gap-2"
+						iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}
 						onClick={() => openUtilityContractDialog()}
 					>
-						<Plus className="h-4 w-4" />
 						Ajouter un contrat
 					</Button>
-				</div>
+				</HStack>
 				{property.utilityContracts.length === 0 ? (
-						<div className="flex flex-col items-center justify-center py-8 text-center">
-							<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
-								<Zap className="h-6 w-6 text-muted-foreground" />
-							</div>
-							<h4 className="font-medium mb-1">Aucun contrat</h4>
-							<p className="text-sm text-muted-foreground mb-4">
+						<Flex direction="col" align="center" justify="center" style={{ padding: '2rem 0', textAlign: 'center' }}>
+							<Flex align="center" justify="center" style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.5)', marginBottom: '0.75rem' }}>
+								<Zap style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }} />
+							</Flex>
+							<Text weight="medium" style={{ marginBottom: '0.25rem' }}>Aucun contrat</Text>
+							<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
 								Ajoutez les contrats d'énergie et abonnements liés à ce bien.
-							</p>
+							</Text>
 							<Button
 								variant="outline"
 								size="sm"
-								className="gap-2"
+								iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}
 								onClick={() => openUtilityContractDialog()}
 							>
-								<Plus className="h-4 w-4" />
 								Ajouter un contrat
 							</Button>
-						</div>
+						</Flex>
 					) : (
-						<div className="space-y-4">
+						<VStack gap="md">
 							{/* Summary stats */}
-							<div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-muted/30">
-								<div className="text-center">
-									<p className="text-xs text-muted-foreground">Nombre de contrats</p>
-									<p className="text-lg font-semibold">{property.utilityContracts.length}</p>
-								</div>
-								<div className="text-center">
-									<p className="text-xs text-muted-foreground">Total mensuel</p>
-									<p className="text-lg font-semibold number-display">
+							<Grid cols={2} gap="md" p="md" style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+								<VStack gap="none" align="center">
+									<Text size="xs" color="muted">Nombre de contrats</Text>
+									<Text size="lg" weight="semibold">{property.utilityContracts.length}</Text>
+								</VStack>
+								<VStack gap="none" align="center">
+									<Text size="xs" color="muted">Total mensuel</Text>
+									<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(property.utilityContracts.reduce((sum, c) => sum + c.monthlyAmount, 0))}
-									</p>
-								</div>
-							</div>
+									</Text>
+								</VStack>
+							</Grid>
 
 							{/* Contract list */}
-							<div className="space-y-3">
+							<VStack gap="sm">
 								{property.utilityContracts.map((contract) => {
 									const IconComponent = getUtilityTypeIcon(contract.type)
 									return (
-										<div
+										<Box
 											key={contract.id}
-											className="rounded-xl border border-border/60 p-4"
+											rounded="xl"
+											border="default"
+											p="md"
+											style={{ borderColor: 'hsl(var(--border) / 0.6)' }}
 										>
-											<div className="flex items-start justify-between gap-4">
-												<div className="flex items-center gap-3">
-													<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
-														<IconComponent className="h-5 w-5 text-primary" />
-													</div>
-													<div>
-														<div className="flex items-center gap-2">
-															<h4 className="font-medium">{contract.provider}</h4>
-															<span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+											<HStack justify="between" align="start" gap="md">
+												<HStack gap="md" align="center">
+													<Flex align="center" justify="center" style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--primary) / 0.1)', flexShrink: 0 }}>
+														<IconComponent style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }} />
+													</Flex>
+													<VStack gap="none">
+														<HStack gap="sm" align="center">
+															<Text weight="medium">{contract.provider}</Text>
+															<Box rounded="full" style={{ fontSize: '0.75rem', padding: '0.125rem 0.5rem', backgroundColor: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }}>
 																{getUtilityTypeLabel(contract.type)}
-															</span>
-														</div>
-														<p className="text-sm text-muted-foreground number-display">
+															</Box>
+														</HStack>
+														<Text size="sm" color="muted" style={{ fontVariantNumeric: 'tabular-nums' }}>
 															{formatCurrency(contract.monthlyAmount)}/mois
-															<span className="text-xs ml-1">
+															<span style={{ fontSize: '0.75rem', marginLeft: '0.25rem' }}>
 																({formatCurrency(contract.monthlyAmount * 12)}/an)
 															</span>
-														</p>
-													</div>
-												</div>
-												<div className="flex items-center gap-2 shrink-0">
+														</Text>
+													</VStack>
+												</HStack>
+												<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-8 w-8"
+														style={{ height: '2rem', width: '2rem' }}
 														onClick={() => openUtilityContractDialog(contract)}
 													>
-														<Pencil className="h-4 w-4" />
+														<Pencil style={{ height: '1rem', width: '1rem' }} />
 													</Button>
 													<AlertDialog>
 														<AlertDialogTrigger asChild>
 															<Button
 																variant="ghost"
 																size="icon"
-																className="h-8 w-8 text-destructive hover:text-destructive"
+																style={{ height: '2rem', width: '2rem', color: 'hsl(var(--destructive))' }}
 															>
-																<Trash2 className="h-4 w-4" />
+																<Trash2 style={{ height: '1rem', width: '1rem' }} />
 															</Button>
 														</AlertDialogTrigger>
 														<AlertDialogContent>
@@ -2075,11 +2073,11 @@ export default function PropertyDetailPage() {
 																<AlertDialogAction
 																	onClick={() => handleDeleteUtilityContract(contract.id)}
 																	disabled={deletingUtilityContractId === contract.id}
-																	className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+																	style={{ backgroundColor: 'hsl(var(--destructive))', color: 'hsl(var(--destructive-foreground))' }}
 																>
 																	{deletingUtilityContractId === contract.id ? (
 																		<>
-																			<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+																			<Loader2 style={{ marginRight: '0.5rem', height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 																			Suppression...
 																		</>
 																	) : (
@@ -2089,43 +2087,43 @@ export default function PropertyDetailPage() {
 															</AlertDialogFooter>
 														</AlertDialogContent>
 													</AlertDialog>
-												</div>
-											</div>
+												</HStack>
+											</HStack>
 
 											{/* Additional info */}
 											{(contract.contractNumber || contract.link) && (
-												<div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between gap-4">
+												<HStack justify="between" align="center" gap="md" style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
 													{contract.contractNumber && (
-														<p className="text-xs text-muted-foreground">
-															N° contrat: <span className="text-foreground">{contract.contractNumber}</span>
-														</p>
+														<Text size="xs" color="muted">
+															N° contrat: <span style={{ color: 'hsl(var(--foreground))' }}>{contract.contractNumber}</span>
+														</Text>
 													)}
 													{contract.link && (
 														<a
 															href={contract.link}
 															target="_blank"
 															rel="noopener noreferrer"
-															className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+															style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'hsl(var(--primary))' }}
 														>
-															<ExternalLink className="h-3 w-3" />
+															<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 															Voir le contrat
 														</a>
 													)}
-												</div>
+												</HStack>
 											)}
 
 											{contract.notes && (
-												<div className="mt-2 pt-2 border-t border-border/40">
-													<p className="text-xs text-muted-foreground">{contract.notes}</p>
-												</div>
+												<Box style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+													<Text size="xs" color="muted">{contract.notes}</Text>
+												</Box>
 											)}
-										</div>
+										</Box>
 									)
 								})}
-							</div>
-					</div>
+							</VStack>
+					</VStack>
 				)}
-			</div>
+			</GlassCard>
 
 			{/* Insurance Dialog */}
 			<Dialog
@@ -2135,26 +2133,26 @@ export default function PropertyDetailPage() {
 					if (!open) resetInsuranceForm()
 				}}
 			>
-				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+				<DialogContent style={{ maxWidth: '32rem', maxHeight: '90vh', overflowY: 'auto' }}>
 					<DialogHeader>
 						<DialogTitle>Ajouter une assurance emprunteur</DialogTitle>
 						<DialogDescription>
 							Renseignez les informations de l'assurance pour ce prêt.
 						</DialogDescription>
 					</DialogHeader>
-					<form onSubmit={handleInsuranceSubmit} className="space-y-4">
+					<form onSubmit={handleInsuranceSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 						{/* Error message */}
 						{insuranceFormError && (
-							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
-								<p className="text-sm text-destructive">{insuranceFormError}</p>
-							</div>
+							<Box p="sm" style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--destructive) / 0.1)', border: '1px solid hsl(var(--destructive) / 0.2)' }}>
+								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>{insuranceFormError}</Text>
+							</Box>
 						)}
 
 						{/* Member selection */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="insurance-member">Emprunteur assuré *</Label>
 							{loadingMembers ? (
-								<Skeleton className="h-10 w-full" />
+								<Skeleton style={{ height: '2.5rem', width: '100%' }} />
 							) : (
 								<Select
 									value={insuranceFormData.memberId}
@@ -2166,23 +2164,23 @@ export default function PropertyDetailPage() {
 									<SelectContent>
 										{members.map((member) => (
 											<SelectItem key={member.id} value={member.id}>
-												<div className="flex items-center gap-2">
-													<div
-														className="h-4 w-4 rounded-full"
-														style={{ backgroundColor: member.color || '#6b7280' }}
+												<HStack gap="sm" align="center">
+													<Box
+														rounded="full"
+														style={{ height: '1rem', width: '1rem', backgroundColor: member.color || '#6b7280' }}
 													/>
 													{member.name}
-												</div>
+												</HStack>
 											</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
 							)}
-						</div>
+						</VStack>
 
 						{/* Insurance info */}
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div className="space-y-2">
+						<Grid cols={1} colsSm={2} gap="md">
+							<VStack gap="xs">
 								<Label htmlFor="insurance-name">Nom de l'assurance *</Label>
 								<Input
 									id="insurance-name"
@@ -2190,8 +2188,8 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.name}
 									onChange={(e) => handleInsuranceInputChange('name', e.target.value)}
 								/>
-							</div>
-							<div className="space-y-2">
+							</VStack>
+							<VStack gap="xs">
 								<Label htmlFor="insurance-provider">Assureur *</Label>
 								<Input
 									id="insurance-provider"
@@ -2199,12 +2197,12 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.provider}
 									onChange={(e) => handleInsuranceInputChange('provider', e.target.value)}
 								/>
-							</div>
-						</div>
+							</VStack>
+						</Grid>
 
 						{/* Coverage and premium */}
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div className="space-y-2">
+						<Grid cols={1} colsSm={2} gap="md">
+							<VStack gap="xs">
 								<Label htmlFor="insurance-coverage">Quotité (%) *</Label>
 								<Input
 									id="insurance-coverage"
@@ -2216,11 +2214,11 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.coveragePercent}
 									onChange={(e) => handleInsuranceInputChange('coveragePercent', e.target.value)}
 								/>
-								<p className="text-xs text-muted-foreground">
+								<Text size="xs" color="muted">
 									Pourcentage du capital couvert
-								</p>
-							</div>
-							<div className="space-y-2">
+								</Text>
+							</VStack>
+							<VStack gap="xs">
 								<Label htmlFor="insurance-premium">Prime mensuelle (€) *</Label>
 								<Input
 									id="insurance-premium"
@@ -2231,11 +2229,11 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.monthlyPremium}
 									onChange={(e) => handleInsuranceInputChange('monthlyPremium', e.target.value)}
 								/>
-							</div>
-						</div>
+							</VStack>
+						</Grid>
 
 						{/* Contract number */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="insurance-contract">N° de contrat</Label>
 							<Input
 								id="insurance-contract"
@@ -2243,10 +2241,10 @@ export default function PropertyDetailPage() {
 								value={insuranceFormData.contractNumber}
 								onChange={(e) => handleInsuranceInputChange('contractNumber', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
 						{/* Link */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="insurance-link">Lien vers le contrat</Label>
 							<Input
 								id="insurance-link"
@@ -2254,10 +2252,10 @@ export default function PropertyDetailPage() {
 								value={insuranceFormData.link}
 								onChange={(e) => handleInsuranceInputChange('link', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
 						{/* Notes */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="insurance-notes">Notes</Label>
 							<Input
 								id="insurance-notes"
@@ -2265,9 +2263,9 @@ export default function PropertyDetailPage() {
 								value={insuranceFormData.notes}
 								onChange={(e) => handleInsuranceInputChange('notes', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
-						<DialogFooter className="pt-4">
+						<DialogFooter style={{ paddingTop: '1rem' }}>
 							<Button
 								type="button"
 								variant="outline"
@@ -2279,7 +2277,7 @@ export default function PropertyDetailPage() {
 							<Button type="submit" disabled={isSubmittingInsurance}>
 								{isSubmittingInsurance ? (
 									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										<Loader2 style={{ marginRight: '0.5rem', height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 										Création...
 									</>
 								) : (
@@ -2299,7 +2297,7 @@ export default function PropertyDetailPage() {
 					if (!open) resetPropertyInsuranceForm()
 				}}
 			>
-				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+				<DialogContent style={{ maxWidth: '32rem', maxHeight: '90vh', overflowY: 'auto' }}>
 					<DialogHeader>
 						<DialogTitle>
 							{isEditingPropertyInsurance ? 'Modifier l\'assurance' : 'Ajouter une assurance'}
@@ -2308,16 +2306,17 @@ export default function PropertyDetailPage() {
 							Renseignez les informations de l'assurance habitation (MRH ou PNO).
 						</DialogDescription>
 					</DialogHeader>
-					<form onSubmit={handlePropertyInsuranceSubmit} className="space-y-4">
+					<form onSubmit={handlePropertyInsuranceSubmit}>
+					<VStack gap="md">
 						{/* Error message */}
 						{propertyInsuranceFormError && (
-							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
-								<p className="text-sm text-destructive">{propertyInsuranceFormError}</p>
-							</div>
+							<Box p="sm" style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--destructive) / 0.1)', border: '1px solid hsl(var(--destructive) / 0.2)' }}>
+								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>{propertyInsuranceFormError}</Text>
+							</Box>
 						)}
 
 						{/* Type selection */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="property-insurance-type">Type d'assurance *</Label>
 							<Select
 								value={propertyInsuranceFormData.type}
@@ -2328,24 +2327,24 @@ export default function PropertyDetailPage() {
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="MRH">
-										<div className="flex flex-col">
+										<VStack gap="none">
 											<span>MRH - Multirisque Habitation</span>
-											<span className="text-xs text-muted-foreground">Pour les occupants du bien</span>
-										</div>
+											<Text size="xs" color="muted">Pour les occupants du bien</Text>
+										</VStack>
 									</SelectItem>
 									<SelectItem value="PNO">
-										<div className="flex flex-col">
+										<VStack gap="none">
 											<span>PNO - Propriétaire Non-Occupant</span>
-											<span className="text-xs text-muted-foreground">Pour les biens locatifs</span>
-										</div>
+											<Text size="xs" color="muted">Pour les biens locatifs</Text>
+										</VStack>
 									</SelectItem>
 								</SelectContent>
 							</Select>
-						</div>
+						</VStack>
 
 						{/* Provider and contract */}
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div className="space-y-2">
+						<Grid cols={1} colsSm={2} gap="md">
+							<VStack gap="xs">
 								<Label htmlFor="property-insurance-provider">Assureur *</Label>
 								<Input
 									id="property-insurance-provider"
@@ -2353,8 +2352,8 @@ export default function PropertyDetailPage() {
 									value={propertyInsuranceFormData.provider}
 									onChange={(e) => handlePropertyInsuranceInputChange('provider', e.target.value)}
 								/>
-							</div>
-							<div className="space-y-2">
+							</VStack>
+							<VStack gap="xs">
 								<Label htmlFor="property-insurance-contract">N° de contrat</Label>
 								<Input
 									id="property-insurance-contract"
@@ -2362,11 +2361,11 @@ export default function PropertyDetailPage() {
 									value={propertyInsuranceFormData.contractNumber}
 									onChange={(e) => handlePropertyInsuranceInputChange('contractNumber', e.target.value)}
 								/>
-							</div>
-						</div>
+							</VStack>
+						</Grid>
 
 						{/* Premium */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="property-insurance-premium">Prime mensuelle (€) *</Label>
 							<Input
 								id="property-insurance-premium"
@@ -2378,15 +2377,15 @@ export default function PropertyDetailPage() {
 								onChange={(e) => handlePropertyInsuranceInputChange('monthlyPremium', e.target.value)}
 							/>
 							{propertyInsuranceFormData.monthlyPremium && (
-								<p className="text-xs text-muted-foreground">
+								<Text size="xs" color="muted">
 									Soit {formatCurrency(Number.parseFloat(propertyInsuranceFormData.monthlyPremium) * 12)}/an
-								</p>
+								</Text>
 							)}
-						</div>
+						</VStack>
 
 						{/* Dates */}
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div className="space-y-2">
+						<Grid cols={1} colsSm={2} gap="md">
+							<VStack gap="xs">
 								<Label htmlFor="property-insurance-start">Date de début *</Label>
 								<Input
 									id="property-insurance-start"
@@ -2394,8 +2393,8 @@ export default function PropertyDetailPage() {
 									value={propertyInsuranceFormData.startDate}
 									onChange={(e) => handlePropertyInsuranceInputChange('startDate', e.target.value)}
 								/>
-							</div>
-							<div className="space-y-2">
+							</VStack>
+							<VStack gap="xs">
 								<Label htmlFor="property-insurance-end">Date de fin</Label>
 								<Input
 									id="property-insurance-end"
@@ -2403,11 +2402,11 @@ export default function PropertyDetailPage() {
 									value={propertyInsuranceFormData.endDate}
 									onChange={(e) => handlePropertyInsuranceInputChange('endDate', e.target.value)}
 								/>
-							</div>
-						</div>
+							</VStack>
+						</Grid>
 
 						{/* Coverage */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="property-insurance-coverage">Couverture</Label>
 							<Input
 								id="property-insurance-coverage"
@@ -2415,10 +2414,10 @@ export default function PropertyDetailPage() {
 								value={propertyInsuranceFormData.coverage}
 								onChange={(e) => handlePropertyInsuranceInputChange('coverage', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
 						{/* Link */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="property-insurance-link">Lien vers le contrat</Label>
 							<Input
 								id="property-insurance-link"
@@ -2426,10 +2425,10 @@ export default function PropertyDetailPage() {
 								value={propertyInsuranceFormData.link}
 								onChange={(e) => handlePropertyInsuranceInputChange('link', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
 						{/* Notes */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="property-insurance-notes">Notes</Label>
 							<Input
 								id="property-insurance-notes"
@@ -2437,9 +2436,9 @@ export default function PropertyDetailPage() {
 								value={propertyInsuranceFormData.notes}
 								onChange={(e) => handlePropertyInsuranceInputChange('notes', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
-						<DialogFooter className="pt-4">
+						<DialogFooter style={{ paddingTop: '1rem' }}>
 							<Button
 								type="button"
 								variant="outline"
@@ -2450,15 +2449,16 @@ export default function PropertyDetailPage() {
 							</Button>
 							<Button type="submit" disabled={isSubmittingPropertyInsurance}>
 								{isSubmittingPropertyInsurance ? (
-									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<HStack gap="sm" align="center">
+										<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 										{isEditingPropertyInsurance ? 'Modification...' : 'Création...'}
-									</>
+									</HStack>
 								) : (
 									isEditingPropertyInsurance ? 'Modifier' : 'Ajouter'
 								)}
 							</Button>
 						</DialogFooter>
+					</VStack>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -2471,7 +2471,7 @@ export default function PropertyDetailPage() {
 					if (!open) resetCoOwnershipForm()
 				}}
 			>
-				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+				<DialogContent style={{ maxWidth: '32rem', maxHeight: '90vh', overflowY: 'auto' }}>
 					<DialogHeader>
 						<DialogTitle>
 							{isEditingCoOwnership ? 'Modifier la copropriété' : 'Ajouter une copropriété'}
@@ -2480,16 +2480,17 @@ export default function PropertyDetailPage() {
 							Renseignez les informations du syndic et des charges de copropriété.
 						</DialogDescription>
 					</DialogHeader>
-					<form onSubmit={handleCoOwnershipSubmit} className="space-y-4">
+					<form onSubmit={handleCoOwnershipSubmit}>
+						<VStack gap="md">
 						{/* Error message */}
 						{coOwnershipFormError && (
-							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
-								<p className="text-sm text-destructive">{coOwnershipFormError}</p>
-							</div>
+							<Box p="sm" style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--destructive) / 0.1)', border: '1px solid hsl(var(--destructive) / 0.2)' }}>
+								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>{coOwnershipFormError}</Text>
+							</Box>
 						)}
 
 						{/* Syndic name */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="coownership-name">Nom du syndic *</Label>
 							<Input
 								id="coownership-name"
@@ -2497,10 +2498,10 @@ export default function PropertyDetailPage() {
 								value={coOwnershipFormData.name}
 								onChange={(e) => handleCoOwnershipInputChange('name', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
 						{/* Quarterly amount */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="coownership-amount">Charges trimestrielles (€) *</Label>
 							<Input
 								id="coownership-amount"
@@ -2512,14 +2513,14 @@ export default function PropertyDetailPage() {
 								onChange={(e) => handleCoOwnershipInputChange('quarterlyAmount', e.target.value)}
 							/>
 							{coOwnershipFormData.quarterlyAmount && (
-								<p className="text-xs text-muted-foreground">
+								<Text size="xs" color="muted">
 									Soit {formatCurrency(Number.parseFloat(coOwnershipFormData.quarterlyAmount) * 4)}/an
-								</p>
+								</Text>
 							)}
-						</div>
+						</VStack>
 
 						{/* Link */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="coownership-link">Lien vers les documents</Label>
 							<Input
 								id="coownership-link"
@@ -2527,10 +2528,10 @@ export default function PropertyDetailPage() {
 								value={coOwnershipFormData.link}
 								onChange={(e) => handleCoOwnershipInputChange('link', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
 						{/* Notes */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="coownership-notes">Notes</Label>
 							<Input
 								id="coownership-notes"
@@ -2538,9 +2539,9 @@ export default function PropertyDetailPage() {
 								value={coOwnershipFormData.notes}
 								onChange={(e) => handleCoOwnershipInputChange('notes', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
-						<DialogFooter className="pt-4">
+						<DialogFooter style={{ paddingTop: '1rem' }}>
 							<Button
 								type="button"
 								variant="outline"
@@ -2551,15 +2552,16 @@ export default function PropertyDetailPage() {
 							</Button>
 							<Button type="submit" disabled={isSubmittingCoOwnership}>
 								{isSubmittingCoOwnership ? (
-									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<HStack gap="sm" align="center">
+										<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 										{isEditingCoOwnership ? 'Modification...' : 'Création...'}
-									</>
+									</HStack>
 								) : (
 									isEditingCoOwnership ? 'Modifier' : 'Ajouter'
 								)}
 							</Button>
 						</DialogFooter>
+						</VStack>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -2572,7 +2574,7 @@ export default function PropertyDetailPage() {
 					if (!open) resetUtilityContractForm()
 				}}
 			>
-				<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+				<DialogContent style={{ maxWidth: '32rem', maxHeight: '90vh', overflowY: 'auto' }}>
 					<DialogHeader>
 						<DialogTitle>
 							{editingUtilityContractId ? 'Modifier le contrat' : 'Ajouter un contrat'}
@@ -2581,16 +2583,17 @@ export default function PropertyDetailPage() {
 							Renseignez les informations du contrat ou abonnement.
 						</DialogDescription>
 					</DialogHeader>
-					<form onSubmit={handleUtilityContractSubmit} className="space-y-4">
+					<form onSubmit={handleUtilityContractSubmit}>
+						<VStack gap="md">
 						{/* Error message */}
 						{utilityContractFormError && (
-							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
-								<p className="text-sm text-destructive">{utilityContractFormError}</p>
-							</div>
+							<Box p="sm" style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--destructive) / 0.1)', border: '1px solid hsl(var(--destructive) / 0.2)' }}>
+								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>{utilityContractFormError}</Text>
+							</Box>
 						)}
 
 						{/* Type selection */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="utility-contract-type">Type de contrat *</Label>
 							<Select
 								value={utilityContractFormData.type}
@@ -2601,42 +2604,42 @@ export default function PropertyDetailPage() {
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="ELECTRICITY">
-										<div className="flex items-center gap-2">
-											<Zap className="h-4 w-4" />
+										<HStack gap="sm" align="center">
+											<Zap style={{ height: '1rem', width: '1rem' }} />
 											Électricité
-										</div>
+										</HStack>
 									</SelectItem>
 									<SelectItem value="GAS">
-										<div className="flex items-center gap-2">
-											<Flame className="h-4 w-4" />
+										<HStack gap="sm" align="center">
+											<Flame style={{ height: '1rem', width: '1rem' }} />
 											Gaz
-										</div>
+										</HStack>
 									</SelectItem>
 									<SelectItem value="WATER">
-										<div className="flex items-center gap-2">
-											<Droplets className="h-4 w-4" />
+										<HStack gap="sm" align="center">
+											<Droplets style={{ height: '1rem', width: '1rem' }} />
 											Eau
-										</div>
+										</HStack>
 									</SelectItem>
 									<SelectItem value="INTERNET">
-										<div className="flex items-center gap-2">
-											<Wifi className="h-4 w-4" />
+										<HStack gap="sm" align="center">
+											<Wifi style={{ height: '1rem', width: '1rem' }} />
 											Internet
-										</div>
+										</HStack>
 									</SelectItem>
 									<SelectItem value="OTHER">
-										<div className="flex items-center gap-2">
-											<Zap className="h-4 w-4" />
+										<HStack gap="sm" align="center">
+											<Zap style={{ height: '1rem', width: '1rem' }} />
 											Autre
-										</div>
+										</HStack>
 									</SelectItem>
 								</SelectContent>
 							</Select>
-						</div>
+						</VStack>
 
 						{/* Provider and contract number */}
-						<div className="grid gap-4 sm:grid-cols-2">
-							<div className="space-y-2">
+						<Grid cols={1} colsSm={2} gap="md">
+							<VStack gap="xs">
 								<Label htmlFor="utility-contract-provider">Fournisseur *</Label>
 								<Input
 									id="utility-contract-provider"
@@ -2644,8 +2647,8 @@ export default function PropertyDetailPage() {
 									value={utilityContractFormData.provider}
 									onChange={(e) => handleUtilityContractInputChange('provider', e.target.value)}
 								/>
-							</div>
-							<div className="space-y-2">
+							</VStack>
+							<VStack gap="xs">
 								<Label htmlFor="utility-contract-number">N° de contrat</Label>
 								<Input
 									id="utility-contract-number"
@@ -2653,11 +2656,11 @@ export default function PropertyDetailPage() {
 									value={utilityContractFormData.contractNumber}
 									onChange={(e) => handleUtilityContractInputChange('contractNumber', e.target.value)}
 								/>
-							</div>
-						</div>
+							</VStack>
+						</Grid>
 
 						{/* Monthly amount */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="utility-contract-amount">Montant mensuel (€) *</Label>
 							<Input
 								id="utility-contract-amount"
@@ -2669,14 +2672,14 @@ export default function PropertyDetailPage() {
 								onChange={(e) => handleUtilityContractInputChange('monthlyAmount', e.target.value)}
 							/>
 							{utilityContractFormData.monthlyAmount && (
-								<p className="text-xs text-muted-foreground">
+								<Text size="xs" color="muted">
 									Soit {formatCurrency(Number.parseFloat(utilityContractFormData.monthlyAmount) * 12)}/an
-								</p>
+								</Text>
 							)}
-						</div>
+						</VStack>
 
 						{/* Link */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="utility-contract-link">Lien vers le contrat</Label>
 							<Input
 								id="utility-contract-link"
@@ -2684,10 +2687,10 @@ export default function PropertyDetailPage() {
 								value={utilityContractFormData.link}
 								onChange={(e) => handleUtilityContractInputChange('link', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
 						{/* Notes */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="utility-contract-notes">Notes</Label>
 							<Input
 								id="utility-contract-notes"
@@ -2695,9 +2698,9 @@ export default function PropertyDetailPage() {
 								value={utilityContractFormData.notes}
 								onChange={(e) => handleUtilityContractInputChange('notes', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
-						<DialogFooter className="pt-4">
+						<DialogFooter style={{ paddingTop: '1rem' }}>
 							<Button
 								type="button"
 								variant="outline"
@@ -2708,15 +2711,16 @@ export default function PropertyDetailPage() {
 							</Button>
 							<Button type="submit" disabled={isSubmittingUtilityContract}>
 								{isSubmittingUtilityContract ? (
-									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<HStack gap="sm" align="center">
+										<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 										{editingUtilityContractId ? 'Modification...' : 'Création...'}
-									</>
+									</HStack>
 								) : (
 									editingUtilityContractId ? 'Modifier' : 'Ajouter'
 								)}
 							</Button>
 						</DialogFooter>
+						</VStack>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -2729,26 +2733,27 @@ export default function PropertyDetailPage() {
 					if (!open) resetPropertyForm()
 				}}
 			>
-				<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+				<DialogContent style={{ maxWidth: '42rem', maxHeight: '90vh', overflowY: 'auto' }}>
 					<DialogHeader>
 						<DialogTitle>Modifier le bien immobilier</DialogTitle>
 						<DialogDescription>
 							Modifiez les informations de votre bien immobilier.
 						</DialogDescription>
 					</DialogHeader>
-					<form onSubmit={handlePropertySubmit} className="space-y-6">
+					<form onSubmit={handlePropertySubmit}>
+						<VStack gap="lg">
 						{/* Error message */}
 						{propertyFormError && (
-							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
-								<p className="text-sm text-destructive">{propertyFormError}</p>
-							</div>
+							<Box p="sm" style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--destructive) / 0.1)', border: '1px solid hsl(var(--destructive) / 0.2)' }}>
+								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>{propertyFormError}</Text>
+							</Box>
 						)}
 
 						{/* Basic info */}
-						<div className="space-y-4">
-							<h3 className="text-sm font-medium text-muted-foreground">Informations générales</h3>
-							<div className="grid gap-4 sm:grid-cols-2">
-								<div className="space-y-2">
+						<VStack gap="md">
+							<Text size="sm" weight="medium" color="muted">Informations générales</Text>
+							<Grid cols={1} colsSm={2} gap="md">
+								<VStack gap="xs">
 									<Label htmlFor="edit-name">Nom du bien *</Label>
 									<Input
 										id="edit-name"
@@ -2756,14 +2761,14 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.name}
 										onChange={(e) => handlePropertyInputChange('name', e.target.value)}
 									/>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-type">Type *</Label>
 									<Select
 										value={propertyFormData.type}
 										onValueChange={(value) => handlePropertyInputChange('type', value)}
 									>
-										<SelectTrigger className="w-full">
+										<SelectTrigger style={{ width: '100%' }}>
 											<SelectValue placeholder="Sélectionner..." />
 										</SelectTrigger>
 										<SelectContent>
@@ -2771,14 +2776,14 @@ export default function PropertyDetailPage() {
 											<SelectItem value="HOUSE">Maison</SelectItem>
 										</SelectContent>
 									</Select>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-usage">Usage *</Label>
 									<Select
 										value={propertyFormData.usage}
 										onValueChange={(value) => handlePropertyInputChange('usage', value)}
 									>
-										<SelectTrigger className="w-full">
+										<SelectTrigger style={{ width: '100%' }}>
 											<SelectValue placeholder="Sélectionner..." />
 										</SelectTrigger>
 										<SelectContent>
@@ -2787,8 +2792,8 @@ export default function PropertyDetailPage() {
 											<SelectItem value="RENTAL">Locatif</SelectItem>
 										</SelectContent>
 									</Select>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-surface">Surface (m²) *</Label>
 									<Input
 										id="edit-surface"
@@ -2799,8 +2804,8 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.surface}
 										onChange={(e) => handlePropertyInputChange('surface', e.target.value)}
 									/>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-rooms">Pièces</Label>
 									<Input
 										id="edit-rooms"
@@ -2810,8 +2815,8 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.rooms}
 										onChange={(e) => handlePropertyInputChange('rooms', e.target.value)}
 									/>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-bedrooms">Chambres</Label>
 									<Input
 										id="edit-bedrooms"
@@ -2821,15 +2826,15 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.bedrooms}
 										onChange={(e) => handlePropertyInputChange('bedrooms', e.target.value)}
 									/>
-								</div>
-							</div>
-						</div>
+								</VStack>
+							</Grid>
+						</VStack>
 
 						{/* Address */}
-						<div className="space-y-4">
-							<h3 className="text-sm font-medium text-muted-foreground">Adresse</h3>
-							<div className="space-y-4">
-								<div className="space-y-2">
+						<VStack gap="md">
+							<Text size="sm" weight="medium" color="muted">Adresse</Text>
+							<VStack gap="md">
+								<VStack gap="xs">
 									<Label htmlFor="edit-address">Adresse *</Label>
 									<Input
 										id="edit-address"
@@ -2837,8 +2842,8 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.address}
 										onChange={(e) => handlePropertyInputChange('address', e.target.value)}
 									/>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-address2">Complément d&apos;adresse</Label>
 									<Input
 										id="edit-address2"
@@ -2846,9 +2851,9 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.address2}
 										onChange={(e) => handlePropertyInputChange('address2', e.target.value)}
 									/>
-								</div>
-								<div className="grid gap-4 sm:grid-cols-2">
-									<div className="space-y-2">
+								</VStack>
+								<Grid cols={1} colsSm={2} gap="md">
+									<VStack gap="xs">
 										<Label htmlFor="edit-city">Ville *</Label>
 										<Input
 											id="edit-city"
@@ -2856,8 +2861,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.city}
 											onChange={(e) => handlePropertyInputChange('city', e.target.value)}
 										/>
-									</div>
-									<div className="space-y-2">
+									</VStack>
+									<VStack gap="xs">
 										<Label htmlFor="edit-postalCode">Code postal *</Label>
 										<Input
 											id="edit-postalCode"
@@ -2865,16 +2870,16 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.postalCode}
 											onChange={(e) => handlePropertyInputChange('postalCode', e.target.value)}
 										/>
-									</div>
-								</div>
-							</div>
-						</div>
+									</VStack>
+								</Grid>
+							</VStack>
+						</VStack>
 
 						{/* Purchase info */}
-						<div className="space-y-4">
-							<h3 className="text-sm font-medium text-muted-foreground">Achat</h3>
-							<div className="grid gap-4 sm:grid-cols-2">
-								<div className="space-y-2">
+						<VStack gap="md">
+							<Text size="sm" weight="medium" color="muted">Achat</Text>
+							<Grid cols={1} colsSm={2} gap="md">
+								<VStack gap="xs">
 									<Label htmlFor="edit-purchasePrice">Prix d&apos;achat (€) *</Label>
 									<Input
 										id="edit-purchasePrice"
@@ -2885,8 +2890,8 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.purchasePrice}
 										onChange={(e) => handlePropertyInputChange('purchasePrice', e.target.value)}
 									/>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-purchaseDate">Date d&apos;achat *</Label>
 									<Input
 										id="edit-purchaseDate"
@@ -2894,8 +2899,8 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.purchaseDate}
 										onChange={(e) => handlePropertyInputChange('purchaseDate', e.target.value)}
 									/>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-notaryFees">Frais de notaire (€) *</Label>
 									<Input
 										id="edit-notaryFees"
@@ -2906,8 +2911,8 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.notaryFees}
 										onChange={(e) => handlePropertyInputChange('notaryFees', e.target.value)}
 									/>
-								</div>
-								<div className="space-y-2">
+								</VStack>
+								<VStack gap="xs">
 									<Label htmlFor="edit-agencyFees">Frais d&apos;agence (€)</Label>
 									<Input
 										id="edit-agencyFees"
@@ -2918,14 +2923,14 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.agencyFees}
 										onChange={(e) => handlePropertyInputChange('agencyFees', e.target.value)}
 									/>
-								</div>
-							</div>
-						</div>
+								</VStack>
+							</Grid>
+						</VStack>
 
 						{/* Current value */}
-						<div className="space-y-4">
-							<h3 className="text-sm font-medium text-muted-foreground">Valeur actuelle</h3>
-							<div className="space-y-2">
+						<VStack gap="md">
+							<Text size="sm" weight="medium" color="muted">Valeur actuelle</Text>
+							<VStack gap="xs">
 								<Label htmlFor="edit-currentValue">Valeur estimée (€) *</Label>
 								<Input
 									id="edit-currentValue"
@@ -2936,15 +2941,15 @@ export default function PropertyDetailPage() {
 									value={propertyFormData.currentValue}
 									onChange={(e) => handlePropertyInputChange('currentValue', e.target.value)}
 								/>
-							</div>
-						</div>
+							</VStack>
+						</VStack>
 
 						{/* Rental info - only shown for RENTAL usage */}
 						{isEditFormRental && (
-							<div className="space-y-4">
-								<h3 className="text-sm font-medium text-muted-foreground">Informations locatives</h3>
-								<div className="grid gap-4 sm:grid-cols-2">
-									<div className="space-y-2">
+							<VStack gap="md">
+								<Text size="sm" weight="medium" color="muted">Informations locatives</Text>
+								<Grid cols={1} colsSm={2} gap="md">
+									<VStack gap="xs">
 										<Label htmlFor="edit-rentAmount">Loyer mensuel (€)</Label>
 										<Input
 											id="edit-rentAmount"
@@ -2955,8 +2960,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.rentAmount}
 											onChange={(e) => handlePropertyInputChange('rentAmount', e.target.value)}
 										/>
-									</div>
-									<div className="space-y-2">
+									</VStack>
+									<VStack gap="xs">
 										<Label htmlFor="edit-rentCharges">Charges locatives (€)</Label>
 										<Input
 											id="edit-rentCharges"
@@ -2967,54 +2972,54 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.rentCharges}
 											onChange={(e) => handlePropertyInputChange('rentCharges', e.target.value)}
 										/>
-									</div>
-								</div>
-							</div>
+									</VStack>
+								</Grid>
+							</VStack>
 						)}
 
 						{/* Members/Owners */}
-						<div className="space-y-4">
-							<div className="flex items-center justify-between">
-								<h3 className="text-sm font-medium text-muted-foreground">Propriétaires</h3>
+						<VStack gap="md">
+							<HStack justify="between" align="center">
+								<Text size="sm" weight="medium" color="muted">Propriétaires</Text>
 								{members.length > editMemberShares.length && (
 									<Button
 										type="button"
 										variant="outline"
 										size="sm"
 										onClick={handleAddMember}
-										className="gap-1"
+										iconLeft={<Plus style={{ height: '0.75rem', width: '0.75rem' }} />}
 									>
-										<Plus className="h-3 w-3" />
 										Ajouter
 									</Button>
 								)}
-							</div>
+							</HStack>
 							{loadingMembers ? (
-								<Skeleton className="h-10 w-full" />
+								<Skeleton style={{ height: '2.5rem', width: '100%' }} />
 							) : editMemberShares.length === 0 ? (
-								<p className="text-sm text-muted-foreground">
+								<Text size="sm" color="muted">
 									Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des propriétaires.
-								</p>
+								</Text>
 							) : (
-								<div className="space-y-3">
+								<VStack gap="sm">
 									{editMemberShares.map((ms, index) => {
 										const member = members.find((m) => m.id === ms.memberId)
 										const availableMembers = members.filter(
 											(m) => m.id === ms.memberId || !editMemberShares.some((other) => other.memberId === m.id)
 										)
 										return (
-											<div key={ms.memberId} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-												<div
-													className="h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium text-white shrink-0"
-													style={{ backgroundColor: member?.color || '#6b7280' }}
+											<HStack key={ms.memberId} gap="md" align="center" p="sm" style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+												<Flex
+													align="center"
+													justify="center"
+													style={{ borderRadius: '9999px', height: '2rem', width: '2rem', fontSize: '0.875rem', fontWeight: 500, color: 'white', flexShrink: 0, backgroundColor: member?.color || '#6b7280' }}
 												>
 													{member?.name.charAt(0).toUpperCase()}
-												</div>
+												</Flex>
 												<Select
 													value={ms.memberId}
 													onValueChange={(value) => handleMemberChange(index, value)}
 												>
-													<SelectTrigger className="flex-1">
+													<SelectTrigger style={{ flex: 1 }}>
 														<SelectValue />
 													</SelectTrigger>
 													<SelectContent>
@@ -3025,45 +3030,45 @@ export default function PropertyDetailPage() {
 														))}
 													</SelectContent>
 												</Select>
-												<div className="flex items-center gap-2">
+												<HStack gap="sm" align="center">
 													<Input
 														type="number"
 														min="0"
 														max="100"
-														className="w-20"
+														style={{ width: '5rem' }}
 														value={ms.ownershipShare}
 														onChange={(e) =>
 															handleShareChange(index, Number.parseInt(e.target.value, 10) || 0)
 														}
 													/>
-													<span className="text-sm text-muted-foreground">%</span>
-												</div>
+													<Text size="sm" color="muted">%</Text>
+												</HStack>
 												<Button
 													type="button"
 													variant="ghost"
 													size="icon"
-													className="h-8 w-8 shrink-0"
+													style={{ height: '2rem', width: '2rem', flexShrink: 0 }}
 													onClick={() => handleRemoveMember(ms.memberId)}
 												>
-													<X className="h-4 w-4" />
+													<X style={{ height: '1rem', width: '1rem' }} />
 												</Button>
-											</div>
+											</HStack>
 										)
 									})}
 									{editMemberShares.length > 0 && (
-										<div className="text-xs text-muted-foreground text-right">
+										<Text size="xs" color="muted" style={{ textAlign: 'right' }}>
 											Total: {editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
 											{editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !== 100 && (
-												<span className="text-destructive ml-1">(doit être 100%)</span>
+												<Text as="span" style={{ marginLeft: '0.25rem', color: 'hsl(var(--destructive))' }}>(doit être 100%)</Text>
 											)}
-										</div>
+										</Text>
 									)}
-								</div>
+								</VStack>
 							)}
-						</div>
+						</VStack>
 
 						{/* Notes */}
-						<div className="space-y-2">
+						<VStack gap="xs">
 							<Label htmlFor="edit-notes">Notes</Label>
 							<Input
 								id="edit-notes"
@@ -3071,9 +3076,9 @@ export default function PropertyDetailPage() {
 								value={propertyFormData.notes}
 								onChange={(e) => handlePropertyInputChange('notes', e.target.value)}
 							/>
-						</div>
+						</VStack>
 
-						<DialogFooter className="pt-4">
+						<DialogFooter style={{ paddingTop: '1rem' }}>
 							<Button
 								type="button"
 								variant="outline"
@@ -3084,15 +3089,16 @@ export default function PropertyDetailPage() {
 							</Button>
 							<Button type="submit" disabled={isSubmittingProperty}>
 								{isSubmittingProperty ? (
-									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<HStack gap="sm" align="center">
+										<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 										Modification...
-									</>
+									</HStack>
 								) : (
 									'Enregistrer'
 								)}
 							</Button>
 						</DialogFooter>
+						</VStack>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -3112,13 +3118,13 @@ export default function PropertyDetailPage() {
 						<AlertDialogAction
 							onClick={handleDeleteProperty}
 							disabled={isDeletingProperty}
-							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+							style={{ backgroundColor: 'hsl(var(--destructive))', color: 'hsl(var(--destructive-foreground))' }}
 						>
 							{isDeletingProperty ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								<HStack gap="sm" align="center">
+									<Loader2 style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }} />
 									Suppression...
-								</>
+								</HStack>
 							) : (
 								'Supprimer'
 							)}
@@ -3126,6 +3132,6 @@ export default function PropertyDetailPage() {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-		</div>
+		</VStack>
 	)
 }

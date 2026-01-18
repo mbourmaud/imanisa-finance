@@ -9,13 +9,22 @@ interface PieDataPoint {
 	color: string;
 }
 
+type ChartHeight = 'sm' | 'md' | 'lg' | 'xl';
+
+const heightMap: Record<ChartHeight, string> = {
+	sm: 'h-48',
+	md: 'h-60',
+	lg: 'h-72',
+	xl: 'h-96',
+};
+
 interface DonutChartProps {
 	data: PieDataPoint[];
 	showLabel?: boolean;
-	className?: string;
+	height?: ChartHeight;
 }
 
-export function DonutChart({ data, showLabel = true, className }: DonutChartProps) {
+export function DonutChart({ data, showLabel = true, height = 'lg' }: DonutChartProps) {
 	const total = data.reduce((sum, item) => sum + item.value, 0);
 
 	return (
@@ -27,7 +36,7 @@ export function DonutChart({ data, showLabel = true, className }: DonutChartProp
 			showLabel={showLabel}
 			label={formatMoneyCompact(total)}
 			valueFormatter={(value) => formatMoneyCompact(value)}
-			className={className}
+			className={heightMap[height]}
 		/>
 	);
 }

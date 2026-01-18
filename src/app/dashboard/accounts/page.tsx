@@ -18,13 +18,21 @@ import {
 	Plus,
 	TrendingUp,
 	Wallet,
+	Button,
+	PageHeader,
+	StatCard,
+	StatCardGrid,
+	EmptyState,
+	VStack,
+	HStack,
+	Box,
+	Flex,
+	Text,
+	Heading,
+	GlassCard,
 } from '@/components';
-import { Button } from '@/components';
 import { useAccountsQuery } from '@/features/accounts';
-import { PageHeader } from '@/components';
-import { StatCard, StatCardGrid } from '@/components';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
-import { EmptyState } from '@/components';
 import { formatMoneyCompact } from '@/shared/utils';
 
 // Account type returned by API
@@ -126,10 +134,10 @@ export default function AccountsPage() {
 			<EmptyState
 				title="Chargement des comptes..."
 				iconElement={
-					<div className="relative">
-						<div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 animate-pulse" />
-						<Loader2 className="h-6 w-6 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-					</div>
+					<Box position="relative">
+						<Box rounded="full" style={{ height: '3rem', width: '3rem', background: 'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))', animation: 'pulse 2s ease-in-out infinite' }} />
+						<Loader2 style={{ height: '1.5rem', width: '1.5rem', animation: 'spin 1s linear infinite', color: 'hsl(var(--primary))', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+					</Box>
 				}
 				size="md"
 			/>
@@ -148,14 +156,14 @@ export default function AccountsPage() {
 	}
 
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Comptes"
 				description="Gérez vos comptes bancaires et suivez vos soldes"
 				actions={
-					<Button className="gap-2">
-						<Plus className="h-4 w-4" />
+					<Button style={{ gap: '0.5rem' }}>
+						<Plus style={{ height: '1rem', width: '1rem' }} />
 						Ajouter un compte
 					</Button>
 				}
@@ -193,57 +201,69 @@ export default function AccountsPage() {
 			</StatCardGrid>
 
 			{/* Accounts by Type */}
-			<div className="space-y-6">
+			<VStack gap="lg">
 				{accountGroups.map((group) => {
 					const Icon = group.icon;
 					return (
-						<div key={group.type} className="glass-card p-5 sm:p-6">
+						<GlassCard key={group.type} padding="lg">
 							{/* Group Header */}
-							<div className="flex items-center gap-3 mb-4">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-									<Icon className="h-5 w-5" />
-								</div>
-								<div>
-									<h3 className="text-lg font-semibold">{group.label}</h3>
-									<p className="text-sm text-muted-foreground">
+							<HStack gap="sm" align="center" style={{ marginBottom: '1rem' }}>
+								<Flex align="center" justify="center" style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem', backgroundColor: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))' }}>
+									<Icon style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<VStack gap="none">
+									<Heading level={3} size="lg" weight="semibold">{group.label}</Heading>
+									<Text size="sm" color="muted">
 										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
-									</p>
-								</div>
-							</div>
+									</Text>
+								</VStack>
+							</HStack>
 
 							{/* Account List */}
-							<div className="space-y-2">
+							<VStack gap="sm">
 								{group.accounts.map((account) => (
 									<Link
 										key={account.id}
 										href={`/dashboard/accounts/${account.id}`}
-										className="flex items-center justify-between rounded-xl bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 p-4 transition-all group border border-white/20"
+										style={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											alignItems: 'center',
+											borderRadius: '0.75rem',
+											padding: '1rem',
+											border: '1px solid hsl(var(--border) / 0.2)',
+											backgroundColor: 'hsl(var(--background) / 0.5)',
+											transition: 'all 0.2s',
+										}}
 									>
-										<div className="flex items-center gap-4">
-											<div
-												className="flex h-10 w-10 items-center justify-center rounded-lg"
+										<HStack gap="md" align="center">
+											<Flex
+												align="center"
+												justify="center"
 												style={{
+													height: '2.5rem',
+													width: '2.5rem',
+													borderRadius: '0.5rem',
 													backgroundColor: account.bank?.color ? `${account.bank.color}20` : undefined,
 												}}
 											>
 												<Building
-													className="h-5 w-5"
-													style={{ color: account.bank?.color || undefined }}
+													style={{ height: '1.25rem', width: '1.25rem', color: account.bank?.color || undefined }}
 												/>
-											</div>
-											<div>
-												<p className="font-medium">{account.name}</p>
-												<p className="text-xs text-muted-foreground">{account.bank?.name || 'Banque'}</p>
-											</div>
-										</div>
-										<div className="flex items-center gap-4">
+											</Flex>
+											<VStack gap="none">
+												<Text weight="medium">{account.name}</Text>
+												<Text size="xs" color="muted">{account.bank?.name || 'Banque'}</Text>
+											</VStack>
+										</HStack>
+										<HStack gap="md" align="center">
 											<MoneyDisplay amount={account.balance} format="compact" size="md" weight="semibold" />
-											<ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
-										</div>
+											<ChevronRight style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground) / 0.5)', transition: 'color 0.2s' }} />
+										</HStack>
 									</Link>
 								))}
-							</div>
-						</div>
+							</VStack>
+						</GlassCard>
 					);
 				})}
 
@@ -255,14 +275,14 @@ export default function AccountsPage() {
 						description="Ajoutez votre premier compte pour commencer à suivre vos finances"
 						size="lg"
 						action={
-							<Button className="gap-2">
-								<Plus className="h-4 w-4" />
+							<Button style={{ gap: '0.5rem' }}>
+								<Plus style={{ height: '1rem', width: '1rem' }} />
 								Ajouter un compte
 							</Button>
 						}
 					/>
 				)}
-			</div>
-		</div>
+			</VStack>
+		</VStack>
 	);
 }
