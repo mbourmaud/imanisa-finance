@@ -28,7 +28,6 @@ import {
 	Zap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
 	Dialog,
 	DialogContent,
@@ -353,18 +352,14 @@ function DetailItemSkeleton() {
 
 function SectionSkeleton() {
 	return (
-		<Card className="border-border/60">
-			<CardHeader className="pb-4">
-				<Skeleton className="h-5 w-32" />
-			</CardHeader>
-			<CardContent className="space-y-4">
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					<DetailItemSkeleton />
-					<DetailItemSkeleton />
-					<DetailItemSkeleton />
-				</div>
-			</CardContent>
-		</Card>
+		<div className="glass-card p-6 space-y-4">
+			<Skeleton className="h-5 w-32" />
+			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<DetailItemSkeleton />
+				<DetailItemSkeleton />
+				<DetailItemSkeleton />
+			</div>
+		</div>
 	)
 }
 
@@ -1216,14 +1211,12 @@ export default function PropertyDetailPage() {
 					<ArrowLeft className="h-4 w-4" />
 					Retour aux biens
 				</Link>
-				<Card className="border-destructive/50 bg-destructive/5">
-					<CardContent className="py-6">
-						<p className="text-sm text-destructive">{error || 'Bien non trouvé'}</p>
-						<Button variant="outline" size="sm" className="mt-4" onClick={() => router.push('/dashboard/real-estate')}>
-							Retour à la liste
-						</Button>
-					</CardContent>
-				</Card>
+				<div className="glass-card p-6 border-destructive/50 bg-destructive/5">
+					<p className="text-sm text-destructive">{error || 'Bien non trouvé'}</p>
+					<Button variant="outline" size="sm" className="mt-4" onClick={() => router.push('/dashboard/real-estate')}>
+						Retour à la liste
+					</Button>
+				</div>
 			</div>
 		)
 	}
@@ -1363,14 +1356,11 @@ export default function PropertyDetailPage() {
 			</div>
 
 			{/* Informations Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<CardTitle className="text-base font-medium flex items-center gap-2">
-						<Home className="h-4 w-4 text-muted-foreground" />
-						Informations
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
+			<div className="glass-card p-6 space-y-4">
+				<h3 className="text-base font-medium flex items-center gap-2">
+					<Home className="h-4 w-4 text-muted-foreground" />
+					Informations
+				</h3>
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 						{/* Caractéristiques */}
 						<div className="space-y-3">
@@ -1410,63 +1400,57 @@ export default function PropertyDetailPage() {
 						</div>
 					</div>
 
-					{/* Notes */}
-					{property.notes && (
-						<div className="mt-6 pt-6 border-t border-border/40">
-							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Notes</p>
-							<p className="text-sm text-muted-foreground">{property.notes}</p>
-						</div>
-					)}
-				</CardContent>
-			</Card>
+				{/* Notes */}
+				{property.notes && (
+					<div className="mt-6 pt-6 border-t border-border/40">
+						<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Notes</p>
+						<p className="text-sm text-muted-foreground">{property.notes}</p>
+					</div>
+				)}
+			</div>
 
 			{/* Propriétaires Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<CardTitle className="text-base font-medium flex items-center gap-2">
-						<Users className="h-4 w-4 text-muted-foreground" />
-						Propriétaires
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
-					{property.propertyMembers.length === 0 ? (
-						<p className="text-sm text-muted-foreground">Aucun propriétaire renseigné</p>
-					) : (
-						<div className="flex flex-wrap gap-3">
-							{property.propertyMembers.map((pm) => (
+			<div className="glass-card p-6 space-y-4">
+				<h3 className="text-base font-medium flex items-center gap-2">
+					<Users className="h-4 w-4 text-muted-foreground" />
+					Propriétaires
+				</h3>
+				{property.propertyMembers.length === 0 ? (
+					<p className="text-sm text-muted-foreground">Aucun propriétaire renseigné</p>
+				) : (
+					<div className="flex flex-wrap gap-3">
+						{property.propertyMembers.map((pm) => (
+							<div
+								key={pm.id}
+								className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/30"
+							>
 								<div
-									key={pm.id}
-									className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/30"
+									className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium text-white shrink-0"
+									style={{ backgroundColor: pm.member.color || '#6b7280' }}
 								>
-									<div
-										className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium text-white shrink-0"
-										style={{ backgroundColor: pm.member.color || '#6b7280' }}
-									>
-										{pm.member.name.charAt(0).toUpperCase()}
-									</div>
-									<div>
-										<p className="font-medium">{pm.member.name}</p>
-										<p className="text-sm text-muted-foreground">{pm.ownershipShare}%</p>
-									</div>
+									{pm.member.name.charAt(0).toUpperCase()}
 								</div>
-							))}
-						</div>
-					)}
-				</CardContent>
-			</Card>
+								<div>
+									<p className="font-medium">{pm.member.name}</p>
+									<p className="text-sm text-muted-foreground">{pm.ownershipShare}%</p>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
+			</div>
 
 			{/* Prêts Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<CardTitle className="text-base font-medium flex items-center gap-2">
-							<CreditCard className="h-4 w-4 text-muted-foreground" />
-							Prêts
-						</CardTitle>
-						<Dialog open={isLoanDialogOpen} onOpenChange={(open) => {
-							setIsLoanDialogOpen(open)
-							if (!open) resetLoanForm()
-						}}>
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between">
+					<h3 className="text-base font-medium flex items-center gap-2">
+						<CreditCard className="h-4 w-4 text-muted-foreground" />
+						Prêts
+					</h3>
+					<Dialog open={isLoanDialogOpen} onOpenChange={(open) => {
+						setIsLoanDialogOpen(open)
+						if (!open) resetLoanForm()
+					}}>
 							<DialogTrigger asChild>
 								<Button variant="outline" size="sm" className="gap-2">
 									<Plus className="h-4 w-4" />
@@ -1637,74 +1621,68 @@ export default function PropertyDetailPage() {
 									</DialogFooter>
 								</form>
 							</DialogContent>
-						</Dialog>
-					</div>
-				</CardHeader>
-				<CardContent>
-					{property.loans.length === 0 ? (
-						<LoansEmptyState onAddClick={() => setIsLoanDialogOpen(true)} />
-					) : (
-						<div className="space-y-4">
-							{/* Summary stats */}
-							<div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-muted/30">
-								<div className="text-center">
-									<p className="text-xs text-muted-foreground">Capital restant</p>
-									<p className="text-lg font-semibold number-display">{formatCurrency(totalLoansRemaining)}</p>
-								</div>
-								<div className="text-center">
-									<p className="text-xs text-muted-foreground">Mensualités</p>
-									<p className="text-lg font-semibold number-display">
-										{formatCurrency(property.loans.reduce((sum, l) => sum + l.monthlyPayment, 0))}
-									</p>
-								</div>
-								<div className="text-center">
-									<p className="text-xs text-muted-foreground">Taux moyen</p>
-									<p className="text-lg font-semibold number-display">
-										{property.loans.length > 0
-											? (property.loans.reduce((sum, l) => sum + l.rate, 0) / property.loans.length).toFixed(2)
-											: 0}%
-									</p>
-								</div>
+					</Dialog>
+				</div>
+				{property.loans.length === 0 ? (
+					<LoansEmptyState onAddClick={() => setIsLoanDialogOpen(true)} />
+				) : (
+					<div className="space-y-4">
+						{/* Summary stats */}
+						<div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-muted/30">
+							<div className="text-center">
+								<p className="text-xs text-muted-foreground">Capital restant</p>
+								<p className="text-lg font-semibold number-display">{formatCurrency(totalLoansRemaining)}</p>
 							</div>
-
-							{/* Loan cards */}
-							<div className="space-y-3">
-								{property.loans.map((loan) => (
-									<LoanCard
-										key={loan.id}
-										loan={loan}
-										onAddInsurance={handleOpenInsuranceDialog}
-									/>
-								))}
+							<div className="text-center">
+								<p className="text-xs text-muted-foreground">Mensualités</p>
+								<p className="text-lg font-semibold number-display">
+									{formatCurrency(property.loans.reduce((sum, l) => sum + l.monthlyPayment, 0))}
+								</p>
+							</div>
+							<div className="text-center">
+								<p className="text-xs text-muted-foreground">Taux moyen</p>
+								<p className="text-lg font-semibold number-display">
+									{property.loans.length > 0
+										? (property.loans.reduce((sum, l) => sum + l.rate, 0) / property.loans.length).toFixed(2)
+										: 0}%
+								</p>
 							</div>
 						</div>
-					)}
-				</CardContent>
-			</Card>
+
+						{/* Loan cards */}
+						<div className="space-y-3">
+							{property.loans.map((loan) => (
+								<LoanCard
+									key={loan.id}
+									loan={loan}
+									onAddInsurance={handleOpenInsuranceDialog}
+								/>
+							))}
+						</div>
+					</div>
+				)}
+			</div>
 
 			{/* Assurance Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<CardTitle className="text-base font-medium flex items-center gap-2">
-							<Shield className="h-4 w-4 text-muted-foreground" />
-							Assurance habitation
-						</CardTitle>
-						{!property.insurance && (
-							<Button
-								variant="outline"
-								size="sm"
-								className="gap-2"
-								onClick={() => openPropertyInsuranceDialog(false)}
-							>
-								<Plus className="h-4 w-4" />
-								Ajouter une assurance
-							</Button>
-						)}
-					</div>
-				</CardHeader>
-				<CardContent>
-					{property.insurance ? (
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between">
+					<h3 className="text-base font-medium flex items-center gap-2">
+						<Shield className="h-4 w-4 text-muted-foreground" />
+						Assurance habitation
+					</h3>
+					{!property.insurance && (
+						<Button
+							variant="outline"
+							size="sm"
+							className="gap-2"
+							onClick={() => openPropertyInsuranceDialog(false)}
+						>
+							<Plus className="h-4 w-4" />
+							Ajouter une assurance
+						</Button>
+					)}
+				</div>
+				{property.insurance ? (
 						<div className="rounded-xl border border-border/60 p-4 space-y-4">
 							{/* Header with type badge and actions */}
 							<div className="flex items-start justify-between gap-4">
@@ -1845,34 +1823,30 @@ export default function PropertyDetailPage() {
 								<Plus className="h-4 w-4" />
 								Ajouter une assurance
 							</Button>
-						</div>
-					)}
-				</CardContent>
-			</Card>
+					</div>
+				)}
+			</div>
 
 			{/* Copropriété Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<CardTitle className="text-base font-medium flex items-center gap-2">
-							<Building2 className="h-4 w-4 text-muted-foreground" />
-							Copropriété
-						</CardTitle>
-						{!property.coOwnership && (
-							<Button
-								variant="outline"
-								size="sm"
-								className="gap-2"
-								onClick={() => openCoOwnershipDialog(false)}
-							>
-								<Plus className="h-4 w-4" />
-								Ajouter
-							</Button>
-						)}
-					</div>
-				</CardHeader>
-				<CardContent>
-					{property.coOwnership ? (
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between">
+					<h3 className="text-base font-medium flex items-center gap-2">
+						<Building2 className="h-4 w-4 text-muted-foreground" />
+						Copropriété
+					</h3>
+					{!property.coOwnership && (
+						<Button
+							variant="outline"
+							size="sm"
+							className="gap-2"
+							onClick={() => openCoOwnershipDialog(false)}
+						>
+							<Plus className="h-4 w-4" />
+							Ajouter
+						</Button>
+					)}
+				</div>
+				{property.coOwnership ? (
 						<div className="rounded-xl border border-border/60 p-4 space-y-4">
 							{/* Header with syndic name and actions */}
 							<div className="flex items-start justify-between gap-4">
@@ -1985,32 +1959,28 @@ export default function PropertyDetailPage() {
 								<Plus className="h-4 w-4" />
 								Ajouter
 							</Button>
-						</div>
-					)}
-				</CardContent>
-			</Card>
+					</div>
+				)}
+			</div>
 
 			{/* Contrats Section */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<CardTitle className="text-base font-medium flex items-center gap-2">
-							<Zap className="h-4 w-4 text-muted-foreground" />
-							Contrats & Abonnements
-						</CardTitle>
-						<Button
-							variant="outline"
-							size="sm"
-							className="gap-2"
-							onClick={() => openUtilityContractDialog()}
-						>
-							<Plus className="h-4 w-4" />
-							Ajouter un contrat
-						</Button>
-					</div>
-				</CardHeader>
-				<CardContent>
-					{property.utilityContracts.length === 0 ? (
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between">
+					<h3 className="text-base font-medium flex items-center gap-2">
+						<Zap className="h-4 w-4 text-muted-foreground" />
+						Contrats & Abonnements
+					</h3>
+					<Button
+						variant="outline"
+						size="sm"
+						className="gap-2"
+						onClick={() => openUtilityContractDialog()}
+					>
+						<Plus className="h-4 w-4" />
+						Ajouter un contrat
+					</Button>
+				</div>
+				{property.utilityContracts.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-8 text-center">
 							<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted/50 mb-3">
 								<Zap className="h-6 w-6 text-muted-foreground" />
@@ -2153,10 +2123,9 @@ export default function PropertyDetailPage() {
 									)
 								})}
 							</div>
-						</div>
-					)}
-				</CardContent>
-			</Card>
+					</div>
+				)}
+			</div>
 
 			{/* Insurance Dialog */}
 			<Dialog

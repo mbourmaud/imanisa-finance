@@ -13,7 +13,8 @@ import {
 	X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageHeader } from '@/components/ui/page-header'
+import { EmptyState } from '@/components/ui/empty-state'
 import {
 	Dialog,
 	DialogContent,
@@ -127,26 +128,22 @@ function getPropertyUsageLabel(usage: PropertyUsage): string {
 
 function PropertyCardSkeleton() {
 	return (
-		<Card className="border-border/60">
-			<CardHeader className="pb-3">
-				<div className="flex items-start justify-between">
-					<div className="flex items-center gap-3">
-						<Skeleton className="h-12 w-12 rounded-xl" />
-						<div className="space-y-2">
-							<Skeleton className="h-5 w-40" />
-							<Skeleton className="h-3 w-32" />
-						</div>
+		<div className="glass-card p-6 space-y-4">
+			<div className="flex items-start justify-between">
+				<div className="flex items-center gap-3">
+					<Skeleton className="h-12 w-12 rounded-xl" />
+					<div className="space-y-2">
+						<Skeleton className="h-5 w-40" />
+						<Skeleton className="h-3 w-32" />
 					</div>
 				</div>
-			</CardHeader>
-			<CardContent className="space-y-4">
-				<div className="grid grid-cols-2 gap-4">
-					<Skeleton className="h-20 rounded-xl" />
-					<Skeleton className="h-20 rounded-xl" />
-				</div>
-				<Skeleton className="h-6 w-full" />
-			</CardContent>
-		</Card>
+			</div>
+			<div className="grid grid-cols-2 gap-4">
+				<Skeleton className="h-20 rounded-xl" />
+				<Skeleton className="h-20 rounded-xl" />
+			</div>
+			<Skeleton className="h-6 w-full" />
+		</div>
 	)
 }
 
@@ -165,23 +162,19 @@ function StatsCardSkeleton() {
 	)
 }
 
-function EmptyState({ onAddClick }: { onAddClick: () => void }) {
+function PropertiesEmptyState({ onAddClick }: { onAddClick: () => void }) {
 	return (
-		<Card className="border-border/60 border-dashed">
-			<CardContent className="flex flex-col items-center justify-center py-12">
-				<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4">
-					<Building2 className="h-8 w-8 text-muted-foreground" />
-				</div>
-				<h3 className="text-lg font-medium mb-1">Aucun bien immobilier</h3>
-				<p className="text-sm text-muted-foreground text-center max-w-sm mb-4">
-					Ajoutez votre premier bien pour commencer à suivre votre patrimoine immobilier.
-				</p>
+		<EmptyState
+			icon={Building2}
+			title="Aucun bien immobilier"
+			description="Ajoutez votre premier bien pour commencer à suivre votre patrimoine immobilier."
+			action={
 				<Button className="gap-2" onClick={onAddClick}>
 					<Plus className="h-4 w-4" />
 					Ajouter un bien
 				</Button>
-			</CardContent>
-		</Card>
+			}
+		/>
 	)
 }
 
@@ -323,21 +316,20 @@ export default function RealEstatePage() {
 	return (
 		<div className="space-y-8">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Immobilier</h1>
-					<p className="mt-1 text-muted-foreground">Gérez votre patrimoine immobilier</p>
-				</div>
-				<Dialog open={isDialogOpen} onOpenChange={(open) => {
-					setIsDialogOpen(open)
-					if (!open) resetForm()
-				}}>
-					<DialogTrigger asChild>
-						<Button className="gap-2">
-							<Plus className="h-4 w-4" />
-							Ajouter un bien
-						</Button>
-					</DialogTrigger>
+			<PageHeader
+				title="Immobilier"
+				description="Gérez votre patrimoine immobilier"
+				actions={
+					<Dialog open={isDialogOpen} onOpenChange={(open) => {
+						setIsDialogOpen(open)
+						if (!open) resetForm()
+					}}>
+						<DialogTrigger asChild>
+							<Button className="gap-2">
+								<Plus className="h-4 w-4" />
+								Ajouter un bien
+							</Button>
+						</DialogTrigger>
 					<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
 						<DialogHeader>
 							<DialogTitle>Ajouter un bien immobilier</DialogTitle>
@@ -703,17 +695,16 @@ export default function RealEstatePage() {
 						</form>
 					</DialogContent>
 				</Dialog>
-			</div>
+				}
+			/>
 
 			{/* Error state */}
 			{isError && (
-				<Card className="border-destructive/50 bg-destructive/5">
-					<CardContent className="py-4">
-						<p className="text-sm text-destructive">
-							{error instanceof Error ? error.message : 'Une erreur est survenue'}
-						</p>
-					</CardContent>
-				</Card>
+				<div className="glass-card p-4 border-destructive/50 bg-destructive/5">
+					<p className="text-sm text-destructive">
+						{error instanceof Error ? error.message : 'Une erreur est survenue'}
+					</p>
+				</div>
 			)}
 
 			{/* Stats Overview */}
@@ -794,25 +785,23 @@ export default function RealEstatePage() {
 
 			{/* Credit Progress */}
 			{!isLoading && summary && summary.totalValue > 0 && (
-				<Card className="border-border/60">
-					<CardContent className="pt-6">
-						<div className="flex items-center justify-between mb-3">
-							<div>
-								<p className="font-medium">Capital restant dû</p>
-								<p className="text-sm text-muted-foreground">
-									{formatCurrency(summary.totalLoansRemaining)} sur {formatCurrency(summary.totalValue)}
-								</p>
-							</div>
-							<p className="text-lg font-semibold number-display">
-								{((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(1)}%
+				<div className="glass-card p-6">
+					<div className="flex items-center justify-between mb-3">
+						<div>
+							<p className="font-medium">Capital restant dû</p>
+							<p className="text-sm text-muted-foreground">
+								{formatCurrency(summary.totalLoansRemaining)} sur {formatCurrency(summary.totalValue)}
 							</p>
 						</div>
-						<Progress value={(summary.totalLoansRemaining / summary.totalValue) * 100} className="h-3" />
-						<p className="mt-2 text-xs text-muted-foreground">
-							Équité: {formatCurrency(summary.totalEquity)} ({((summary.totalEquity / summary.totalValue) * 100).toFixed(1)}%)
+						<p className="text-lg font-semibold number-display">
+							{((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(1)}%
 						</p>
-					</CardContent>
-				</Card>
+					</div>
+					<Progress value={(summary.totalLoansRemaining / summary.totalValue) * 100} className="h-3" />
+					<p className="mt-2 text-xs text-muted-foreground">
+						Équité: {formatCurrency(summary.totalEquity)} ({((summary.totalEquity / summary.totalValue) * 100).toFixed(1)}%)
+					</p>
+				</div>
 			)}
 
 			{/* Properties Grid */}
@@ -822,7 +811,7 @@ export default function RealEstatePage() {
 					<PropertyCardSkeleton />
 				</div>
 			) : properties.length === 0 ? (
-				<EmptyState onAddClick={() => setIsDialogOpen(true)} />
+				<PropertiesEmptyState onAddClick={() => setIsDialogOpen(true)} />
 			) : (
 				<div className="grid gap-6 lg:grid-cols-2">
 					{properties.map((property: PropertyWithDetails) => {
@@ -836,60 +825,58 @@ export default function RealEstatePage() {
 						const isRentalProperty = property.usage === 'RENTAL'
 
 						return (
-							<Card key={property.id} className="border-border/60 group overflow-hidden">
-								<CardHeader className="pb-3">
-									<div className="flex items-start justify-between">
-										<Link href={`/dashboard/real-estate/${property.id}`} className="flex items-center gap-3 flex-1 min-w-0">
-											<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-												{property.type === 'HOUSE' ? (
-													<Home className="h-6 w-6" />
-												) : (
-													<Building2 className="h-6 w-6" />
-												)}
+							<div key={property.id} className="glass-card p-6 group overflow-hidden space-y-4">
+								{/* Header */}
+								<div className="flex items-start justify-between">
+									<Link href={`/dashboard/real-estate/${property.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+										<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+											{property.type === 'HOUSE' ? (
+												<Home className="h-6 w-6" />
+											) : (
+												<Building2 className="h-6 w-6" />
+											)}
+										</div>
+										<div className="min-w-0">
+											<h3 className="text-lg font-medium truncate">{property.name}</h3>
+											<div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+												<MapPin className="h-3 w-3 shrink-0" />
+												<span className="truncate">{property.address}, {property.city}</span>
 											</div>
-											<div className="min-w-0">
-												<CardTitle className="text-lg font-medium truncate">{property.name}</CardTitle>
-												<div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-													<MapPin className="h-3 w-3 shrink-0" />
-													<span className="truncate">{property.address}, {property.city}</span>
-												</div>
-											</div>
-										</Link>
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="ghost"
-													size="icon"
-													className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-												>
-													<MoreHorizontal className="h-4 w-4" />
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
-												<DropdownMenuItem asChild>
-													<Link href={`/dashboard/real-estate/${property.id}`}>Voir les détails</Link>
-												</DropdownMenuItem>
-												<DropdownMenuItem>Modifier</DropdownMenuItem>
-												<DropdownMenuSeparator />
-												<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</div>
-									<div className="flex flex-wrap gap-1.5 mt-2">
+										</div>
+									</Link>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+											>
+												<MoreHorizontal className="h-4 w-4" />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem asChild>
+												<Link href={`/dashboard/real-estate/${property.id}`}>Voir les détails</Link>
+											</DropdownMenuItem>
+											<DropdownMenuItem>Modifier</DropdownMenuItem>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</div>
+								<div className="flex flex-wrap gap-1.5">
+									<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+										{getPropertyTypeLabel(property.type)}
+									</span>
+									<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+										{getPropertyUsageLabel(property.usage)}
+									</span>
+									{property.propertyMembers.length > 0 && (
 										<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-											{getPropertyTypeLabel(property.type)}
+											{property.propertyMembers.map(pm => pm.member.name).join(', ')}
 										</span>
-										<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-											{getPropertyUsageLabel(property.usage)}
-										</span>
-										{property.propertyMembers.length > 0 && (
-											<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-												{property.propertyMembers.map(pm => pm.member.name).join(', ')}
-											</span>
-										)}
-									</div>
-								</CardHeader>
-								<CardContent className="space-y-4">
+									)}
+								</div>
 									{/* Value & Equity */}
 									<div className="grid grid-cols-2 gap-4">
 										<div className="rounded-xl bg-muted/30 p-3">
@@ -980,8 +967,7 @@ export default function RealEstatePage() {
 											</div>
 										</div>
 									)}
-								</CardContent>
-							</Card>
+							</div>
 						)
 					})}
 				</div>
