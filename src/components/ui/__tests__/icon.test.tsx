@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
-import { IconWrapper, Plus, Search, Wallet } from '../icon';
+import { describe, expect, it, vi } from 'vitest';
+import { Icon, IconWrapper, Plus, Search, Wallet } from '../icon';
 
 describe('Icon', () => {
 	describe('IconWrapper', () => {
@@ -106,6 +106,108 @@ describe('Icon', () => {
 		it('exports Wallet icon', () => {
 			const { container } = render(<Wallet />);
 			expect(container.querySelector('svg')).toBeTruthy();
+		});
+	});
+
+	describe('Icon (name-based)', () => {
+		it('renders icon by name with default size and color', () => {
+			const { container } = render(<Icon name="plus" />);
+			const svg = container.querySelector('svg');
+			expect(svg).toBeTruthy();
+			expect(svg?.classList.contains('size-5')).toBe(true);
+			expect(svg?.classList.contains('text-current')).toBe(true);
+		});
+
+		it('renders icon with size xs', () => {
+			const { container } = render(<Icon name="search" size="xs" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('size-3')).toBe(true);
+		});
+
+		it('renders icon with size sm', () => {
+			const { container } = render(<Icon name="search" size="sm" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('size-4')).toBe(true);
+		});
+
+		it('renders icon with size lg', () => {
+			const { container } = render(<Icon name="search" size="lg" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('size-6')).toBe(true);
+		});
+
+		it('renders icon with size xl', () => {
+			const { container } = render(<Icon name="search" size="xl" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('size-8')).toBe(true);
+		});
+
+		it('renders icon with size 2xl', () => {
+			const { container } = render(<Icon name="search" size="2xl" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('size-10')).toBe(true);
+		});
+
+		it('renders icon with color muted', () => {
+			const { container } = render(<Icon name="wallet" color="muted" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('text-muted-foreground')).toBe(true);
+		});
+
+		it('renders icon with color primary', () => {
+			const { container } = render(<Icon name="wallet" color="primary" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('text-primary')).toBe(true);
+		});
+
+		it('renders icon with color danger', () => {
+			const { container } = render(<Icon name="wallet" color="danger" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('text-destructive')).toBe(true);
+		});
+
+		it('renders icon with color inherit (no color class)', () => {
+			const { container } = render(<Icon name="wallet" color="inherit" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('text-current')).toBe(false);
+			expect(svg?.classList.contains('text-muted-foreground')).toBe(false);
+		});
+
+		it('renders icon with custom className', () => {
+			const { container } = render(<Icon name="plus" className="animate-spin" />);
+			const svg = container.querySelector('svg');
+			expect(svg?.classList.contains('animate-spin')).toBe(true);
+		});
+
+		it('renders icon with aria-label', () => {
+			const { container } = render(<Icon name="plus" aria-label="Add item" aria-hidden={false} />);
+			const svg = container.querySelector('svg');
+			expect(svg?.getAttribute('aria-label')).toBe('Add item');
+			expect(svg?.getAttribute('aria-hidden')).toBe('false');
+		});
+
+		it('renders various kebab-case icon names', () => {
+			const iconNames = [
+				'alert-circle',
+				'arrow-right',
+				'chevron-down',
+				'credit-card',
+				'trending-up',
+			] as const;
+
+			iconNames.forEach((name) => {
+				const { container } = render(<Icon name={name} />);
+				expect(container.querySelector('svg')).toBeTruthy();
+			});
+		});
+
+		it('returns null and warns for unknown icon name', () => {
+			const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+			// @ts-expect-error - testing invalid icon name
+			const { container } = render(<Icon name="unknown-icon" />);
+			expect(container.firstChild).toBeNull();
+			expect(consoleSpy).toHaveBeenCalledWith('Icon "unknown-icon" not found in icon map');
+			consoleSpy.mockRestore();
 		});
 	});
 });

@@ -10,7 +10,7 @@ import {
 	Plus,
 	TrendingUp,
 	Wallet,
-} from 'lucide-react';
+} from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -42,7 +42,11 @@ import { StatCard, StatCardGrid, StatCardSkeleton } from '@/components/ui/stat-c
 import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
 import { AccountTypeBadge } from '@/components/accounts/AccountCard';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
-import { cn } from '@/lib/utils';
+import { Box } from '@/components/ui/box';
+import { VStack, HStack } from '@/components/ui/stack';
+import { Flex } from '@/components/ui/flex';
+import { Text, Heading } from '@/components/ui/typography';
+import { GlassCard } from '@/components/ui/glass-card';
 
 // =============================================================================
 // TYPES
@@ -103,16 +107,16 @@ interface BanksResponse {
 
 function BankRowSkeleton() {
 	return (
-		<div className="glass-card p-4 animate-pulse">
-			<div className="flex items-center gap-4">
-				<div className="h-12 w-12 rounded-xl bg-muted" />
-				<div className="flex-1 space-y-2">
-					<div className="h-5 w-32 rounded bg-muted" />
-					<div className="h-4 w-20 rounded bg-muted" />
-				</div>
-				<div className="h-6 w-24 rounded bg-muted" />
-			</div>
-		</div>
+		<GlassCard padding="sm">
+			<HStack gap="md" align="center">
+				<Box rounded="xl" bg="muted" className="h-12 w-12 animate-pulse" />
+				<Flex direction="col" gap="xs" grow>
+					<Box rounded="md" bg="muted" className="h-5 w-32 animate-pulse" />
+					<Box rounded="md" bg="muted" className="h-4 w-20 animate-pulse" />
+				</Flex>
+				<Box rounded="md" bg="muted" className="h-6 w-24 animate-pulse" />
+			</HStack>
+		</GlassCard>
 	);
 }
 
@@ -134,21 +138,22 @@ function SectionHeaderWithIcon({
 	action,
 }: SectionHeaderWithIconProps) {
 	return (
-		<div className="flex items-center justify-between mb-4">
-			<div className="flex items-center gap-2">
-				<div
-					className={cn(
-						'flex h-6 w-6 items-center justify-center rounded-md',
-						iconBgClass
-					)}
+		<HStack justify="between" align="center" className="mb-4">
+			<HStack gap="sm" align="center">
+				<Flex
+					align="center"
+					justify="center"
+					className={`h-6 w-6 rounded-md ${iconBgClass}`}
 				>
 					{icon}
-				</div>
-				<h2 className="text-sm font-semibold text-foreground">{title}</h2>
-				<div className="flex-1 ml-3 h-px bg-border/50" />
-			</div>
+				</Flex>
+				<Heading level={2} size="sm" weight="semibold">
+					{title}
+				</Heading>
+				<Box grow className="ml-3 h-px bg-border/50" />
+			</HStack>
 			{action}
-		</div>
+		</HStack>
 	);
 }
 
@@ -173,10 +178,6 @@ function BankRow({
 }: BankRowProps) {
 	const hasAccounts = bank.accountCount > 0;
 
-	const baseStyles = cn(
-		'glass-card border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2'
-	);
-
 	const animationStyles = {
 		borderLeftColor: bank.color,
 		animationDelay: `${animationDelay}ms`,
@@ -186,7 +187,7 @@ function BankRow({
 	const contentMarkup = (
 		<>
 			{/* Bank header */}
-			<div className="flex items-center gap-4 p-4">
+			<HStack gap="md" align="center" p="sm">
 				<BankLogo
 					bankId={bank.id}
 					bankName={bank.name}
@@ -195,32 +196,32 @@ function BankRow({
 					size="lg"
 					onLogoChange={onLogoChange}
 				/>
-				<div className="flex-1 min-w-0">
-					<div className="flex items-center gap-2">
-						<h3
-							className={cn(
-								'text-lg font-semibold',
-								!hasAccounts && 'text-muted-foreground'
-							)}
+				<Flex direction="col" grow minW0>
+					<HStack gap="sm" align="center">
+						<Heading
+							level={3}
+							size="lg"
+							weight="semibold"
+							color={!hasAccounts ? 'muted' : 'default'}
 						>
 							{bank.name}
-						</h3>
+						</Heading>
 						{hasAccounts ? (
-							<span className="badge-fun badge-default text-xs">
+							<Text as="span" size="xs" className="badge-fun badge-default">
 								{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-							</span>
+							</Text>
 						) : (
-							<span className="text-xs text-muted-foreground italic">
+							<Text as="span" size="xs" color="muted" italic>
 								Aucun compte
-							</span>
+							</Text>
 						)}
-					</div>
+					</HStack>
 					{bank.description && (
-						<p className="text-sm text-muted-foreground mt-0.5">
+						<Text size="sm" color="muted" className="mt-0.5">
 							{bank.description}
-						</p>
+						</Text>
 					)}
-				</div>
+				</Flex>
 				{hasAccounts ? (
 					<>
 						<MoneyDisplay
@@ -231,39 +232,37 @@ function BankRow({
 						<Button
 							variant="ghost"
 							size="sm"
-							className="gap-1 text-muted-foreground hover:text-foreground"
+							iconLeft={<Plus className="h-4 w-4" />}
 							onClick={(e) => {
 								e.stopPropagation();
 								onAddAccount();
 							}}
 						>
-							<Plus className="h-4 w-4" />
-							<span className="hidden sm:inline">Ajouter</span>
+							<Text as="span" className="hidden sm:inline">Ajouter</Text>
 						</Button>
 					</>
 				) : (
 					<Button
 						variant="default"
 						size="sm"
-						className="gap-1"
+						iconLeft={<Plus className="h-4 w-4" />}
 						onClick={(e) => {
 							e.stopPropagation();
 							onAddAccount();
 						}}
 					>
-						<Plus className="h-4 w-4" />
 						Ajouter un compte
 					</Button>
 				)}
-			</div>
+			</HStack>
 
 			{/* Accounts list */}
 			{bank.accounts.length > 0 && (
-				<div className="px-4 pb-4 ml-16 space-y-2">
+				<VStack gap="sm" className="px-4 pb-4 ml-16">
 					{bank.accounts.map((account) => (
 						<AccountRowLink key={account.id} account={account} />
 					))}
-				</div>
+				</VStack>
 			)}
 		</>
 	);
@@ -273,10 +272,7 @@ function BankRow({
 		return (
 			<button
 				type="button"
-				className={cn(
-					baseStyles,
-					'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer text-left w-full'
-				)}
+				className="glass-card border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer text-left w-full"
 				style={animationStyles}
 				onClick={onAddAccount}
 			>
@@ -286,12 +282,12 @@ function BankRow({
 	}
 
 	return (
-		<div
-			className={cn(baseStyles, 'hover:shadow-sm')}
+		<Box
+			className="glass-card border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 hover:shadow-sm"
 			style={animationStyles}
 		>
 			{contentMarkup}
-		</div>
+		</Box>
 	);
 }
 
@@ -316,31 +312,31 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 			href={`/dashboard/accounts/${account.id}`}
 			className="glass-card p-3 flex items-center justify-between group hover:bg-muted/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 		>
-			<div className="flex items-center gap-3">
-				<div>
-					<div className="flex items-center gap-2">
-						<p className="font-medium text-sm group-hover:text-foreground">
+			<HStack gap="sm" align="center">
+				<VStack gap="none">
+					<HStack gap="sm" align="center">
+						<Text as="span" size="sm" weight="medium" className="group-hover:text-foreground">
 							{account.name}
-						</p>
+						</Text>
 						<AccountTypeBadge
 							type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
 							variant="subtle"
 							className="text-[10px]"
 						/>
-					</div>
+					</HStack>
 					{account.members.length > 0 && (
-						<div className="mt-1.5">
+						<Box className="mt-1.5">
 							<MemberAvatarGroup
 								members={memberData}
 								size="xs"
 								max={4}
 								spacing="normal"
 							/>
-						</div>
+						</Box>
 					)}
-				</div>
-			</div>
-			<div className="flex items-center gap-3">
+				</VStack>
+			</HStack>
+			<HStack gap="sm" align="center">
 				<MoneyDisplay
 					amount={account.balance}
 					size="sm"
@@ -348,7 +344,7 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 					autoColor
 				/>
 				<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
-			</div>
+			</HStack>
 		</Link>
 	);
 }
@@ -366,9 +362,9 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline" size="sm" className="gap-1 text-xs">
+				<Button variant="outline" size="sm">
 					<Plus className="h-3.5 w-3.5" />
-					Ajouter
+					<Text as="span" size="xs">Ajouter</Text>
 					<ChevronDown className="h-3 w-3 opacity-50" />
 				</Button>
 			</DropdownMenuTrigger>
@@ -377,13 +373,15 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 					<DropdownMenuItem
 						key={bank.id}
 						onClick={() => onSelectBank(bank)}
-						className="gap-2"
 					>
-						<span
-							className="w-2 h-2 rounded-full"
-							style={{ backgroundColor: bank.color }}
-						/>
-						{bank.name}
+						<HStack gap="sm" align="center">
+							<Box
+								rounded="full"
+								className="w-2 h-2"
+								style={{ backgroundColor: bank.color }}
+							/>
+							<Text as="span">{bank.name}</Text>
+						</HStack>
 					</DropdownMenuItem>
 				))}
 			</DropdownMenuContent>
@@ -407,27 +405,30 @@ function MemberSelectorChips({
 	onToggle,
 }: MemberSelectorChipsProps) {
 	return (
-		<div className="flex flex-wrap gap-2">
-			{members.map((member) => (
-				<button
-					key={member.id}
-					type="button"
-					onClick={() => onToggle(member.id)}
-					className={cn(
-						'flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150 cursor-pointer border',
-						selectedIds.includes(member.id)
-							? 'bg-primary/10 text-primary border-primary/30'
-							: 'bg-muted/50 text-muted-foreground border-transparent hover:bg-muted hover:text-foreground'
-					)}
-				>
-					<span
-						className="w-2.5 h-2.5 rounded-full"
-						style={{ backgroundColor: member.color || '#6b7280' }}
-					/>
-					{member.name}
-				</button>
-			))}
-		</div>
+		<Flex wrap="wrap" gap="sm">
+			{members.map((member) => {
+				const isSelected = selectedIds.includes(member.id);
+				return (
+					<button
+						key={member.id}
+						type="button"
+						onClick={() => onToggle(member.id)}
+						className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150 cursor-pointer border ${
+							isSelected
+								? 'bg-primary/10 text-primary border-primary/30'
+								: 'bg-muted/50 text-muted-foreground border-transparent hover:bg-muted hover:text-foreground'
+						}`}
+					>
+						<Box
+							rounded="full"
+							className="w-2.5 h-2.5"
+							style={{ backgroundColor: member.color || '#6b7280' }}
+						/>
+						<Text as="span">{member.name}</Text>
+					</button>
+				);
+			})}
+		</Flex>
 	);
 }
 
@@ -547,7 +548,7 @@ export default function BanksPage() {
 	};
 
 	return (
-		<div className="max-w-4xl">
+		<Box className="max-w-4xl">
 			{/* Header */}
 			<PageHeader
 				title="Banques"
@@ -563,7 +564,9 @@ export default function BanksPage() {
 					<StatCardSkeleton variant="mint" />
 				</StatCardGrid>
 			) : error ? (
-				<div className="py-6 text-destructive">{error}</div>
+				<Box py="lg">
+					<Text color="danger">{error}</Text>
+				</Box>
 			) : (
 				<StatCardGrid columns={3}>
 					<StatCard
@@ -592,7 +595,7 @@ export default function BanksPage() {
 			)}
 
 			{/* Bank accounts section */}
-			<div className="mt-8">
+			<Box mt="xl">
 				<SectionHeaderWithIcon
 					icon={<Landmark className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />}
 					iconBgClass="bg-blue-100 dark:bg-blue-900/50"
@@ -608,13 +611,13 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<div className="space-y-3">
+					<VStack gap="sm">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</div>
+					</VStack>
 				) : (
-					<div className="space-y-3">
+					<VStack gap="sm">
 						{data?.bankAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -625,12 +628,12 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</div>
+					</VStack>
 				)}
-			</div>
+			</Box>
 
 			{/* Investments section */}
-			<div className="mt-8">
+			<Box mt="xl">
 				<SectionHeaderWithIcon
 					icon={<TrendingUp className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />}
 					iconBgClass="bg-purple-100 dark:bg-purple-900/50"
@@ -646,12 +649,12 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<div className="space-y-3">
+					<VStack gap="sm">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</div>
+					</VStack>
 				) : (
-					<div className="space-y-3">
+					<VStack gap="sm">
 						{data?.investmentAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -662,9 +665,9 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</div>
+					</VStack>
 				)}
-			</div>
+			</Box>
 
 			{/* Add Account Dialog */}
 			<Dialog open={showAddAccount} onOpenChange={setShowAddAccount}>
@@ -674,16 +677,16 @@ export default function BanksPage() {
 						<DialogDescription>{selectedBank?.name}</DialogDescription>
 					</DialogHeader>
 
-					<div className="space-y-5">
+					<VStack gap="lg">
 						{/* Error message */}
 						{formError && (
-							<div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3">
-								<p className="text-sm text-destructive">{formError}</p>
-							</div>
+							<Box rounded="md" bg="destructive" p="sm" border="default" className="bg-destructive/10 border-destructive/20">
+								<Text size="sm" color="danger">{formError}</Text>
+							</Box>
 						)}
 
 						{/* Account name */}
-						<div className="space-y-2">
+						<VStack gap="sm">
 							<Label
 								htmlFor="accountName"
 								className="text-sm font-medium text-muted-foreground"
@@ -697,16 +700,16 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountName(e.target.value)}
 								className="h-10"
 							/>
-						</div>
+						</VStack>
 
 						{/* Description (optional) */}
-						<div className="space-y-2">
+						<VStack gap="sm">
 							<Label
 								htmlFor="accountDescription"
 								className="text-sm font-medium text-muted-foreground"
 							>
 								Description
-								<span className="ml-1 text-xs font-normal">(optionnel)</span>
+								<Text as="span" size="xs" weight="normal" className="ml-1">(optionnel)</Text>
 							</Label>
 							<Textarea
 								id="accountDescription"
@@ -715,10 +718,10 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountDescription(e.target.value)}
 								className="min-h-[80px] resize-none"
 							/>
-						</div>
+						</VStack>
 
 						{/* Account type */}
-						<div className="space-y-2">
+						<VStack gap="sm">
 							<Label
 								htmlFor="accountType"
 								className="text-sm font-medium text-muted-foreground"
@@ -736,16 +739,16 @@ export default function BanksPage() {
 									<SelectItem value="LOAN">Prêt</SelectItem>
 								</SelectContent>
 							</Select>
-						</div>
+						</VStack>
 
 						{/* Export URL (optional) */}
-						<div className="space-y-2">
+						<VStack gap="sm">
 							<Label
 								htmlFor="accountExportUrl"
 								className="text-sm font-medium text-muted-foreground"
 							>
 								Lien d'export
-								<span className="ml-1 text-xs font-normal">(optionnel)</span>
+								<Text as="span" size="xs" weight="normal" className="ml-1">(optionnel)</Text>
 							</Label>
 							<Input
 								id="accountExportUrl"
@@ -755,13 +758,13 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountExportUrl(e.target.value)}
 								className="h-10"
 							/>
-							<p className="text-xs text-muted-foreground">
+							<Text size="xs" color="muted">
 								URL vers l'espace client pour exporter les relevés
-							</p>
-						</div>
+							</Text>
+						</VStack>
 
 						{/* Member selection */}
-						<div className="space-y-3">
+						<VStack gap="sm">
 							<Label className="text-sm font-medium text-muted-foreground">
 								Titulaires
 							</Label>
@@ -770,8 +773,8 @@ export default function BanksPage() {
 								selectedIds={newAccountMembers}
 								onToggle={toggleMember}
 							/>
-						</div>
-					</div>
+						</VStack>
+					</VStack>
 
 					<DialogFooter className="pt-4">
 						<Button
@@ -790,6 +793,6 @@ export default function BanksPage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-		</div>
+		</Box>
 	);
 }

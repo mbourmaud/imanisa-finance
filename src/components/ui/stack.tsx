@@ -62,6 +62,12 @@ interface VStackProps extends React.HTMLAttributes<HTMLDivElement> {
 	fullHeight?: boolean;
 	/** Fill available width */
 	fullWidth?: boolean;
+	/** Flex grow (flex-1) */
+	grow?: boolean;
+	/** Prevent shrinking (flex-shrink-0) */
+	shrink?: boolean;
+	/** Allow text truncation (min-w-0) */
+	minW0?: boolean;
 }
 
 const alignClasses: Record<VStackAlign, string> = {
@@ -82,6 +88,9 @@ const VStack = forwardRef<HTMLDivElement, VStackProps>(
 			wrap,
 			fullHeight,
 			fullWidth,
+			grow,
+			shrink,
+			minW0,
 			...props
 		},
 		ref
@@ -98,6 +107,9 @@ const VStack = forwardRef<HTMLDivElement, VStackProps>(
 					wrap && 'flex-wrap',
 					fullHeight && 'h-full',
 					fullWidth && 'w-full',
+					grow && 'flex-1',
+					shrink === false && 'shrink-0',
+					minW0 && 'min-w-0',
 					className
 				)}
 				{...props}
@@ -129,6 +141,12 @@ interface HStackProps extends React.HTMLAttributes<HTMLDivElement> {
 	fullHeight?: boolean;
 	/** Fill available width */
 	fullWidth?: boolean;
+	/** Flex grow (flex-1) */
+	grow?: boolean;
+	/** Prevent shrinking (flex-shrink-0) */
+	shrink?: boolean;
+	/** Allow text truncation (min-w-0) */
+	minW0?: boolean;
 }
 
 const hstackAlignClasses: Record<HStackAlign, string> = {
