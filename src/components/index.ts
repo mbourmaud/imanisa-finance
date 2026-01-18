@@ -431,3 +431,21 @@ export { Grid } from './common/Grid';
 
 export type { BudgetCategoryCardProps } from './budget/BudgetCategoryCard';
 export { BudgetCategoryCard } from './budget/BudgetCategoryCard';
+
+// =============================================================================
+// INDICATOR COMPONENTS
+// =============================================================================
+
+export type { ColorDotProps, ColorDotSize } from './common/ColorDot';
+export { ColorDot } from './common/ColorDot';
+
+// =============================================================================
+// SKELETON COMPONENTS
+// =============================================================================
+
+export type {
+	ContentSkeletonProps,
+	ContentSkeletonVariant,
+	ContentSkeletonSize,
+} from './common/ContentSkeleton';
+export { ContentSkeleton } from './common/ContentSkeleton';

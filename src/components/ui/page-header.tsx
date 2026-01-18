@@ -142,6 +142,10 @@ interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 	action?: React.ReactNode;
 	/** Whether to add a border bottom */
 	bordered?: boolean;
+	/** Optional icon element to display before title */
+	icon?: React.ReactNode;
+	/** Show a horizontal line after the title (extends to fill remaining space) */
+	showLine?: boolean;
 }
 
 function SectionHeader({
@@ -151,6 +155,8 @@ function SectionHeader({
 	size = 'md',
 	action,
 	bordered = false,
+	icon,
+	showLine = false,
 	...props
 }: SectionHeaderProps) {
 	return (
@@ -164,11 +170,13 @@ function SectionHeader({
 			{...props}
 		>
 			<div className="flex items-center justify-between gap-4">
-				<div className="space-y-0.5 min-w-0">
+				<div className="flex items-center gap-3 min-w-0 flex-1">
+					{icon && <div className="flex-shrink-0">{icon}</div>}
 					<h2 className={cn('font-semibold tracking-tight', sectionTitleSizeClasses[size])}>
 						{title}
 					</h2>
-					{description && (
+					{showLine && <div className="flex-1 h-px bg-border/50 ml-3" />}
+					{description && !showLine && (
 						<p className={cn('text-muted-foreground', sectionDescriptionSizeClasses[size])}>
 							{description}
 						</p>
@@ -176,6 +184,11 @@ function SectionHeader({
 				</div>
 				{action && <div className="flex items-center gap-2 flex-shrink-0">{action}</div>}
 			</div>
+			{description && showLine && (
+				<p className={cn('text-muted-foreground mt-1', sectionDescriptionSizeClasses[size])}>
+					{description}
+				</p>
+			)}
 		</div>
 	);
 }
