@@ -5,11 +5,11 @@ import {
 	ArrowDown,
 	Building2,
 	Button,
-	Calendar,
 	Card,
 	CardContent,
 	CardHeader,
 	CardTitle,
+	ContentSkeleton,
 	CreditCard,
 	DropdownMenu,
 	DropdownMenuContent,
@@ -20,15 +20,22 @@ import {
 	Euro,
 	ExternalLink,
 	GlassCard,
+	Grid,
+	Heading,
+	IconBox,
 	Loader2,
 	MoreHorizontal,
 	PageHeader,
 	Percent,
 	Progress,
+	Row,
 	Skeleton,
+	Stack,
 	StatCard,
 	StatCardGrid,
+	Text,
 	TrendingDown,
+	Calendar,
 } from '@/components';
 import { useLoansQuery } from '@/features/loans';
 import type { PropertyType } from '@/lib/prisma';
@@ -79,14 +86,14 @@ function formatRemainingTime(endDate: string | null): string {
 function StatsCardSkeleton() {
 	return (
 		<GlassCard padding="md">
-			<div className="flex justify-between items-start">
-				<div className="flex flex-col gap-3">
+			<Row justify="between" align="start">
+				<Stack gap="sm">
 					<Skeleton style={{ height: '1rem', width: '6rem' }} />
 					<Skeleton style={{ height: '2rem', width: '8rem' }} />
 					<Skeleton style={{ height: '0.75rem', width: '5rem' }} />
-				</div>
+				</Stack>
 				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.75rem' }} />
-			</div>
+			</Row>
 		</GlassCard>
 	);
 }
@@ -95,52 +102,44 @@ function LoanCardSkeleton() {
 	return (
 		<Card style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
 			<CardHeader style={{ paddingBottom: '0.75rem' }}>
-				<div className="flex justify-between items-start">
-					<div className="flex items-center gap-4">
-						<Skeleton style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem' }} />
-						<div className="flex flex-col gap-3">
+				<Row justify="between" align="start">
+					<Row gap="md">
+						<ContentSkeleton variant="icon" size="lg" />
+						<Stack gap="sm">
 							<Skeleton style={{ height: '1.25rem', width: '10rem' }} />
 							<Skeleton style={{ height: '1rem', width: '8rem' }} />
-						</div>
-					</div>
-					<div className="hidden sm:block" style={{ textAlign: 'right' }}>
-						<Skeleton style={{ height: '2rem', width: '7rem', marginBottom: '0.25rem' }} />
+						</Stack>
+					</Row>
+					<Stack gap="xs" align="end" data-show-sm style={{ display: 'none' }}>
+						<Skeleton style={{ height: '2rem', width: '7rem' }} />
 						<Skeleton style={{ height: '0.75rem', width: '5rem' }} />
-					</div>
-				</div>
+					</Stack>
+				</Row>
 			</CardHeader>
 			<CardContent>
-				<div className="flex flex-col gap-4">
-					<div className="flex flex-col gap-3">
+				<Stack gap="md">
+					<Stack gap="sm">
 						<Skeleton style={{ height: '0.75rem', width: '100%' }} />
 						<Skeleton style={{ height: '0.5rem', width: '100%' }} />
-					</div>
-					<div
-						className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+					</Stack>
+					<Grid
+						cols={4}
+						gap="md"
+						responsive={{ sm: 2, lg: 4 }}
 						style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 					>
-						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
-							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
-							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</div>
-						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
-							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
-							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</div>
-						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
-							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
-							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</div>
-						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
-							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
-							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
-							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</div>
-					</div>
-				</div>
+						{[1, 2, 3, 4].map((i) => (
+							<div
+								key={i}
+								style={{ backgroundColor: 'hsl(var(--muted) / 0.3)', borderRadius: '0.75rem', padding: '0.75rem' }}
+							>
+								<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
+								<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
+								<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
+							</div>
+						))}
+					</Grid>
+				</Stack>
 			</CardContent>
 		</Card>
 	);
@@ -175,7 +174,7 @@ export default function LoansPage() {
 	const totalMonthly = summary ? summary.totalMonthlyPayment + summary.totalInsurance : 0;
 
 	return (
-		<div className="flex flex-col gap-8">
+		<Stack gap="xl">
 			{/* Header */}
 			<PageHeader title="Crédits" description="Suivez vos emprunts et échéanciers" />
 
@@ -188,11 +187,11 @@ export default function LoansPage() {
 						<StatsCardSkeleton />
 						<StatsCardSkeleton />
 					</StatCardGrid>
-					<div className="flex flex-col gap-4">
+					<Stack gap="md">
 						<LoanCardSkeleton />
 						<LoanCardSkeleton />
 						<LoanCardSkeleton />
-					</div>
+					</Stack>
 				</>
 			)}
 
@@ -200,15 +199,15 @@ export default function LoansPage() {
 			{isError && !isLoading && (
 				<Card style={{ borderColor: 'hsl(var(--destructive) / 0.5)' }}>
 					<CardContent style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
-						<div className="flex flex-col items-center gap-4 text-center">
-							<p className="text-destructive">
+						<Stack gap="md" align="center">
+							<Text color="destructive">
 								{error instanceof Error ? error.message : 'Une erreur est survenue'}
-							</p>
+							</Text>
 							<Button onClick={() => refetch()} variant="outline" size="sm">
 								<Loader2 style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
 								Réessayer
 							</Button>
-						</div>
+						</Stack>
 					</CardContent>
 				</Card>
 			)}
@@ -258,7 +257,7 @@ export default function LoansPage() {
 						)}
 
 						{/* Loans List */}
-						<div className="flex flex-col gap-4">
+						<Stack gap="md">
 							{loans.map((loan) => {
 								const Icon = getPropertyIcon(loan.property.type);
 								const progress =
@@ -272,24 +271,16 @@ export default function LoansPage() {
 								return (
 									<Card key={loan.id} style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
 										<CardHeader style={{ paddingBottom: '0.75rem' }}>
-											<div className="flex justify-between items-start">
-												<div className="flex items-center gap-4">
-													<div
-														className="flex items-center justify-center h-12 w-12 rounded-xl"
-														style={{
-															backgroundColor: 'hsl(var(--primary) / 0.1)',
-															color: 'hsl(var(--primary))',
-														}}
-													>
-														<Icon style={{ height: '1.5rem', width: '1.5rem' }} />
-													</div>
-													<div className="flex flex-col">
+											<Row justify="between" align="start">
+												<Row gap="md">
+													<IconBox icon={Icon} size="lg" variant="primary" rounded="xl" />
+													<Stack gap="xs">
 														<CardTitle style={{ fontSize: '1.125rem', fontWeight: 500 }}>
 															{loan.name}
 														</CardTitle>
-														<p className="text-sm text-muted-foreground">
+														<Text size="sm" color="muted">
 															{loan.lender || 'Prêt familial'} · {loan.rate}%
-														</p>
+														</Text>
 														<Link
 															href={`/dashboard/real-estate/${loan.propertyId}`}
 															style={{
@@ -304,18 +295,21 @@ export default function LoansPage() {
 															{loan.property.name}
 															<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 														</Link>
-													</div>
-												</div>
-												<div className="flex items-center gap-4">
-													<div className="hidden sm:block" style={{ textAlign: 'right' }}>
-														<p
-															className="text-2xl font-semibold"
+													</Stack>
+												</Row>
+												<Row gap="md">
+													<Stack gap="xs" align="end" data-show-sm style={{ display: 'none' }}>
+														<Text
+															size="2xl"
+															weight="semibold"
 															style={{ fontVariantNumeric: 'tabular-nums' }}
 														>
 															{formatCurrency(loan.remainingAmount)}
-														</p>
-														<p className="text-xs text-muted-foreground">Capital restant</p>
-													</div>
+														</Text>
+														<Text size="xs" color="muted">
+															Capital restant
+														</Text>
+													</Stack>
 													<DropdownMenu>
 														<DropdownMenuTrigger asChild>
 															<Button
@@ -343,122 +337,153 @@ export default function LoansPage() {
 															</DropdownMenuItem>
 														</DropdownMenuContent>
 													</DropdownMenu>
-												</div>
-											</div>
+												</Row>
+											</Row>
 										</CardHeader>
 										<CardContent>
-											<div className="flex flex-col gap-4">
+											<Stack gap="md">
 												{/* Mobile: Show remaining amount */}
-												<div className="block sm:hidden">
-													<p
-														className="text-2xl font-semibold"
+												<Stack
+													gap="xs"
+													data-show-mobile
+													style={{ display: 'block' }}
+												>
+													<Text
+														size="2xl"
+														weight="semibold"
 														style={{ fontVariantNumeric: 'tabular-nums' }}
 													>
 														{formatCurrency(loan.remainingAmount)}
-													</p>
-													<p className="text-xs text-muted-foreground">Capital restant</p>
-												</div>
+													</Text>
+													<Text size="xs" color="muted">
+														Capital restant
+													</Text>
+												</Stack>
 
 												{/* Progress Bar */}
-												<div className="flex flex-col gap-3">
-													<div className="flex justify-between">
-														<span className="text-xs text-muted-foreground">
+												<Stack gap="sm">
+													<Row justify="between">
+														<Text size="xs" color="muted">
 															Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
-														</span>
-														<span className="text-xs font-medium">{progress.toFixed(1)}%</span>
-													</div>
+														</Text>
+														<Text size="xs" weight="medium">
+															{progress.toFixed(1)}%
+														</Text>
+													</Row>
 													<Progress value={progress} style={{ height: '0.5rem' }} />
-												</div>
+												</Stack>
 
 												{/* Info Grid */}
-												<div
-													className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+												<Grid
+													cols={4}
+													gap="md"
+													responsive={{ sm: 2, lg: 4 }}
 													style={{
 														paddingTop: '0.5rem',
 														borderTop: '1px solid hsl(var(--border) / 0.4)',
 													}}
 												>
-													<div
-														className="rounded-xl p-3"
-														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+													<Stack
+														gap="xs"
+														style={{
+															backgroundColor: 'hsl(var(--muted) / 0.3)',
+															borderRadius: '0.75rem',
+															padding: '0.75rem',
+														}}
 													>
-														<div
-															className="flex items-center gap-2 mb-1"
+														<Row
+															gap="sm"
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<Euro style={{ height: '0.875rem', width: '0.875rem' }} />
-															<span className="text-xs">Mensualité</span>
-														</div>
-														<p
-															className="font-semibold"
+															<Text size="xs">Mensualité</Text>
+														</Row>
+														<Text
+															weight="semibold"
 															style={{ fontVariantNumeric: 'tabular-nums' }}
 														>
 															{formatCurrency(loan.monthlyPayment)}
-														</p>
+														</Text>
 														{loanInsuranceTotal > 0 && (
-															<p className="text-xs text-muted-foreground">
+															<Text size="xs" color="muted">
 																+ {formatCurrency(loanInsuranceTotal)} assurance
-															</p>
+															</Text>
 														)}
-													</div>
-													<div
-														className="rounded-xl p-3"
-														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+													</Stack>
+													<Stack
+														gap="xs"
+														style={{
+															backgroundColor: 'hsl(var(--muted) / 0.3)',
+															borderRadius: '0.75rem',
+															padding: '0.75rem',
+														}}
 													>
-														<div
-															className="flex items-center gap-2 mb-1"
+														<Row
+															gap="sm"
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<Percent style={{ height: '0.875rem', width: '0.875rem' }} />
-															<span className="text-xs">Taux</span>
-														</div>
-														<p className="font-semibold">{loan.rate}%</p>
-														<p className="text-xs text-muted-foreground">Taux nominal</p>
-													</div>
-													<div
-														className="rounded-xl p-3"
-														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+															<Text size="xs">Taux</Text>
+														</Row>
+														<Text weight="semibold">{loan.rate}%</Text>
+														<Text size="xs" color="muted">
+															Taux nominal
+														</Text>
+													</Stack>
+													<Stack
+														gap="xs"
+														style={{
+															backgroundColor: 'hsl(var(--muted) / 0.3)',
+															borderRadius: '0.75rem',
+															padding: '0.75rem',
+														}}
 													>
-														<div
-															className="flex items-center gap-2 mb-1"
+														<Row
+															gap="sm"
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<Calendar style={{ height: '0.875rem', width: '0.875rem' }} />
-															<span className="text-xs">Durée restante</span>
-														</div>
-														<p className="font-semibold">{formatRemainingTime(loan.endDate)}</p>
+															<Text size="xs">Durée restante</Text>
+														</Row>
+														<Text weight="semibold">{formatRemainingTime(loan.endDate)}</Text>
 														{loan.endDate && (
-															<p className="text-xs text-muted-foreground">
+															<Text size="xs" color="muted">
 																{remainingMonths} échéances
-															</p>
+															</Text>
 														)}
-													</div>
-													<div
-														className="rounded-xl p-3"
-														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+													</Stack>
+													<Stack
+														gap="xs"
+														style={{
+															backgroundColor: 'hsl(var(--muted) / 0.3)',
+															borderRadius: '0.75rem',
+															padding: '0.75rem',
+														}}
 													>
-														<div
-															className="flex items-center gap-2 mb-1"
+														<Row
+															gap="sm"
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<ArrowDown style={{ height: '0.875rem', width: '0.875rem' }} />
-															<span className="text-xs">Montant initial</span>
-														</div>
-														<p
-															className="font-semibold"
+															<Text size="xs">Montant initial</Text>
+														</Row>
+														<Text
+															weight="semibold"
 															style={{ fontVariantNumeric: 'tabular-nums' }}
 														>
 															{formatCurrency(loan.initialAmount)}
-														</p>
-														<p className="text-xs text-muted-foreground">Emprunté</p>
-													</div>
-												</div>
-											</div>
+														</Text>
+														<Text size="xs" color="muted">
+															Emprunté
+														</Text>
+													</Stack>
+												</Grid>
+											</Stack>
 										</CardContent>
 									</Card>
 								);
 							})}
-						</div>
+						</Stack>
 
 						{/* Summary Card */}
 						{summary && totalMonthly > 0 && (
@@ -469,29 +494,32 @@ export default function LoansPage() {
 								}}
 							>
 								<CardContent style={{ paddingTop: '1.5rem' }}>
-									<div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-										<div className="flex flex-col">
-											<p className="font-medium">Total mensuel</p>
-											<p className="text-sm text-muted-foreground">Tous crédits confondus</p>
-										</div>
-										<div style={{ textAlign: 'right' }}>
-											<p
-												className="text-3xl font-semibold"
+									<Row justify="between" align="center" responsive>
+										<Stack gap="xs">
+											<Text weight="medium">Total mensuel</Text>
+											<Text size="sm" color="muted">
+												Tous crédits confondus
+											</Text>
+										</Stack>
+										<Stack gap="xs" align="end">
+											<Text
+												size="3xl"
+												weight="semibold"
 												style={{ fontVariantNumeric: 'tabular-nums' }}
 											>
 												{formatCurrency(totalMonthly)}
-											</p>
-											<p className="text-sm text-muted-foreground">
+											</Text>
+											<Text size="sm" color="muted">
 												{formatCurrency(summary.totalMonthlyPayment)} capital +{' '}
 												{formatCurrency(summary.totalInsurance)} assurance
-											</p>
-										</div>
-									</div>
+											</Text>
+										</Stack>
+									</Row>
 								</CardContent>
 							</Card>
 						)}
 					</>
 				))}
-		</div>
+		</Stack>
 	);
 }
