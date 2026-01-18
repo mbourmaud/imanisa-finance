@@ -15,11 +15,11 @@ import {
 	AccountLoadingState,
 	AccountNotFoundState,
 	AccountSettingsSheet,
+	ConfirmDialog,
 	Flex,
 	FloatingToast,
 	TransactionsSection,
 } from '@/components'
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import {
 	useAccountQuery,
 	useAddAccountMemberMutation,

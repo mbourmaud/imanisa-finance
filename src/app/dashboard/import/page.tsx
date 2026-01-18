@@ -12,6 +12,7 @@ import { useStore } from '@tanstack/react-store'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
+	ConfirmDialog,
 	Flex,
 	GlassCard,
 	ImportDropZone,
@@ -23,7 +24,6 @@ import {
 	Label,
 	PageHeader,
 } from '@/components'
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import {
 	importFormSchema,
 	useDeleteImportMutation,

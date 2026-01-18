@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import {
 	Bell,
 	Button,
+	ConfirmDialog,
 	Database,
 	Dialog,
 	DialogContent,
@@ -46,7 +47,6 @@ import {
 	User,
 	Users,
 } from '@/components'
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { MemberAvatar } from '@/components/members/MemberAvatar'
 import { ProfileForm } from '@/features/profile'
 import {
