@@ -518,3 +518,24 @@ export { SettingsMemberSkeleton } from './settings/SettingsMemberSkeleton';
 export { SettingsNotificationRow } from './settings/SettingsNotificationRow';
 export { SettingsSectionCard } from './settings/SettingsSectionCard';
 export { SettingsThemeSelector } from './settings/SettingsThemeSelector';
+
+// =============================================================================
+// BANK COMPONENTS
+// =============================================================================
+
+export type {
+	BankAvatarProps,
+	BankAvatarSize,
+	BankCardProps,
+	BankCardVariant,
+	BankCardListProps,
+	BankCardGridProps,
+} from './banks/BankCard';
+export { BankAvatar, BankCard, BankCardList, BankCardGrid } from './banks/BankCard';
+export { BankLogo } from './banks/BankLogo';
+export { BankRow } from './banks/BankRow';
+export { BankRowSkeleton } from './banks/BankRowSkeleton';
+export { AccountRowLink } from './banks/AccountRowLink';
+export { AddBankDropdown } from './banks/AddBankDropdown';
+export { AddAccountDialog } from './banks/AddAccountDialog';
+export { MemberSelectorChips } from './banks/MemberSelectorChips';
