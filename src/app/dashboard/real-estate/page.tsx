@@ -5,6 +5,7 @@ import { useState } from 'react';
 import {
 	Building2,
 	Button,
+	ContentSkeleton,
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -19,7 +20,10 @@ import {
 	DropdownMenuTrigger,
 	EmptyState,
 	GlassCard,
+	Grid,
+	Heading,
 	Home,
+	IconBox,
 	Input,
 	Label,
 	Loader2,
@@ -28,14 +32,17 @@ import {
 	PageHeader,
 	Plus,
 	Progress,
+	Row,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 	Skeleton,
+	Stack,
 	StatCard,
 	StatCardGrid,
+	Text,
 	TrendingUp,
 	X,
 } from '@/components';
@@ -126,22 +133,22 @@ function getPropertyUsageLabel(usage: PropertyUsage): string {
 function PropertyCardSkeleton() {
 	return (
 		<GlassCard padding="lg">
-			<div className="flex flex-col gap-4">
-				<div className="flex justify-between items-start">
-					<div className="flex items-center gap-4">
+			<Stack gap="md">
+				<Row justify="between">
+					<Row gap="md">
 						<Skeleton style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem' }} />
-						<div className="flex flex-col gap-3">
+						<Stack gap="sm">
 							<Skeleton style={{ height: '1.25rem', width: '10rem' }} />
 							<Skeleton style={{ height: '0.75rem', width: '8rem' }} />
-						</div>
-					</div>
-				</div>
-				<div className="grid grid-cols-2 gap-4">
+						</Stack>
+					</Row>
+				</Row>
+				<Grid cols={2} gap="md">
 					<Skeleton style={{ height: '5rem', borderRadius: '0.75rem' }} />
 					<Skeleton style={{ height: '5rem', borderRadius: '0.75rem' }} />
-				</div>
+				</Grid>
 				<Skeleton style={{ height: '1.5rem', width: '100%' }} />
-			</div>
+			</Stack>
 		</GlassCard>
 	);
 }
@@ -149,14 +156,14 @@ function PropertyCardSkeleton() {
 function StatsCardSkeleton() {
 	return (
 		<GlassCard padding="md">
-			<div className="flex justify-between items-start">
-				<div className="flex flex-col gap-3">
-					<Skeleton style={{ height: '1rem', width: '6rem' }} />
-					<Skeleton style={{ height: '2rem', width: '8rem' }} />
-					<Skeleton style={{ height: '0.75rem', width: '5rem' }} />
-				</div>
-				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.5rem' }} />
-			</div>
+			<Row justify="between">
+				<Stack gap="sm">
+					<ContentSkeleton variant="text" size="md" />
+					<ContentSkeleton variant="title" size="lg" />
+					<ContentSkeleton variant="text" size="sm" />
+				</Stack>
+				<ContentSkeleton variant="icon" size="md" />
+			</Row>
 		</GlassCard>
 	);
 }
@@ -310,7 +317,7 @@ export default function RealEstatePage() {
 	const isSubmitting = createPropertyMutation.isPending;
 
 	return (
-		<div className="flex flex-col gap-8">
+		<Stack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Immobilier"
@@ -336,7 +343,7 @@ export default function RealEstatePage() {
 								</DialogDescription>
 							</DialogHeader>
 							<form onSubmit={handleSubmit}>
-								<div className="flex flex-col gap-6">
+								<Stack gap="lg">
 									{/* Error message */}
 									{formError && (
 										<div
@@ -347,19 +354,19 @@ export default function RealEstatePage() {
 												border: '1px solid hsl(var(--destructive) / 0.2)',
 											}}
 										>
-											<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
+											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 												{formError}
-											</p>
+											</Text>
 										</div>
 									)}
 
 									{/* Basic info */}
-									<div className="flex flex-col gap-4">
-										<p className="text-sm font-medium text-muted-foreground">
+									<Stack gap="md">
+										<Text size="sm" weight="medium" color="muted">
 											Informations générales
-										</p>
-										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-											<div className="flex flex-col gap-3">
+										</Text>
+										<Grid cols={2} gap="md" responsive={{ sm: 1 }}>
+											<Stack gap="sm">
 												<Label htmlFor="name">Nom du bien *</Label>
 												<Input
 													id="name"
@@ -367,8 +374,8 @@ export default function RealEstatePage() {
 													value={formData.name}
 													onChange={(e) => handleInputChange('name', e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="type">Type *</Label>
 												<Select
 													value={formData.type}
@@ -382,8 +389,8 @@ export default function RealEstatePage() {
 														<SelectItem value="HOUSE">Maison</SelectItem>
 													</SelectContent>
 												</Select>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="usage">Usage *</Label>
 												<Select
 													value={formData.usage}
@@ -398,8 +405,8 @@ export default function RealEstatePage() {
 														<SelectItem value="RENTAL">Locatif</SelectItem>
 													</SelectContent>
 												</Select>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="surface">Surface (m²) *</Label>
 												<Input
 													id="surface"
@@ -410,8 +417,8 @@ export default function RealEstatePage() {
 													value={formData.surface}
 													onChange={(e) => handleInputChange('surface', e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="rooms">Pièces</Label>
 												<Input
 													id="rooms"
@@ -421,8 +428,8 @@ export default function RealEstatePage() {
 													value={formData.rooms}
 													onChange={(e) => handleInputChange('rooms', e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="bedrooms">Chambres</Label>
 												<Input
 													id="bedrooms"
@@ -432,15 +439,17 @@ export default function RealEstatePage() {
 													value={formData.bedrooms}
 													onChange={(e) => handleInputChange('bedrooms', e.target.value)}
 												/>
-											</div>
-										</div>
-									</div>
+											</Stack>
+										</Grid>
+									</Stack>
 
 									{/* Address */}
-									<div className="flex flex-col gap-4">
-										<p className="text-sm font-medium text-muted-foreground">Adresse</p>
-										<div className="flex flex-col gap-4">
-											<div className="flex flex-col gap-3">
+									<Stack gap="md">
+										<Text size="sm" weight="medium" color="muted">
+											Adresse
+										</Text>
+										<Stack gap="md">
+											<Stack gap="sm">
 												<Label htmlFor="address">Adresse *</Label>
 												<Input
 													id="address"
@@ -448,8 +457,8 @@ export default function RealEstatePage() {
 													value={formData.address}
 													onChange={(e) => handleInputChange('address', e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="address2">Complément d&apos;adresse</Label>
 												<Input
 													id="address2"
@@ -457,9 +466,9 @@ export default function RealEstatePage() {
 													value={formData.address2}
 													onChange={(e) => handleInputChange('address2', e.target.value)}
 												/>
-											</div>
-											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-												<div className="flex flex-col gap-3">
+											</Stack>
+											<Grid cols={2} gap="md" responsive={{ sm: 1 }}>
+												<Stack gap="sm">
 													<Label htmlFor="city">Ville *</Label>
 													<Input
 														id="city"
@@ -467,8 +476,8 @@ export default function RealEstatePage() {
 														value={formData.city}
 														onChange={(e) => handleInputChange('city', e.target.value)}
 													/>
-												</div>
-												<div className="flex flex-col gap-3">
+												</Stack>
+												<Stack gap="sm">
 													<Label htmlFor="postalCode">Code postal *</Label>
 													<Input
 														id="postalCode"
@@ -476,16 +485,18 @@ export default function RealEstatePage() {
 														value={formData.postalCode}
 														onChange={(e) => handleInputChange('postalCode', e.target.value)}
 													/>
-												</div>
-											</div>
-										</div>
-									</div>
+												</Stack>
+											</Grid>
+										</Stack>
+									</Stack>
 
 									{/* Purchase info */}
-									<div className="flex flex-col gap-4">
-										<p className="text-sm font-medium text-muted-foreground">Achat</p>
-										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-											<div className="flex flex-col gap-3">
+									<Stack gap="md">
+										<Text size="sm" weight="medium" color="muted">
+											Achat
+										</Text>
+										<Grid cols={2} gap="md" responsive={{ sm: 1 }}>
+											<Stack gap="sm">
 												<Label htmlFor="purchasePrice">Prix d&apos;achat (€) *</Label>
 												<Input
 													id="purchasePrice"
@@ -496,8 +507,8 @@ export default function RealEstatePage() {
 													value={formData.purchasePrice}
 													onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="purchaseDate">Date d&apos;achat *</Label>
 												<Input
 													id="purchaseDate"
@@ -505,8 +516,8 @@ export default function RealEstatePage() {
 													value={formData.purchaseDate}
 													onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="notaryFees">Frais de notaire (€) *</Label>
 												<Input
 													id="notaryFees"
@@ -517,8 +528,8 @@ export default function RealEstatePage() {
 													value={formData.notaryFees}
 													onChange={(e) => handleInputChange('notaryFees', e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-3">
+											</Stack>
+											<Stack gap="sm">
 												<Label htmlFor="agencyFees">Frais d&apos;agence (€)</Label>
 												<Input
 													id="agencyFees"
@@ -529,14 +540,16 @@ export default function RealEstatePage() {
 													value={formData.agencyFees}
 													onChange={(e) => handleInputChange('agencyFees', e.target.value)}
 												/>
-											</div>
-										</div>
-									</div>
+											</Stack>
+										</Grid>
+									</Stack>
 
 									{/* Current value */}
-									<div className="flex flex-col gap-4">
-										<p className="text-sm font-medium text-muted-foreground">Valeur actuelle</p>
-										<div className="flex flex-col gap-3">
+									<Stack gap="md">
+										<Text size="sm" weight="medium" color="muted">
+											Valeur actuelle
+										</Text>
+										<Stack gap="sm">
 											<Label htmlFor="currentValue">Valeur estimée (€) *</Label>
 											<Input
 												id="currentValue"
@@ -547,17 +560,17 @@ export default function RealEstatePage() {
 												value={formData.currentValue}
 												onChange={(e) => handleInputChange('currentValue', e.target.value)}
 											/>
-										</div>
-									</div>
+										</Stack>
+									</Stack>
 
 									{/* Rental info - only shown for RENTAL usage */}
 									{isRental && (
-										<div className="flex flex-col gap-4">
-											<p className="text-sm font-medium text-muted-foreground">
+										<Stack gap="md">
+											<Text size="sm" weight="medium" color="muted">
 												Informations locatives
-											</p>
-											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-												<div className="flex flex-col gap-3">
+											</Text>
+											<Grid cols={2} gap="md" responsive={{ sm: 1 }}>
+												<Stack gap="sm">
 													<Label htmlFor="rentAmount">Loyer mensuel (€)</Label>
 													<Input
 														id="rentAmount"
@@ -568,8 +581,8 @@ export default function RealEstatePage() {
 														value={formData.rentAmount}
 														onChange={(e) => handleInputChange('rentAmount', e.target.value)}
 													/>
-												</div>
-												<div className="flex flex-col gap-3">
+												</Stack>
+												<Stack gap="sm">
 													<Label htmlFor="rentCharges">Charges locatives (€)</Label>
 													<Input
 														id="rentCharges"
@@ -580,15 +593,17 @@ export default function RealEstatePage() {
 														value={formData.rentCharges}
 														onChange={(e) => handleInputChange('rentCharges', e.target.value)}
 													/>
-												</div>
-											</div>
-										</div>
+												</Stack>
+											</Grid>
+										</Stack>
 									)}
 
 									{/* Members/Owners */}
-									<div className="flex flex-col gap-4">
-										<div className="flex justify-between items-center">
-											<p className="text-sm font-medium text-muted-foreground">Propriétaires</p>
+									<Stack gap="md">
+										<Row justify="between">
+											<Text size="sm" weight="medium" color="muted">
+												Propriétaires
+											</Text>
 											{members.length > memberShares.length && (
 												<Button
 													type="button"
@@ -600,14 +615,14 @@ export default function RealEstatePage() {
 													Ajouter
 												</Button>
 											)}
-										</div>
+										</Row>
 										{memberShares.length === 0 ? (
-											<p className="text-sm text-muted-foreground">
+											<Text size="sm" color="muted">
 												Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter
 												des propriétaires.
-											</p>
+											</Text>
 										) : (
-											<div className="flex flex-col gap-4">
+											<Stack gap="md">
 												{memberShares.map((ms, index) => {
 													const member = members.find((m) => m.id === ms.memberId);
 													const availableMembers = members.filter(
@@ -616,16 +631,24 @@ export default function RealEstatePage() {
 															!memberShares.some((other) => other.memberId === m.id),
 													);
 													return (
-														<div
+														<Row
 															key={ms.memberId}
-															className="flex items-center gap-4 p-3 rounded-lg"
+															gap="md"
 															style={{
+																padding: '0.75rem',
+																borderRadius: '0.5rem',
 																backgroundColor: 'hsl(var(--muted) / 0.3)',
 															}}
 														>
 															<div
-																className="flex items-center justify-center h-8 w-8 rounded-full shrink-0"
 																style={{
+																	display: 'flex',
+																	alignItems: 'center',
+																	justifyContent: 'center',
+																	height: '2rem',
+																	width: '2rem',
+																	borderRadius: '9999px',
+																	flexShrink: 0,
 																	fontSize: '0.875rem',
 																	fontWeight: 500,
 																	color: 'white',
@@ -649,7 +672,7 @@ export default function RealEstatePage() {
 																	))}
 																</SelectContent>
 															</Select>
-															<div className="flex items-center gap-3">
+															<Row gap="sm">
 																<Input
 																	type="number"
 																	min="0"
@@ -663,8 +686,10 @@ export default function RealEstatePage() {
 																		)
 																	}
 																/>
-																<span className="text-sm text-muted-foreground">%</span>
-															</div>
+																<Text as="span" size="sm" color="muted">
+																	%
+																</Text>
+															</Row>
 															<Button
 																type="button"
 																variant="ghost"
@@ -674,31 +699,29 @@ export default function RealEstatePage() {
 															>
 																<X style={{ height: '1rem', width: '1rem' }} />
 															</Button>
-														</div>
+														</Row>
 													);
 												})}
 												{memberShares.length > 0 && (
-													<p
-														className="text-xs text-muted-foreground"
-														style={{ textAlign: 'right' }}
-													>
+													<Text size="xs" color="muted" align="right">
 														Total: {memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
 														{memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !==
 															100 && (
-															<span
+															<Text
+																as="span"
 																style={{ color: 'hsl(var(--destructive))', marginLeft: '0.25rem' }}
 															>
 																(doit être 100%)
-															</span>
+															</Text>
 														)}
-													</p>
+													</Text>
 												)}
-											</div>
+											</Stack>
 										)}
-									</div>
+									</Stack>
 
 									{/* Notes */}
-									<div className="flex flex-col gap-3">
+									<Stack gap="sm">
 										<Label htmlFor="notes">Notes</Label>
 										<Input
 											id="notes"
@@ -706,7 +729,7 @@ export default function RealEstatePage() {
 											value={formData.notes}
 											onChange={(e) => handleInputChange('notes', e.target.value)}
 										/>
-									</div>
+									</Stack>
 
 									<DialogFooter style={{ paddingTop: '1rem' }}>
 										<Button
@@ -735,7 +758,7 @@ export default function RealEstatePage() {
 											)}
 										</Button>
 									</DialogFooter>
-								</div>
+								</Stack>
 							</form>
 						</DialogContent>
 					</Dialog>
@@ -751,9 +774,9 @@ export default function RealEstatePage() {
 						backgroundColor: 'hsl(var(--destructive) / 0.05)',
 					}}
 				>
-					<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
+					<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 						{error instanceof Error ? error.message : 'Une erreur est survenue'}
-					</p>
+					</Text>
 				</GlassCard>
 			)}
 
@@ -814,39 +837,39 @@ export default function RealEstatePage() {
 			{/* Credit Progress */}
 			{!isLoading && summary && summary.totalValue > 0 && (
 				<GlassCard padding="lg">
-					<div className="flex justify-between items-center mb-4">
-						<div className="flex flex-col">
-							<p className="font-medium">Capital restant dû</p>
-							<p className="text-sm text-muted-foreground">
+					<Row justify="between" style={{ marginBottom: '1rem' }}>
+						<Stack gap="xs">
+							<Text weight="medium">Capital restant dû</Text>
+							<Text size="sm" color="muted">
 								{formatCurrency(summary.totalLoansRemaining)} sur{' '}
 								{formatCurrency(summary.totalValue)}
-							</p>
-						</div>
-						<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+							</Text>
+						</Stack>
+						<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(1)}%
-						</p>
-					</div>
+						</Text>
+					</Row>
 					<Progress
 						value={(summary.totalLoansRemaining / summary.totalValue) * 100}
 						style={{ height: '0.75rem' }}
 					/>
-					<p className="text-xs text-muted-foreground" style={{ marginTop: '0.5rem' }}>
+					<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
 						Équité: {formatCurrency(summary.totalEquity)} (
 						{((summary.totalEquity / summary.totalValue) * 100).toFixed(1)}%)
-					</p>
+					</Text>
 				</GlassCard>
 			)}
 
 			{/* Properties Grid */}
 			{isLoading ? (
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<Grid cols={2} gap="lg" responsive={{ lg: 2 }}>
 					<PropertyCardSkeleton />
 					<PropertyCardSkeleton />
-				</div>
+				</Grid>
 			) : properties.length === 0 ? (
 				<PropertiesEmptyState onAddClick={() => setIsDialogOpen(true)} />
 			) : (
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<Grid cols={2} gap="lg" responsive={{ lg: 2 }}>
 					{properties.map((property: PropertyWithDetails) => {
 						const totalLoansRemaining = property.loans.reduce(
 							(sum, loan) => sum + loan.remainingAmount,
@@ -861,9 +884,9 @@ export default function RealEstatePage() {
 
 						return (
 							<GlassCard key={property.id} padding="lg" style={{ overflow: 'hidden' }}>
-								<div className="flex flex-col gap-4">
+								<Stack gap="md">
 									{/* Header */}
-									<div className="flex justify-between items-start">
+									<Row justify="between">
 										<Link
 											href={`/dashboard/real-estate/${property.id}`}
 											style={{
@@ -874,22 +897,17 @@ export default function RealEstatePage() {
 												minWidth: 0,
 											}}
 										>
-											<div
-												className="flex items-center justify-center rounded-xl h-12 w-12 shrink-0"
-												style={{
-													backgroundColor: 'hsl(var(--primary) / 0.1)',
-													color: 'hsl(var(--primary))',
-												}}
-											>
-												{property.type === 'HOUSE' ? (
-													<Home style={{ height: '1.5rem', width: '1.5rem' }} />
-												) : (
-													<Building2 style={{ height: '1.5rem', width: '1.5rem' }} />
-												)}
-											</div>
+											<IconBox
+												icon={property.type === 'HOUSE' ? Home : Building2}
+												size="lg"
+												variant="primary"
+												rounded="xl"
+											/>
 											<div style={{ minWidth: 0 }}>
-												<h3
-													className="text-lg font-medium tracking-tight"
+												<Heading
+													level={3}
+													size="lg"
+													tracking="tight"
 													style={{
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
@@ -897,8 +915,8 @@ export default function RealEstatePage() {
 													}}
 												>
 													{property.name}
-												</h3>
-												<div className="flex items-center gap-1 mt-0.5">
+												</Heading>
+												<Row gap="xs" style={{ marginTop: '0.125rem' }}>
 													<MapPin
 														style={{
 															height: '0.75rem',
@@ -907,8 +925,10 @@ export default function RealEstatePage() {
 															color: 'hsl(var(--muted-foreground))',
 														}}
 													/>
-													<span
-														className="text-xs text-muted-foreground"
+													<Text
+														as="span"
+														size="xs"
+														color="muted"
 														style={{
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
@@ -916,8 +936,8 @@ export default function RealEstatePage() {
 														}}
 													>
 														{property.address}, {property.city}
-													</span>
-												</div>
+													</Text>
+												</Row>
 											</div>
 										</Link>
 										<DropdownMenu>
@@ -949,61 +969,69 @@ export default function RealEstatePage() {
 												</DropdownMenuItem>
 											</DropdownMenuContent>
 										</DropdownMenu>
-									</div>
-									<div className="flex items-center gap-3 flex-wrap">
-										<span
+									</Row>
+									<Row gap="sm" wrap="wrap">
+										<Text
+											as="span"
+											size="xs"
 											style={{
 												borderRadius: '9999px',
-												fontSize: '0.625rem',
 												padding: '0.125rem 0.5rem',
 												backgroundColor: 'hsl(var(--muted))',
 												color: 'hsl(var(--muted-foreground))',
 											}}
 										>
 											{getPropertyTypeLabel(property.type)}
-										</span>
-										<span
+										</Text>
+										<Text
+											as="span"
+											size="xs"
 											style={{
 												borderRadius: '9999px',
-												fontSize: '0.625rem',
 												padding: '0.125rem 0.5rem',
 												backgroundColor: 'hsl(var(--muted))',
 												color: 'hsl(var(--muted-foreground))',
 											}}
 										>
 											{getPropertyUsageLabel(property.usage)}
-										</span>
+										</Text>
 										{property.propertyMembers.length > 0 && (
-											<span
-												className="rounded-full"
+											<Text
+												as="span"
+												size="xs"
 												style={{
-													fontSize: '0.625rem',
+													borderRadius: '9999px',
 													padding: '0.125rem 0.5rem',
 													backgroundColor: 'hsl(var(--muted))',
 													color: 'hsl(var(--muted-foreground))',
 												}}
 											>
 												{property.propertyMembers.map((pm) => pm.member.name).join(', ')}
-											</span>
+											</Text>
 										)}
-									</div>
+									</Row>
 									{/* Value & Equity */}
-									<div className="grid grid-cols-2 gap-4">
+									<Grid cols={2} gap="md">
 										<div
-											className="rounded-xl p-3"
 											style={{
+												borderRadius: '0.75rem',
+												padding: '0.75rem',
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
-											<p className="text-xs text-muted-foreground">Valeur actuelle</p>
-											<p
-												className="text-xl font-semibold"
+											<Text size="xs" color="muted">
+												Valeur actuelle
+											</Text>
+											<Text
+												size="xl"
+												weight="semibold"
 												style={{ fontVariantNumeric: 'tabular-nums', marginTop: '0.25rem' }}
 											>
 												{formatCurrency(property.currentValue)}
-											</p>
-											<p
-												className="text-xs font-medium"
+											</Text>
+											<Text
+												size="xs"
+												weight="medium"
 												style={{
 													marginTop: '0.125rem',
 													color: appreciation >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
@@ -1011,17 +1039,21 @@ export default function RealEstatePage() {
 											>
 												{appreciation >= 0 ? '+' : ''}
 												{appreciation.toFixed(1)}% depuis l&apos;achat
-											</p>
+											</Text>
 										</div>
 										<div
-											className="rounded-xl p-3"
 											style={{
+												borderRadius: '0.75rem',
+												padding: '0.75rem',
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
-											<p className="text-xs text-muted-foreground">Équité</p>
-											<p
-												className="text-xl font-semibold"
+											<Text size="xs" color="muted">
+												Équité
+											</Text>
+											<Text
+												size="xl"
+												weight="semibold"
 												style={{
 													fontVariantNumeric: 'tabular-nums',
 													marginTop: '0.25rem',
@@ -1029,117 +1061,116 @@ export default function RealEstatePage() {
 												}}
 											>
 												{formatCurrency(equity)}
-											</p>
-											<p
-												className="text-xs text-muted-foreground"
-												style={{ marginTop: '0.125rem' }}
-											>
+											</Text>
+											<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
 												{property.currentValue > 0
 													? `${((equity / property.currentValue) * 100).toFixed(0)}% de la valeur`
 													: '-'}
-											</p>
+											</Text>
 										</div>
-									</div>
+									</Grid>
 
 									{/* Loan Progress */}
 									{totalLoansRemaining > 0 && (
-										<div className="flex flex-col gap-2">
-											<div className="flex justify-between">
-												<span className="text-xs text-muted-foreground">
+										<Stack gap="sm">
+											<Row justify="between">
+												<Text as="span" size="xs" color="muted">
 													Crédit restant ({property._count.loans} prêt
 													{property._count.loans > 1 ? 's' : ''})
-												</span>
-												<span className="text-xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
+												</Text>
+												<Text as="span" size="xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
 													{formatCurrency(totalLoansRemaining)}
-												</span>
-											</div>
+												</Text>
+											</Row>
 											<Progress value={100 - loanProgress} style={{ height: '0.5rem' }} />
-										</div>
+										</Stack>
 									)}
 
 									{/* Info Grid */}
-									<div className="grid grid-cols-3 gap-4 pt-2 border-t border-border/40">
-										<div className="text-center">
-											<div
-												className="flex items-center justify-center gap-1"
-												style={{ color: 'hsl(var(--muted-foreground))' }}
-											>
+									<Grid
+										cols={3}
+										gap="md"
+										style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
+									>
+										<Stack align="center">
+											<Row gap="xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
 												<Home style={{ height: '0.875rem', width: '0.875rem' }} />
-												<span className="text-xs">Surface</span>
-											</div>
-											<p className="font-medium" style={{ marginTop: '0.25rem' }}>
+												<Text as="span" size="xs">
+													Surface
+												</Text>
+											</Row>
+											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
 												{property.surface} m²
-											</p>
-										</div>
-										<div className="text-center">
-											<div
-												className="flex items-center justify-center gap-1"
-												style={{ color: 'hsl(var(--muted-foreground))' }}
-											>
+											</Text>
+										</Stack>
+										<Stack align="center">
+											<Row gap="xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
 												<Building2 style={{ height: '0.875rem', width: '0.875rem' }} />
-												<span className="text-xs">Pièces</span>
-											</div>
-											<p className="font-medium" style={{ marginTop: '0.25rem' }}>
+												<Text as="span" size="xs">
+													Pièces
+												</Text>
+											</Row>
+											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
 												{property.rooms || '-'}
-											</p>
-										</div>
-										<div className="text-center">
-											<div
-												className="flex items-center justify-center gap-1"
-												style={{ color: 'hsl(var(--muted-foreground))' }}
-											>
+											</Text>
+										</Stack>
+										<Stack align="center">
+											<Row gap="xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
 												<Building2 style={{ height: '0.875rem', width: '0.875rem' }} />
-												<span className="text-xs">Chambres</span>
-											</div>
-											<p className="font-medium" style={{ marginTop: '0.25rem' }}>
+												<Text as="span" size="xs">
+													Chambres
+												</Text>
+											</Row>
+											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
 												{property.bedrooms || '-'}
-											</p>
-										</div>
-									</div>
+											</Text>
+										</Stack>
+									</Grid>
 
 									{/* Rent Info if rental */}
 									{isRentalProperty && property.rentAmount && (
 										<div
-											className="rounded-xl p-3"
 											style={{
+												borderRadius: '0.75rem',
+												padding: '0.75rem',
 												backgroundColor: 'oklch(0.55 0.15 145 / 0.1)',
 											}}
 										>
-											<div className="flex justify-between items-center">
-												<div className="flex flex-col">
-													<span className="text-xs" style={{ color: 'oklch(0.55 0.15 145)' }}>
+											<Row justify="between">
+												<Stack gap="xs">
+													<Text as="span" size="xs" style={{ color: 'oklch(0.55 0.15 145)' }}>
 														Loyer mensuel
-													</span>
-													<p
-														className="text-lg font-semibold"
+													</Text>
+													<Text
+														size="lg"
+														weight="semibold"
 														style={{
 															fontVariantNumeric: 'tabular-nums',
 															color: 'oklch(0.55 0.15 145)',
 														}}
 													>
 														{formatCurrency(property.rentAmount)}
-													</p>
-												</div>
+													</Text>
+												</Stack>
 												{property.rentCharges && (
-													<div className="text-right">
-														<span className="text-xs text-muted-foreground">Net de charges</span>
-														<p
-															className="font-medium"
-															style={{ fontVariantNumeric: 'tabular-nums' }}
-														>
+													<Stack gap="xs" align="end">
+														<Text as="span" size="xs" color="muted">
+															Net de charges
+														</Text>
+														<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 															{formatCurrency(property.rentAmount - property.rentCharges)}
-														</p>
-													</div>
+														</Text>
+													</Stack>
 												)}
-											</div>
+											</Row>
 										</div>
 									)}
-								</div>
+								</Stack>
 							</GlassCard>
 						);
 					})}
-				</div>
+				</Grid>
 			)}
-		</div>
+		</Stack>
 	);
 }
