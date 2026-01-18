@@ -18,7 +18,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	GlassCard,
-	Heading,
 	Input,
 	Label,
 	Landmark,
@@ -32,7 +31,6 @@ import {
 	StatCard,
 	StatCardGrid,
 	StatCardSkeleton,
-	Text,
 	Textarea,
 	TrendingUp,
 	Wallet,
@@ -151,9 +149,9 @@ function SectionHeaderWithIcon({ icon, title, iconBgClass, action }: SectionHead
 				>
 					{icon}
 				</div>
-				<Heading level={2} size="sm" weight="semibold">
+				<h2 className="text-sm font-semibold tracking-tight">
 					{title}
-				</Heading>
+				</h2>
 				<div
 					className="flex-1"
 					style={{
@@ -203,17 +201,12 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 				/>
 				<div className="flex flex-col flex-grow min-w-0">
 					<div className="flex items-center gap-3">
-						<Heading
-							level={3}
-							size="lg"
-							weight="semibold"
-							color={!hasAccounts ? 'muted' : 'default'}
-						>
+						<h3 className={`text-lg font-semibold tracking-tight ${!hasAccounts ? 'text-muted-foreground' : ''}`}>
 							{bank.name}
-						</Heading>
+						</h3>
 						{hasAccounts ? (
-							<Text
-								size="xs"
+							<span
+								className="text-xs"
 								style={{
 									padding: '0.125rem 0.5rem',
 									borderRadius: '9999px',
@@ -222,11 +215,11 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 								}}
 							>
 								{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-							</Text>
+							</span>
 						) : (
-							<Text size="xs" color="muted" italic>
+							<span className="text-xs text-muted-foreground italic">
 								Aucun compte
-							</Text>
+							</span>
 						)}
 					</div>
 					{bank.description && (

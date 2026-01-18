@@ -22,6 +22,7 @@ export {
 
 // Field components
 export { TextField } from './fields/TextField';
+export { SelectField } from './fields/SelectField';
 
 // Re-export types
 export type { FormApi, FieldApi } from './form-context';

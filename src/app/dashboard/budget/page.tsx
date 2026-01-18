@@ -260,12 +260,12 @@ export default function BudgetPage() {
 			<GlassCard padding="lg">
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
-						<Heading level={3} size="md">
+						<h3 className="text-base font-semibold tracking-tight">
 							Répartition des dépenses
-						</Heading>
-						<Text size="sm" color="muted">
+						</h3>
+						<p className="text-sm text-muted-foreground">
 							Vue graphique par catégorie
-						</Text>
+						</p>
 					</div>
 					<div className="grid grid-cols-2 gap-8 items-center">
 						<DonutChart data={chartData} height="lg" />
