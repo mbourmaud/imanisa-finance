@@ -11,25 +11,22 @@
  * - Form components: SubmitButton, FormActions, FieldError
  */
 
+export { FieldError } from './components/FieldError';
+export { FormActions } from './components/FormActions';
+// Form components
+export { SubmitButton } from './components/SubmitButton';
+export { NumberField } from './fields/NumberField';
+export { SelectField } from './fields/SelectField';
+export { TextAreaField } from './fields/TextAreaField';
+// Field components
+export { TextField } from './fields/TextField';
+// Re-export types
+export type { FieldApi, FormApi } from './form-context';
 // Form context and hooks
 export {
 	fieldContext,
 	formContext,
+	useAppForm,
 	useFieldContext,
 	useFormContext,
-	useAppForm,
 } from './form-context';
-
-// Field components
-export { TextField } from './fields/TextField';
-export { SelectField } from './fields/SelectField';
-export { NumberField } from './fields/NumberField';
-export { TextAreaField } from './fields/TextAreaField';
-
-// Form components
-export { SubmitButton } from './components/SubmitButton';
-export { FormActions } from './components/FormActions';
-export { FieldError } from './components/FieldError';
-
-// Re-export types
-export type { FormApi, FieldApi } from './form-context';

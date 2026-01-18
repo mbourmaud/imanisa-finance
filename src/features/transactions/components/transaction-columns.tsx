@@ -108,12 +108,8 @@ export function createTransactionColumns(
 				const date = row.getValue('date') as Date;
 				return (
 					<div className="flex flex-col">
-						<span className="text-sm font-medium">
-							{formatRelativeDate(date)}
-						</span>
-						<span className="text-xs text-muted-foreground">
-							{formatDate(date)}
-						</span>
+						<span className="text-sm font-medium">{formatRelativeDate(date)}</span>
+						<span className="text-xs text-muted-foreground">{formatDate(date)}</span>
 					</div>
 				);
 			},
@@ -141,9 +137,7 @@ export function createTransactionColumns(
 							)}
 						</div>
 						<div className="flex flex-col min-w-0">
-							<span className="font-medium truncate">
-								{transaction.description}
-							</span>
+							<span className="font-medium truncate">{transaction.description}</span>
 							<span className="text-xs text-muted-foreground">
 								{transaction.category || 'Non catégorisé'}
 							</span>
@@ -158,11 +152,7 @@ export function createTransactionColumns(
 			header: 'Compte',
 			cell: ({ row }) => {
 				const accountName = row.getValue('accountName') as string;
-				return (
-					<span className="text-sm text-muted-foreground">
-						{accountName}
-					</span>
-				);
+				return <span className="text-sm text-muted-foreground">{accountName}</span>;
 			},
 		},
 		// Amount column
@@ -177,9 +167,7 @@ export function createTransactionColumns(
 
 				return (
 					<span
-						className={`font-medium text-right tabular-nums ${
-							isIncome ? 'text-emerald-600' : ''
-						}`}
+						className={`font-medium text-right tabular-nums ${isIncome ? 'text-emerald-600' : ''}`}
 					>
 						{isIncome ? '+' : ''}
 						{formatCurrency(displayAmount)}
@@ -271,11 +259,7 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			header: 'Date',
 			cell: ({ row }) => {
 				const date = row.getValue('date') as Date;
-				return (
-					<span className="text-sm text-muted-foreground">
-						{formatRelativeDate(date)}
-					</span>
-				);
+				return <span className="text-sm text-muted-foreground">{formatRelativeDate(date)}</span>;
 			},
 			sortingFn: 'datetime',
 			size: 100,
@@ -288,13 +272,9 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 				const transaction = row.original;
 				return (
 					<div className="flex flex-col min-w-0">
-						<span className="text-sm font-medium truncate">
-							{transaction.description}
-						</span>
+						<span className="text-sm font-medium truncate">{transaction.description}</span>
 						{transaction.category && (
-							<span className="text-xs text-muted-foreground">
-								{transaction.category}
-							</span>
+							<span className="text-xs text-muted-foreground">{transaction.category}</span>
 						)}
 					</div>
 				);

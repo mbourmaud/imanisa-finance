@@ -25,15 +25,14 @@
  */
 
 import {
-	createFormHookContexts,
 	createFormHook,
-	type FormApi,
+	createFormHookContexts,
 	type FieldApi,
+	type FormApi,
 } from '@tanstack/react-form';
 
 // Create the form and field contexts
-const { fieldContext, formContext, useFieldContext, useFormContext } =
-	createFormHookContexts();
+const { fieldContext, formContext, useFieldContext, useFormContext } = createFormHookContexts();
 
 // Create the base form hook
 const { useAppForm } = createFormHook({

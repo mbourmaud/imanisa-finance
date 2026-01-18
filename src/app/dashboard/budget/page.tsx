@@ -201,9 +201,7 @@ export default function BudgetPage() {
 											<category.icon style={{ height: '1.25rem', width: '1.25rem' }} />
 										</div>
 										<div className="flex flex-col">
-											<p className="text-base font-medium">
-												{category.name}
-											</p>
+											<p className="text-base font-medium">{category.name}</p>
 											<p className="text-xs text-muted-foreground">
 												{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
 											</p>
@@ -245,9 +243,7 @@ export default function BudgetPage() {
 												? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
 												: `Reste ${formatCurrency(remainingBudget)}`}
 										</p>
-										<p className="text-xs text-muted-foreground">
-											{Math.round(percentage)}%
-										</p>
+										<p className="text-xs text-muted-foreground">{Math.round(percentage)}%</p>
 									</div>
 								</div>
 							</div>
@@ -260,12 +256,8 @@ export default function BudgetPage() {
 			<GlassCard padding="lg">
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
-						<h3 className="text-base font-semibold tracking-tight">
-							Répartition des dépenses
-						</h3>
-						<p className="text-sm text-muted-foreground">
-							Vue graphique par catégorie
-						</p>
+						<h3 className="text-base font-semibold tracking-tight">Répartition des dépenses</h3>
+						<p className="text-sm text-muted-foreground">Vue graphique par catégorie</p>
 					</div>
 					<div className="grid grid-cols-2 gap-8 items-center">
 						<DonutChart data={chartData} height="lg" />

@@ -23,7 +23,7 @@
  * ```
  */
 
-import { useFieldContext } from '../form-context';
+import { Label } from '@/components/ui/label';
 import {
 	Select,
 	SelectContent,
@@ -31,8 +31,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { useFieldContext } from '../form-context';
 
 interface SelectOption {
 	value: string;
@@ -78,10 +78,7 @@ export function SelectField({
 	return (
 		<div className="flex flex-col gap-2">
 			{label && (
-				<Label
-					htmlFor={fieldId}
-					className={cn(hasError && 'text-destructive')}
-				>
+				<Label htmlFor={fieldId} className={cn(hasError && 'text-destructive')}>
 					{label}
 				</Label>
 			)}
@@ -100,31 +97,20 @@ export function SelectField({
 					aria-describedby={
 						hasError ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined
 					}
-					className={cn(
-						hasError && 'border-destructive focus:ring-destructive',
-						className
-					)}
+					className={cn(hasError && 'border-destructive focus:ring-destructive', className)}
 				>
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
 				<SelectContent>
 					{options.map((option) => (
-						<SelectItem
-							key={option.value}
-							value={option.value}
-							disabled={option.disabled}
-						>
+						<SelectItem key={option.value} value={option.value} disabled={option.disabled}>
 							{option.label}
 						</SelectItem>
 					))}
 				</SelectContent>
 			</Select>
 			{!hideErrors && hasError && (
-				<p
-					id={`${fieldId}-error`}
-					className="text-sm text-destructive"
-					role="alert"
-				>
+				<p id={`${fieldId}-error`} className="text-sm text-destructive" role="alert">
 					{typeof errorMessage === 'string' ? errorMessage : 'Invalid selection'}
 				</p>
 			)}

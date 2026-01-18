@@ -18,10 +18,10 @@
  */
 
 import { useStore } from '@tanstack/react-store';
-import { useFormContext } from '../form-context';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { Loader2 } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
+import { useFormContext } from '../form-context';
 
 interface SubmitButtonProps extends Omit<ButtonProps, 'type' | 'disabled'> {
 	/** Text to show when submitting */
@@ -48,15 +48,8 @@ export function SubmitButton({
 	const showLoader = isSubmitting || isValidating;
 
 	return (
-		<Button
-			type="submit"
-			disabled={isDisabled}
-			className={cn(className)}
-			{...props}
-		>
-			{showLoader && (
-				<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-			)}
+		<Button type="submit" disabled={isDisabled} className={cn(className)} {...props}>
+			{showLoader && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 			{showLoader && loadingText ? loadingText : children}
 		</Button>
 	);

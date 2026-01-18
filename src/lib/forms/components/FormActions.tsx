@@ -34,19 +34,9 @@ const alignClasses = {
 	between: 'justify-between',
 } as const;
 
-export function FormActions({
-	children,
-	align = 'right',
-	className,
-}: FormActionsProps) {
+export function FormActions({ children, align = 'right', className }: FormActionsProps) {
 	return (
-		<div
-			className={cn(
-				'flex items-center gap-3 pt-4',
-				alignClasses[align],
-				className
-			)}
-		>
+		<div className={cn('flex items-center gap-3 pt-4', alignClasses[align], className)}>
 			{children}
 		</div>
 	);

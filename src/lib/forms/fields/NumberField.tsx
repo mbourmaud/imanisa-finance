@@ -14,10 +14,10 @@
  * ```
  */
 
-import { useFieldContext } from '../form-context';
 import { Input, type InputProps } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { useFieldContext } from '../form-context';
 
 interface NumberFieldProps extends Omit<InputProps, 'value' | 'onChange' | 'onBlur' | 'type'> {
 	/** Field label */
@@ -69,10 +69,7 @@ export function NumberField({
 	return (
 		<div className="flex flex-col gap-2">
 			{label && (
-				<Label
-					htmlFor={fieldId}
-					className={cn(hasError && 'text-destructive')}
-				>
+				<Label htmlFor={fieldId} className={cn(hasError && 'text-destructive')}>
 					{label}
 				</Label>
 			)}
@@ -87,21 +84,12 @@ export function NumberField({
 				max={max}
 				step={step}
 				aria-invalid={hasError}
-				aria-describedby={
-					hasError ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined
-				}
-				className={cn(
-					hasError && 'border-destructive focus-visible:ring-destructive',
-					className
-				)}
+				aria-describedby={hasError ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined}
+				className={cn(hasError && 'border-destructive focus-visible:ring-destructive', className)}
 				{...props}
 			/>
 			{!hideErrors && hasError && (
-				<p
-					id={`${fieldId}-error`}
-					className="text-sm text-destructive"
-					role="alert"
-				>
+				<p id={`${fieldId}-error`} className="text-sm text-destructive" role="alert">
 					{typeof errorMessage === 'string' ? errorMessage : 'Invalid value'}
 				</p>
 			)}

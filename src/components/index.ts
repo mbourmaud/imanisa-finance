@@ -10,23 +10,6 @@
  */
 
 // =============================================================================
-// TYPOGRAPHY
-// =============================================================================
-
-export type {
-	FontWeight,
-	HeadingLevel,
-	HeadingProps,
-	TextAlign,
-	TextColor,
-	TextProps,
-	TextSize,
-	TextTruncate,
-	TextVariant,
-} from './ui/typography';
-export { Heading, Text } from './ui/typography';
-
-// =============================================================================
 // ICONS
 // =============================================================================
 
@@ -165,7 +148,14 @@ export { Button, buttonVariants } from './ui/button';
 export { Checkbox } from './ui/checkbox';
 // Form components are exported separately from @/components/ui/form
 // due to TypeScript/react-hook-form compatibility issues with barrel exports
-export { FormControl, FormDescription, FormItem, FormLabel, FormMessage, useFormField } from './ui/form';
+export {
+	FormControl,
+	FormDescription,
+	FormItem,
+	FormLabel,
+	FormMessage,
+	useFormField,
+} from './ui/form';
 export type { InputProps } from './ui/input';
 export { Input } from './ui/input';
 export { Label } from './ui/label';

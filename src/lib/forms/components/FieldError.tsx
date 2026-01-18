@@ -19,8 +19,8 @@
  * ```
  */
 
-import { useFieldContext } from '../form-context';
 import { cn } from '@/lib/utils';
+import { useFieldContext } from '../form-context';
 
 interface FieldErrorProps {
 	/** Custom ID for the error element */
@@ -46,11 +46,7 @@ function getErrorMessage(error: unknown): string {
 	return 'Invalid value';
 }
 
-export function FieldError({
-	id,
-	className,
-	showUntouched = false,
-}: FieldErrorProps) {
+export function FieldError({ id, className, showUntouched = false }: FieldErrorProps) {
 	const field = useFieldContext();
 	const { name, state } = field;
 	const { meta } = state;
@@ -67,11 +63,7 @@ export function FieldError({
 	const errorId = id || `${name}-error`;
 
 	return (
-		<p
-			id={errorId}
-			className={cn('text-sm text-destructive', className)}
-			role="alert"
-		>
+		<p id={errorId} className={cn('text-sm text-destructive', className)} role="alert">
 			{errorMessage}
 		</p>
 	);

@@ -14,10 +14,10 @@
  * ```
  */
 
-import { useFieldContext } from '../form-context';
-import { Textarea, type TextareaProps } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea, type TextareaProps } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { useFieldContext } from '../form-context';
 
 interface TextAreaFieldProps extends Omit<TextareaProps, 'value' | 'onChange' | 'onBlur'> {
 	/** Field label */
@@ -48,10 +48,7 @@ export function TextAreaField({
 	return (
 		<div className="flex flex-col gap-2">
 			{label && (
-				<Label
-					htmlFor={fieldId}
-					className={cn(hasError && 'text-destructive')}
-				>
+				<Label htmlFor={fieldId} className={cn(hasError && 'text-destructive')}>
 					{label}
 				</Label>
 			)}
@@ -62,21 +59,12 @@ export function TextAreaField({
 				onChange={(e) => field.handleChange(e.target.value)}
 				onBlur={field.handleBlur}
 				aria-invalid={hasError}
-				aria-describedby={
-					hasError ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined
-				}
-				className={cn(
-					hasError && 'border-destructive focus-visible:ring-destructive',
-					className
-				)}
+				aria-describedby={hasError ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined}
+				className={cn(hasError && 'border-destructive focus-visible:ring-destructive', className)}
 				{...props}
 			/>
 			{!hideErrors && hasError && (
-				<p
-					id={`${fieldId}-error`}
-					className="text-sm text-destructive"
-					role="alert"
-				>
+				<p id={`${fieldId}-error`} className="text-sm text-destructive" role="alert">
 					{typeof errorMessage === 'string' ? errorMessage : 'Invalid value'}
 				</p>
 			)}
