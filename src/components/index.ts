@@ -383,6 +383,7 @@ export type { DashboardHeaderProps, DashboardMainProps } from './common/Dashboar
 export { DashboardHeader, DashboardHeaderMobile, DashboardMain } from './common/DashboardHeader';
 export type { LoadingSpinnerProps, LoadingSpinnerSize } from './common/LoadingSpinner';
 export { LoadingSpinner } from './common/LoadingSpinner';
+export { AppLogo } from './common/AppLogo';
 export type { IconBoxProps, IconBoxSize, IconBoxVariant, IconBoxRounded } from './common/IconBox';
 export { IconBox } from './common/IconBox';
 

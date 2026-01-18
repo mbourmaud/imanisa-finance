@@ -291,12 +291,20 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
 	);
 }
 
-function SidebarInset({ className, ...props }: React.ComponentProps<'main'>) {
+type SidebarInsetVariant = 'default' | 'muted'
+
+interface SidebarInsetProps extends React.ComponentProps<'main'> {
+	variant?: SidebarInsetVariant
+}
+
+function SidebarInset({ className, variant = 'default', ...props }: SidebarInsetProps) {
 	return (
 		<main
 			data-slot="sidebar-inset"
 			className={cn(
-				'bg-background relative flex w-full flex-1 flex-col',
+				'relative flex w-full flex-1 flex-col',
+				variant === 'default' && 'bg-background',
+				variant === 'muted' && 'bg-muted/30',
 				'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',
 				className,
 			)}
