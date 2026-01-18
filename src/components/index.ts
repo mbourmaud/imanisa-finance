@@ -450,3 +450,13 @@ export { GoogleIcon } from './login/GoogleIcon';
 export { GoogleLoginButton } from './login/GoogleLoginButton';
 export { LoginCard } from './login/LoginCard';
 export { LoginLogo } from './login/LoginLogo';
+
+// =============================================================================
+// AUTH ERROR PAGE COMPONENTS
+// =============================================================================
+
+export { AuthErrorBackground } from './auth/AuthErrorBackground';
+export { AuthErrorCard } from './auth/AuthErrorCard';
+export { AuthErrorContainer } from './auth/AuthErrorContainer';
+export { AuthErrorFooter } from './auth/AuthErrorFooter';
+export { AuthErrorLogo } from './auth/AuthErrorLogo';
