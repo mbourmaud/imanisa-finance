@@ -29,19 +29,22 @@ interface BankAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const BankAvatar = forwardRef<HTMLDivElement, BankAvatarProps>(
 	({ bank, logoUrl, size = 'md', className, ...props }, ref) => {
+		const colorStyle = {
+			'--bank-bg': bank.color,
+			'--bank-text': bank.textColor || '#ffffff',
+		} as React.CSSProperties;
+
 		return (
 			<div
 				ref={ref}
 				data-slot="bank-avatar"
 				className={cn(
 					'flex items-center justify-center rounded-xl font-bold overflow-hidden flex-shrink-0',
+					'bg-[var(--bank-bg)] text-[var(--bank-text)]',
 					avatarSizeClasses[size],
 					className,
 				)}
-				style={{
-					backgroundColor: bank.color,
-					color: bank.textColor || '#ffffff',
-				}}
+				style={colorStyle}
 				{...props}
 			>
 				{logoUrl ? (
