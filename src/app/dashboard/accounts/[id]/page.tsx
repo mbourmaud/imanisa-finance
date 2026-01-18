@@ -39,7 +39,11 @@ import {
 	SheetDescription,
 } from '@/components/ui/sheet';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { formatMoney, formatDate, formatRelativeTime } from '@/shared/utils';
+import { formatDate, formatRelativeTime } from '@/shared/utils';
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
+import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
+import { AccountTypeBadge } from '@/components/accounts/AccountCard';
+import { EmptyState } from '@/components/ui/empty-state';
 
 // TanStack Query hooks
 import {
@@ -126,16 +130,6 @@ function getStatusIcon(status: RawImport['status']) {
 		default:
 			return <Clock className="h-4 w-4 text-muted-foreground" />;
 	}
-}
-
-function getAccountTypeLabel(type: string): string {
-	const types: Record<string, string> = {
-		CHECKING: 'Compte courant',
-		SAVINGS: 'Epargne',
-		INVESTMENT: 'Investissement',
-		LOAN: 'Pret',
-	};
-	return types[type] || type;
 }
 
 function getBankShortName(name: string): string {
@@ -501,35 +495,35 @@ export default function AccountDetailPage() {
 	// ===== Render =====
 	if (isLoadingAccount) {
 		return (
-			<div className="flex items-center justify-center h-64">
-				<div className="flex flex-col items-center gap-4">
+			<EmptyState
+				title="Chargement du compte..."
+				iconElement={
 					<div className="relative">
 						<div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 animate-pulse" />
 						<Loader2 className="h-6 w-6 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 					</div>
-					<p className="text-sm text-muted-foreground">Chargement du compte...</p>
-				</div>
-			</div>
+				}
+				size="md"
+			/>
 		);
 	}
 
 	if (isAccountError || !account) {
 		return (
-			<div className="flex flex-col items-center justify-center h-64 gap-6">
-				<div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center">
-					<AlertCircle className="h-8 w-8 text-muted-foreground" />
-				</div>
-				<div className="text-center">
-					<p className="font-medium text-foreground">Compte introuvable</p>
-					<p className="text-sm text-muted-foreground mt-1">Ce compte n&apos;existe pas ou a été supprimé</p>
-				</div>
-				<Button variant="outline" className="gap-2" asChild>
-					<Link href="/dashboard/accounts">
-						<ArrowLeft className="h-4 w-4" />
-						Retour aux comptes
-					</Link>
-				</Button>
-			</div>
+			<EmptyState
+				icon={AlertCircle}
+				title="Compte introuvable"
+				description="Ce compte n'existe pas ou a été supprimé"
+				size="md"
+				action={
+					<Button variant="outline" className="gap-2" asChild>
+						<Link href="/dashboard/accounts">
+							<ArrowLeft className="h-4 w-4" />
+							Retour aux comptes
+						</Link>
+					</Button>
+				}
+			/>
 		);
 	}
 
@@ -592,9 +586,13 @@ export default function AccountDetailPage() {
 							{/* Balance + Actions */}
 							<div className="flex items-center gap-4 shrink-0">
 								<div className="text-right">
-									<p className="text-3xl sm:text-4xl font-bold number-display tracking-tight">
-										{formatMoney(account.balance, account.currency as 'EUR')}
-									</p>
+									<MoneyDisplay
+										amount={account.balance}
+										currency={account.currency as 'EUR'}
+										size="2xl"
+										weight="bold"
+										className="tracking-tight sm:text-4xl"
+									/>
 									<p className="text-xs text-muted-foreground mt-1 font-medium">
 										{account._count.transactions} transaction{account._count.transactions !== 1 ? 's' : ''}
 									</p>
@@ -627,9 +625,10 @@ export default function AccountDetailPage() {
 							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-white/10 text-muted-foreground">
 								{account.bank.name}
 							</span>
-							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-white/10 text-muted-foreground">
-								{getAccountTypeLabel(account.type)}
-							</span>
+							<AccountTypeBadge
+								type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
+								className="bg-white/60 dark:bg-white/10 rounded-full px-3 py-1"
+							/>
 							{account.accountNumber && (
 								<span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-white/60 dark:bg-white/10 text-muted-foreground">
 									{account.accountNumber}
@@ -640,26 +639,15 @@ export default function AccountDetailPage() {
 								<>
 									<span className="text-muted-foreground/40">•</span>
 									<div className="flex items-center gap-2">
-										<div className="flex -space-x-2">
-											{account.accountMembers.map((am) => (
-												<div
-													key={am.id}
-													className="relative group/avatar"
-												>
-													<div
-														className="absolute inset-0 rounded-full blur-md opacity-0 group-hover/avatar:opacity-50 transition-opacity"
-														style={{ backgroundColor: am.member.color || '#6b7280' }}
-													/>
-													<div
-														className="relative h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold ring-2 ring-white/80 dark:ring-card shadow-sm transition-transform hover:scale-110 hover:z-10"
-														style={{ backgroundColor: am.member.color || '#6b7280' }}
-														title={`${am.member.name} (${am.ownerShare}%)`}
-													>
-														{am.member.name.charAt(0).toUpperCase()}
-													</div>
-												</div>
-											))}
-										</div>
+										<MemberAvatarGroup
+											members={account.accountMembers.map((am) => ({
+												id: am.memberId,
+												name: am.member.name,
+												color: am.member.color,
+											}))}
+											size="sm"
+											max={5}
+										/>
 										<span className="text-xs text-muted-foreground hidden sm:inline font-medium">
 											{account.accountMembers.map((am) => am.member.name).join(', ')}
 										</span>
@@ -1270,15 +1258,12 @@ export default function AccountDetailPage() {
 					)}
 
 					{allTransactions.length === 0 && !isLoadingTransactions ? (
-						<div className="text-center py-16">
-							<div className="h-20 w-20 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
-								<FileSpreadsheet className="h-10 w-10 text-muted-foreground/50" />
-							</div>
-							<p className="font-semibold text-foreground">Aucune transaction</p>
-							<p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
-								Glissez un fichier CSV ou cliquez sur Importer pour ajouter vos transactions
-							</p>
-						</div>
+						<EmptyState
+							icon={FileSpreadsheet}
+							title="Aucune transaction"
+							description="Glissez un fichier CSV ou cliquez sur Importer pour ajouter vos transactions"
+							size="md"
+						/>
 					) : (
 						<div className="space-y-1">
 							{allTransactions.map((tx, index) => (
@@ -1311,16 +1296,14 @@ export default function AccountDetailPage() {
 											)}
 										</div>
 									</div>
-									<p
-										className={`font-bold number-display shrink-0 ml-4 text-base ${
-											tx.type === 'INCOME'
-												? 'text-[oklch(0.55_0.15_145)]'
-												: 'text-foreground'
-										}`}
-									>
-										{tx.type === 'INCOME' ? '+' : '−'}
-										{formatMoney(tx.amount)}
-									</p>
+									<MoneyDisplay
+										amount={tx.type === 'INCOME' ? tx.amount : -tx.amount}
+										format="withSign"
+										size="md"
+										weight="bold"
+										variant={tx.type === 'INCOME' ? 'positive' : 'default'}
+										className="shrink-0 ml-4"
+									/>
 								</div>
 							))}
 
