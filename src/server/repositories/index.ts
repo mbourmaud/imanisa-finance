@@ -42,6 +42,12 @@ export {
 	transactionRepository,
 } from './transaction-repository';
 export {
+	type CreateUserDTO,
+	type UpdateUserDTO,
+	type User,
+	userRepository,
+} from './user-repository';
+export {
 	type CreateUtilityContractDTO,
 	type UpdateUtilityContractDTO,
 	utilityContractRepository,
