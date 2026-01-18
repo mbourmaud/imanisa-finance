@@ -45,6 +45,7 @@ const BankAvatar = forwardRef<HTMLDivElement, BankAvatarProps>(
 				{...props}
 			>
 				{logoUrl ? (
+					// biome-ignore lint/performance/noImgElement: Logo is small, next/image overkill
 					<img src={logoUrl} alt={`Logo ${bank.name}`} className="h-full w-full object-cover" />
 				) : (
 					<span>{bank.shortName}</span>
@@ -100,6 +101,7 @@ const BankCard = forwardRef<HTMLDivElement, BankCardProps>(
 		const isDetailed = variant === 'detailed';
 
 		return (
+			// biome-ignore lint/a11y/noStaticElementInteractions: Card with conditional interactivity
 			<div
 				ref={ref}
 				data-slot="bank-card"

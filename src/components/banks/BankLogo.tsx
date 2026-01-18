@@ -123,6 +123,7 @@ export function BankLogo({
 			onClick={handleClick}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
+			// biome-ignore lint/a11y/useSemanticElements: Div used for complex logo styling
 			role="button"
 			tabIndex={0}
 			aria-label={`Changer le logo de ${bankName}`}

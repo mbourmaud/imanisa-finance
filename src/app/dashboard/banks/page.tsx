@@ -300,6 +300,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 	if (!hasAccounts) {
 		return (
 			<button
+				type="button"
 				onClick={onAddAccount}
 				style={{
 					...animationStyles,

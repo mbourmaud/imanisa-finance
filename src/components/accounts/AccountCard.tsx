@@ -350,6 +350,7 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 		}
 
 		return (
+			// biome-ignore lint/a11y/noStaticElementInteractions: Card with conditional interactivity
 			<div
 				ref={ref}
 				data-slot="account-card"
