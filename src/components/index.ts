@@ -441,3 +441,12 @@ export { LandingFooter } from './landing/LandingFooter';
 export { LandingLogo } from './landing/LandingLogo';
 export { ProfileButton } from './landing/ProfileButton';
 export { ProfileSelector } from './landing/ProfileSelector';
+
+// =============================================================================
+// LOGIN PAGE COMPONENTS
+// =============================================================================
+
+export { GoogleIcon } from './login/GoogleIcon';
+export { GoogleLoginButton } from './login/GoogleLoginButton';
+export { LoginCard } from './login/LoginCard';
+export { LoginLogo } from './login/LoginLogo';
