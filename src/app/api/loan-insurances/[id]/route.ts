@@ -22,7 +22,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 			return NextResponse.json({ error: 'Loan insurance not found' }, { status: 404 });
 		}
 
-		const { memberId, name, provider, contractNumber, coveragePercent, monthlyPremium, link, notes } = body;
+		const {
+			memberId,
+			name,
+			provider,
+			contractNumber,
+			coveragePercent,
+			monthlyPremium,
+			link,
+			notes,
+		} = body;
 
 		// Validate memberId if provided
 		if (memberId !== undefined) {
@@ -38,7 +47,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 				return NextResponse.json({ error: 'coveragePercent must be a number' }, { status: 400 });
 			}
 			if (coveragePercent < 0 || coveragePercent > 100) {
-				return NextResponse.json({ error: 'coveragePercent must be between 0 and 100' }, { status: 400 });
+				return NextResponse.json(
+					{ error: 'coveragePercent must be between 0 and 100' },
+					{ status: 400 },
+				);
 			}
 		}
 
@@ -48,7 +60,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 				return NextResponse.json({ error: 'monthlyPremium must be a number' }, { status: 400 });
 			}
 			if (monthlyPremium < 0) {
-				return NextResponse.json({ error: 'monthlyPremium must be a non-negative number' }, { status: 400 });
+				return NextResponse.json(
+					{ error: 'monthlyPremium must be a non-negative number' },
+					{ status: 400 },
+				);
 			}
 		}
 

@@ -1,20 +1,11 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
+import Link from 'next/link';
+import { useState } from 'react';
 import {
+	Box,
 	Building2,
-	Home,
-	Loader2,
-	MapPin,
-	MoreHorizontal,
-	Plus,
-	TrendingUp,
-	X,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
+	Button,
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -22,54 +13,68 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '@/components/ui/dialog'
-import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
-import {
+	EmptyState,
+	Flex,
+	GlassCard,
+	Grid,
+	Heading,
+	Home,
+	HStack,
+	Input,
+	Label,
+	Loader2,
+	MapPin,
+	MoreHorizontal,
+	PageHeader,
+	Plus,
+	Progress,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
+	Skeleton,
+	StatCard,
+	StatCardGrid,
+	Text,
+	TrendingUp,
+	VStack,
+	X,
+} from '@/components';
+import { useMembersQuery } from '@/features/members/hooks/use-members-query';
 import {
-	usePropertiesQuery,
-	useCreatePropertyMutation,
-	type PropertyWithDetails,
+	type MemberShare,
 	type PropertyType,
 	type PropertyUsage,
-	type MemberShare,
-} from '@/features/properties'
-import { useMembersQuery } from '@/features/members/hooks/use-members-query'
+	type PropertyWithDetails,
+	useCreatePropertyMutation,
+	usePropertiesQuery,
+} from '@/features/properties';
 
 interface PropertyFormData {
-	name: string
-	type: PropertyType | ''
-	usage: PropertyUsage | ''
-	address: string
-	address2: string
-	city: string
-	postalCode: string
-	surface: string
-	rooms: string
-	bedrooms: string
-	purchasePrice: string
-	purchaseDate: string
-	notaryFees: string
-	agencyFees: string
-	currentValue: string
-	rentAmount: string
-	rentCharges: string
-	notes: string
+	name: string;
+	type: PropertyType | '';
+	usage: PropertyUsage | '';
+	address: string;
+	address2: string;
+	city: string;
+	postalCode: string;
+	surface: string;
+	rooms: string;
+	bedrooms: string;
+	purchasePrice: string;
+	purchaseDate: string;
+	notaryFees: string;
+	agencyFees: string;
+	currentValue: string;
+	rentAmount: string;
+	rentCharges: string;
+	notes: string;
 }
 
 const initialFormData: PropertyFormData = {
@@ -91,199 +96,190 @@ const initialFormData: PropertyFormData = {
 	rentAmount: '',
 	rentCharges: '',
 	notes: '',
-}
+};
 
 function formatCurrency(amount: number): string {
 	return new Intl.NumberFormat('fr-FR', {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount)
+	}).format(amount);
 }
 
 function getPropertyTypeLabel(type: PropertyType): string {
 	switch (type) {
 		case 'HOUSE':
-			return 'Maison'
+			return 'Maison';
 		case 'APARTMENT':
-			return 'Appartement'
+			return 'Appartement';
 		default:
-			return type
+			return type;
 	}
 }
 
 function getPropertyUsageLabel(usage: PropertyUsage): string {
 	switch (usage) {
 		case 'PRIMARY':
-			return 'Résidence principale'
+			return 'Résidence principale';
 		case 'SECONDARY':
-			return 'Résidence secondaire'
+			return 'Résidence secondaire';
 		case 'RENTAL':
-			return 'Locatif'
+			return 'Locatif';
 		default:
-			return usage
+			return usage;
 	}
 }
 
 function PropertyCardSkeleton() {
 	return (
-		<Card className="border-border/60">
-			<CardHeader className="pb-3">
-				<div className="flex items-start justify-between">
-					<div className="flex items-center gap-3">
-						<Skeleton className="h-12 w-12 rounded-xl" />
-						<div className="space-y-2">
-							<Skeleton className="h-5 w-40" />
-							<Skeleton className="h-3 w-32" />
-						</div>
-					</div>
-				</div>
-			</CardHeader>
-			<CardContent className="space-y-4">
-				<div className="grid grid-cols-2 gap-4">
-					<Skeleton className="h-20 rounded-xl" />
-					<Skeleton className="h-20 rounded-xl" />
-				</div>
-				<Skeleton className="h-6 w-full" />
-			</CardContent>
-		</Card>
-	)
+		<GlassCard padding="lg">
+			<VStack gap="md">
+				<HStack justify="between" align="start">
+					<HStack gap="md" align="center">
+						<Skeleton style={{ height: '3rem', width: '3rem', borderRadius: '0.75rem' }} />
+						<VStack gap="sm">
+							<Skeleton style={{ height: '1.25rem', width: '10rem' }} />
+							<Skeleton style={{ height: '0.75rem', width: '8rem' }} />
+						</VStack>
+					</HStack>
+				</HStack>
+				<Grid cols={2} gap="md">
+					<Skeleton style={{ height: '5rem', borderRadius: '0.75rem' }} />
+					<Skeleton style={{ height: '5rem', borderRadius: '0.75rem' }} />
+				</Grid>
+				<Skeleton style={{ height: '1.5rem', width: '100%' }} />
+			</VStack>
+		</GlassCard>
+	);
 }
 
 function StatsCardSkeleton() {
 	return (
-		<div className="stat-card">
-			<div className="stat-card-content">
-				<div className="stat-card-text">
-					<Skeleton className="h-4 w-24 mb-2" />
-					<Skeleton className="h-8 w-32 mb-2" />
-					<Skeleton className="h-3 w-20" />
-				</div>
-				<Skeleton className="h-10 w-10 rounded-lg" />
-			</div>
-		</div>
-	)
+		<GlassCard padding="md">
+			<HStack justify="between" align="start">
+				<VStack gap="sm">
+					<Skeleton style={{ height: '1rem', width: '6rem' }} />
+					<Skeleton style={{ height: '2rem', width: '8rem' }} />
+					<Skeleton style={{ height: '0.75rem', width: '5rem' }} />
+				</VStack>
+				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.5rem' }} />
+			</HStack>
+		</GlassCard>
+	);
 }
 
-function EmptyState({ onAddClick }: { onAddClick: () => void }) {
+function PropertiesEmptyState({ onAddClick }: { onAddClick: () => void }) {
 	return (
-		<Card className="border-border/60 border-dashed">
-			<CardContent className="flex flex-col items-center justify-center py-12">
-				<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4">
-					<Building2 className="h-8 w-8 text-muted-foreground" />
-				</div>
-				<h3 className="text-lg font-medium mb-1">Aucun bien immobilier</h3>
-				<p className="text-sm text-muted-foreground text-center max-w-sm mb-4">
-					Ajoutez votre premier bien pour commencer à suivre votre patrimoine immobilier.
-				</p>
-				<Button className="gap-2" onClick={onAddClick}>
-					<Plus className="h-4 w-4" />
+		<EmptyState
+			icon={Building2}
+			title="Aucun bien immobilier"
+			description="Ajoutez votre premier bien pour commencer à suivre votre patrimoine immobilier."
+			action={
+				<Button onClick={onAddClick} iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 					Ajouter un bien
 				</Button>
-			</CardContent>
-		</Card>
-	)
+			}
+		/>
+	);
 }
 
 export default function RealEstatePage() {
 	// TanStack Query hooks
-	const { data, isLoading, isError, error } = usePropertiesQuery()
-	const { data: members = [] } = useMembersQuery()
-	const createPropertyMutation = useCreatePropertyMutation()
+	const { data, isLoading, isError, error } = usePropertiesQuery();
+	const { data: members = [] } = useMembersQuery();
+	const createPropertyMutation = useCreatePropertyMutation();
 
 	// Dialog state
-	const [isDialogOpen, setIsDialogOpen] = useState(false)
-	const [formData, setFormData] = useState<PropertyFormData>(initialFormData)
-	const [memberShares, setMemberShares] = useState<MemberShare[]>([])
-	const [formError, setFormError] = useState<string | null>(null)
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
+	const [memberShares, setMemberShares] = useState<MemberShare[]>([]);
+	const [formError, setFormError] = useState<string | null>(null);
 
 	// Derived data from query
-	const properties = data?.properties ?? []
-	const summary = data?.summary ?? null
+	const properties = data?.properties ?? [];
+	const summary = data?.summary ?? null;
 
 	const handleInputChange = (field: keyof PropertyFormData, value: string) => {
-		setFormData((prev) => ({ ...prev, [field]: value }))
-	}
+		setFormData((prev) => ({ ...prev, [field]: value }));
+	};
 
 	const handleAddMember = () => {
 		const availableMembers = members.filter(
-			(m) => !memberShares.some((ms) => ms.memberId === m.id)
-		)
+			(m) => !memberShares.some((ms) => ms.memberId === m.id),
+		);
 		if (availableMembers.length > 0) {
 			setMemberShares((prev) => [
 				...prev,
 				{ memberId: availableMembers[0].id, ownershipShare: 100 },
-			])
+			]);
 		}
-	}
+	};
 
 	const handleRemoveMember = (memberId: string) => {
-		setMemberShares((prev) => prev.filter((ms) => ms.memberId !== memberId))
-	}
+		setMemberShares((prev) => prev.filter((ms) => ms.memberId !== memberId));
+	};
 
 	const handleMemberChange = (index: number, memberId: string) => {
-		setMemberShares((prev) =>
-			prev.map((ms, i) => (i === index ? { ...ms, memberId } : ms))
-		)
-	}
+		setMemberShares((prev) => prev.map((ms, i) => (i === index ? { ...ms, memberId } : ms)));
+	};
 
 	const handleShareChange = (index: number, share: number) => {
 		setMemberShares((prev) =>
-			prev.map((ms, i) => (i === index ? { ...ms, ownershipShare: share } : ms))
-		)
-	}
+			prev.map((ms, i) => (i === index ? { ...ms, ownershipShare: share } : ms)),
+		);
+	};
 
 	const resetForm = () => {
-		setFormData(initialFormData)
-		setMemberShares([])
-		setFormError(null)
-	}
+		setFormData(initialFormData);
+		setMemberShares([]);
+		setFormError(null);
+	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		setFormError(null)
+		e.preventDefault();
+		setFormError(null);
 
 		try {
 			// Validate required fields
 			if (!formData.name.trim()) {
-				throw new Error('Le nom est requis')
+				throw new Error('Le nom est requis');
 			}
 			if (!formData.type) {
-				throw new Error('Le type est requis')
+				throw new Error('Le type est requis');
 			}
 			if (!formData.usage) {
-				throw new Error("L'usage est requis")
+				throw new Error("L'usage est requis");
 			}
 			if (!formData.address.trim()) {
-				throw new Error("L'adresse est requise")
+				throw new Error("L'adresse est requise");
 			}
 			if (!formData.city.trim()) {
-				throw new Error('La ville est requise')
+				throw new Error('La ville est requise');
 			}
 			if (!formData.postalCode.trim()) {
-				throw new Error('Le code postal est requis')
+				throw new Error('Le code postal est requis');
 			}
 			if (!formData.surface) {
-				throw new Error('La surface est requise')
+				throw new Error('La surface est requise');
 			}
 			if (!formData.purchasePrice) {
-				throw new Error("Le prix d'achat est requis")
+				throw new Error("Le prix d'achat est requis");
 			}
 			if (!formData.purchaseDate) {
-				throw new Error("La date d'achat est requise")
+				throw new Error("La date d'achat est requise");
 			}
 			if (!formData.notaryFees) {
-				throw new Error('Les frais de notaire sont requis')
+				throw new Error('Les frais de notaire sont requis');
 			}
 			if (!formData.currentValue) {
-				throw new Error('La valeur actuelle est requise')
+				throw new Error('La valeur actuelle est requise');
 			}
 
 			// Validate member shares total to 100%
 			if (memberShares.length > 0) {
-				const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)
+				const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0);
 				if (totalShare !== 100) {
-					throw new Error('La somme des parts de propriété doit être égale à 100%')
+					throw new Error('La somme des parts de propriété doit être égale à 100%');
 				}
 			}
 
@@ -307,417 +303,484 @@ export default function RealEstatePage() {
 				rentCharges: formData.rentCharges ? Number.parseFloat(formData.rentCharges) : null,
 				notes: formData.notes.trim() || null,
 				memberShares: memberShares.length > 0 ? memberShares : undefined,
-			})
+			});
 
 			// Success - close dialog and reset form
-			setIsDialogOpen(false)
-			resetForm()
+			setIsDialogOpen(false);
+			resetForm();
 		} catch (err) {
-			setFormError(err instanceof Error ? err.message : 'Une erreur est survenue')
+			setFormError(err instanceof Error ? err.message : 'Une erreur est survenue');
 		}
-	}
+	};
 
-	const isRental = formData.usage === 'RENTAL'
-	const isSubmitting = createPropertyMutation.isPending
+	const isRental = formData.usage === 'RENTAL';
+	const isSubmitting = createPropertyMutation.isPending;
 
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Immobilier</h1>
-					<p className="mt-1 text-muted-foreground">Gérez votre patrimoine immobilier</p>
-				</div>
-				<Dialog open={isDialogOpen} onOpenChange={(open) => {
-					setIsDialogOpen(open)
-					if (!open) resetForm()
-				}}>
-					<DialogTrigger asChild>
-						<Button className="gap-2">
-							<Plus className="h-4 w-4" />
-							Ajouter un bien
-						</Button>
-					</DialogTrigger>
-					<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-						<DialogHeader>
-							<DialogTitle>Ajouter un bien immobilier</DialogTitle>
-							<DialogDescription>
-								Renseignez les informations de votre bien immobilier.
-							</DialogDescription>
-						</DialogHeader>
-						<form onSubmit={handleSubmit} className="space-y-6">
-							{/* Error message */}
-							{formError && (
-								<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
-									<p className="text-sm text-destructive">{formError}</p>
-								</div>
-							)}
-
-							{/* Basic info */}
-							<div className="space-y-4">
-								<h3 className="text-sm font-medium text-muted-foreground">Informations générales</h3>
-								<div className="grid gap-4 sm:grid-cols-2">
-									<div className="space-y-2">
-										<Label htmlFor="name">Nom du bien *</Label>
-										<Input
-											id="name"
-											placeholder="Appartement Paris 15"
-											value={formData.name}
-											onChange={(e) => handleInputChange('name', e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="type">Type *</Label>
-										<Select
-											value={formData.type}
-											onValueChange={(value) => handleInputChange('type', value)}
+			<PageHeader
+				title="Immobilier"
+				description="Gérez votre patrimoine immobilier"
+				actions={
+					<Dialog
+						open={isDialogOpen}
+						onOpenChange={(open) => {
+							setIsDialogOpen(open);
+							if (!open) resetForm();
+						}}
+					>
+						<DialogTrigger asChild>
+							<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
+								Ajouter un bien
+							</Button>
+						</DialogTrigger>
+						<DialogContent style={{ maxWidth: '42rem', maxHeight: '90vh', overflowY: 'auto' }}>
+							<DialogHeader>
+								<DialogTitle>Ajouter un bien immobilier</DialogTitle>
+								<DialogDescription>
+									Renseignez les informations de votre bien immobilier.
+								</DialogDescription>
+							</DialogHeader>
+							<form onSubmit={handleSubmit}>
+								<VStack gap="lg">
+									{/* Error message */}
+									{formError && (
+										<Box
+											style={{
+												borderRadius: '0.5rem',
+												padding: '0.75rem',
+												backgroundColor: 'hsl(var(--destructive) / 0.1)',
+												border: '1px solid hsl(var(--destructive) / 0.2)',
+											}}
 										>
-											<SelectTrigger className="w-full">
-												<SelectValue placeholder="Sélectionner..." />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="APARTMENT">Appartement</SelectItem>
-												<SelectItem value="HOUSE">Maison</SelectItem>
-											</SelectContent>
-										</Select>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="usage">Usage *</Label>
-										<Select
-											value={formData.usage}
-											onValueChange={(value) => handleInputChange('usage', value)}
-										>
-											<SelectTrigger className="w-full">
-												<SelectValue placeholder="Sélectionner..." />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="PRIMARY">Résidence principale</SelectItem>
-												<SelectItem value="SECONDARY">Résidence secondaire</SelectItem>
-												<SelectItem value="RENTAL">Locatif</SelectItem>
-											</SelectContent>
-										</Select>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="surface">Surface (m²) *</Label>
-										<Input
-											id="surface"
-											type="number"
-											min="0"
-											step="0.01"
-											placeholder="65"
-											value={formData.surface}
-											onChange={(e) => handleInputChange('surface', e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="rooms">Pièces</Label>
-										<Input
-											id="rooms"
-											type="number"
-											min="0"
-											placeholder="3"
-											value={formData.rooms}
-											onChange={(e) => handleInputChange('rooms', e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="bedrooms">Chambres</Label>
-										<Input
-											id="bedrooms"
-											type="number"
-											min="0"
-											placeholder="2"
-											value={formData.bedrooms}
-											onChange={(e) => handleInputChange('bedrooms', e.target.value)}
-										/>
-									</div>
-								</div>
-							</div>
+											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+												{formError}
+											</Text>
+										</Box>
+									)}
 
-							{/* Address */}
-							<div className="space-y-4">
-								<h3 className="text-sm font-medium text-muted-foreground">Adresse</h3>
-								<div className="space-y-4">
-									<div className="space-y-2">
-										<Label htmlFor="address">Adresse *</Label>
-										<Input
-											id="address"
-											placeholder="10 rue de Paris"
-											value={formData.address}
-											onChange={(e) => handleInputChange('address', e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="address2">Complément d&apos;adresse</Label>
-										<Input
-											id="address2"
-											placeholder="Bâtiment A, 3ème étage"
-											value={formData.address2}
-											onChange={(e) => handleInputChange('address2', e.target.value)}
-										/>
-									</div>
-									<div className="grid gap-4 sm:grid-cols-2">
-										<div className="space-y-2">
-											<Label htmlFor="city">Ville *</Label>
+									{/* Basic info */}
+									<VStack gap="md">
+										<Text size="sm" weight="medium" color="muted">
+											Informations générales
+										</Text>
+										<Grid cols={1} colsSm={2} gap="md">
+											<VStack gap="sm">
+												<Label htmlFor="name">Nom du bien *</Label>
+												<Input
+													id="name"
+													placeholder="Appartement Paris 15"
+													value={formData.name}
+													onChange={(e) => handleInputChange('name', e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="type">Type *</Label>
+												<Select
+													value={formData.type}
+													onValueChange={(value) => handleInputChange('type', value)}
+												>
+													<SelectTrigger style={{ width: '100%' }}>
+														<SelectValue placeholder="Sélectionner..." />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value="APARTMENT">Appartement</SelectItem>
+														<SelectItem value="HOUSE">Maison</SelectItem>
+													</SelectContent>
+												</Select>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="usage">Usage *</Label>
+												<Select
+													value={formData.usage}
+													onValueChange={(value) => handleInputChange('usage', value)}
+												>
+													<SelectTrigger style={{ width: '100%' }}>
+														<SelectValue placeholder="Sélectionner..." />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value="PRIMARY">Résidence principale</SelectItem>
+														<SelectItem value="SECONDARY">Résidence secondaire</SelectItem>
+														<SelectItem value="RENTAL">Locatif</SelectItem>
+													</SelectContent>
+												</Select>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="surface">Surface (m²) *</Label>
+												<Input
+													id="surface"
+													type="number"
+													min="0"
+													step="0.01"
+													placeholder="65"
+													value={formData.surface}
+													onChange={(e) => handleInputChange('surface', e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="rooms">Pièces</Label>
+												<Input
+													id="rooms"
+													type="number"
+													min="0"
+													placeholder="3"
+													value={formData.rooms}
+													onChange={(e) => handleInputChange('rooms', e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="bedrooms">Chambres</Label>
+												<Input
+													id="bedrooms"
+													type="number"
+													min="0"
+													placeholder="2"
+													value={formData.bedrooms}
+													onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+												/>
+											</VStack>
+										</Grid>
+									</VStack>
+
+									{/* Address */}
+									<VStack gap="md">
+										<Text size="sm" weight="medium" color="muted">
+											Adresse
+										</Text>
+										<VStack gap="md">
+											<VStack gap="sm">
+												<Label htmlFor="address">Adresse *</Label>
+												<Input
+													id="address"
+													placeholder="10 rue de Paris"
+													value={formData.address}
+													onChange={(e) => handleInputChange('address', e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="address2">Complément d&apos;adresse</Label>
+												<Input
+													id="address2"
+													placeholder="Bâtiment A, 3ème étage"
+													value={formData.address2}
+													onChange={(e) => handleInputChange('address2', e.target.value)}
+												/>
+											</VStack>
+											<Grid cols={1} colsSm={2} gap="md">
+												<VStack gap="sm">
+													<Label htmlFor="city">Ville *</Label>
+													<Input
+														id="city"
+														placeholder="Paris"
+														value={formData.city}
+														onChange={(e) => handleInputChange('city', e.target.value)}
+													/>
+												</VStack>
+												<VStack gap="sm">
+													<Label htmlFor="postalCode">Code postal *</Label>
+													<Input
+														id="postalCode"
+														placeholder="75015"
+														value={formData.postalCode}
+														onChange={(e) => handleInputChange('postalCode', e.target.value)}
+													/>
+												</VStack>
+											</Grid>
+										</VStack>
+									</VStack>
+
+									{/* Purchase info */}
+									<VStack gap="md">
+										<Text size="sm" weight="medium" color="muted">
+											Achat
+										</Text>
+										<Grid cols={1} colsSm={2} gap="md">
+											<VStack gap="sm">
+												<Label htmlFor="purchasePrice">Prix d&apos;achat (€) *</Label>
+												<Input
+													id="purchasePrice"
+													type="number"
+													min="0"
+													step="0.01"
+													placeholder="350000"
+													value={formData.purchasePrice}
+													onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="purchaseDate">Date d&apos;achat *</Label>
+												<Input
+													id="purchaseDate"
+													type="date"
+													value={formData.purchaseDate}
+													onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="notaryFees">Frais de notaire (€) *</Label>
+												<Input
+													id="notaryFees"
+													type="number"
+													min="0"
+													step="0.01"
+													placeholder="25000"
+													value={formData.notaryFees}
+													onChange={(e) => handleInputChange('notaryFees', e.target.value)}
+												/>
+											</VStack>
+											<VStack gap="sm">
+												<Label htmlFor="agencyFees">Frais d&apos;agence (€)</Label>
+												<Input
+													id="agencyFees"
+													type="number"
+													min="0"
+													step="0.01"
+													placeholder="10000"
+													value={formData.agencyFees}
+													onChange={(e) => handleInputChange('agencyFees', e.target.value)}
+												/>
+											</VStack>
+										</Grid>
+									</VStack>
+
+									{/* Current value */}
+									<VStack gap="md">
+										<Text size="sm" weight="medium" color="muted">
+											Valeur actuelle
+										</Text>
+										<VStack gap="sm">
+											<Label htmlFor="currentValue">Valeur estimée (€) *</Label>
 											<Input
-												id="city"
-												placeholder="Paris"
-												value={formData.city}
-												onChange={(e) => handleInputChange('city', e.target.value)}
-											/>
-										</div>
-										<div className="space-y-2">
-											<Label htmlFor="postalCode">Code postal *</Label>
-											<Input
-												id="postalCode"
-												placeholder="75015"
-												value={formData.postalCode}
-												onChange={(e) => handleInputChange('postalCode', e.target.value)}
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{/* Purchase info */}
-							<div className="space-y-4">
-								<h3 className="text-sm font-medium text-muted-foreground">Achat</h3>
-								<div className="grid gap-4 sm:grid-cols-2">
-									<div className="space-y-2">
-										<Label htmlFor="purchasePrice">Prix d&apos;achat (€) *</Label>
-										<Input
-											id="purchasePrice"
-											type="number"
-											min="0"
-											step="0.01"
-											placeholder="350000"
-											value={formData.purchasePrice}
-											onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="purchaseDate">Date d&apos;achat *</Label>
-										<Input
-											id="purchaseDate"
-											type="date"
-											value={formData.purchaseDate}
-											onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="notaryFees">Frais de notaire (€) *</Label>
-										<Input
-											id="notaryFees"
-											type="number"
-											min="0"
-											step="0.01"
-											placeholder="25000"
-											value={formData.notaryFees}
-											onChange={(e) => handleInputChange('notaryFees', e.target.value)}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="agencyFees">Frais d&apos;agence (€)</Label>
-										<Input
-											id="agencyFees"
-											type="number"
-											min="0"
-											step="0.01"
-											placeholder="10000"
-											value={formData.agencyFees}
-											onChange={(e) => handleInputChange('agencyFees', e.target.value)}
-										/>
-									</div>
-								</div>
-							</div>
-
-							{/* Current value */}
-							<div className="space-y-4">
-								<h3 className="text-sm font-medium text-muted-foreground">Valeur actuelle</h3>
-								<div className="space-y-2">
-									<Label htmlFor="currentValue">Valeur estimée (€) *</Label>
-									<Input
-										id="currentValue"
-										type="number"
-										min="0"
-										step="0.01"
-										placeholder="380000"
-										value={formData.currentValue}
-										onChange={(e) => handleInputChange('currentValue', e.target.value)}
-									/>
-								</div>
-							</div>
-
-							{/* Rental info - only shown for RENTAL usage */}
-							{isRental && (
-								<div className="space-y-4">
-									<h3 className="text-sm font-medium text-muted-foreground">Informations locatives</h3>
-									<div className="grid gap-4 sm:grid-cols-2">
-										<div className="space-y-2">
-											<Label htmlFor="rentAmount">Loyer mensuel (€)</Label>
-											<Input
-												id="rentAmount"
+												id="currentValue"
 												type="number"
 												min="0"
 												step="0.01"
-												placeholder="1200"
-												value={formData.rentAmount}
-												onChange={(e) => handleInputChange('rentAmount', e.target.value)}
+												placeholder="380000"
+												value={formData.currentValue}
+												onChange={(e) => handleInputChange('currentValue', e.target.value)}
 											/>
-										</div>
-										<div className="space-y-2">
-											<Label htmlFor="rentCharges">Charges locatives (€)</Label>
-											<Input
-												id="rentCharges"
-												type="number"
-												min="0"
-												step="0.01"
-												placeholder="150"
-												value={formData.rentCharges}
-												onChange={(e) => handleInputChange('rentCharges', e.target.value)}
-											/>
-										</div>
-									</div>
-								</div>
-							)}
+										</VStack>
+									</VStack>
 
-							{/* Members/Owners */}
-							<div className="space-y-4">
-								<div className="flex items-center justify-between">
-									<h3 className="text-sm font-medium text-muted-foreground">Propriétaires</h3>
-									{members.length > memberShares.length && (
+									{/* Rental info - only shown for RENTAL usage */}
+									{isRental && (
+										<VStack gap="md">
+											<Text size="sm" weight="medium" color="muted">
+												Informations locatives
+											</Text>
+											<Grid cols={1} colsSm={2} gap="md">
+												<VStack gap="sm">
+													<Label htmlFor="rentAmount">Loyer mensuel (€)</Label>
+													<Input
+														id="rentAmount"
+														type="number"
+														min="0"
+														step="0.01"
+														placeholder="1200"
+														value={formData.rentAmount}
+														onChange={(e) => handleInputChange('rentAmount', e.target.value)}
+													/>
+												</VStack>
+												<VStack gap="sm">
+													<Label htmlFor="rentCharges">Charges locatives (€)</Label>
+													<Input
+														id="rentCharges"
+														type="number"
+														min="0"
+														step="0.01"
+														placeholder="150"
+														value={formData.rentCharges}
+														onChange={(e) => handleInputChange('rentCharges', e.target.value)}
+													/>
+												</VStack>
+											</Grid>
+										</VStack>
+									)}
+
+									{/* Members/Owners */}
+									<VStack gap="md">
+										<HStack justify="between" align="center">
+											<Text size="sm" weight="medium" color="muted">
+												Propriétaires
+											</Text>
+											{members.length > memberShares.length && (
+												<Button
+													type="button"
+													variant="outline"
+													size="sm"
+													onClick={handleAddMember}
+													iconLeft={<Plus style={{ height: '0.75rem', width: '0.75rem' }} />}
+												>
+													Ajouter
+												</Button>
+											)}
+										</HStack>
+										{memberShares.length === 0 ? (
+											<Text size="sm" color="muted">
+												Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter
+												des propriétaires.
+											</Text>
+										) : (
+											<VStack gap="md">
+												{memberShares.map((ms, index) => {
+													const member = members.find((m) => m.id === ms.memberId);
+													const availableMembers = members.filter(
+														(m) =>
+															m.id === ms.memberId ||
+															!memberShares.some((other) => other.memberId === m.id),
+													);
+													return (
+														<HStack
+															key={ms.memberId}
+															gap="md"
+															align="center"
+															p="sm"
+															style={{
+																borderRadius: '0.5rem',
+																backgroundColor: 'hsl(var(--muted) / 0.3)',
+															}}
+														>
+															<Flex
+																align="center"
+																justify="center"
+																style={{
+																	borderRadius: '9999px',
+																	height: '2rem',
+																	width: '2rem',
+																	fontSize: '0.875rem',
+																	fontWeight: 500,
+																	color: 'white',
+																	flexShrink: 0,
+																	backgroundColor: member?.color || '#6b7280',
+																}}
+															>
+																{member?.name.charAt(0).toUpperCase()}
+															</Flex>
+															<Select
+																value={ms.memberId}
+																onValueChange={(value) => handleMemberChange(index, value)}
+															>
+																<SelectTrigger style={{ flex: 1 }}>
+																	<SelectValue />
+																</SelectTrigger>
+																<SelectContent>
+																	{availableMembers.map((m) => (
+																		<SelectItem key={m.id} value={m.id}>
+																			{m.name}
+																		</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+															<HStack gap="sm" align="center">
+																<Input
+																	type="number"
+																	min="0"
+																	max="100"
+																	style={{ width: '5rem' }}
+																	value={ms.ownershipShare}
+																	onChange={(e) =>
+																		handleShareChange(
+																			index,
+																			Number.parseInt(e.target.value, 10) || 0,
+																		)
+																	}
+																/>
+																<Text size="sm" color="muted">
+																	%
+																</Text>
+															</HStack>
+															<Button
+																type="button"
+																variant="ghost"
+																size="icon"
+																style={{ height: '2rem', width: '2rem', flexShrink: 0 }}
+																onClick={() => handleRemoveMember(ms.memberId)}
+															>
+																<X style={{ height: '1rem', width: '1rem' }} />
+															</Button>
+														</HStack>
+													);
+												})}
+												{memberShares.length > 0 && (
+													<Text size="xs" color="muted" style={{ textAlign: 'right' }}>
+														Total: {memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
+														{memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !==
+															100 && (
+															<span
+																style={{ color: 'hsl(var(--destructive))', marginLeft: '0.25rem' }}
+															>
+																(doit être 100%)
+															</span>
+														)}
+													</Text>
+												)}
+											</VStack>
+										)}
+									</VStack>
+
+									{/* Notes */}
+									<VStack gap="sm">
+										<Label htmlFor="notes">Notes</Label>
+										<Input
+											id="notes"
+											placeholder="Notes additionnelles..."
+											value={formData.notes}
+											onChange={(e) => handleInputChange('notes', e.target.value)}
+										/>
+									</VStack>
+
+									<DialogFooter style={{ paddingTop: '1rem' }}>
 										<Button
 											type="button"
 											variant="outline"
-											size="sm"
-											onClick={handleAddMember}
-											className="gap-1"
+											onClick={() => setIsDialogOpen(false)}
+											disabled={isSubmitting}
 										>
-											<Plus className="h-3 w-3" />
-											Ajouter
+											Annuler
 										</Button>
-									)}
-								</div>
-								{memberShares.length === 0 ? (
-									<p className="text-sm text-muted-foreground">
-										Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des propriétaires.
-									</p>
-								) : (
-									<div className="space-y-3">
-										{memberShares.map((ms, index) => {
-											const member = members.find((m) => m.id === ms.memberId)
-											const availableMembers = members.filter(
-												(m) => m.id === ms.memberId || !memberShares.some((other) => other.memberId === m.id)
-											)
-											return (
-												<div key={ms.memberId} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-													<div
-														className="h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium text-white shrink-0"
-														style={{ backgroundColor: member?.color || '#6b7280' }}
-													>
-														{member?.name.charAt(0).toUpperCase()}
-													</div>
-													<Select
-														value={ms.memberId}
-														onValueChange={(value) => handleMemberChange(index, value)}
-													>
-														<SelectTrigger className="flex-1">
-															<SelectValue />
-														</SelectTrigger>
-														<SelectContent>
-															{availableMembers.map((m) => (
-																<SelectItem key={m.id} value={m.id}>
-																	{m.name}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-													<div className="flex items-center gap-2">
-														<Input
-															type="number"
-															min="0"
-															max="100"
-															className="w-20"
-															value={ms.ownershipShare}
-															onChange={(e) =>
-																handleShareChange(index, Number.parseInt(e.target.value, 10) || 0)
-															}
-														/>
-														<span className="text-sm text-muted-foreground">%</span>
-													</div>
-													<Button
-														type="button"
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 shrink-0"
-														onClick={() => handleRemoveMember(ms.memberId)}
-													>
-														<X className="h-4 w-4" />
-													</Button>
-												</div>
-											)
-										})}
-										{memberShares.length > 0 && (
-											<div className="text-xs text-muted-foreground text-right">
-												Total: {memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
-												{memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !== 100 && (
-													<span className="text-destructive ml-1">(doit être 100%)</span>
-												)}
-											</div>
-										)}
-									</div>
-								)}
-							</div>
-
-							{/* Notes */}
-							<div className="space-y-2">
-								<Label htmlFor="notes">Notes</Label>
-								<Input
-									id="notes"
-									placeholder="Notes additionnelles..."
-									value={formData.notes}
-									onChange={(e) => handleInputChange('notes', e.target.value)}
-								/>
-							</div>
-
-							<DialogFooter className="pt-4">
-								<Button
-									type="button"
-									variant="outline"
-									onClick={() => setIsDialogOpen(false)}
-									disabled={isSubmitting}
-								>
-									Annuler
-								</Button>
-								<Button type="submit" disabled={isSubmitting}>
-									{isSubmitting ? (
-										<>
-											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-											Création...
-										</>
-									) : (
-										'Créer le bien'
-									)}
-								</Button>
-							</DialogFooter>
-						</form>
-					</DialogContent>
-				</Dialog>
-			</div>
+										<Button type="submit" disabled={isSubmitting}>
+											{isSubmitting ? (
+												<>
+													<Loader2
+														style={{
+															marginRight: '0.5rem',
+															height: '1rem',
+															width: '1rem',
+															animation: 'spin 1s linear infinite',
+														}}
+													/>
+													Création...
+												</>
+											) : (
+												'Créer le bien'
+											)}
+										</Button>
+									</DialogFooter>
+								</VStack>
+							</form>
+						</DialogContent>
+					</Dialog>
+				}
+			/>
 
 			{/* Error state */}
 			{isError && (
-				<Card className="border-destructive/50 bg-destructive/5">
-					<CardContent className="py-4">
-						<p className="text-sm text-destructive">
-							{error instanceof Error ? error.message : 'Une erreur est survenue'}
-						</p>
-					</CardContent>
-				</Card>
+				<GlassCard
+					padding="md"
+					style={{
+						borderColor: 'hsl(var(--destructive) / 0.5)',
+						backgroundColor: 'hsl(var(--destructive) / 0.05)',
+					}}
+				>
+					<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+						{error instanceof Error ? error.message : 'Une erreur est survenue'}
+					</Text>
+				</GlassCard>
 			)}
 
 			{/* Stats Overview */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
+			<StatCardGrid columns={4}>
 				{isLoading ? (
 					<>
 						<StatsCardSkeleton />
@@ -727,265 +790,409 @@ export default function RealEstatePage() {
 					</>
 				) : summary ? (
 					<>
-						<div className="stat-card">
-							<div className="stat-card-content">
-								<div className="stat-card-text">
-									<p className="text-xs sm:text-sm font-medium text-muted-foreground">Valeur totale</p>
-									<p className="stat-card-value">{formatCurrency(summary.totalValue)}</p>
-									<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-										{summary.totalProperties} bien{summary.totalProperties > 1 ? 's' : ''}
-									</p>
-								</div>
-								<div className="stat-card-icon">
-									<Building2 className="h-4 w-4 sm:h-5 sm:w-5" />
-								</div>
-							</div>
-						</div>
+						<StatCard
+							label="Valeur totale"
+							value={formatCurrency(summary.totalValue)}
+							description={`${summary.totalProperties} bien${summary.totalProperties > 1 ? 's' : ''}`}
+							icon={Building2}
+							variant="default"
+						/>
 
-						<div className="stat-card">
-							<div className="stat-card-content">
-								<div className="stat-card-text">
-									<p className="text-xs sm:text-sm font-medium text-muted-foreground">Valeur nette</p>
-									<p className="stat-card-value value-positive">{formatCurrency(summary.totalEquity)}</p>
-									<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Après crédits</p>
-								</div>
-								<div className="stat-card-icon bg-[oklch(0.55_0.15_145)]/10 text-[oklch(0.55_0.15_145)]">
-									<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
-								</div>
-							</div>
-						</div>
+						<StatCard
+							label="Valeur nette"
+							value={formatCurrency(summary.totalEquity)}
+							description="Après crédits"
+							icon={TrendingUp}
+							variant="teal"
+						/>
 
-						<div className="stat-card">
-							<div className="stat-card-content">
-								<div className="stat-card-text">
-									<p className="text-xs sm:text-sm font-medium text-muted-foreground">Crédits restants</p>
-									<p className="stat-card-value">{formatCurrency(summary.totalLoansRemaining)}</p>
-									<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">
-										{summary.totalValue > 0
-											? `${((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(0)}% de la valeur`
-											: '-'}
-									</p>
-								</div>
-								<div className="stat-card-icon">
-									<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 rotate-180" />
-								</div>
-							</div>
-						</div>
+						<StatCard
+							label="Crédits restants"
+							value={formatCurrency(summary.totalLoansRemaining)}
+							description={
+								summary.totalValue > 0
+									? `${((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(0)}% de la valeur`
+									: '-'
+							}
+							icon={TrendingUp}
+							variant="default"
+						/>
 
-						<div className="stat-card">
-							<div className="stat-card-content">
-								<div className="stat-card-text">
-									<p className="text-xs sm:text-sm font-medium text-muted-foreground">Équité</p>
-									<p className="stat-card-value">
-										{summary.totalValue > 0
-											? `${((summary.totalEquity / summary.totalValue) * 100).toFixed(0)}%`
-											: '-'}
-									</p>
-									<p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Du patrimoine</p>
-								</div>
-								<div className="stat-card-icon">
-									<Building2 className="h-4 w-4 sm:h-5 sm:w-5" />
-								</div>
-							</div>
-						</div>
+						<StatCard
+							label="Équité"
+							value={
+								summary.totalValue > 0
+									? `${((summary.totalEquity / summary.totalValue) * 100).toFixed(0)}%`
+									: '-'
+							}
+							description="Du patrimoine"
+							icon={Building2}
+							variant="default"
+						/>
 					</>
 				) : null}
-			</div>
+			</StatCardGrid>
 
 			{/* Credit Progress */}
 			{!isLoading && summary && summary.totalValue > 0 && (
-				<Card className="border-border/60">
-					<CardContent className="pt-6">
-						<div className="flex items-center justify-between mb-3">
-							<div>
-								<p className="font-medium">Capital restant dû</p>
-								<p className="text-sm text-muted-foreground">
-									{formatCurrency(summary.totalLoansRemaining)} sur {formatCurrency(summary.totalValue)}
-								</p>
-							</div>
-							<p className="text-lg font-semibold number-display">
-								{((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(1)}%
-							</p>
-						</div>
-						<Progress value={(summary.totalLoansRemaining / summary.totalValue) * 100} className="h-3" />
-						<p className="mt-2 text-xs text-muted-foreground">
-							Équité: {formatCurrency(summary.totalEquity)} ({((summary.totalEquity / summary.totalValue) * 100).toFixed(1)}%)
-						</p>
-					</CardContent>
-				</Card>
+				<GlassCard padding="lg">
+					<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
+						<VStack gap="none">
+							<Text weight="medium">Capital restant dû</Text>
+							<Text size="sm" color="muted">
+								{formatCurrency(summary.totalLoansRemaining)} sur{' '}
+								{formatCurrency(summary.totalValue)}
+							</Text>
+						</VStack>
+						<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+							{((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(1)}%
+						</Text>
+					</HStack>
+					<Progress
+						value={(summary.totalLoansRemaining / summary.totalValue) * 100}
+						style={{ height: '0.75rem' }}
+					/>
+					<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
+						Équité: {formatCurrency(summary.totalEquity)} (
+						{((summary.totalEquity / summary.totalValue) * 100).toFixed(1)}%)
+					</Text>
+				</GlassCard>
 			)}
 
 			{/* Properties Grid */}
 			{isLoading ? (
-				<div className="grid gap-6 lg:grid-cols-2">
+				<Grid cols={1} colsLg={2} gap="lg">
 					<PropertyCardSkeleton />
 					<PropertyCardSkeleton />
-				</div>
+				</Grid>
 			) : properties.length === 0 ? (
-				<EmptyState onAddClick={() => setIsDialogOpen(true)} />
+				<PropertiesEmptyState onAddClick={() => setIsDialogOpen(true)} />
 			) : (
-				<div className="grid gap-6 lg:grid-cols-2">
+				<Grid cols={1} colsLg={2} gap="lg">
 					{properties.map((property: PropertyWithDetails) => {
-						const totalLoansRemaining = property.loans.reduce((sum, loan) => sum + loan.remainingAmount, 0)
+						const totalLoansRemaining = property.loans.reduce(
+							(sum, loan) => sum + loan.remainingAmount,
+							0,
+						);
 						const appreciation =
-							((property.currentValue - property.purchasePrice) / property.purchasePrice) * 100
-						const equity = property.currentValue - totalLoansRemaining
-						const loanProgress = property.purchasePrice > 0
-							? (totalLoansRemaining / property.purchasePrice) * 100
-							: 0
-						const isRentalProperty = property.usage === 'RENTAL'
+							((property.currentValue - property.purchasePrice) / property.purchasePrice) * 100;
+						const equity = property.currentValue - totalLoansRemaining;
+						const loanProgress =
+							property.purchasePrice > 0 ? (totalLoansRemaining / property.purchasePrice) * 100 : 0;
+						const isRentalProperty = property.usage === 'RENTAL';
 
 						return (
-							<Card key={property.id} className="border-border/60 group overflow-hidden">
-								<CardHeader className="pb-3">
-									<div className="flex items-start justify-between">
-										<Link href={`/dashboard/real-estate/${property.id}`} className="flex items-center gap-3 flex-1 min-w-0">
-											<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+							<GlassCard key={property.id} padding="lg" style={{ overflow: 'hidden' }}>
+								<VStack gap="md">
+									{/* Header */}
+									<HStack justify="between" align="start">
+										<Link
+											href={`/dashboard/real-estate/${property.id}`}
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: '0.75rem',
+												flex: 1,
+												minWidth: 0,
+											}}
+										>
+											<Flex
+												align="center"
+												justify="center"
+												style={{
+													borderRadius: '0.75rem',
+													height: '3rem',
+													width: '3rem',
+													backgroundColor: 'hsl(var(--primary) / 0.1)',
+													color: 'hsl(var(--primary))',
+													flexShrink: 0,
+												}}
+											>
 												{property.type === 'HOUSE' ? (
-													<Home className="h-6 w-6" />
+													<Home style={{ height: '1.5rem', width: '1.5rem' }} />
 												) : (
-													<Building2 className="h-6 w-6" />
+													<Building2 style={{ height: '1.5rem', width: '1.5rem' }} />
 												)}
-											</div>
-											<div className="min-w-0">
-												<CardTitle className="text-lg font-medium truncate">{property.name}</CardTitle>
-												<div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-													<MapPin className="h-3 w-3 shrink-0" />
-													<span className="truncate">{property.address}, {property.city}</span>
-												</div>
-											</div>
+											</Flex>
+											<Box style={{ minWidth: 0 }}>
+												<Heading
+													level={3}
+													size="lg"
+													weight="medium"
+													style={{
+														overflow: 'hidden',
+														textOverflow: 'ellipsis',
+														whiteSpace: 'nowrap',
+													}}
+												>
+													{property.name}
+												</Heading>
+												<HStack gap="xs" align="center" style={{ marginTop: '0.125rem' }}>
+													<MapPin
+														style={{
+															height: '0.75rem',
+															width: '0.75rem',
+															flexShrink: 0,
+															color: 'hsl(var(--muted-foreground))',
+														}}
+													/>
+													<Text
+														size="xs"
+														color="muted"
+														style={{
+															overflow: 'hidden',
+															textOverflow: 'ellipsis',
+															whiteSpace: 'nowrap',
+														}}
+													>
+														{property.address}, {property.city}
+													</Text>
+												</HStack>
+											</Box>
 										</Link>
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
 												<Button
 													variant="ghost"
 													size="icon"
-													className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+													style={{
+														height: '2rem',
+														width: '2rem',
+														opacity: 0,
+														transition: 'opacity 0.2s',
+														flexShrink: 0,
+													}}
 												>
-													<MoreHorizontal className="h-4 w-4" />
+													<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
 												</Button>
 											</DropdownMenuTrigger>
 											<DropdownMenuContent align="end">
 												<DropdownMenuItem asChild>
-													<Link href={`/dashboard/real-estate/${property.id}`}>Voir les détails</Link>
+													<Link href={`/dashboard/real-estate/${property.id}`}>
+														Voir les détails
+													</Link>
 												</DropdownMenuItem>
 												<DropdownMenuItem>Modifier</DropdownMenuItem>
 												<DropdownMenuSeparator />
-												<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+												<DropdownMenuItem style={{ color: 'hsl(var(--destructive))' }}>
+													Supprimer
+												</DropdownMenuItem>
 											</DropdownMenuContent>
 										</DropdownMenu>
-									</div>
-									<div className="flex flex-wrap gap-1.5 mt-2">
-										<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+									</HStack>
+									<HStack gap="sm" style={{ flexWrap: 'wrap' }}>
+										<Box
+											as="span"
+											style={{
+												borderRadius: '9999px',
+												fontSize: '0.625rem',
+												padding: '0.125rem 0.5rem',
+												backgroundColor: 'hsl(var(--muted))',
+												color: 'hsl(var(--muted-foreground))',
+											}}
+										>
 											{getPropertyTypeLabel(property.type)}
-										</span>
-										<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+										</Box>
+										<Box
+											as="span"
+											style={{
+												borderRadius: '9999px',
+												fontSize: '0.625rem',
+												padding: '0.125rem 0.5rem',
+												backgroundColor: 'hsl(var(--muted))',
+												color: 'hsl(var(--muted-foreground))',
+											}}
+										>
 											{getPropertyUsageLabel(property.usage)}
-										</span>
+										</Box>
 										{property.propertyMembers.length > 0 && (
-											<span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-												{property.propertyMembers.map(pm => pm.member.name).join(', ')}
-											</span>
+											<Box
+												as="span"
+												rounded="full"
+												style={{
+													fontSize: '0.625rem',
+													padding: '0.125rem 0.5rem',
+													backgroundColor: 'hsl(var(--muted))',
+													color: 'hsl(var(--muted-foreground))',
+												}}
+											>
+												{property.propertyMembers.map((pm) => pm.member.name).join(', ')}
+											</Box>
 										)}
-									</div>
-								</CardHeader>
-								<CardContent className="space-y-4">
+									</HStack>
 									{/* Value & Equity */}
-									<div className="grid grid-cols-2 gap-4">
-										<div className="rounded-xl bg-muted/30 p-3">
-											<p className="text-xs text-muted-foreground">Valeur actuelle</p>
-											<p className="text-xl font-semibold number-display mt-1">
+									<Grid cols={2} gap="md">
+										<Box
+											style={{
+												borderRadius: '0.75rem',
+												padding: '0.75rem',
+												backgroundColor: 'hsl(var(--muted) / 0.3)',
+											}}
+										>
+											<Text size="xs" color="muted">
+												Valeur actuelle
+											</Text>
+											<Text
+												size="xl"
+												weight="semibold"
+												style={{ fontVariantNumeric: 'tabular-nums', marginTop: '0.25rem' }}
+											>
 												{formatCurrency(property.currentValue)}
-											</p>
-											<p
-												className={`text-xs font-medium mt-0.5 ${
-													appreciation >= 0 ? 'value-positive' : 'value-negative'
-												}`}
+											</Text>
+											<Text
+												size="xs"
+												weight="medium"
+												style={{
+													marginTop: '0.125rem',
+													color: appreciation >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
+												}}
 											>
 												{appreciation >= 0 ? '+' : ''}
 												{appreciation.toFixed(1)}% depuis l&apos;achat
-											</p>
-										</div>
-										<div className="rounded-xl bg-muted/30 p-3">
-											<p className="text-xs text-muted-foreground">Équité</p>
-											<p className="text-xl font-semibold number-display mt-1 value-positive">
+											</Text>
+										</Box>
+										<Box
+											style={{
+												borderRadius: '0.75rem',
+												padding: '0.75rem',
+												backgroundColor: 'hsl(var(--muted) / 0.3)',
+											}}
+										>
+											<Text size="xs" color="muted">
+												Équité
+											</Text>
+											<Text
+												size="xl"
+												weight="semibold"
+												style={{
+													fontVariantNumeric: 'tabular-nums',
+													marginTop: '0.25rem',
+													color: 'oklch(0.55 0.15 145)',
+												}}
+											>
 												{formatCurrency(equity)}
-											</p>
-											<p className="text-xs text-muted-foreground mt-0.5">
+											</Text>
+											<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
 												{property.currentValue > 0
 													? `${((equity / property.currentValue) * 100).toFixed(0)}% de la valeur`
 													: '-'}
-											</p>
-										</div>
-									</div>
+											</Text>
+										</Box>
+									</Grid>
 
 									{/* Loan Progress */}
 									{totalLoansRemaining > 0 && (
-										<div>
-											<div className="flex justify-between text-xs mb-1">
-												<span className="text-muted-foreground">
-													Crédit restant ({property._count.loans} prêt{property._count.loans > 1 ? 's' : ''})
-												</span>
-												<span className="number-display">
+										<VStack gap="xs">
+											<HStack justify="between">
+												<Text size="xs" color="muted">
+													Crédit restant ({property._count.loans} prêt
+													{property._count.loans > 1 ? 's' : ''})
+												</Text>
+												<Text size="xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
 													{formatCurrency(totalLoansRemaining)}
-												</span>
-											</div>
-											<Progress value={100 - loanProgress} className="h-2" />
-										</div>
+												</Text>
+											</HStack>
+											<Progress value={100 - loanProgress} style={{ height: '0.5rem' }} />
+										</VStack>
 									)}
 
 									{/* Info Grid */}
-									<div className="grid grid-cols-3 gap-3 pt-2 border-t border-border/40">
-										<div className="text-center">
-											<div className="flex items-center justify-center gap-1 text-muted-foreground">
-												<Home className="h-3.5 w-3.5" />
-												<span className="text-xs">Surface</span>
-											</div>
-											<p className="font-medium mt-1">{property.surface} m²</p>
-										</div>
-										<div className="text-center">
-											<div className="flex items-center justify-center gap-1 text-muted-foreground">
-												<Building2 className="h-3.5 w-3.5" />
-												<span className="text-xs">Pièces</span>
-											</div>
-											<p className="font-medium mt-1">{property.rooms || '-'}</p>
-										</div>
-										<div className="text-center">
-											<div className="flex items-center justify-center gap-1 text-muted-foreground">
-												<Building2 className="h-3.5 w-3.5" />
-												<span className="text-xs">Chambres</span>
-											</div>
-											<p className="font-medium mt-1">{property.bedrooms || '-'}</p>
-										</div>
-									</div>
+									<Grid
+										cols={3}
+										gap="md"
+										style={{
+											paddingTop: '0.5rem',
+											borderTop: '1px solid hsl(var(--border) / 0.4)',
+										}}
+									>
+										<Box style={{ textAlign: 'center' }}>
+											<HStack
+												gap="xs"
+												align="center"
+												justify="center"
+												style={{ color: 'hsl(var(--muted-foreground))' }}
+											>
+												<Home style={{ height: '0.875rem', width: '0.875rem' }} />
+												<Text size="xs">Surface</Text>
+											</HStack>
+											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
+												{property.surface} m²
+											</Text>
+										</Box>
+										<Box style={{ textAlign: 'center' }}>
+											<HStack
+												gap="xs"
+												align="center"
+												justify="center"
+												style={{ color: 'hsl(var(--muted-foreground))' }}
+											>
+												<Building2 style={{ height: '0.875rem', width: '0.875rem' }} />
+												<Text size="xs">Pièces</Text>
+											</HStack>
+											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
+												{property.rooms || '-'}
+											</Text>
+										</Box>
+										<Box style={{ textAlign: 'center' }}>
+											<HStack
+												gap="xs"
+												align="center"
+												justify="center"
+												style={{ color: 'hsl(var(--muted-foreground))' }}
+											>
+												<Building2 style={{ height: '0.875rem', width: '0.875rem' }} />
+												<Text size="xs">Chambres</Text>
+											</HStack>
+											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
+												{property.bedrooms || '-'}
+											</Text>
+										</Box>
+									</Grid>
 
 									{/* Rent Info if rental */}
 									{isRentalProperty && property.rentAmount && (
-										<div className="rounded-xl bg-[oklch(0.55_0.15_145)]/10 p-3">
-											<div className="flex justify-between items-center">
-												<div>
-													<p className="text-xs text-[oklch(0.55_0.15_145)]">Loyer mensuel</p>
-													<p className="text-lg font-semibold number-display text-[oklch(0.55_0.15_145)]">
+										<Box
+											style={{
+												borderRadius: '0.75rem',
+												padding: '0.75rem',
+												backgroundColor: 'oklch(0.55 0.15 145 / 0.1)',
+											}}
+										>
+											<HStack justify="between" align="center">
+												<VStack gap="none">
+													<Text size="xs" style={{ color: 'oklch(0.55 0.15 145)' }}>
+														Loyer mensuel
+													</Text>
+													<Text
+														size="lg"
+														weight="semibold"
+														style={{
+															fontVariantNumeric: 'tabular-nums',
+															color: 'oklch(0.55 0.15 145)',
+														}}
+													>
 														{formatCurrency(property.rentAmount)}
-													</p>
-												</div>
+													</Text>
+												</VStack>
 												{property.rentCharges && (
-													<div className="text-right">
-														<p className="text-xs text-muted-foreground">Net de charges</p>
-														<p className="font-medium number-display">
+													<Box style={{ textAlign: 'right' }}>
+														<Text size="xs" color="muted">
+															Net de charges
+														</Text>
+														<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 															{formatCurrency(property.rentAmount - property.rentCharges)}
-														</p>
-													</div>
+														</Text>
+													</Box>
 												)}
-											</div>
-										</div>
+											</HStack>
+										</Box>
 									)}
-								</CardContent>
-							</Card>
-						)
+								</VStack>
+							</GlassCard>
+						);
 					})}
-				</div>
+				</Grid>
 			)}
-		</div>
-	)
+		</VStack>
+	);
 }

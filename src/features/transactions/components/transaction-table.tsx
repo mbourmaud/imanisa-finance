@@ -7,22 +7,33 @@
  * Supports sorting, filtering, pagination, and row selection.
  */
 
-import { useMemo, useState, useCallback } from 'react';
-import type { PaginationState, RowSelectionState, SortingState, Updater } from '@tanstack/react-table';
-import { Search, X } from 'lucide-react';
-import { DataTable } from '@/components/ui/data-table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import type {
+	PaginationState,
+	RowSelectionState,
+	SortingState,
+	Updater,
+} from '@tanstack/react-table';
+import { useCallback, useMemo, useState } from 'react';
 import {
+	Box,
+	Button,
+	DataTable,
+	Flex,
+	HStack,
+	Input,
+	Search,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
+	Text,
+	VStack,
+	X,
+} from '@/components';
 import { useTransactionsQuery } from '../hooks/use-transactions-query';
-import { createTransactionColumns } from './transaction-columns';
 import type { Transaction, TransactionFilters, TransactionType } from '../types';
+import { createTransactionColumns } from './transaction-columns';
 
 interface TransactionTableProps {
 	/** Initial filters to apply */
@@ -131,42 +142,60 @@ export function TransactionTable({
 
 	if (isError) {
 		return (
-			<div className="flex h-48 items-center justify-center text-muted-foreground">
-				Erreur lors du chargement des transactions
-			</div>
+			<Flex align="center" justify="center" style={{ height: '12rem' }}>
+				<Text color="muted">Erreur lors du chargement des transactions</Text>
+			</Flex>
 		);
 	}
 
 	return (
-		<div className="space-y-4">
+		<VStack gap="md">
 			{/* Filters */}
-			<div className="flex flex-col gap-4 sm:flex-row">
-				<div className="relative flex-1">
-					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+			<Flex gap="md" style={{ flexDirection: 'column' }}>
+				<Box position="relative" style={{ flex: 1 }}>
+					<Search
+						style={{
+							position: 'absolute',
+							left: '0.75rem',
+							top: '50%',
+							height: '1rem',
+							width: '1rem',
+							transform: 'translateY(-50%)',
+							color: 'hsl(var(--muted-foreground))',
+						}}
+					/>
 					<Input
 						placeholder="Rechercher une transaction..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						className="pl-10"
+						style={{ paddingLeft: '2.5rem' }}
 					/>
-				</div>
-				<Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as TransactionType | 'all')}>
-					<SelectTrigger className="w-[150px]">
-						<SelectValue placeholder="Type" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">Tous</SelectItem>
-						<SelectItem value="income">Revenus</SelectItem>
-						<SelectItem value="expense">Dépenses</SelectItem>
-					</SelectContent>
-				</Select>
-				{hasActiveFilters && (
-					<Button variant="ghost" onClick={clearFilters} className="gap-2">
-						<X className="h-4 w-4" />
-						Effacer
-					</Button>
-				)}
-			</div>
+				</Box>
+				<HStack gap="md">
+					<Select
+						value={typeFilter}
+						onValueChange={(v) => setTypeFilter(v as TransactionType | 'all')}
+					>
+						<SelectTrigger style={{ width: '150px' }}>
+							<SelectValue placeholder="Type" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">Tous</SelectItem>
+							<SelectItem value="income">Revenus</SelectItem>
+							<SelectItem value="expense">Dépenses</SelectItem>
+						</SelectContent>
+					</Select>
+					{hasActiveFilters && (
+						<Button
+							variant="ghost"
+							onClick={clearFilters}
+							iconLeft={<X style={{ height: '1rem', width: '1rem' }} />}
+						>
+							Effacer
+						</Button>
+					)}
+				</HStack>
+			</Flex>
 
 			{/* Table */}
 			<DataTable
@@ -188,6 +217,6 @@ export function TransactionTable({
 				// Empty state
 				emptyMessage="Aucune transaction trouvée"
 			/>
-		</div>
+		</VStack>
 	);
 }

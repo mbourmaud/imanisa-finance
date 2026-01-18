@@ -7,17 +7,31 @@
  * Supports infinite scroll for transactions, import management, and account settings.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+	// Icons
 	AlertCircle,
 	ArrowLeft,
+	// Layout
+	Box,
+	// Form elements
+	Button,
 	Check,
 	CheckCircle2,
 	Clock,
+	// Feedback
+	EmptyState,
 	ExternalLink,
 	FileSpreadsheet,
+	Flex,
+	// Cards
+	GlassCard,
+	Heading,
+	HStack,
+	IconWrapper,
+	Input,
 	Loader2,
 	Pencil,
 	Plus,
@@ -25,40 +39,42 @@ import {
 	RotateCcw,
 	Search,
 	Settings,
-	Trash2,
-	Upload,
-	X,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
+	// Sheet
 	Sheet,
 	SheetContent,
+	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-	SheetDescription,
-} from '@/components/ui/sheet';
+	// Typography
+	Text,
+	Trash2,
+	Upload,
+	VStack,
+	X,
+} from '@/components';
+import { AccountTypeBadge } from '@/components/accounts/AccountCard';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { formatMoney, formatDate, formatRelativeTime } from '@/shared/utils';
-
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
+import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
 // TanStack Query hooks
 import {
 	useAccountQuery,
-	useUpdateAccountMutation,
-	useDeleteAccountMutation,
-	useSyncAccountMutation,
 	useAddAccountMemberMutation,
+	useDeleteAccountMutation,
 	useRemoveAccountMemberMutation,
+	useSyncAccountMutation,
+	useUpdateAccountMutation,
 } from '@/features/accounts';
 import {
+	useDeleteImportMutation,
 	useImportsQuery,
-	useUploadImportMutation,
 	useProcessImportMutation,
 	useReprocessImportMutation,
-	useDeleteImportMutation,
+	useUploadImportMutation,
 } from '@/features/imports';
 import { useMembersQuery } from '@/features/members';
 import { useTransactionsQuery } from '@/features/transactions/hooks/use-transactions-query';
+import { formatDate, formatRelativeTime } from '@/shared/utils';
 
 // Types for data returned by API (more complete than domain types)
 interface AccountMember {
@@ -118,24 +134,29 @@ interface RawImport {
 function getStatusIcon(status: RawImport['status']) {
 	switch (status) {
 		case 'PROCESSED':
-			return <CheckCircle2 className="h-4 w-4 text-[oklch(0.55_0.15_145)]" />;
+			return (
+				<CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }} />
+			);
 		case 'PROCESSING':
-			return <Loader2 className="h-4 w-4 text-primary animate-spin" />;
+			return (
+				<Loader2
+					style={{
+						height: '1rem',
+						width: '1rem',
+						color: 'hsl(var(--primary))',
+						animation: 'spin 1s linear infinite',
+					}}
+				/>
+			);
 		case 'FAILED':
-			return <AlertCircle className="h-4 w-4 text-[oklch(0.55_0.2_25)]" />;
+			return (
+				<AlertCircle style={{ height: '1rem', width: '1rem', color: 'hsl(var(--destructive))' }} />
+			);
 		default:
-			return <Clock className="h-4 w-4 text-muted-foreground" />;
+			return (
+				<Clock style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+			);
 	}
-}
-
-function getAccountTypeLabel(type: string): string {
-	const types: Record<string, string> = {
-		CHECKING: 'Compte courant',
-		SAVINGS: 'Epargne',
-		INVESTMENT: 'Investissement',
-		LOAN: 'Pret',
-	};
-	return types[type] || type;
 }
 
 function getBankShortName(name: string): string {
@@ -180,7 +201,7 @@ export default function AccountDetailPage() {
 		isFetching: isFetchingTransactions,
 	} = useTransactionsQuery(
 		{ accountId, search: searchQuery || undefined },
-		{ page: currentPage, pageSize }
+		{ page: currentPage, pageSize },
 	);
 
 	// ===== Mutations =====
@@ -287,7 +308,7 @@ export default function AccountDetailPage() {
 					loadMore();
 				}
 			},
-			{ threshold: 0.1, rootMargin: '100px' }
+			{ threshold: 0.1, rootMargin: '100px' },
 		);
 
 		observerRef.current.observe(currentRef);
@@ -313,7 +334,7 @@ export default function AccountDetailPage() {
 
 			if (result.process.skippedCount > 0) {
 				setError(
-					`${result.process.recordsCount} transactions importées, ${result.process.skippedCount} doublons ignorés`
+					`${result.process.recordsCount} transactions importées, ${result.process.skippedCount} doublons ignorés`,
 				);
 			}
 
@@ -418,8 +439,11 @@ export default function AccountDetailPage() {
 				id: accountId,
 				input: {
 					name: name.trim(),
-					description: (editDescription !== '' ? editDescription : account.description)?.trim() || undefined,
-					accountNumber: (editAccountNumber !== '' ? editAccountNumber : account.accountNumber)?.trim() || undefined,
+					description:
+						(editDescription !== '' ? editDescription : account.description)?.trim() || undefined,
+					accountNumber:
+						(editAccountNumber !== '' ? editAccountNumber : account.accountNumber)?.trim() ||
+						undefined,
 				},
 			});
 			setIsEditingAccount(false);
@@ -446,14 +470,19 @@ export default function AccountDetailPage() {
 	const saveInitialBalance = async () => {
 		if (!account) return;
 
-		const balanceStr = editInitialBalance !== '' ? editInitialBalance : account.initialBalance?.toString() || '0';
+		const balanceStr =
+			editInitialBalance !== '' ? editInitialBalance : account.initialBalance?.toString() || '0';
 		const balanceValue = parseFloat(balanceStr.replace(',', '.'));
 		if (Number.isNaN(balanceValue)) {
 			setError('Montant invalide');
 			return;
 		}
 
-		const dateValue = editInitialBalanceDate || (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '');
+		const dateValue =
+			editInitialBalanceDate ||
+			(account.initialBalanceDate
+				? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+				: '');
 
 		try {
 			await updateAccountMutation.mutateAsync({
@@ -494,214 +523,350 @@ export default function AccountDetailPage() {
 	const availableMembers = useMemo(() => {
 		if (!account) return [];
 		return (allMembers ?? []).filter(
-			(m) => !account.accountMembers.some((am) => am.memberId === m.id)
+			(m) => !account.accountMembers.some((am) => am.memberId === m.id),
 		);
 	}, [allMembers, account]);
 
 	// ===== Render =====
 	if (isLoadingAccount) {
 		return (
-			<div className="flex items-center justify-center h-64">
-				<div className="flex flex-col items-center gap-4">
-					<div className="relative">
-						<div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 animate-pulse" />
-						<Loader2 className="h-6 w-6 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-					</div>
-					<p className="text-sm text-muted-foreground">Chargement du compte...</p>
-				</div>
-			</div>
+			<EmptyState
+				title="Chargement du compte..."
+				iconElement={
+					<Box style={{ position: 'relative' }}>
+						<Box
+							style={{
+								height: '3rem',
+								width: '3rem',
+								borderRadius: '9999px',
+								background:
+									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
+								animation: 'pulse 2s ease-in-out infinite',
+							}}
+						/>
+						<Loader2
+							style={{
+								height: '1.5rem',
+								width: '1.5rem',
+								color: 'hsl(var(--primary))',
+								animation: 'spin 1s linear infinite',
+								position: 'absolute',
+								top: '50%',
+								left: '50%',
+								transform: 'translate(-50%, -50%)',
+							}}
+						/>
+					</Box>
+				}
+				size="md"
+			/>
 		);
 	}
 
 	if (isAccountError || !account) {
 		return (
-			<div className="flex flex-col items-center justify-center h-64 gap-6">
-				<div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center">
-					<AlertCircle className="h-8 w-8 text-muted-foreground" />
-				</div>
-				<div className="text-center">
-					<p className="font-medium text-foreground">Compte introuvable</p>
-					<p className="text-sm text-muted-foreground mt-1">Ce compte n&apos;existe pas ou a été supprimé</p>
-				</div>
-				<Button variant="outline" className="gap-2" asChild>
-					<Link href="/dashboard/accounts">
-						<ArrowLeft className="h-4 w-4" />
-						Retour aux comptes
-					</Link>
-				</Button>
-			</div>
+			<EmptyState
+				icon={AlertCircle}
+				title="Compte introuvable"
+				description="Ce compte n'existe pas ou a été supprimé"
+				size="md"
+				action={
+					<Button variant="outline" iconLeft={<IconWrapper icon={ArrowLeft} size="sm" />} asChild>
+						<Link href="/dashboard/accounts">Retour aux comptes</Link>
+					</Button>
+				}
+			/>
 		);
 	}
 
 	return (
-		<div className="space-y-6">
+		<VStack gap="lg">
 			{/* Back link */}
 			<Link
 				href="/dashboard/banks"
-				className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-all duration-200 group"
+				style={{
+					display: 'inline-flex',
+					alignItems: 'center',
+					gap: '0.5rem',
+					fontSize: '0.875rem',
+					color: 'hsl(var(--muted-foreground))',
+					transition: 'all 0.2s',
+					textDecoration: 'none',
+				}}
 			>
-				<ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-				Retour aux banques
+				<ArrowLeft style={{ height: '1rem', width: '1rem', transition: 'transform 0.2s' }} />
+				<span>Retour aux banques</span>
 			</Link>
 
 			{/* Header - Glassmorphism card */}
-			<div className="glass-card p-6 sm:p-8 hover-shine">
+			<GlassCard padding="lg" style={{ position: 'relative' }}>
 				{/* Gradient accent bar */}
-				<div
-					className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
+				<Box
 					style={{
-						background: `linear-gradient(90deg, ${account.bank.color}, ${account.bank.color}88, transparent)`
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						height: '0.25rem',
+						borderRadius: '1rem 1rem 0 0',
+						background: `linear-gradient(90deg, ${account.bank.color}, ${account.bank.color}88, transparent)`,
 					}}
 				/>
 
-				<div className="flex items-start gap-5">
+				<HStack gap="lg" align="start">
 					{/* Bank logo with glow */}
-					<div className="relative group/logo shrink-0">
-						<div
-							className="absolute inset-0 rounded-2xl blur-xl opacity-40 group-hover/logo:opacity-60 transition-opacity"
-							style={{ backgroundColor: account.bank.color }}
-						/>
-						<div
-							className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-white font-bold text-lg shadow-lg transition-transform hover:scale-105"
+					<Box style={{ position: 'relative', flexShrink: 0 }}>
+						<Box
 							style={{
-								background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)`
+								position: 'absolute',
+								inset: 0,
+								filter: 'blur(16px)',
+								opacity: 0.4,
+								borderRadius: '1rem',
+								backgroundColor: account.bank.color,
+							}}
+						/>
+						<Flex
+							align="center"
+							justify="center"
+							style={{
+								position: 'relative',
+								height: '4rem',
+								width: '4rem',
+								borderRadius: '1rem',
+								boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+								color: 'white',
+								fontWeight: 700,
+								fontSize: '1.125rem',
+								transition: 'transform 0.2s',
+								background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)`,
 							}}
 						>
 							{getBankShortName(account.bank.name)}
-						</div>
-					</div>
+						</Flex>
+					</Box>
 
 					{/* Content */}
-					<div className="flex-1 min-w-0">
+					<Flex direction="col" grow minW0>
 						{/* Top row: Name + Balance + Actions */}
-						<div className="flex items-start justify-between gap-4">
-							<div className="min-w-0">
-								<div className="flex items-center gap-3">
-									<h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{account.name}</h1>
+						<HStack justify="between" align="start" gap="md">
+							<Box minW0>
+								<HStack gap="sm" align="center">
+									<Heading level={1} size="2xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
+										{account.name}
+									</Heading>
 									<Button
 										variant="ghost"
 										size="icon"
-										className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/10 shrink-0 transition-all"
 										onClick={startEditingAccount}
+										style={{
+											height: '2.25rem',
+											width: '2.25rem',
+											borderRadius: '0.75rem',
+											color: 'hsl(var(--muted-foreground))',
+											flexShrink: 0,
+											transition: 'all 0.2s',
+										}}
 									>
-										<Pencil className="h-4 w-4" />
+										<Pencil style={{ height: '1rem', width: '1rem' }} />
 									</Button>
-								</div>
-							</div>
+								</HStack>
+							</Box>
 
 							{/* Balance + Actions */}
-							<div className="flex items-center gap-4 shrink-0">
-								<div className="text-right">
-									<p className="text-3xl sm:text-4xl font-bold number-display tracking-tight">
-										{formatMoney(account.balance, account.currency as 'EUR')}
-									</p>
-									<p className="text-xs text-muted-foreground mt-1 font-medium">
-										{account._count.transactions} transaction{account._count.transactions !== 1 ? 's' : ''}
-									</p>
-								</div>
+							<HStack gap="md" align="center" style={{ flexShrink: 0 }}>
+								<VStack gap="none" align="end">
+									<MoneyDisplay
+										amount={account.balance}
+										currency={account.currency as 'EUR'}
+										size="2xl"
+										weight="bold"
+										style={{ letterSpacing: '-0.025em' }}
+									/>
+									<Text size="xs" color="muted" weight="medium" style={{ marginTop: '0.25rem' }}>
+										{account._count.transactions} transaction
+										{account._count.transactions !== 1 ? 's' : ''}
+									</Text>
+								</VStack>
 
 								{/* Actions */}
-								<div className="flex items-center gap-2">
+								<HStack gap="sm" align="center">
 									<Button
 										variant="ghost"
 										size="icon"
-										className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-white/20 shadow-sm transition-all hover:scale-105"
 										onClick={() => setShowSettings(true)}
+										style={{
+											height: '2.5rem',
+											width: '2.5rem',
+											borderRadius: '0.75rem',
+											backgroundColor: 'hsl(var(--background) / 0.5)',
+											border: '1px solid hsl(var(--border) / 0.2)',
+											boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+											transition: 'all 0.2s',
+										}}
 									>
-										<Settings className="h-4 w-4" />
+										<Settings style={{ height: '1rem', width: '1rem' }} />
 									</Button>
 									<Button
 										variant="ghost"
 										size="icon"
-										className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-[oklch(0.55_0.2_25)]/10 border border-white/20 shadow-sm text-muted-foreground hover:text-[oklch(0.55_0.2_25)] transition-all hover:scale-105"
 										onClick={() => setDeleteAccountOpen(true)}
+										style={{
+											height: '2.5rem',
+											width: '2.5rem',
+											borderRadius: '0.75rem',
+											backgroundColor: 'hsl(var(--background) / 0.5)',
+											border: '1px solid hsl(var(--border) / 0.2)',
+											boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+											color: 'hsl(var(--muted-foreground))',
+											transition: 'all 0.2s',
+										}}
 									>
-										<Trash2 className="h-4 w-4" />
+										<Trash2 style={{ height: '1rem', width: '1rem' }} />
 									</Button>
-								</div>
-							</div>
-						</div>
+								</HStack>
+							</HStack>
+						</HStack>
 
 						{/* Bottom row: Bank info + Members */}
-						<div className="flex flex-wrap items-center gap-2 mt-3">
-							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-white/10 text-muted-foreground">
+						<Flex wrap="wrap" align="center" gap="sm" style={{ marginTop: '0.75rem' }}>
+							<Text
+								as="span"
+								size="xs"
+								weight="medium"
+								style={{
+									display: 'inline-flex',
+									alignItems: 'center',
+									gap: '0.375rem',
+									padding: '0.25rem 0.75rem',
+									borderRadius: '9999px',
+									backgroundColor: 'hsl(var(--background) / 0.6)',
+									color: 'hsl(var(--muted-foreground))',
+								}}
+							>
 								{account.bank.name}
-							</span>
-							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-white/10 text-muted-foreground">
-								{getAccountTypeLabel(account.type)}
-							</span>
+							</Text>
+							<AccountTypeBadge
+								type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
+								style={{
+									backgroundColor: 'hsl(var(--background) / 0.6)',
+									borderRadius: '9999px',
+									padding: '0.25rem 0.75rem',
+								}}
+							/>
 							{account.accountNumber && (
-								<span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-white/60 dark:bg-white/10 text-muted-foreground">
+								<Text
+									as="span"
+									size="xs"
+									style={{
+										display: 'none',
+										padding: '0.25rem 0.75rem',
+										borderRadius: '9999px',
+										fontFamily: 'monospace',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										color: 'hsl(var(--muted-foreground))',
+									}}
+								>
 									{account.accountNumber}
-								</span>
+								</Text>
 							)}
 							{/* Members */}
 							{account.accountMembers.length > 0 && (
 								<>
-									<span className="text-muted-foreground/40">•</span>
-									<div className="flex items-center gap-2">
-										<div className="flex -space-x-2">
-											{account.accountMembers.map((am) => (
-												<div
-													key={am.id}
-													className="relative group/avatar"
-												>
-													<div
-														className="absolute inset-0 rounded-full blur-md opacity-0 group-hover/avatar:opacity-50 transition-opacity"
-														style={{ backgroundColor: am.member.color || '#6b7280' }}
-													/>
-													<div
-														className="relative h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-semibold ring-2 ring-white/80 dark:ring-card shadow-sm transition-transform hover:scale-110 hover:z-10"
-														style={{ backgroundColor: am.member.color || '#6b7280' }}
-														title={`${am.member.name} (${am.ownerShare}%)`}
-													>
-														{am.member.name.charAt(0).toUpperCase()}
-													</div>
-												</div>
-											))}
-										</div>
-										<span className="text-xs text-muted-foreground hidden sm:inline font-medium">
+									<Text as="span" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>
+										•
+									</Text>
+									<HStack gap="sm" align="center">
+										<MemberAvatarGroup
+											members={account.accountMembers.map((am) => ({
+												id: am.memberId,
+												name: am.member.name,
+												color: am.member.color,
+											}))}
+											size="sm"
+											max={5}
+										/>
+										<Text size="xs" color="muted" weight="medium">
 											{account.accountMembers.map((am) => am.member.name).join(', ')}
-										</span>
-									</div>
+										</Text>
+									</HStack>
 								</>
 							)}
-						</div>
+						</Flex>
 						{account.description && (
-							<p className="text-sm text-muted-foreground mt-3 hidden sm:block">{account.description}</p>
+							<Text size="sm" color="muted" style={{ marginTop: '0.75rem' }}>
+								{account.description}
+							</Text>
 						)}
-					</div>
-				</div>
-			</div>
+					</Flex>
+				</HStack>
+			</GlassCard>
 
 			{/* Account Edit Drawer */}
 			<Sheet open={isEditingAccount} onOpenChange={setIsEditingAccount}>
-				<SheetContent side="right" className="w-full sm:w-[420px] sm:max-w-[90vw] overflow-y-auto border-l border-white/20 bg-gradient-to-b from-background to-background/95">
-					<SheetHeader className="pb-6">
-						<SheetTitle className="text-xl font-bold">Modifier le compte</SheetTitle>
-						<SheetDescription>
-							Modifiez les informations du compte.
-						</SheetDescription>
+				<SheetContent
+					side="right"
+					style={{
+						width: '100%',
+						maxWidth: '420px',
+						overflowY: 'auto',
+						borderLeft: '1px solid hsl(var(--border) / 0.2)',
+						background:
+							'linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background) / 0.95))',
+					}}
+				>
+					<SheetHeader style={{ paddingBottom: '1.5rem' }}>
+						<SheetTitle style={{ fontSize: '1.25rem', fontWeight: 700 }}>
+							Modifier le compte
+						</SheetTitle>
+						<SheetDescription>Modifiez les informations du compte.</SheetDescription>
 					</SheetHeader>
 
-					<div className="space-y-6">
+					<VStack gap="lg">
 						{/* Bank logo centered with glow */}
-						<div className="relative w-fit mx-auto">
-							<div
-								className="absolute inset-0 rounded-2xl blur-xl opacity-50"
-								style={{ backgroundColor: account.bank.color }}
+						<Box
+							style={{
+								position: 'relative',
+								width: 'fit-content',
+								marginLeft: 'auto',
+								marginRight: 'auto',
+							}}
+						>
+							<Box
+								style={{
+									position: 'absolute',
+									inset: 0,
+									filter: 'blur(16px)',
+									opacity: 0.5,
+									borderRadius: '1rem',
+									backgroundColor: account.bank.color,
+								}}
 							/>
-							<div
-								className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-white font-bold text-lg shadow-lg"
-								style={{ background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)` }}
+							<Flex
+								align="center"
+								justify="center"
+								style={{
+									position: 'relative',
+									height: '4rem',
+									width: '4rem',
+									borderRadius: '1rem',
+									boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+									color: 'white',
+									fontWeight: 700,
+									fontSize: '1.125rem',
+									background: `linear-gradient(135deg, ${account.bank.color}, ${account.bank.color}dd)`,
+								}}
 							>
 								{getBankShortName(account.bank.name)}
-							</div>
-						</div>
+							</Flex>
+						</Box>
 
-						<div className="space-y-5">
-							<div className="space-y-2">
-								<label htmlFor="edit-account-name" className="text-sm font-semibold text-foreground">
+						<VStack gap="md">
+							<VStack gap="sm">
+								<label
+									htmlFor="edit-account-name"
+									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+								>
 									Nom du compte
 								</label>
 								<Input
@@ -709,134 +874,261 @@ export default function AccountDetailPage() {
 									value={editName}
 									onChange={(e) => setEditName(e.target.value)}
 									placeholder="Ex: Compte Joint"
-									className="h-12 text-base rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:border-primary/50"
+									style={{
+										height: '3rem',
+										fontSize: '1rem',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										borderColor: 'hsl(var(--border) / 0.3)',
+									}}
 								/>
-							</div>
-							<div className="space-y-2">
-								<label htmlFor="edit-account-number" className="text-sm font-semibold text-foreground">
+							</VStack>
+							<VStack gap="sm">
+								<label
+									htmlFor="edit-account-number"
+									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+								>
 									Numéro de compte
-									<span className="text-muted-foreground font-normal ml-1">(optionnel)</span>
+									<span
+										style={{
+											marginLeft: '0.25rem',
+											fontSize: '0.75rem',
+											fontWeight: 400,
+											color: 'hsl(var(--muted-foreground))',
+										}}
+									>
+										(optionnel)
+									</span>
 								</label>
 								<Input
 									id="edit-account-number"
 									value={editAccountNumber}
 									onChange={(e) => setEditAccountNumber(e.target.value)}
 									placeholder="Ex: FR76 1234 5678 9012"
-									className="h-12 font-mono rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:border-primary/50"
+									style={{
+										height: '3rem',
+										fontFamily: 'monospace',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										borderColor: 'hsl(var(--border) / 0.3)',
+									}}
 								/>
-							</div>
-							<div className="space-y-2">
-								<label htmlFor="edit-account-description" className="text-sm font-semibold text-foreground">
+							</VStack>
+							<VStack gap="sm">
+								<label
+									htmlFor="edit-account-description"
+									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+								>
 									Description
-									<span className="text-muted-foreground font-normal ml-1">(optionnel)</span>
+									<span
+										style={{
+											marginLeft: '0.25rem',
+											fontSize: '0.75rem',
+											fontWeight: 400,
+											color: 'hsl(var(--muted-foreground))',
+										}}
+									>
+										(optionnel)
+									</span>
 								</label>
 								<Input
 									id="edit-account-description"
 									value={editDescription}
 									onChange={(e) => setEditDescription(e.target.value)}
 									placeholder="Ex: Compte pour les dépenses courantes"
-									className="h-12 rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:border-primary/50"
+									style={{
+										height: '3rem',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--background) / 0.6)',
+										borderColor: 'hsl(var(--border) / 0.3)',
+									}}
 								/>
-							</div>
-						</div>
+							</VStack>
+						</VStack>
 
-						<div className="flex gap-3 pt-4">
+						<HStack gap="sm" style={{ paddingTop: '1rem' }}>
 							<Button
 								variant="outline"
-								className="flex-1 h-12 rounded-xl border-white/20 hover:bg-white/50 dark:hover:bg-white/5"
 								onClick={cancelEditingAccount}
 								disabled={updateAccountMutation.isPending}
+								style={{
+									flex: 1,
+									height: '3rem',
+									borderRadius: '0.75rem',
+									borderColor: 'hsl(var(--border) / 0.2)',
+								}}
 							>
 								Annuler
 							</Button>
 							<Button
-								className="flex-1 h-12 rounded-xl shadow-md hover:shadow-lg transition-all"
 								onClick={saveAccountDetails}
 								disabled={updateAccountMutation.isPending || !editName.trim()}
+								style={{
+									flex: 1,
+									height: '3rem',
+									borderRadius: '0.75rem',
+									boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+									transition: 'all 0.2s',
+								}}
 							>
 								{updateAccountMutation.isPending ? (
-									<Loader2 className="h-4 w-4 animate-spin mr-2" />
+									<Loader2
+										style={{
+											height: '1rem',
+											width: '1rem',
+											animation: 'spin 1s linear infinite',
+											marginRight: '0.5rem',
+										}}
+									/>
 								) : (
-									<Check className="h-4 w-4 mr-2" />
+									<Check style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
 								)}
 								Enregistrer
 							</Button>
-						</div>
-					</div>
+						</HStack>
+					</VStack>
 				</SheetContent>
 			</Sheet>
 
 			{/* Error/Success message - floating toast style */}
 			{error && (
-				<div
-					className={`fixed bottom-6 right-6 z-50 max-w-md animate-fade-in rounded-2xl p-4 shadow-xl ${
-						error.includes('importées')
-							? 'bg-[oklch(0.55_0.15_145)]/10 border border-[oklch(0.55_0.15_145)]/20'
-							: 'bg-[oklch(0.55_0.2_25)]/10 border border-[oklch(0.55_0.2_25)]/20'
-					}`}
+				<Box
 					style={{
+						position: 'fixed',
+						bottom: '1.5rem',
+						right: '1.5rem',
+						zIndex: 50,
+						maxWidth: '28rem',
+						padding: '1rem',
+						borderRadius: '1rem',
+						boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+						animation: 'fadeIn 0.3s ease-out',
 						backdropFilter: 'blur(16px)',
-						WebkitBackdropFilter: 'blur(16px)'
+						WebkitBackdropFilter: 'blur(16px)',
+						backgroundColor: error.includes('importées')
+							? 'oklch(0.55 0.15 145 / 0.1)'
+							: 'oklch(0.55 0.2 25 / 0.1)',
+						border: error.includes('importées')
+							? '1px solid oklch(0.55 0.15 145 / 0.2)'
+							: '1px solid oklch(0.55 0.2 25 / 0.2)',
 					}}
 				>
-					<div className="flex items-start gap-3">
-						<div className={`shrink-0 h-8 w-8 rounded-xl flex items-center justify-center ${
-							error.includes('importées')
-								? 'bg-[oklch(0.55_0.15_145)]/20'
-								: 'bg-[oklch(0.55_0.2_25)]/20'
-						}`}>
+					<HStack gap="sm" align="start">
+						<Flex
+							align="center"
+							justify="center"
+							style={{
+								flexShrink: 0,
+								height: '2rem',
+								width: '2rem',
+								borderRadius: '0.75rem',
+								backgroundColor: error.includes('importées')
+									? 'oklch(0.55 0.15 145 / 0.2)'
+									: 'oklch(0.55 0.2 25 / 0.2)',
+							}}
+						>
 							{error.includes('importées') ? (
-								<CheckCircle2 className="h-4 w-4 text-[oklch(0.55_0.15_145)]" />
+								<CheckCircle2
+									style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }}
+								/>
 							) : (
-								<AlertCircle className="h-4 w-4 text-[oklch(0.55_0.2_25)]" />
+								<AlertCircle
+									style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.2 25)' }}
+								/>
 							)}
-						</div>
-						<div className="flex-1 min-w-0">
-							<p className={`text-sm font-semibold ${
-								error.includes('importées')
-									? 'text-[oklch(0.55_0.15_145)]'
-									: 'text-[oklch(0.55_0.2_25)]'
-							}`}>
+						</Flex>
+						<Flex direction="col" grow minW0>
+							<Text
+								size="sm"
+								weight="semibold"
+								style={{
+									color: error.includes('importées')
+										? 'oklch(0.55 0.15 145)'
+										: 'oklch(0.55 0.2 25)',
+								}}
+							>
 								{error.includes('importées') ? 'Import réussi' : 'Erreur'}
-							</p>
-							<p className="text-sm text-foreground/80 mt-0.5">{error}</p>
-						</div>
+							</Text>
+							<Text
+								size="sm"
+								style={{ color: 'hsl(var(--foreground) / 0.8)', marginTop: '0.125rem' }}
+							>
+								{error}
+							</Text>
+						</Flex>
 						<Button
 							variant="ghost"
 							size="icon"
-							className="shrink-0 h-8 w-8 rounded-lg hover:bg-white/20"
 							onClick={() => setError(null)}
+							style={{ flexShrink: 0, height: '2rem', width: '2rem', borderRadius: '0.5rem' }}
 						>
-							<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-								<title>Fermer</title>
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-							</svg>
+							<X style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</div>
-				</div>
+					</HStack>
+				</Box>
 			)}
 
 			{/* Settings Drawer - 33% width on desktop */}
 			<Sheet open={showSettings} onOpenChange={setShowSettings}>
-				<SheetContent side="right" className="w-full sm:w-[33vw] sm:min-w-[400px] sm:max-w-[500px] overflow-y-auto bg-background border-l p-0">
+				<SheetContent
+					side="right"
+					style={{
+						width: '100%',
+						minWidth: '400px',
+						maxWidth: '500px',
+						overflowY: 'auto',
+						backgroundColor: 'hsl(var(--background))',
+						borderLeft: '1px solid hsl(var(--border))',
+						padding: 0,
+					}}
+				>
 					{/* Header */}
-					<div className="px-5 py-4 border-b">
+					<Box
+						style={{
+							paddingLeft: '1rem',
+							paddingRight: '1rem',
+							paddingTop: '0.5rem',
+							paddingBottom: '0.5rem',
+							borderBottom: '1px solid hsl(var(--border))',
+						}}
+					>
 						<SheetHeader>
-							<SheetTitle className="text-base font-semibold">Paramètres</SheetTitle>
-							<SheetDescription className="text-xs">
+							<SheetTitle style={{ fontSize: '1rem', fontWeight: 600 }}>Paramètres</SheetTitle>
+							<SheetDescription style={{ fontSize: '0.75rem' }}>
 								Informations et historique du compte
 							</SheetDescription>
 						</SheetHeader>
-					</div>
+					</Box>
 
-					<div className="divide-y">
+					<VStack gap="none">
 						{/* Section 1: Informations */}
-						<div className="px-5 py-5 space-y-5">
-							<h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Informations</h3>
+						<VStack
+							gap="md"
+							style={{
+								paddingLeft: '1rem',
+								paddingRight: '1rem',
+								paddingTop: '1rem',
+								paddingBottom: '1rem',
+								borderBottom: '1px solid hsl(var(--border))',
+							}}
+						>
+							<Text
+								size="xs"
+								weight="semibold"
+								color="muted"
+								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+							>
+								Informations
+							</Text>
 
 							{/* Account name */}
-							<div className="space-y-1.5">
-								<label htmlFor="settings-account-name" className="text-sm text-muted-foreground">Nom du compte</label>
+							<VStack gap="xs">
+								<label
+									htmlFor="settings-account-name"
+									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+								>
+									Nom du compte
+								</label>
 								<Input
 									id="settings-account-name"
 									value={editName || account.name}
@@ -849,17 +1141,22 @@ export default function AccountDetailPage() {
 									onFocus={() => {
 										if (!editName) setEditName(account.name);
 									}}
-									className="h-10 text-sm font-medium"
+									style={{ height: '2.5rem', fontSize: '0.875rem', fontWeight: 500 }}
 									placeholder="Nom du compte"
 								/>
-							</div>
+							</VStack>
 
 							{/* Description */}
-							<div className="space-y-1.5">
-								<label htmlFor="settings-account-description" className="text-sm text-muted-foreground">Description</label>
+							<VStack gap="xs">
+								<label
+									htmlFor="settings-account-description"
+									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+								>
+									Description
+								</label>
 								<Input
 									id="settings-account-description"
-									value={editDescription !== '' ? editDescription : (account.description || '')}
+									value={editDescription !== '' ? editDescription : account.description || ''}
 									onChange={(e) => setEditDescription(e.target.value)}
 									onBlur={() => {
 										if (editDescription !== (account.description || '')) {
@@ -869,117 +1166,264 @@ export default function AccountDetailPage() {
 									onFocus={() => {
 										if (editDescription === '') setEditDescription(account.description || '');
 									}}
-									className="h-10 text-sm"
+									style={{ height: '2.5rem', fontSize: '0.875rem' }}
 									placeholder="Description (optionnel)"
 								/>
-							</div>
+							</VStack>
 
 							{/* Owners - Multi-select */}
-							<div className="space-y-1.5">
-								<span className="text-sm text-muted-foreground">Titulaires</span>
-								<div className="min-h-[42px] p-2 rounded-md border bg-background flex flex-wrap gap-2 items-center">
+							<VStack gap="xs">
+								<Text size="sm" color="muted">
+									Titulaires
+								</Text>
+								<Flex
+									wrap="wrap"
+									gap="sm"
+									align="center"
+									style={{
+										padding: '0.5rem',
+										borderRadius: '0.375rem',
+										border: '1px solid hsl(var(--border))',
+										backgroundColor: 'hsl(var(--background))',
+										minHeight: '42px',
+									}}
+								>
 									{account.accountMembers.map((am) => (
-										<div
+										<HStack
 											key={am.id}
-											className={`inline-flex items-center gap-1.5 pl-1.5 pr-1 py-1 rounded-md bg-muted text-sm transition-opacity ${
-												removeMemberMutation.isPending && removeMemberMutation.variables?.memberId === am.memberId ? 'opacity-50' : ''
-											}`}
+											gap="xs"
+											align="center"
+											style={{
+												display: 'inline-flex',
+												paddingLeft: '0.375rem',
+												paddingRight: '0.25rem',
+												paddingTop: '0.25rem',
+												paddingBottom: '0.25rem',
+												fontSize: '0.875rem',
+												borderRadius: '0.375rem',
+												backgroundColor: 'hsl(var(--muted))',
+												transition: 'opacity 0.2s',
+												opacity:
+													removeMemberMutation.isPending &&
+													removeMemberMutation.variables?.memberId === am.memberId
+														? 0.5
+														: 1,
+											}}
 										>
-											<div
-												className="h-5 w-5 rounded-full flex items-center justify-center text-white text-xs font-medium"
-												style={{ backgroundColor: am.member.color || '#6b7280' }}
+											<Flex
+												align="center"
+												justify="center"
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													borderRadius: '9999px',
+													color: 'white',
+													fontSize: '0.75rem',
+													fontWeight: 500,
+													backgroundColor: am.member.color || '#6b7280',
+												}}
 											>
-												{removeMemberMutation.isPending && removeMemberMutation.variables?.memberId === am.memberId ? (
-													<Loader2 className="h-3 w-3 animate-spin" />
+												{removeMemberMutation.isPending &&
+												removeMemberMutation.variables?.memberId === am.memberId ? (
+													<Loader2
+														style={{
+															height: '0.75rem',
+															width: '0.75rem',
+															animation: 'spin 1s linear infinite',
+														}}
+													/>
 												) : (
 													am.member.name.charAt(0).toUpperCase()
 												)}
-											</div>
-											<span className="font-medium">{am.member.name}</span>
-											<button
-												type="button"
+											</Flex>
+											<Text as="span" weight="medium">
+												{am.member.name}
+											</Text>
+											<Button
+												variant="ghost"
+												size="icon"
 												onClick={() => removeMemberFromAccount(am.memberId)}
 												disabled={removeMemberMutation.isPending || addMemberMutation.isPending}
-												className="h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted-foreground/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													borderRadius: '0.25rem',
+													color: 'hsl(var(--muted-foreground))',
+													transition: 'all 0.2s',
+												}}
 											>
-												<X className="h-3 w-3" />
-											</button>
-										</div>
+												<X style={{ height: '0.75rem', width: '0.75rem' }} />
+											</Button>
+										</HStack>
 									))}
 									{/* Loading indicator when adding */}
 									{addMemberMutation.isPending && addMemberMutation.variables && (
-										<div className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-md bg-muted/50 text-sm animate-pulse">
-											<div
-												className="h-5 w-5 rounded-full flex items-center justify-center text-white text-xs font-medium"
-												style={{ backgroundColor: allMembers?.find(m => m.id === addMemberMutation.variables?.memberId)?.color || '#6b7280' }}
+										<HStack
+											gap="xs"
+											align="center"
+											style={{
+												display: 'inline-flex',
+												paddingLeft: '0.375rem',
+												paddingRight: '0.5rem',
+												paddingTop: '0.25rem',
+												paddingBottom: '0.25rem',
+												fontSize: '0.875rem',
+												borderRadius: '0.375rem',
+												backgroundColor: 'hsl(var(--muted) / 0.5)',
+												animation: 'pulse 2s ease-in-out infinite',
+											}}
+										>
+											<Flex
+												align="center"
+												justify="center"
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													borderRadius: '9999px',
+													color: 'white',
+													fontSize: '0.75rem',
+													fontWeight: 500,
+													backgroundColor:
+														allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
+															?.color || '#6b7280',
+												}}
 											>
-												<Loader2 className="h-3 w-3 animate-spin" />
-											</div>
-											<span className="font-medium text-muted-foreground">
-												{allMembers?.find(m => m.id === addMemberMutation.variables?.memberId)?.name}
-											</span>
-										</div>
+												<Loader2
+													style={{
+														height: '0.75rem',
+														width: '0.75rem',
+														animation: 'spin 1s linear infinite',
+													}}
+												/>
+											</Flex>
+											<Text as="span" weight="medium" color="muted">
+												{
+													allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
+														?.name
+												}
+											</Text>
+										</HStack>
 									)}
 									{/* Add member button */}
-									<div className="relative">
-										<button
-											type="button"
+									<Box style={{ position: 'relative' }}>
+										<Button
+											variant="ghost"
+											size="sm"
 											onClick={() => setShowMemberDropdown(!showMemberDropdown)}
 											disabled={addMemberMutation.isPending || removeMemberMutation.isPending}
-											className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+											style={{
+												display: 'inline-flex',
+												alignItems: 'center',
+												gap: '0.25rem',
+												padding: '0.25rem 0.5rem',
+												borderRadius: '0.375rem',
+												fontSize: '0.875rem',
+												color: 'hsl(var(--muted-foreground))',
+												transition: 'all 0.2s',
+											}}
 										>
-											<Plus className="h-4 w-4" />
+											<Plus style={{ height: '1rem', width: '1rem' }} />
 											Ajouter
-										</button>
+										</Button>
 										{showMemberDropdown && (
-											<div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-md border bg-popover p-1 shadow-md">
+											<Box
+												style={{
+													position: 'absolute',
+													top: '100%',
+													left: 0,
+													marginTop: '0.25rem',
+													zIndex: 50,
+													minWidth: '180px',
+													padding: '0.25rem',
+													borderRadius: '0.375rem',
+													border: '1px solid hsl(var(--border))',
+													boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+													backgroundColor: 'hsl(var(--popover))',
+												}}
+											>
 												{availableMembers.map((member) => (
-													<button
+													<Button
 														key={member.id}
-														type="button"
+														variant="ghost"
 														onClick={() => addMemberToAccount(member.id)}
-														className="w-full flex items-center gap-2 px-2 py-1.5 rounded-sm text-sm hover:bg-muted transition-colors text-left"
+														fullWidth
+														style={{
+															display: 'flex',
+															alignItems: 'center',
+															gap: '0.5rem',
+															padding: '0.375rem 0.5rem',
+															borderRadius: '0.25rem',
+															fontSize: '0.875rem',
+															justifyContent: 'flex-start',
+															textAlign: 'left',
+															transition: 'all 0.2s',
+														}}
 													>
-														<div
-															className="h-5 w-5 rounded-full flex items-center justify-center text-white text-xs font-medium"
-															style={{ backgroundColor: member.color || '#6b7280' }}
+														<Flex
+															align="center"
+															justify="center"
+															style={{
+																height: '1.25rem',
+																width: '1.25rem',
+																borderRadius: '9999px',
+																color: 'white',
+																fontSize: '0.75rem',
+																fontWeight: 500,
+																backgroundColor: member.color || '#6b7280',
+															}}
 														>
 															{member.name.charAt(0).toUpperCase()}
-														</div>
+														</Flex>
 														<span>{member.name}</span>
-													</button>
+													</Button>
 												))}
 												{availableMembers.length === 0 && (
-													<p className="px-2 py-1.5 text-sm text-muted-foreground">Tous les membres sont ajoutés</p>
+													<Text size="sm" color="muted" style={{ padding: '0.25rem 0.5rem' }}>
+														Tous les membres sont ajoutés
+													</Text>
 												)}
-											</div>
+											</Box>
 										)}
-									</div>
-								</div>
-							</div>
+									</Box>
+								</Flex>
+							</VStack>
 
 							{/* Export URL */}
-							<div className="space-y-1.5">
-								<div className="flex items-center justify-between">
-									<label htmlFor="settings-export-url" className="text-sm text-muted-foreground">Lien d&apos;export banque</label>
+							<VStack gap="xs">
+								<HStack justify="between" align="center">
+									<label
+										htmlFor="settings-export-url"
+										style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+									>
+										Lien d&apos;export banque
+									</label>
 									{account.exportUrl && (
 										<a
 											href={account.exportUrl}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+											style={{
+												display: 'inline-flex',
+												alignItems: 'center',
+												gap: '0.25rem',
+												fontSize: '0.75rem',
+												color: 'hsl(var(--primary))',
+												textDecoration: 'none',
+											}}
 										>
-											Ouvrir <ExternalLink className="h-3 w-3" />
+											<span>Ouvrir</span>
+											<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 										</a>
 									)}
-								</div>
+								</HStack>
 								<Input
 									id="settings-export-url"
 									type="url"
-									value={exportUrlInput !== '' ? exportUrlInput : (account.exportUrl || '')}
+									value={exportUrlInput !== '' ? exportUrlInput : account.exportUrl || ''}
 									onChange={(e) => setExportUrlInput(e.target.value)}
 									onBlur={() => {
-										const currentValue = exportUrlInput !== '' ? exportUrlInput : (account.exportUrl || '');
+										const currentValue =
+											exportUrlInput !== '' ? exportUrlInput : account.exportUrl || '';
 										if (currentValue !== (account.exportUrl || '')) {
 											saveExportUrl();
 										}
@@ -988,23 +1432,37 @@ export default function AccountDetailPage() {
 										if (exportUrlInput === '') setExportUrlInput(account.exportUrl || '');
 									}}
 									placeholder="https://www.banque.fr/espace-client"
-									className="h-10 text-sm"
+									style={{ height: '2.5rem', fontSize: '0.875rem' }}
 								/>
-							</div>
+							</VStack>
 
 							{/* Initial Balance */}
-							<div className="space-y-1.5">
-								<span className="text-sm text-muted-foreground">Solde initial</span>
-								<div className="grid grid-cols-2 gap-2">
-									<div className="relative">
+							<VStack gap="xs">
+								<Text size="sm" color="muted">
+									Solde initial
+								</Text>
+								<HStack gap="sm">
+									<Box grow style={{ position: 'relative' }}>
 										<Input
 											type="text"
-											value={editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0')}
+											value={
+												editInitialBalance !== ''
+													? editInitialBalance
+													: account.initialBalance?.toString() || '0'
+											}
 											onChange={(e) => setEditInitialBalance(e.target.value)}
 											onBlur={() => {
-												const currentValue = editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0');
-												if (currentValue !== (account.initialBalance?.toString() || '0') ||
-													editInitialBalanceDate !== (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '')) {
+												const currentValue =
+													editInitialBalance !== ''
+														? editInitialBalance
+														: account.initialBalance?.toString() || '0';
+												if (
+													currentValue !== (account.initialBalance?.toString() || '0') ||
+													editInitialBalanceDate !==
+														(account.initialBalanceDate
+															? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+															: '')
+												) {
 													saveInitialBalance();
 												}
 											}}
@@ -1012,24 +1470,61 @@ export default function AccountDetailPage() {
 												if (editInitialBalance === '') {
 													setEditInitialBalance(account.initialBalance?.toString() || '0');
 													if (account.initialBalanceDate) {
-														setEditInitialBalanceDate(new Date(account.initialBalanceDate).toISOString().split('T')[0]);
+														setEditInitialBalanceDate(
+															new Date(account.initialBalanceDate).toISOString().split('T')[0],
+														);
 													}
 												}
 											}}
 											placeholder="0,00"
-											className="h-10 text-sm font-mono pr-12"
+											style={{
+												height: '2.5rem',
+												fontSize: '0.875rem',
+												fontFamily: 'monospace',
+												paddingRight: '3rem',
+											}}
 										/>
-										<span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">EUR</span>
-									</div>
+										<span
+											style={{
+												position: 'absolute',
+												right: '0.75rem',
+												top: '50%',
+												transform: 'translateY(-50%)',
+												fontSize: '0.875rem',
+												color: 'hsl(var(--muted-foreground))',
+											}}
+										>
+											EUR
+										</span>
+									</Box>
 									<Input
 										type="date"
-										value={editInitialBalanceDate !== '' ? editInitialBalanceDate : (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '')}
+										value={
+											editInitialBalanceDate !== ''
+												? editInitialBalanceDate
+												: account.initialBalanceDate
+													? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+													: ''
+										}
 										onChange={(e) => setEditInitialBalanceDate(e.target.value)}
 										onBlur={() => {
-											const currentBalanceDate = editInitialBalanceDate !== '' ? editInitialBalanceDate : (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '');
-											const currentBalance = editInitialBalance !== '' ? editInitialBalance : (account.initialBalance?.toString() || '0');
-											if (currentBalanceDate !== (account.initialBalanceDate ? new Date(account.initialBalanceDate).toISOString().split('T')[0] : '') ||
-												currentBalance !== (account.initialBalance?.toString() || '0')) {
+											const currentBalanceDate =
+												editInitialBalanceDate !== ''
+													? editInitialBalanceDate
+													: account.initialBalanceDate
+														? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+														: '';
+											const currentBalance =
+												editInitialBalance !== ''
+													? editInitialBalance
+													: account.initialBalance?.toString() || '0';
+											if (
+												currentBalanceDate !==
+													(account.initialBalanceDate
+														? new Date(account.initialBalanceDate).toISOString().split('T')[0]
+														: '') ||
+												currentBalance !== (account.initialBalance?.toString() || '0')
+											) {
 												saveInitialBalance();
 											}
 										}}
@@ -1037,81 +1532,162 @@ export default function AccountDetailPage() {
 											if (editInitialBalanceDate === '') {
 												setEditInitialBalance(account.initialBalance?.toString() || '0');
 												if (account.initialBalanceDate) {
-													setEditInitialBalanceDate(new Date(account.initialBalanceDate).toISOString().split('T')[0]);
+													setEditInitialBalanceDate(
+														new Date(account.initialBalanceDate).toISOString().split('T')[0],
+													);
 												}
 											}
 										}}
-										className="h-10 text-sm"
+										style={{ height: '2.5rem', fontSize: '0.875rem', flex: 1 }}
 									/>
-								</div>
-							</div>
-						</div>
+								</HStack>
+							</VStack>
+						</VStack>
 
 						{/* Section 2: Imports */}
-						<div className="px-5 py-5 space-y-3">
-							<div className="flex items-center justify-between">
-								<h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+						<VStack
+							gap="sm"
+							style={{
+								paddingLeft: '1rem',
+								paddingRight: '1rem',
+								paddingTop: '1rem',
+								paddingBottom: '1rem',
+								borderBottom: '1px solid hsl(var(--border))',
+							}}
+						>
+							<HStack justify="between" align="center">
+								<Text
+									size="xs"
+									weight="semibold"
+									color="muted"
+									style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+								>
 									Imports
 									{accountImports.length > 0 && (
-										<span className="ml-1 text-muted-foreground/60">({accountImports.length})</span>
+										<span
+											style={{ marginLeft: '0.25rem', color: 'hsl(var(--muted-foreground) / 0.6)' }}
+										>
+											({accountImports.length})
+										</span>
 									)}
-								</h3>
+								</Text>
 								{accountImports.length > 5 && (
 									<Button
 										variant="ghost"
 										size="sm"
-										className="h-6 px-2 text-xs"
 										onClick={() => setShowAllImports(!showAllImports)}
+										style={{ height: '1.5rem', padding: '0 0.5rem', fontSize: '0.75rem' }}
 									>
 										{showAllImports ? 'Réduire' : 'Tout voir'}
 									</Button>
 								)}
-							</div>
+							</HStack>
 
 							{accountImports.length === 0 ? (
-								<div className="text-center py-6 rounded-lg bg-muted/20 border border-dashed">
-									<FileSpreadsheet className="h-6 w-6 mx-auto text-muted-foreground/40 mb-2" />
-									<p className="text-xs text-muted-foreground">Aucun import</p>
-								</div>
+								<Box
+									style={{
+										textAlign: 'center',
+										paddingTop: '1.5rem',
+										paddingBottom: '1.5rem',
+										borderRadius: '0.5rem',
+										border: '1px dashed hsl(var(--border))',
+										backgroundColor: 'hsl(var(--muted) / 0.2)',
+									}}
+								>
+									<FileSpreadsheet
+										style={{
+											height: '1.5rem',
+											width: '1.5rem',
+											marginLeft: 'auto',
+											marginRight: 'auto',
+											color: 'hsl(var(--muted-foreground) / 0.4)',
+											marginBottom: '0.5rem',
+										}}
+									/>
+									<Text size="xs" color="muted">
+										Aucun import
+									</Text>
+								</Box>
 							) : (
-								<div className="space-y-2">
+								<VStack gap="sm">
 									{(showAllImports ? accountImports : accountImports.slice(0, 5)).map((imp) => (
-										<div
+										<HStack
 											key={imp.id}
-											className={`flex items-center gap-2 rounded-lg p-2.5 border text-sm ${
-												imp.status === 'FAILED'
-													? 'bg-destructive/5 border-destructive/20'
-													: 'bg-muted/20 border-transparent'
-											}`}
+											gap="sm"
+											align="center"
+											p="sm"
+											style={{
+												fontSize: '0.875rem',
+												borderRadius: '0.5rem',
+												border: '1px solid',
+												backgroundColor:
+													imp.status === 'FAILED'
+														? 'hsl(var(--destructive) / 0.05)'
+														: 'hsl(var(--muted) / 0.2)',
+												borderColor:
+													imp.status === 'FAILED' ? 'hsl(var(--destructive) / 0.2)' : 'transparent',
+											}}
 										>
-											<div className={`h-6 w-6 rounded flex items-center justify-center shrink-0 ${
-												imp.status === 'PROCESSED' ? 'bg-[oklch(0.55_0.15_145)]/10' :
-												imp.status === 'FAILED' ? 'bg-destructive/10' :
-												imp.status === 'PROCESSING' ? 'bg-primary/10' :
-												'bg-muted'
-											}`}>
+											<Flex
+												align="center"
+												justify="center"
+												style={{
+													height: '1.5rem',
+													width: '1.5rem',
+													flexShrink: 0,
+													borderRadius: '0.375rem',
+													backgroundColor:
+														imp.status === 'PROCESSED'
+															? 'oklch(0.55 0.15 145 / 0.1)'
+															: imp.status === 'FAILED'
+																? 'hsl(var(--destructive) / 0.1)'
+																: imp.status === 'PROCESSING'
+																	? 'hsl(var(--primary) / 0.1)'
+																	: 'hsl(var(--muted))',
+												}}
+											>
 												{getStatusIcon(imp.status)}
-											</div>
-											<div className="min-w-0 flex-1">
-												<p className="text-xs font-medium truncate">{imp.filename}</p>
-												<p className="text-[11px] text-muted-foreground">
+											</Flex>
+											<Flex direction="col" grow minW0>
+												<Text
+													size="xs"
+													weight="medium"
+													style={{
+														overflow: 'hidden',
+														textOverflow: 'ellipsis',
+														whiteSpace: 'nowrap',
+													}}
+												>
+													{imp.filename}
+												</Text>
+												<Text style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))' }}>
 													{formatRelativeTime(imp.createdAt)}
 													{imp.recordsCount !== null && (
-														<span className="text-[oklch(0.5_0.15_145)]"> • {imp.recordsCount} tx</span>
+														<Text as="span" style={{ color: 'oklch(0.5 0.15 145)' }}>
+															{' '}
+															• {imp.recordsCount} tx
+														</Text>
 													)}
-												</p>
-											</div>
-											<div className="flex items-center shrink-0">
+												</Text>
+											</Flex>
+											<HStack gap="none" align="center" style={{ flexShrink: 0 }}>
 												{imp.status === 'PENDING' && (
 													<Button
 														variant="outline"
 														size="sm"
-														className="h-6 px-2 text-xs"
 														onClick={() => handleProcess(imp.id)}
 														disabled={processImportMutation.isPending}
+														style={{ height: '1.5rem', padding: '0 0.5rem', fontSize: '0.75rem' }}
 													>
-														{processImportMutation.isPending && processImportMutation.variables?.importId === imp.id ? (
-															<Loader2 className="h-3 w-3 animate-spin" />
+														{processImportMutation.isPending &&
+														processImportMutation.variables?.importId === imp.id ? (
+															<Loader2
+																style={{
+																	height: '0.75rem',
+																	width: '0.75rem',
+																	animation: 'spin 1s linear infinite',
+																}}
+															/>
 														) : (
 															'Traiter'
 														)}
@@ -1121,15 +1697,22 @@ export default function AccountDetailPage() {
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-6 w-6"
 														onClick={() => handleReprocess(imp.id)}
 														title="Retraiter"
 														disabled={reprocessImportMutation.isPending}
+														style={{ height: '1.5rem', width: '1.5rem' }}
 													>
-														{reprocessImportMutation.isPending && reprocessImportMutation.variables?.importId === imp.id ? (
-															<Loader2 className="h-3 w-3 animate-spin" />
+														{reprocessImportMutation.isPending &&
+														reprocessImportMutation.variables?.importId === imp.id ? (
+															<Loader2
+																style={{
+																	height: '0.75rem',
+																	width: '0.75rem',
+																	animation: 'spin 1s linear infinite',
+																}}
+															/>
 														) : (
-															<RotateCcw className="h-3 w-3" />
+															<RotateCcw style={{ height: '0.75rem', width: '0.75rem' }} />
 														)}
 													</Button>
 												)}
@@ -1137,227 +1720,426 @@ export default function AccountDetailPage() {
 													<Button
 														variant="ghost"
 														size="icon"
-														className="h-6 w-6"
 														onClick={() => handleProcess(imp.id)}
 														title="Réessayer"
 														disabled={processImportMutation.isPending}
+														style={{ height: '1.5rem', width: '1.5rem' }}
 													>
-														{processImportMutation.isPending && processImportMutation.variables?.importId === imp.id ? (
-															<Loader2 className="h-3 w-3 animate-spin" />
+														{processImportMutation.isPending &&
+														processImportMutation.variables?.importId === imp.id ? (
+															<Loader2
+																style={{
+																	height: '0.75rem',
+																	width: '0.75rem',
+																	animation: 'spin 1s linear infinite',
+																}}
+															/>
 														) : (
-															<RefreshCw className="h-3 w-3" />
+															<RefreshCw style={{ height: '0.75rem', width: '0.75rem' }} />
 														)}
 													</Button>
 												)}
 												<Button
 													variant="ghost"
 													size="icon"
-													className="h-6 w-6 text-muted-foreground hover:text-destructive"
 													onClick={() => setDeleteImportId(imp.id)}
 													disabled={deleteImportMutation.isPending}
+													style={{
+														height: '1.5rem',
+														width: '1.5rem',
+														color: 'hsl(var(--muted-foreground))',
+													}}
 												>
 													{deleteImportMutation.isPending && deleteImportId === imp.id ? (
-														<Loader2 className="h-3 w-3 animate-spin" />
+														<Loader2
+															style={{
+																height: '0.75rem',
+																width: '0.75rem',
+																animation: 'spin 1s linear infinite',
+															}}
+														/>
 													) : (
-														<Trash2 className="h-3 w-3" />
+														<Trash2 style={{ height: '0.75rem', width: '0.75rem' }} />
 													)}
 												</Button>
-											</div>
-										</div>
+											</HStack>
+										</HStack>
 									))}
-								</div>
+								</VStack>
 							)}
-						</div>
+						</VStack>
 
 						{/* Section 3: Gestion du compte */}
-						<div className="px-5 py-4 space-y-3">
-							<h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Gestion du compte</h3>
+						<VStack
+							gap="sm"
+							style={{
+								paddingLeft: '1rem',
+								paddingRight: '1rem',
+								paddingTop: '0.5rem',
+								paddingBottom: '0.5rem',
+							}}
+						>
+							<Text
+								size="xs"
+								weight="semibold"
+								color="muted"
+								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+							>
+								Gestion du compte
+							</Text>
 							<Button
 								variant="outline"
 								size="sm"
-								className="w-full h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+								fullWidth
 								onClick={() => {
 									setShowSettings(false);
 									setDeleteAccountOpen(true);
 								}}
+								style={{
+									height: '2rem',
+									fontSize: '0.75rem',
+									color: 'hsl(var(--destructive))',
+									borderColor: 'hsl(var(--destructive) / 0.3)',
+								}}
 							>
-								<Trash2 className="h-3 w-3 mr-1.5" />
+								<Trash2 style={{ height: '0.75rem', width: '0.75rem', marginRight: '0.375rem' }} />
 								Supprimer le compte
 							</Button>
 							{account._count.transactions > 0 && (
-								<p className="text-[11px] text-muted-foreground text-center">
-									{account._count.transactions} transaction{account._count.transactions > 1 ? 's' : ''} sera{account._count.transactions > 1 ? 'ont' : ''} également supprimée{account._count.transactions > 1 ? 's' : ''}
-								</p>
+								<Text
+									style={{
+										fontSize: '11px',
+										color: 'hsl(var(--muted-foreground))',
+										textAlign: 'center',
+									}}
+								>
+									{account._count.transactions} transaction
+									{account._count.transactions > 1 ? 's' : ''} sera
+									{account._count.transactions > 1 ? 'ont' : ''} également supprimée
+									{account._count.transactions > 1 ? 's' : ''}
+								</Text>
 							)}
-						</div>
-					</div>
+						</VStack>
+					</VStack>
 				</SheetContent>
 			</Sheet>
 
 			{/* Transactions - Glassmorphism Section with Infinite Scroll */}
-			<div className="glass-card">
+			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
-				<div className="p-6 pb-4">
-					<div className="flex flex-col gap-5">
+				<Box p="lg" style={{ paddingBottom: '1rem' }}>
+					<VStack gap="md">
 						{/* Title row */}
-						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-3">
-								<h2 className="text-xl font-bold tracking-tight">Transactions</h2>
+						<HStack justify="between" align="center">
+							<HStack gap="sm" align="center">
+								<Heading level={2} size="xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
+									Transactions
+								</Heading>
 								{totalTransactions > 0 && (
-									<span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
+									<Text
+										as="span"
+										size="xs"
+										weight="semibold"
+										style={{
+											display: 'inline-flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											padding: '0.125rem 0.625rem',
+											borderRadius: '9999px',
+											backgroundColor: 'hsl(var(--primary) / 0.1)',
+											color: 'hsl(var(--primary))',
+										}}
+									>
 										{totalTransactions}
-									</span>
+									</Text>
 								)}
-							</div>
-							<label htmlFor="transaction-import-file" className="cursor-pointer">
+							</HStack>
+							<label htmlFor="transaction-import-file" style={{ cursor: 'pointer' }}>
 								<input
 									id="transaction-import-file"
 									type="file"
 									accept=".csv,.xlsx,.xls"
 									onChange={handleFileSelect}
-									className="hidden"
+									style={{ display: 'none' }}
 									disabled={isUploading}
 								/>
 								<Button
-									className="gap-2 rounded-xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
 									disabled={isUploading}
 									asChild
+									style={{
+										gap: '0.5rem',
+										borderRadius: '0.75rem',
+										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+										transition: 'all 0.2s',
+									}}
 								>
 									<span>
 										{isUploading ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
+											<Loader2
+												style={{
+													height: '1rem',
+													width: '1rem',
+													animation: 'spin 1s linear infinite',
+												}}
+											/>
 										) : (
-											<Upload className="h-4 w-4" />
+											<Upload style={{ height: '1rem', width: '1rem' }} />
 										)}
 										Importer
 									</span>
 								</Button>
 							</label>
-						</div>
+						</HStack>
 						{/* Search row */}
-						<div className="relative group">
-							<Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+						<Box style={{ position: 'relative' }}>
+							<Search
+								style={{
+									position: 'absolute',
+									left: '1rem',
+									top: '50%',
+									transform: 'translateY(-50%)',
+									height: '1.25rem',
+									width: '1.25rem',
+									color: 'hsl(var(--muted-foreground))',
+									transition: 'color 0.2s',
+								}}
+							/>
 							<Input
 								placeholder="Rechercher une transaction..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								className="pl-12 h-12 text-base rounded-xl bg-white/60 dark:bg-white/5 border-white/30 dark:border-white/10 focus:bg-white dark:focus:bg-white/10 focus:border-primary/50 transition-all shadow-sm"
+								style={{
+									paddingLeft: '3rem',
+									height: '3rem',
+									fontSize: '1rem',
+									borderRadius: '0.75rem',
+									backgroundColor: 'hsl(var(--background) / 0.6)',
+									borderColor: 'hsl(var(--border) / 0.3)',
+									transition: 'all 0.2s',
+									boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+								}}
 							/>
-						</div>
-					</div>
-				</div>
+						</Box>
+					</VStack>
+				</Box>
 
 				{/* Content */}
-				<div
+				<Box
 					role="presentation"
 					onDragEnter={handleDrag}
 					onDragLeave={handleDrag}
 					onDragOver={handleDrag}
 					onDrop={handleDrop}
-					className={`px-6 pb-6 relative ${dragActive ? 'bg-primary/5' : ''}`}
+					style={{
+						position: 'relative',
+						paddingLeft: '1.5rem',
+						paddingRight: '1.5rem',
+						paddingBottom: '1.5rem',
+						backgroundColor: dragActive ? 'hsl(var(--primary) / 0.05)' : 'transparent',
+					}}
 				>
 					{/* Drag overlay */}
 					{dragActive && (
-						<div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-dashed border-primary/50 rounded-2xl z-10 m-2">
-							<div className="text-center">
-								<div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-									<Upload className="h-8 w-8 text-primary" />
-								</div>
-								<p className="text-sm font-semibold text-primary">Déposez votre fichier ici</p>
-								<p className="text-xs text-primary/70 mt-1">CSV, XLSX ou XLS</p>
-							</div>
-						</div>
+						<Flex
+							align="center"
+							justify="center"
+							style={{
+								position: 'absolute',
+								inset: 0,
+								margin: '0.5rem',
+								borderRadius: '1rem',
+								background:
+									'linear-gradient(to bottom right, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.05))',
+								border: '2px dashed hsl(var(--primary) / 0.5)',
+								zIndex: 10,
+							}}
+						>
+							<VStack gap="sm" align="center">
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										height: '4rem',
+										width: '4rem',
+										borderRadius: '1rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+									}}
+								>
+									<Upload style={{ height: '2rem', width: '2rem', color: 'hsl(var(--primary))' }} />
+								</Flex>
+								<Text size="sm" weight="semibold" style={{ color: 'hsl(var(--primary))' }}>
+									Déposez votre fichier ici
+								</Text>
+								<Text size="xs" style={{ color: 'hsl(var(--primary) / 0.7)' }}>
+									CSV, XLSX ou XLS
+								</Text>
+							</VStack>
+						</Flex>
 					)}
 
 					{allTransactions.length === 0 && !isLoadingTransactions ? (
-						<div className="text-center py-16">
-							<div className="h-20 w-20 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
-								<FileSpreadsheet className="h-10 w-10 text-muted-foreground/50" />
-							</div>
-							<p className="font-semibold text-foreground">Aucune transaction</p>
-							<p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
-								Glissez un fichier CSV ou cliquez sur Importer pour ajouter vos transactions
-							</p>
-						</div>
+						<EmptyState
+							icon={FileSpreadsheet}
+							title="Aucune transaction"
+							description="Glissez un fichier CSV ou cliquez sur Importer pour ajouter vos transactions"
+							size="md"
+						/>
 					) : (
-						<div className="space-y-1">
+						<VStack gap="xs">
 							{allTransactions.map((tx, index) => (
-								<div
+								<HStack
 									key={tx.id}
-									className="group flex items-center justify-between rounded-xl px-4 py-3.5 hover:bg-white/60 dark:hover:bg-white/5 transition-all duration-200 cursor-default"
-									style={{ animationDelay: `${Math.min(index, 10) * 20}ms` }}
+									justify="between"
+									align="center"
+									style={{
+										paddingLeft: '1rem',
+										paddingRight: '1rem',
+										paddingTop: '0.875rem',
+										paddingBottom: '0.875rem',
+										borderRadius: '0.75rem',
+										transition: 'all 0.2s',
+										cursor: 'default',
+										animationDelay: `${Math.min(index, 10) * 20}ms`,
+									}}
 								>
-									<div className="flex items-center gap-4 min-w-0">
+									<HStack gap="md" align="center" minW0>
 										{/* Date badge */}
-										<div className="w-16 shrink-0">
-											<div className="inline-flex flex-col items-center px-2.5 py-1.5 rounded-lg bg-muted/40 dark:bg-white/5 group-hover:bg-muted/60 dark:group-hover:bg-white/10 transition-colors">
-												<span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+										<Box style={{ width: '4rem', flexShrink: 0 }}>
+											<VStack
+												gap="none"
+												align="center"
+												style={{
+													paddingLeft: '0.5rem',
+													paddingRight: '0.5rem',
+													paddingTop: '0.375rem',
+													paddingBottom: '0.375rem',
+													borderRadius: '0.5rem',
+													backgroundColor: 'hsl(var(--muted) / 0.4)',
+													display: 'inline-flex',
+													transition: 'background-color 0.2s',
+												}}
+											>
+												<Text
+													style={{
+														fontSize: '10px',
+														fontWeight: 600,
+														color: 'hsl(var(--muted-foreground))',
+														textTransform: 'uppercase',
+														letterSpacing: '0.05em',
+													}}
+												>
 													{formatDate(tx.date, 'MMM')}
-												</span>
-												<span className="text-sm font-bold text-foreground -mt-0.5">
+												</Text>
+												<Text size="sm" weight="bold" style={{ marginTop: '-0.125rem' }}>
 													{formatDate(tx.date, 'D')}
-												</span>
-											</div>
-										</div>
-										<div className="min-w-0">
-											<p className="font-medium truncate text-foreground group-hover:text-foreground transition-colors">
+												</Text>
+											</VStack>
+										</Box>
+										<VStack gap="none" minW0>
+											<Text
+												weight="medium"
+												style={{
+													overflow: 'hidden',
+													textOverflow: 'ellipsis',
+													whiteSpace: 'nowrap',
+													transition: 'color 0.2s',
+												}}
+											>
 												{tx.description}
-											</p>
+											</Text>
 											{tx.transactionCategory?.category && (
-												<p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-													<span>{tx.transactionCategory.category.icon}</span>
-													<span>{tx.transactionCategory.category.name}</span>
-												</p>
+												<HStack gap="xs" align="center" style={{ marginTop: '0.125rem' }}>
+													<Text as="span" size="xs" color="muted">
+														{tx.transactionCategory.category.icon}
+													</Text>
+													<Text as="span" size="xs" color="muted">
+														{tx.transactionCategory.category.name}
+													</Text>
+												</HStack>
 											)}
-										</div>
-									</div>
-									<p
-										className={`font-bold number-display shrink-0 ml-4 text-base ${
-											tx.type === 'INCOME'
-												? 'text-[oklch(0.55_0.15_145)]'
-												: 'text-foreground'
-										}`}
-									>
-										{tx.type === 'INCOME' ? '+' : '−'}
-										{formatMoney(tx.amount)}
-									</p>
-								</div>
+										</VStack>
+									</HStack>
+									<MoneyDisplay
+										amount={tx.type === 'INCOME' ? tx.amount : -tx.amount}
+										format="withSign"
+										size="md"
+										weight="bold"
+										variant={tx.type === 'INCOME' ? 'positive' : 'default'}
+										style={{ flexShrink: 0, marginLeft: '1rem' }}
+									/>
+								</HStack>
 							))}
 
 							{/* Infinite scroll trigger & loading indicator */}
-							<div ref={loadMoreRef} className="py-8">
+							<Box ref={loadMoreRef} py="xl">
 								{isLoadingMore ? (
-									<div className="flex items-center justify-center gap-3">
-										<div className="relative">
-											<div className="h-8 w-8 rounded-full bg-primary/10 animate-pulse" />
-											<Loader2 className="h-5 w-5 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-										</div>
-										<span className="text-sm text-muted-foreground font-medium">Chargement...</span>
-									</div>
+									<HStack gap="sm" justify="center" align="center">
+										<Box style={{ position: 'relative' }}>
+											<Box
+												style={{
+													height: '2rem',
+													width: '2rem',
+													borderRadius: '9999px',
+													backgroundColor: 'hsl(var(--primary) / 0.1)',
+													animation: 'pulse 2s ease-in-out infinite',
+												}}
+											/>
+											<Loader2
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													animation: 'spin 1s linear infinite',
+													color: 'hsl(var(--primary))',
+													position: 'absolute',
+													top: '50%',
+													left: '50%',
+													transform: 'translate(-50%, -50%)',
+												}}
+											/>
+										</Box>
+										<Text size="sm" color="muted" weight="medium">
+											Chargement...
+										</Text>
+									</HStack>
 								) : hasMore ? (
-									<div className="flex flex-col items-center gap-2">
+									<Flex direction="col" align="center" gap="sm">
 										<Button
 											variant="ghost"
 											size="sm"
 											onClick={loadMore}
-											className="text-muted-foreground hover:text-foreground rounded-xl hover:bg-white/60 dark:hover:bg-white/5"
+											style={{
+												color: 'hsl(var(--muted-foreground))',
+												borderRadius: '0.75rem',
+												transition: 'all 0.2s',
+											}}
 										>
 											Charger plus de transactions
 										</Button>
-									</div>
+									</Flex>
 								) : allTransactions.length > 0 ? (
-									<div className="flex items-center justify-center gap-2 pt-4 border-t border-border/30">
-										<CheckCircle2 className="h-4 w-4 text-muted-foreground/50" />
-										<span className="text-sm text-muted-foreground">
+									<HStack
+										justify="center"
+										align="center"
+										gap="sm"
+										style={{ paddingTop: '1rem', borderTop: '1px solid hsl(var(--border) / 0.3)' }}
+									>
+										<CheckCircle2
+											style={{
+												height: '1rem',
+												width: '1rem',
+												color: 'hsl(var(--muted-foreground) / 0.5)',
+											}}
+										/>
+										<Text size="sm" color="muted">
 											{allTransactions.length} transactions affichées
-										</span>
-									</div>
+										</Text>
+									</HStack>
 								) : null}
-							</div>
-						</div>
+							</Box>
+						</VStack>
 					)}
-				</div>
-			</div>
+				</Box>
+			</GlassCard>
 
 			{/* Confirmation Dialogs */}
 			<ConfirmDialog
@@ -1383,6 +2165,6 @@ export default function AccountDetailPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteImport}
 			/>
-		</div>
+		</VStack>
 	);
 }

@@ -21,8 +21,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { createClient } from '@/lib/supabase/client';
-import { useUser } from '@/lib/hooks/use-user';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -45,6 +43,8 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useUser } from '@/lib/hooks/use-user';
+import { createClient } from '@/lib/supabase/client';
 import { useEntityStore } from '@/shared/stores/entity-store';
 
 const mainNavItems = [
@@ -73,17 +73,17 @@ function NavItem({
 				}`}
 			>
 				<Link href={item.url} className="flex items-center gap-3">
-					<div className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-300 ${
-						isActive
-							? 'bg-primary text-white shadow-md shadow-primary/25'
-							: 'bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
-					}`}>
+					<div
+						className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-300 ${
+							isActive
+								? 'bg-primary text-white shadow-md shadow-primary/25'
+								: 'bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
+						}`}
+					>
 						<Icon className="h-4 w-4" />
 					</div>
 					<span className="flex-1">{item.title}</span>
-					{isActive && (
-						<div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-					)}
+					{isActive && <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />}
 				</Link>
 			</SidebarMenuButton>
 		</SidebarMenuItem>
@@ -143,12 +143,17 @@ export function AppSidebar() {
 				{/* Entity Selector - Modern pill style */}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<button type="button" className="mt-5 w-full flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-muted/80 to-muted/40 hover:from-muted hover:to-muted/60 transition-all duration-300 group">
-							<div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
-								selectedEntity?.type === 'family'
-									? 'bg-gradient-to-br from-primary/20 to-purple-500/20'
-									: 'bg-gradient-to-br from-primary/20 to-orange-500/20'
-							}`}>
+						<button
+							type="button"
+							className="mt-5 w-full flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-muted/80 to-muted/40 hover:from-muted hover:to-muted/60 transition-all duration-300 group"
+						>
+							<div
+								className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+									selectedEntity?.type === 'family'
+										? 'bg-gradient-to-br from-primary/20 to-purple-500/20'
+										: 'bg-gradient-to-br from-primary/20 to-orange-500/20'
+								}`}
+							>
 								{selectedEntity?.type === 'family' ? (
 									<Users className="h-5 w-5 text-primary" />
 								) : (
@@ -171,11 +176,13 @@ export function AppSidebar() {
 								onClick={() => setSelectedEntity(entity.id)}
 								className="flex items-center gap-3 p-3 rounded-xl cursor-pointer"
 							>
-								<div className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-									entity.type === 'family'
-										? 'bg-gradient-to-br from-primary/15 to-purple-500/15'
-										: 'bg-gradient-to-br from-primary/15 to-orange-500/15'
-								}`}>
+								<div
+									className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+										entity.type === 'family'
+											? 'bg-gradient-to-br from-primary/15 to-purple-500/15'
+											: 'bg-gradient-to-br from-primary/15 to-orange-500/15'
+									}`}
+								>
 									{entity.type === 'family' ? (
 										<Users className="h-4 w-4 text-primary" />
 									) : (
@@ -221,7 +228,10 @@ export function AppSidebar() {
 				{/* User Menu */}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<button type="button" className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors">
+						<button
+							type="button"
+							className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors"
+						>
 							{avatarUrl ? (
 								<Image
 									src={avatarUrl}

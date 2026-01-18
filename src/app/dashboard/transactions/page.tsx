@@ -1,23 +1,41 @@
+'use client';
+
+/**
+ * Transactions Page
+ *
+ * Shows transaction history with filtering and search.
+ * Uses the new component library for consistent UI.
+ */
+
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
+	Box,
+	Button,
 	Calendar,
 	CreditCard,
 	Download,
 	Filter,
+	GlassCard,
+	Heading,
+	HStack,
+	Input,
+	PageHeader,
 	Search,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
+	StatCard,
+	StatCardGrid,
+	Text,
+	VStack,
+} from '@/components';
+import { MoneyDifference } from '@/components/common/MoneyDisplay';
+import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
 
+// Mock transaction data
 const transactions = [
 	{
 		id: 'tx-1',
@@ -106,13 +124,6 @@ const expenses = transactions
 	.filter((t) => t.amount < 0)
 	.reduce((s, t) => s + Math.abs(t.amount), 0);
 
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-	}).format(amount);
-}
-
 function formatDate(dateStr: string): string {
 	const date = new Date(dateStr);
 	const today = new Date();
@@ -125,75 +136,77 @@ function formatDate(dateStr: string): string {
 	if (date.toDateString() === yesterday.toDateString()) {
 		return 'Hier';
 	}
-	return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(date);
+	return formatDateUtil(dateStr, 'D MMM');
 }
 
 export default function TransactionsPage() {
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Transactions</h1>
-					<p className="mt-1 text-muted-foreground">Historique de toutes vos transactions</p>
-				</div>
-				<Button variant="outline" className="gap-2">
-					<Download className="h-4 w-4" />
-					Exporter
-				</Button>
-			</div>
+			<PageHeader
+				title="Transactions"
+				description="Historique de toutes vos transactions"
+				actions={
+					<Button
+						variant="outline"
+						iconLeft={<Download style={{ height: '1rem', width: '1rem' }} />}
+					>
+						Exporter
+					</Button>
+				}
+			/>
 
 			{/* Stats Overview */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-2 sm:grid-cols-3 stagger-children">
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Revenus</p>
-							<p className="stat-card-value value-positive">+{formatCurrency(income)}</p>
-						</div>
-						<div className="stat-card-icon bg-[oklch(0.55_0.15_145)]/10 text-[oklch(0.55_0.15_145)]">
-							<ArrowDownLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+			<StatCardGrid columns={3}>
+				<StatCard
+					label="Revenus"
+					value={`+${formatMoney(income)}`}
+					icon={ArrowDownLeft}
+					variant="teal"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Dépenses</p>
-							<p className="stat-card-value value-negative">-{formatCurrency(expenses)}</p>
-						</div>
-						<div className="stat-card-icon bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]">
-							<ArrowUpRight className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+				<StatCard
+					label="Dépenses"
+					value={`-${formatMoney(expenses)}`}
+					icon={ArrowUpRight}
+					variant="coral"
+				/>
 
-				<div className="stat-card col-span-2 sm:col-span-1">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Solde net</p>
-							<p className={`stat-card-value ${income - expenses >= 0 ? 'value-positive' : 'value-negative'}`}>
-								{formatCurrency(income - expenses)}
-							</p>
-						</div>
-						<div className="stat-card-icon">
-							<CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-			</div>
+				<StatCard
+					label="Solde net"
+					value={formatMoney(income - expenses)}
+					icon={CreditCard}
+					variant={income - expenses >= 0 ? 'teal' : 'coral'}
+				/>
+			</StatCardGrid>
 
 			{/* Filters */}
-			<Card className="border-border/60">
-				<CardContent className="pt-6">
-					<div className="flex flex-col gap-4 sm:flex-row">
-						<div className="relative flex-1">
-							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-							<Input placeholder="Rechercher une transaction..." className="pl-10" />
-						</div>
+			<GlassCard padding="md">
+				<Box display="flex" style={{ flexDirection: 'column', gap: '1rem' }}>
+					<HStack gap="md" style={{ flexWrap: 'wrap' }}>
+						<Box style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+							<Search
+								style={{
+									position: 'absolute',
+									left: '0.75rem',
+									top: '50%',
+									transform: 'translateY(-50%)',
+									height: '1rem',
+									width: '1rem',
+									color: 'hsl(var(--muted-foreground))',
+								}}
+							/>
+							<Input
+								placeholder="Rechercher une transaction..."
+								style={{
+									paddingLeft: '2.5rem',
+									height: '2.75rem',
+									borderRadius: '0.75rem',
+								}}
+							/>
+						</Box>
 						<Select defaultValue="all">
-							<SelectTrigger className="w-[180px]">
+							<SelectTrigger style={{ width: '180px', height: '2.75rem', borderRadius: '0.75rem' }}>
 								<SelectValue placeholder="Catégorie" />
 							</SelectTrigger>
 							<SelectContent>
@@ -206,7 +219,7 @@ export default function TransactionsPage() {
 							</SelectContent>
 						</Select>
 						<Select defaultValue="all">
-							<SelectTrigger className="w-[180px]">
+							<SelectTrigger style={{ width: '180px', height: '2.75rem', borderRadius: '0.75rem' }}>
 								<SelectValue placeholder="Compte" />
 							</SelectTrigger>
 							<SelectContent>
@@ -215,63 +228,98 @@ export default function TransactionsPage() {
 								<SelectItem value="joint">Compte joint</SelectItem>
 							</SelectContent>
 						</Select>
-						<Button variant="outline" className="gap-2">
-							<Calendar className="h-4 w-4" />
+						<Button
+							variant="outline"
+							iconLeft={<Calendar style={{ height: '1rem', width: '1rem' }} />}
+							style={{ height: '2.75rem', borderRadius: '0.75rem' }}
+						>
 							Janvier 2025
 						</Button>
-						<Button variant="outline" size="icon">
-							<Filter className="h-4 w-4" />
+						<Button
+							variant="outline"
+							size="icon"
+							style={{ height: '2.75rem', width: '2.75rem', borderRadius: '0.75rem' }}
+						>
+							<Filter style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</div>
-				</CardContent>
-			</Card>
+					</HStack>
+				</Box>
+			</GlassCard>
 
 			{/* Transactions List */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<CardTitle className="text-lg font-medium">Toutes les transactions</CardTitle>
-						<p className="text-sm text-muted-foreground">{transactions.length} opérations</p>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-1">
+			<GlassCard style={{ padding: 0 }}>
+				{/* Header */}
+				<HStack
+					justify="between"
+					align="center"
+					p="md"
+					style={{ borderBottom: '1px solid hsl(var(--border))' }}
+				>
+					<Heading level={3} size="md">
+						Toutes les transactions
+					</Heading>
+					<Text size="sm" color="muted">
+						{transactions.length} opérations
+					</Text>
+				</HStack>
+
+				{/* List */}
+				<VStack gap="xs" p="md">
 					{transactions.map((tx) => (
-						<div
+						<HStack
 							key={tx.id}
-							className="flex items-center justify-between rounded-xl p-4 transition-colors hover:bg-muted/30"
+							justify="between"
+							align="center"
+							p="md"
+							style={{
+								borderRadius: '0.75rem',
+								transition: 'background-color 0.2s',
+							}}
 						>
-							<div className="flex items-center gap-4">
-								<div
-									className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-										tx.amount > 0 ? 'bg-[oklch(0.55_0.15_145)]/10' : 'bg-muted/50'
-									}`}
+							<HStack gap="md" align="center">
+								<Box
+									display="flex"
+									style={{
+										borderRadius: '0.75rem',
+										height: '2.5rem',
+										width: '2.5rem',
+										alignItems: 'center',
+										justifyContent: 'center',
+										backgroundColor:
+											tx.amount > 0 ? 'oklch(0.55 0.15 145 / 0.1)' : 'hsl(var(--muted) / 0.3)',
+									}}
 								>
 									{tx.amount > 0 ? (
-										<ArrowDownLeft className="h-5 w-5 text-[oklch(0.55_0.15_145)]" />
+										<ArrowDownLeft
+											style={{ height: '1.25rem', width: '1.25rem', color: 'oklch(0.55 0.15 145)' }}
+										/>
 									) : (
-										<CreditCard className="h-5 w-5 text-muted-foreground" />
+										<CreditCard
+											style={{
+												height: '1.25rem',
+												width: '1.25rem',
+												color: 'hsl(var(--muted-foreground))',
+											}}
+										/>
 									)}
-								</div>
-								<div>
-									<p className="font-medium">{tx.description}</p>
-									<p className="text-xs text-muted-foreground">
+								</Box>
+								<VStack gap="none">
+									<Text weight="medium">{tx.description}</Text>
+									<Text size="xs" color="muted">
 										{tx.category} · {tx.account}
-									</p>
-								</div>
-							</div>
-							<div className="text-right">
-								<p
-									className={`font-medium number-display ${tx.amount > 0 ? 'value-positive' : ''}`}
-								>
-									{tx.amount > 0 ? '+' : ''}
-									{formatCurrency(tx.amount)}
-								</p>
-								<p className="text-xs text-muted-foreground">{formatDate(tx.date)}</p>
-							</div>
-						</div>
+									</Text>
+								</VStack>
+							</HStack>
+							<VStack gap="none" align="end">
+								<MoneyDifference amount={tx.amount} size="md" />
+								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
+									{formatDate(tx.date)}
+								</Text>
+							</VStack>
+						</HStack>
 					))}
-				</CardContent>
-			</Card>
-		</div>
+				</VStack>
+			</GlassCard>
+		</VStack>
 	);
 }

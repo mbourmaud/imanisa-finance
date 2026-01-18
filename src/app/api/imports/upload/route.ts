@@ -7,11 +7,11 @@
  * - Returns the import ID
  */
 
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import { uploadRawFile } from '@/lib/supabase/storage';
 import { rawImportRepository } from '@/server/repositories';
-import { prisma } from '@/lib/prisma';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = [
@@ -73,10 +73,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		if (!isValidBankKey(bankKey)) {
-			return NextResponse.json(
-				{ error: 'Invalid bank key' },
-				{ status: 400 },
-			);
+			return NextResponse.json({ error: 'Invalid bank key' }, { status: 400 });
 		}
 
 		// Validate file size
@@ -101,7 +98,10 @@ export async function POST(request: NextRequest) {
 
 		if (uploadError) {
 			console.error('Upload error:', uploadError.message);
-			return NextResponse.json({ error: `Failed to upload file: ${uploadError.message}` }, { status: 500 });
+			return NextResponse.json(
+				{ error: `Failed to upload file: ${uploadError.message}` },
+				{ status: 500 },
+			);
 		}
 
 		// Create RawImport record in database
@@ -134,9 +134,10 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Return more specific error message in development
-		const errorMessage = process.env.NODE_ENV === 'development' && error instanceof Error
-			? error.message
-			: 'Internal server error';
+		const errorMessage =
+			process.env.NODE_ENV === 'development' && error instanceof Error
+				? error.message
+				: 'Internal server error';
 
 		return NextResponse.json({ error: errorMessage }, { status: 500 });
 	}

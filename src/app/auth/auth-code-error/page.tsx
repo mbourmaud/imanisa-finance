@@ -1,68 +1,147 @@
 'use client';
 
-import { AlertTriangle, ArrowLeft, RefreshCw, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import {
+	AlertTriangle,
+	ArrowLeft,
+	Box,
+	Button,
+	Flex,
+	GlassCard,
+	Heading,
+	RefreshCw,
+	Text,
+	VStack,
+	Wallet,
+} from '@/components';
 
 export default function AuthCodeErrorPage() {
 	const router = useRouter();
 
 	return (
-		<div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6">
+		<Box
+			display="flex"
+			position="relative"
+			overflow="hidden"
+			bg="background"
+			p="lg"
+			style={{ minHeight: '100vh' }}
+		>
 			{/* Background gradient blobs */}
-			<div className="absolute inset-0 -z-10 overflow-hidden">
-				<div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-red-500/10 blur-3xl animate-pulse" />
-				<div className="absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full bg-orange-500/10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-			</div>
+			<Box position="absolute" overflow="hidden" style={{ inset: 0, zIndex: -10 }}>
+				<Box
+					position="absolute"
+					rounded="full"
+					style={{
+						top: '-10rem',
+						right: '-10rem',
+						height: '500px',
+						width: '500px',
+						backgroundColor: 'oklch(0.5 0.2 25 / 0.1)',
+						filter: 'blur(64px)',
+						animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+					}}
+				/>
+				<Box
+					position="absolute"
+					rounded="full"
+					style={{
+						bottom: '-10rem',
+						left: '-10rem',
+						height: '400px',
+						width: '400px',
+						backgroundColor: 'oklch(0.6 0.2 40 / 0.1)',
+						filter: 'blur(64px)',
+						animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+						animationDelay: '1s',
+					}}
+				/>
+			</Box>
 
-			{/* Logo */}
-			<div className="mb-8 flex flex-col items-center gap-4 animate-fade-in">
-				<div className="relative">
-					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-xl">
-						<Wallet className="h-8 w-8 text-white" />
-					</div>
-				</div>
-			</div>
+			{/* Center content */}
+			<Flex direction="col" align="center" justify="center" fullWidth fullHeight>
+				{/* Logo */}
+				<VStack gap="md" align="center" p="lg">
+					<Box
+						display="flex"
+						rounded="2xl"
+						shadow="xl"
+						style={{
+							height: '4rem',
+							width: '4rem',
+							alignItems: 'center',
+							justifyContent: 'center',
+							background:
+								'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
+						}}
+					>
+						<Wallet style={{ height: '2rem', width: '2rem', color: 'white' }} />
+					</Box>
+				</VStack>
 
-			{/* Error card */}
-			<div className="w-full max-w-md">
-				<div className="rounded-3xl bg-card/80 backdrop-blur-sm border border-border/40 p-8 shadow-xl text-center">
-					<div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-						<AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
-					</div>
+				{/* Error card */}
+				<Box style={{ maxWidth: '28rem', width: '100%' }}>
+					<GlassCard padding="lg" variant="elevated">
+						<VStack gap="lg" align="center">
+							{/* Error icon */}
+							<Box
+								display="flex"
+								rounded="full"
+								style={{
+									height: '4rem',
+									width: '4rem',
+									alignItems: 'center',
+									justifyContent: 'center',
+									backgroundColor: 'oklch(0.9 0.05 25)',
+								}}
+							>
+								<AlertTriangle
+									style={{ height: '2rem', width: '2rem', color: 'oklch(0.55 0.2 25)' }}
+								/>
+							</Box>
 
-					<h1 className="text-2xl font-bold mb-3">Erreur d'authentification</h1>
+							{/* Title */}
+							<Heading level={1} size="xl" align="center">
+								Erreur d'authentification
+							</Heading>
 
-					<p className="text-muted-foreground mb-8">
-						Une erreur s'est produite lors de la connexion avec Google.
-						Veuillez reessayer ou contacter le support si le probleme persiste.
-					</p>
+							{/* Description */}
+							<Text color="muted" align="center">
+								Une erreur s'est produite lors de la connexion avec Google. Veuillez réessayer ou
+								contacter le support si le problème persiste.
+							</Text>
 
-					<div className="space-y-3">
-						<button
-							type="button"
-							onClick={() => router.push('/login')}
-							className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-						>
-							<RefreshCw className="h-5 w-5" />
-							Reessayer
-						</button>
+							{/* Actions */}
+							<VStack gap="sm" fullWidth>
+								<Button
+									onClick={() => router.push('/login')}
+									iconLeft={<RefreshCw style={{ height: '1.25rem', width: '1.25rem' }} />}
+									fullWidth
+								>
+									Réessayer
+								</Button>
 
-						<Link
-							href="/"
-							className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all duration-300"
-						>
-							<ArrowLeft className="h-5 w-5" />
-							Retour a l'accueil
-						</Link>
-					</div>
-				</div>
-			</div>
+								<Button
+									asChild
+									variant="secondary"
+									iconLeft={<ArrowLeft style={{ height: '1.25rem', width: '1.25rem' }} />}
+									fullWidth
+								>
+									<Link href="/">Retour à l'accueil</Link>
+								</Button>
+							</VStack>
+						</VStack>
+					</GlassCard>
+				</Box>
 
-			{/* Footer */}
-			<p className="absolute bottom-6 text-sm text-muted-foreground/50">
-				Besoin d'aide ? Contactez le support
-			</p>
-		</div>
+				{/* Footer */}
+				<Box position="absolute" style={{ bottom: '1.5rem' }}>
+					<Text size="sm" color="muted">
+						Besoin d'aide ? Contactez le support
+					</Text>
+				</Box>
+			</Flex>
+		</Box>
 	);
 }

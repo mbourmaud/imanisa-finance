@@ -8,7 +8,13 @@
    Warm, friendly, personal finance for families
    ============================================ */
 
+/* ============================================
+   📐 DESIGN TOKENS - Spacing & Layout
+   See src/styles/tokens.ts for TypeScript values
+   ============================================ */
+
 @theme inline {
+	/* Color tokens */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-geist-sans);
@@ -42,6 +48,8 @@
 	--color-popover: var(--popover);
 	--color-card-foreground: var(--card-foreground);
 	--color-card: var(--card);
+
+	/* Border radius tokens */
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -49,6 +57,29 @@
 	--radius-2xl: calc(var(--radius) + 8px);
 	--radius-3xl: calc(var(--radius) + 12px);
 	--radius-4xl: calc(var(--radius) + 16px);
+
+	/* Spacing tokens - extends Tailwind spacing scale */
+	--spacing-xs: 0.25rem; /* 4px */
+	--spacing-sm: 0.5rem; /* 8px */
+	--spacing-md: 1rem; /* 16px */
+	--spacing-lg: 1.5rem; /* 24px */
+	--spacing-xl: 2rem; /* 32px */
+	--spacing-2xl: 3rem; /* 48px */
+	--spacing-3xl: 4rem; /* 64px */
+
+	/* Container max-widths */
+	--container-sm: 640px;
+	--container-md: 768px;
+	--container-lg: 1024px;
+	--container-xl: 1280px;
+	--container-2xl: 1536px;
+
+	/* Layout tokens */
+	--page-gutter-mobile: 1rem; /* 16px */
+	--page-gutter-desktop: 1.5rem; /* 24px */
+	--section-gap: 2rem; /* 32px */
+	--card-padding-sm: 1rem; /* 16px */
+	--card-padding-md: 1.5rem; /* 24px */
 }
 
 :root {
@@ -92,10 +123,10 @@
 	--ring: oklch(0.65 0.18 25);
 
 	/* 🎨 Charts - Vibrant & fun palette */
-	--chart-1: oklch(0.65 0.2 25);   /* Coral */
-	--chart-2: oklch(0.7 0.15 165);  /* Teal */
-	--chart-3: oklch(0.75 0.15 85);  /* Sunny yellow */
-	--chart-4: oklch(0.6 0.18 290);  /* Purple */
+	--chart-1: oklch(0.65 0.2 25); /* Coral */
+	--chart-2: oklch(0.7 0.15 165); /* Teal */
+	--chart-3: oklch(0.75 0.15 85); /* Sunny yellow */
+	--chart-4: oklch(0.6 0.18 290); /* Purple */
 	--chart-5: oklch(0.65 0.15 145); /* Green */
 
 	/* Sidebar - Warm cream */
@@ -267,8 +298,12 @@
 	}
 
 	@keyframes shimmer {
-		0% { background-position: 200% 0; }
-		100% { background-position: -200% 0; }
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
+		}
 	}
 
 	/* 🎴 Stat card - warm & friendly */
@@ -503,6 +538,63 @@
 			transparent 100%
 		);
 	}
+
+	/* ============================================
+	   📐 LAYOUT UTILITY CLASSES
+	   Use these for consistent spacing across pages
+	   ============================================ */
+
+	/* Page gutter - horizontal padding for page content */
+	.gutter {
+		@apply px-4 sm:px-6;
+	}
+
+	/* Section spacing - vertical gap between page sections */
+	.section-spacing {
+		@apply py-8;
+	}
+
+	/* Card padding variants */
+	.card-padding {
+		@apply p-4 sm:p-6;
+	}
+
+	.card-padding-sm {
+		@apply p-4;
+	}
+
+	.card-padding-lg {
+		@apply p-6 sm:p-8;
+	}
+
+	/* Gap utility classes using token scale */
+	.gap-token-xs {
+		gap: var(--spacing-xs);
+	}
+
+	.gap-token-sm {
+		gap: var(--spacing-sm);
+	}
+
+	.gap-token-md {
+		gap: var(--spacing-md);
+	}
+
+	.gap-token-lg {
+		gap: var(--spacing-lg);
+	}
+
+	.gap-token-xl {
+		gap: var(--spacing-xl);
+	}
+
+	.gap-token-2xl {
+		gap: var(--spacing-2xl);
+	}
+
+	.gap-token-3xl {
+		gap: var(--spacing-3xl);
+	}
 }
 
 @layer utilities {
@@ -569,8 +661,13 @@
 	}
 
 	@keyframes bounce {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-4px); }
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-4px);
+		}
 	}
 
 	/* Pulse glow effect */
@@ -579,7 +676,8 @@
 	}
 
 	@keyframes pulseGlow {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 0 0 oklch(0.65 0.18 25 / 0.4);
 		}
 		50% {
@@ -593,14 +691,30 @@
 		opacity: 0;
 	}
 
-	.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
-	.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
-	.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
-	.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
-	.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
-	.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
-	.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
-	.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+	.stagger-children > *:nth-child(1) {
+		animation-delay: 0.05s;
+	}
+	.stagger-children > *:nth-child(2) {
+		animation-delay: 0.1s;
+	}
+	.stagger-children > *:nth-child(3) {
+		animation-delay: 0.15s;
+	}
+	.stagger-children > *:nth-child(4) {
+		animation-delay: 0.2s;
+	}
+	.stagger-children > *:nth-child(5) {
+		animation-delay: 0.25s;
+	}
+	.stagger-children > *:nth-child(6) {
+		animation-delay: 0.3s;
+	}
+	.stagger-children > *:nth-child(7) {
+		animation-delay: 0.35s;
+	}
+	.stagger-children > *:nth-child(8) {
+		animation-delay: 0.4s;
+	}
 
 	/* Wiggle animation for fun interactions */
 	.wiggle:hover {
@@ -608,9 +722,16 @@
 	}
 
 	@keyframes wiggle {
-		0%, 100% { transform: rotate(0deg); }
-		25% { transform: rotate(-3deg); }
-		75% { transform: rotate(3deg); }
+		0%,
+		100% {
+			transform: rotate(0deg);
+		}
+		25% {
+			transform: rotate(-3deg);
+		}
+		75% {
+			transform: rotate(3deg);
+		}
 	}
 
 	/* Gradient text */
@@ -673,13 +794,16 @@
 	}
 
 	.glass-card-accent::before {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
 		height: 3px;
-		background: var(--accent-gradient, linear-gradient(90deg, oklch(0.65 0.18 25), oklch(0.7 0.15 180)));
+		background: var(
+			--accent-gradient,
+			linear-gradient(90deg, oklch(0.65 0.18 25), oklch(0.7 0.15 180))
+		);
 		border-radius: 1rem 1rem 0 0;
 	}
 
@@ -721,11 +845,7 @@
 	/* Glass button */
 	.glass-button {
 		@apply relative rounded-xl px-4 py-2.5 font-medium transition-all duration-200;
-		background: linear-gradient(
-			135deg,
-			oklch(1 0 0 / 0.8) 0%,
-			oklch(0.98 0.005 85 / 0.7) 100%
-		);
+		background: linear-gradient(135deg, oklch(1 0 0 / 0.8) 0%, oklch(0.98 0.005 85 / 0.7) 100%);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
 		border: 1px solid oklch(1 0 0 / 0.3);
@@ -735,11 +855,7 @@
 	}
 
 	.glass-button:hover {
-		background: linear-gradient(
-			135deg,
-			oklch(1 0 0 / 0.95) 0%,
-			oklch(0.99 0.005 85 / 0.85) 100%
-		);
+		background: linear-gradient(135deg, oklch(1 0 0 / 0.95) 0%, oklch(0.99 0.005 85 / 0.85) 100%);
 		box-shadow:
 			0 4px 12px oklch(0.3 0.02 260 / 0.1),
 			inset 0 1px 0 oklch(1 0 0 / 0.6);
@@ -787,24 +903,23 @@
 	}
 
 	.shimmer-effect::after {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		left: -100%;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(
-			90deg,
-			transparent 0%,
-			oklch(1 0 0 / 0.2) 50%,
-			transparent 100%
-		);
+		background: linear-gradient(90deg, transparent 0%, oklch(1 0 0 / 0.2) 50%, transparent 100%);
 		animation: shimmerMove 2s ease-in-out infinite;
 	}
 
 	@keyframes shimmerMove {
-		0% { left: -100%; }
-		100% { left: 100%; }
+		0% {
+			left: -100%;
+		}
+		100% {
+			left: 100%;
+		}
 	}
 
 	/* Glow effect for important elements */
@@ -826,14 +941,23 @@
 	}
 
 	.gradient-border::before {
-		content: '';
+		content: "";
 		position: absolute;
 		inset: 0;
 		border-radius: inherit;
 		padding: 1px;
-		background: linear-gradient(135deg, oklch(0.65 0.18 25 / 0.5), oklch(0.7 0.15 180 / 0.5), oklch(0.6 0.18 290 / 0.5));
-		-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-		mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+		background: linear-gradient(
+			135deg,
+			oklch(0.65 0.18 25 / 0.5),
+			oklch(0.7 0.15 180 / 0.5),
+			oklch(0.6 0.18 290 / 0.5)
+		);
+		-webkit-mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
 		-webkit-mask-composite: xor;
 		mask-composite: exclude;
 		pointer-events: none;
@@ -845,8 +969,13 @@
 	}
 
 	@keyframes float {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-4px); }
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-4px);
+		}
 	}
 
 	/* Scale on hover */
@@ -865,18 +994,13 @@
 	}
 
 	.hover-shine::before {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		left: -75%;
 		width: 50%;
 		height: 100%;
-		background: linear-gradient(
-			90deg,
-			transparent 0%,
-			oklch(1 0 0 / 0.15) 50%,
-			transparent 100%
-		);
+		background: linear-gradient(90deg, transparent 0%, oklch(1 0 0 / 0.15) 50%, transparent 100%);
 		transform: skewX(-25deg);
 		transition: left 0.5s ease-out;
 	}

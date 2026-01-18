@@ -5,8 +5,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { propertyRepository, memberRepository } from '@/server/repositories';
 import type { PropertyType, PropertyUsage } from '@/lib/prisma';
+import { memberRepository, propertyRepository } from '@/server/repositories';
 
 export async function GET(request: NextRequest) {
 	try {
@@ -74,13 +74,19 @@ export async function POST(request: NextRequest) {
 		// Validate type
 		const validTypes: PropertyType[] = ['HOUSE', 'APARTMENT'];
 		if (!type || !validTypes.includes(type)) {
-			return NextResponse.json({ error: `Invalid property type: ${type}. Must be HOUSE or APARTMENT` }, { status: 400 });
+			return NextResponse.json(
+				{ error: `Invalid property type: ${type}. Must be HOUSE or APARTMENT` },
+				{ status: 400 },
+			);
 		}
 
 		// Validate usage
 		const validUsages: PropertyUsage[] = ['PRIMARY', 'SECONDARY', 'RENTAL'];
 		if (!usage || !validUsages.includes(usage)) {
-			return NextResponse.json({ error: `Invalid property usage: ${usage}. Must be PRIMARY, SECONDARY or RENTAL` }, { status: 400 });
+			return NextResponse.json(
+				{ error: `Invalid property usage: ${usage}. Must be PRIMARY, SECONDARY or RENTAL` },
+				{ status: 400 },
+			);
 		}
 
 		// Validate address fields
@@ -99,13 +105,22 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: 'surface must be a positive number' }, { status: 400 });
 		}
 		if (typeof purchasePrice !== 'number' || purchasePrice < 0) {
-			return NextResponse.json({ error: 'purchasePrice must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'purchasePrice must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 		if (typeof notaryFees !== 'number' || notaryFees < 0) {
-			return NextResponse.json({ error: 'notaryFees must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'notaryFees must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 		if (typeof currentValue !== 'number' || currentValue < 0) {
-			return NextResponse.json({ error: 'currentValue must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'currentValue must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 
 		// Validate purchaseDate
@@ -127,12 +142,18 @@ export async function POST(request: NextRequest) {
 					);
 				}
 				if (share.ownershipShare < 0 || share.ownershipShare > 100) {
-					return NextResponse.json({ error: 'ownershipShare must be between 0 and 100' }, { status: 400 });
+					return NextResponse.json(
+						{ error: 'ownershipShare must be between 0 and 100' },
+						{ status: 400 },
+					);
 				}
 				// Verify member exists
 				const member = await memberRepository.getById(share.memberId);
 				if (!member) {
-					return NextResponse.json({ error: `Member not found: ${share.memberId}` }, { status: 400 });
+					return NextResponse.json(
+						{ error: `Member not found: ${share.memberId}` },
+						{ status: 400 },
+					);
 				}
 			}
 		}

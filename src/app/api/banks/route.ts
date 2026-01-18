@@ -6,8 +6,8 @@
  */
 
 import { NextResponse } from 'next/server';
+import type { Bank } from '@/lib/prisma';
 import { accountRepository, bankRepository } from '@/server/repositories';
-import type { Bank, } from '@/lib/prisma';
 
 export interface BankWithAccounts extends Bank {
 	accountCount: number;

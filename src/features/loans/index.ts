@@ -1,24 +1,23 @@
 // Types
-export * from './types'
-
-// TanStack Query Hooks - Loans
-export {
-	loanKeys,
-	useLoansQuery,
-	useLoansByPropertyQuery,
-	useLoanQuery,
-	useCreateLoanMutation,
-	useUpdateLoanMutation,
-	useDeleteLoanMutation,
-} from './hooks/use-loans-query'
 
 // TanStack Query Hooks - Loan Insurances
 export {
 	loanInsuranceKeys,
 	useCreateLoanInsuranceMutation,
-	useUpdateLoanInsuranceMutation,
 	useDeleteLoanInsuranceMutation,
-} from './hooks/use-loan-insurances-query'
+	useUpdateLoanInsuranceMutation,
+} from './hooks/use-loan-insurances-query';
 
+// TanStack Query Hooks - Loans
+export {
+	loanKeys,
+	useCreateLoanMutation,
+	useDeleteLoanMutation,
+	useLoanQuery,
+	useLoansByPropertyQuery,
+	useLoansQuery,
+	useUpdateLoanMutation,
+} from './hooks/use-loans-query';
 // Services
-export { loanService } from './services/loan-service'
+export { loanService } from './services/loan-service';
+export * from './types';

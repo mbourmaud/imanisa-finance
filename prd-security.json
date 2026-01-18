@@ -1,178 +1,165 @@
 {
-  "id": "security-api-protection",
-  "title": "Sécurisation des Routes API",
-  "description": "Ajouter l'authentification obligatoire sur toutes les routes API non protégées. La whitelist des utilisateurs autorisés est gérée côté Google OAuth Console (pas dans le code).",
-  "created": "2026-01-17",
-  "stories": [
-    {
-      "id": "SEC-001",
-      "title": "Protéger les routes /api/accounts/*",
-      "description": "Ajouter requireAuth() au début de chaque handler (GET, POST, PATCH, DELETE) dans les fichiers de routes accounts. Retourner 401 si non authentifié.",
-      "acceptance_criteria": [
-        "src/app/api/accounts/route.ts - GET et POST protégés",
-        "src/app/api/accounts/[id]/route.ts - GET, PATCH, DELETE protégés",
-        "src/app/api/accounts/[id]/members/route.ts - GET, POST, DELETE protégés",
-        "src/app/api/accounts/[id]/sync/route.ts - POST protégé",
-        "src/app/api/accounts/summary/route.ts - GET protégé",
-        "Toutes les routes retournent { error: 'Unauthorized' } avec status 401 si requireAuth() échoue"
-      ],
-      "files": [
-        "src/app/api/accounts/route.ts",
-        "src/app/api/accounts/[id]/route.ts",
-        "src/app/api/accounts/[id]/members/route.ts",
-        "src/app/api/accounts/[id]/sync/route.ts",
-        "src/app/api/accounts/summary/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-002",
-      "title": "Protéger les routes /api/members/*",
-      "description": "Ajouter requireAuth() au début de chaque handler dans les routes members.",
-      "acceptance_criteria": [
-        "src/app/api/members/route.ts - GET et POST protégés",
-        "src/app/api/members/[id]/route.ts - GET, PATCH, DELETE protégés",
-        "Retourner 401 Unauthorized si non authentifié"
-      ],
-      "files": [
-        "src/app/api/members/route.ts",
-        "src/app/api/members/[id]/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-003",
-      "title": "Protéger les routes /api/transactions/*",
-      "description": "Ajouter requireAuth() au début de chaque handler dans les routes transactions.",
-      "acceptance_criteria": [
-        "src/app/api/transactions/route.ts - GET protégé",
-        "src/app/api/transactions/[id]/route.ts - GET, PATCH, DELETE protégés",
-        "src/app/api/transactions/bulk-categorize/route.ts - POST protégé",
-        "src/app/api/transactions/summary/route.ts - GET protégé",
-        "Retourner 401 Unauthorized si non authentifié"
-      ],
-      "files": [
-        "src/app/api/transactions/route.ts",
-        "src/app/api/transactions/[id]/route.ts",
-        "src/app/api/transactions/bulk-categorize/route.ts",
-        "src/app/api/transactions/summary/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-004",
-      "title": "Protéger les routes /api/banks/*",
-      "description": "Ajouter requireAuth() au début de chaque handler dans les routes banks.",
-      "acceptance_criteria": [
-        "src/app/api/banks/route.ts - GET protégé",
-        "src/app/api/banks/[id]/logo/route.ts - GET protégé (ou laisser public si logo non sensible)",
-        "Retourner 401 Unauthorized si non authentifié"
-      ],
-      "files": [
-        "src/app/api/banks/route.ts",
-        "src/app/api/banks/[id]/logo/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-005",
-      "title": "Protéger les routes /api/properties/*",
-      "description": "Ajouter requireAuth() au début de chaque handler dans les routes properties.",
-      "acceptance_criteria": [
-        "src/app/api/properties/route.ts - GET et POST protégés",
-        "src/app/api/properties/[id]/route.ts - GET, PATCH, DELETE protégés",
-        "src/app/api/properties/[id]/loans/route.ts - GET et POST protégés",
-        "src/app/api/properties/[id]/co-ownership/route.ts - GET, POST, PATCH protégés",
-        "src/app/api/properties/[id]/utility-contracts/route.ts - GET et POST protégés",
-        "src/app/api/properties/[id]/insurance/route.ts - GET, POST, PATCH protégés",
-        "Retourner 401 Unauthorized si non authentifié"
-      ],
-      "files": [
-        "src/app/api/properties/route.ts",
-        "src/app/api/properties/[id]/route.ts",
-        "src/app/api/properties/[id]/loans/route.ts",
-        "src/app/api/properties/[id]/co-ownership/route.ts",
-        "src/app/api/properties/[id]/utility-contracts/route.ts",
-        "src/app/api/properties/[id]/insurance/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-006",
-      "title": "Protéger les routes /api/loans/*",
-      "description": "Ajouter requireAuth() au début de chaque handler dans les routes loans.",
-      "acceptance_criteria": [
-        "src/app/api/loans/route.ts - GET et POST protégés",
-        "src/app/api/loans/[id]/route.ts - GET, PATCH, DELETE protégés",
-        "src/app/api/loans/[id]/insurances/route.ts - GET et POST protégés",
-        "Retourner 401 Unauthorized si non authentifié"
-      ],
-      "files": [
-        "src/app/api/loans/route.ts",
-        "src/app/api/loans/[id]/route.ts",
-        "src/app/api/loans/[id]/insurances/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-007",
-      "title": "Protéger les routes /api/utility-contracts/* et /api/loan-insurances/*",
-      "description": "Ajouter requireAuth() au début de chaque handler dans ces routes.",
-      "acceptance_criteria": [
-        "src/app/api/utility-contracts/[id]/route.ts - GET, PATCH, DELETE protégés",
-        "src/app/api/loan-insurances/[id]/route.ts - GET, PATCH, DELETE protégés",
-        "Retourner 401 Unauthorized si non authentifié"
-      ],
-      "files": [
-        "src/app/api/utility-contracts/[id]/route.ts",
-        "src/app/api/loan-insurances/[id]/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-008",
-      "title": "Protéger les routes /api/auth/*",
-      "description": "Vérifier et sécuriser les routes auth selon leur usage.",
-      "acceptance_criteria": [
-        "src/app/api/auth/me/route.ts - GET protégé par requireAuth()",
-        "src/app/api/auth/logout/route.ts - POST peut rester accessible (pour permettre logout même en cas de session corrompue)",
-        "La route /me doit retourner les infos user ou 401"
-      ],
-      "files": [
-        "src/app/api/auth/me/route.ts",
-        "src/app/api/auth/logout/route.ts"
-      ]
-    },
-    {
-      "id": "SEC-009",
-      "title": "Créer un helper withAuth pour simplifier la protection",
-      "description": "Optionnel: Créer un wrapper HOF (Higher Order Function) pour simplifier l'ajout d'auth sur les routes.",
-      "acceptance_criteria": [
-        "Créer src/lib/api-auth.ts avec une fonction withAuth(handler)",
-        "La fonction wrap le handler et appelle requireAuth() automatiquement",
-        "Retourne 401 avec { error: 'Unauthorized' } si non authentifié",
-        "Exemple d'usage: export const GET = withAuth(async (req, user) => { ... })"
-      ],
-      "files": [
-        "src/lib/api-auth.ts"
-      ]
-    },
-    {
-      "id": "SEC-010",
-      "title": "Documenter la configuration Google OAuth whitelist",
-      "description": "Ajouter documentation sur comment configurer la whitelist dans Google Cloud Console.",
-      "acceptance_criteria": [
-        "Ajouter section dans .github/SECRETS.md ou créer docs/SECURITY.md",
-        "Expliquer comment accéder à Google Cloud Console > APIs & Services > OAuth consent screen",
-        "Expliquer comment ajouter les test users en mode External/Testing",
-        "OU comment passer en Internal pour limiter au domaine Google Workspace",
-        "Mentionner que seuls les emails whitelistés peuvent se connecter"
-      ],
-      "files": [
-        ".github/SECRETS.md"
-      ]
-    }
-  ],
-  "notes": [
-    "La whitelist des utilisateurs est gérée côté Google OAuth Console, pas dans le code",
-    "En mode 'Testing' de Google OAuth, seuls les 'Test users' ajoutés peuvent se connecter",
-    "Le mode démo (NEXT_PUBLIC_DEMO_MODE) bypasse l'auth - s'assurer qu'il est désactivé en production",
-    "Les routes /api/imports/* sont déjà protégées - les utiliser comme référence",
-    "Pattern à suivre: try { await requireAuth(); ... } catch { return 401 }"
-  ],
-  "priority": "critical",
-  "estimated_stories": 10
+	"id": "security-api-protection",
+	"title": "Sécurisation des Routes API",
+	"description": "Ajouter l'authentification obligatoire sur toutes les routes API non protégées. La whitelist des utilisateurs autorisés est gérée côté Google OAuth Console (pas dans le code).",
+	"created": "2026-01-17",
+	"stories": [
+		{
+			"id": "SEC-001",
+			"title": "Protéger les routes /api/accounts/*",
+			"description": "Ajouter requireAuth() au début de chaque handler (GET, POST, PATCH, DELETE) dans les fichiers de routes accounts. Retourner 401 si non authentifié.",
+			"acceptance_criteria": [
+				"src/app/api/accounts/route.ts - GET et POST protégés",
+				"src/app/api/accounts/[id]/route.ts - GET, PATCH, DELETE protégés",
+				"src/app/api/accounts/[id]/members/route.ts - GET, POST, DELETE protégés",
+				"src/app/api/accounts/[id]/sync/route.ts - POST protégé",
+				"src/app/api/accounts/summary/route.ts - GET protégé",
+				"Toutes les routes retournent { error: 'Unauthorized' } avec status 401 si requireAuth() échoue"
+			],
+			"files": [
+				"src/app/api/accounts/route.ts",
+				"src/app/api/accounts/[id]/route.ts",
+				"src/app/api/accounts/[id]/members/route.ts",
+				"src/app/api/accounts/[id]/sync/route.ts",
+				"src/app/api/accounts/summary/route.ts"
+			]
+		},
+		{
+			"id": "SEC-002",
+			"title": "Protéger les routes /api/members/*",
+			"description": "Ajouter requireAuth() au début de chaque handler dans les routes members.",
+			"acceptance_criteria": [
+				"src/app/api/members/route.ts - GET et POST protégés",
+				"src/app/api/members/[id]/route.ts - GET, PATCH, DELETE protégés",
+				"Retourner 401 Unauthorized si non authentifié"
+			],
+			"files": ["src/app/api/members/route.ts", "src/app/api/members/[id]/route.ts"]
+		},
+		{
+			"id": "SEC-003",
+			"title": "Protéger les routes /api/transactions/*",
+			"description": "Ajouter requireAuth() au début de chaque handler dans les routes transactions.",
+			"acceptance_criteria": [
+				"src/app/api/transactions/route.ts - GET protégé",
+				"src/app/api/transactions/[id]/route.ts - GET, PATCH, DELETE protégés",
+				"src/app/api/transactions/bulk-categorize/route.ts - POST protégé",
+				"src/app/api/transactions/summary/route.ts - GET protégé",
+				"Retourner 401 Unauthorized si non authentifié"
+			],
+			"files": [
+				"src/app/api/transactions/route.ts",
+				"src/app/api/transactions/[id]/route.ts",
+				"src/app/api/transactions/bulk-categorize/route.ts",
+				"src/app/api/transactions/summary/route.ts"
+			]
+		},
+		{
+			"id": "SEC-004",
+			"title": "Protéger les routes /api/banks/*",
+			"description": "Ajouter requireAuth() au début de chaque handler dans les routes banks.",
+			"acceptance_criteria": [
+				"src/app/api/banks/route.ts - GET protégé",
+				"src/app/api/banks/[id]/logo/route.ts - GET protégé (ou laisser public si logo non sensible)",
+				"Retourner 401 Unauthorized si non authentifié"
+			],
+			"files": ["src/app/api/banks/route.ts", "src/app/api/banks/[id]/logo/route.ts"]
+		},
+		{
+			"id": "SEC-005",
+			"title": "Protéger les routes /api/properties/*",
+			"description": "Ajouter requireAuth() au début de chaque handler dans les routes properties.",
+			"acceptance_criteria": [
+				"src/app/api/properties/route.ts - GET et POST protégés",
+				"src/app/api/properties/[id]/route.ts - GET, PATCH, DELETE protégés",
+				"src/app/api/properties/[id]/loans/route.ts - GET et POST protégés",
+				"src/app/api/properties/[id]/co-ownership/route.ts - GET, POST, PATCH protégés",
+				"src/app/api/properties/[id]/utility-contracts/route.ts - GET et POST protégés",
+				"src/app/api/properties/[id]/insurance/route.ts - GET, POST, PATCH protégés",
+				"Retourner 401 Unauthorized si non authentifié"
+			],
+			"files": [
+				"src/app/api/properties/route.ts",
+				"src/app/api/properties/[id]/route.ts",
+				"src/app/api/properties/[id]/loans/route.ts",
+				"src/app/api/properties/[id]/co-ownership/route.ts",
+				"src/app/api/properties/[id]/utility-contracts/route.ts",
+				"src/app/api/properties/[id]/insurance/route.ts"
+			]
+		},
+		{
+			"id": "SEC-006",
+			"title": "Protéger les routes /api/loans/*",
+			"description": "Ajouter requireAuth() au début de chaque handler dans les routes loans.",
+			"acceptance_criteria": [
+				"src/app/api/loans/route.ts - GET et POST protégés",
+				"src/app/api/loans/[id]/route.ts - GET, PATCH, DELETE protégés",
+				"src/app/api/loans/[id]/insurances/route.ts - GET et POST protégés",
+				"Retourner 401 Unauthorized si non authentifié"
+			],
+			"files": [
+				"src/app/api/loans/route.ts",
+				"src/app/api/loans/[id]/route.ts",
+				"src/app/api/loans/[id]/insurances/route.ts"
+			]
+		},
+		{
+			"id": "SEC-007",
+			"title": "Protéger les routes /api/utility-contracts/* et /api/loan-insurances/*",
+			"description": "Ajouter requireAuth() au début de chaque handler dans ces routes.",
+			"acceptance_criteria": [
+				"src/app/api/utility-contracts/[id]/route.ts - GET, PATCH, DELETE protégés",
+				"src/app/api/loan-insurances/[id]/route.ts - GET, PATCH, DELETE protégés",
+				"Retourner 401 Unauthorized si non authentifié"
+			],
+			"files": [
+				"src/app/api/utility-contracts/[id]/route.ts",
+				"src/app/api/loan-insurances/[id]/route.ts"
+			]
+		},
+		{
+			"id": "SEC-008",
+			"title": "Protéger les routes /api/auth/*",
+			"description": "Vérifier et sécuriser les routes auth selon leur usage.",
+			"acceptance_criteria": [
+				"src/app/api/auth/me/route.ts - GET protégé par requireAuth()",
+				"src/app/api/auth/logout/route.ts - POST peut rester accessible (pour permettre logout même en cas de session corrompue)",
+				"La route /me doit retourner les infos user ou 401"
+			],
+			"files": ["src/app/api/auth/me/route.ts", "src/app/api/auth/logout/route.ts"]
+		},
+		{
+			"id": "SEC-009",
+			"title": "Créer un helper withAuth pour simplifier la protection",
+			"description": "Optionnel: Créer un wrapper HOF (Higher Order Function) pour simplifier l'ajout d'auth sur les routes.",
+			"acceptance_criteria": [
+				"Créer src/lib/api-auth.ts avec une fonction withAuth(handler)",
+				"La fonction wrap le handler et appelle requireAuth() automatiquement",
+				"Retourne 401 avec { error: 'Unauthorized' } si non authentifié",
+				"Exemple d'usage: export const GET = withAuth(async (req, user) => { ... })"
+			],
+			"files": ["src/lib/api-auth.ts"]
+		},
+		{
+			"id": "SEC-010",
+			"title": "Documenter la configuration Google OAuth whitelist",
+			"description": "Ajouter documentation sur comment configurer la whitelist dans Google Cloud Console.",
+			"acceptance_criteria": [
+				"Ajouter section dans .github/SECRETS.md ou créer docs/SECURITY.md",
+				"Expliquer comment accéder à Google Cloud Console > APIs & Services > OAuth consent screen",
+				"Expliquer comment ajouter les test users en mode External/Testing",
+				"OU comment passer en Internal pour limiter au domaine Google Workspace",
+				"Mentionner que seuls les emails whitelistés peuvent se connecter"
+			],
+			"files": [".github/SECRETS.md"]
+		}
+	],
+	"notes": [
+		"La whitelist des utilisateurs est gérée côté Google OAuth Console, pas dans le code",
+		"En mode 'Testing' de Google OAuth, seuls les 'Test users' ajoutés peuvent se connecter",
+		"Le mode démo (NEXT_PUBLIC_DEMO_MODE) bypasse l'auth - s'assurer qu'il est désactivé en production",
+		"Les routes /api/imports/* sont déjà protégées - les utiliser comme référence",
+		"Pattern à suivre: try { await requireAuth(); ... } catch { return 401 }"
+	],
+	"priority": "critical",
+	"estimated_stories": 10
 }

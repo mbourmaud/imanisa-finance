@@ -136,8 +136,7 @@ export const genericParser: Parser = {
 
 		try {
 			// Convert ArrayBuffer to string if needed
-			const text =
-				typeof content === 'string' ? content : new TextDecoder('utf-8').decode(content);
+			const text = typeof content === 'string' ? content : new TextDecoder('utf-8').decode(content);
 
 			const lines = text.split(/\r?\n/).filter((line) => line.trim());
 

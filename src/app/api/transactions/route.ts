@@ -5,8 +5,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { transactionRepository, type TransactionFilters } from '@/server/repositories';
 import type { TransactionType } from '@/lib/prisma';
+import { type TransactionFilters, transactionRepository } from '@/server/repositories';
 
 export async function GET(request: NextRequest) {
 	try {

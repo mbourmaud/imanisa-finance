@@ -4,25 +4,33 @@ import {
 	ArrowDownRight,
 	ArrowUpRight,
 	Bitcoin,
+	Box,
 	Briefcase,
 	Building,
-	MoreHorizontal,
-	Plus,
-	RefreshCw,
-	TrendingUp,
-	Wallet,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { InvestmentPerformanceChart } from '@/components/charts';
-import { demoInvestmentPerformance } from '@/lib/demo';
-import {
+	Button,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+	Flex,
+	GlassCard,
+	Grid,
+	Heading,
+	HStack,
+	MoreHorizontal,
+	PageHeader,
+	Plus,
+	RefreshCw,
+	StatCard,
+	StatCardGrid,
+	Text,
+	TrendingUp,
+	VStack,
+	Wallet,
+} from '@/components';
+import { InvestmentPerformanceChart } from '@/components/charts';
+import { demoInvestmentPerformance } from '@/lib/demo';
 
 const sources = [
 	{
@@ -144,248 +152,280 @@ function formatCurrency(amount: number): string {
 
 export default function InvestmentsPage() {
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Investissements</h1>
-					<p className="mt-1 text-muted-foreground">PEA, CTO, Assurance-vie, Crypto</p>
-				</div>
-				<div className="flex gap-2">
-					<Button variant="outline" className="gap-2">
-						<RefreshCw className="h-4 w-4" />
-						Actualiser
-					</Button>
-					<Button className="gap-2">
-						<Plus className="h-4 w-4" />
-						Nouvelle source
-					</Button>
-				</div>
-			</div>
+			<PageHeader
+				title="Investissements"
+				description="PEA, CTO, Assurance-vie, Crypto"
+				actions={
+					<HStack gap="sm">
+						<Button
+							variant="outline"
+							iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
+						>
+							Actualiser
+						</Button>
+						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
+							Nouvelle source
+						</Button>
+					</HStack>
+				}
+			/>
 
 			{/* Stats Overview */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Valeur totale</p>
-							<p className="stat-card-value">{formatCurrency(totalValue)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<Wallet className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+			<StatCardGrid columns={4}>
+				<StatCard
+					label="Valeur totale"
+					value={formatCurrency(totalValue)}
+					icon={Wallet}
+					variant="default"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Total investi</p>
-							<p className="stat-card-value">{formatCurrency(totalInvested)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+				<StatCard
+					label="Total investi"
+					value={formatCurrency(totalInvested)}
+					icon={TrendingUp}
+					variant="default"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Plus-value latente</p>
-							<p className={`stat-card-value ${totalGain >= 0 ? 'value-positive' : 'value-negative'}`}>
-								{totalGain >= 0 ? '+' : ''}
-								{formatCurrency(totalGain)}
-							</p>
-						</div>
-						<div
-							className={`stat-card-icon ${
-								totalGain >= 0
-									? 'bg-[oklch(0.55_0.15_145)]/10 text-[oklch(0.55_0.15_145)]'
-									: 'bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]'
-							}`}
-						>
-							{totalGain >= 0 ? (
-								<ArrowUpRight className="h-4 w-4 sm:h-5 sm:w-5" />
-							) : (
-								<ArrowDownRight className="h-4 w-4 sm:h-5 sm:w-5" />
-							)}
-						</div>
-					</div>
-				</div>
+				<StatCard
+					label="Plus-value latente"
+					value={`${totalGain >= 0 ? '+' : ''}${formatCurrency(totalGain)}`}
+					icon={totalGain >= 0 ? ArrowUpRight : ArrowDownRight}
+					variant={totalGain >= 0 ? 'teal' : 'coral'}
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Performance</p>
-							<p className={`stat-card-value ${totalPerformance >= 0 ? 'value-positive' : 'value-negative'}`}>
-								{totalPerformance >= 0 ? '+' : ''}
-								{totalPerformance.toFixed(2)}%
-							</p>
-						</div>
-						<div className="stat-card-icon">
-							<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-			</div>
+				<StatCard
+					label="Performance"
+					value={`${totalPerformance >= 0 ? '+' : ''}${totalPerformance.toFixed(2)}%`}
+					icon={TrendingUp}
+					variant={totalPerformance >= 0 ? 'teal' : 'coral'}
+				/>
+			</StatCardGrid>
 
 			{/* Sources Grid */}
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<Grid cols={1} colsSm={2} colsLg={4} gap="md">
 				{sources.map((source) => {
 					const gain = source.value - source.invested;
 					const isPositive = gain >= 0;
 
 					return (
-						<Card key={source.id} className="border-border/60 group">
-							<CardHeader className="pb-3">
-								<div className="flex items-start justify-between">
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-										<source.icon className="h-5 w-5" />
-									</div>
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-											>
-												<MoreHorizontal className="h-4 w-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuItem>Voir les positions</DropdownMenuItem>
-											<DropdownMenuItem>Ajouter une transaction</DropdownMenuItem>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</div>
-							</CardHeader>
-							<CardContent>
-								<div className="space-y-3">
-									<div>
-										<p className="font-medium">{source.name}</p>
-										<p className="text-xs text-muted-foreground">
-											{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
-										</p>
-									</div>
-									<div>
-										<p className="text-2xl font-semibold number-display">
-											{formatCurrency(source.value)}
-										</p>
-										<p
-											className={`text-sm font-medium ${
-												isPositive ? 'value-positive' : 'value-negative'
-											}`}
+						<GlassCard
+							key={source.id}
+							padding="md"
+							style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+						>
+							<HStack justify="between" align="start">
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										height: '2.5rem',
+										width: '2.5rem',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
+									<source.icon style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											style={{
+												height: '2rem',
+												width: '2rem',
+												opacity: 0,
+												transition: 'opacity 0.2s',
+											}}
 										>
-											{isPositive ? '+' : ''}
-											{formatCurrency(gain)} ({isPositive ? '+' : ''}
-											{source.performance.toFixed(2)}%)
-										</p>
-									</div>
-								</div>
-							</CardContent>
-						</Card>
+											<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										<DropdownMenuItem>Voir les positions</DropdownMenuItem>
+										<DropdownMenuItem>Ajouter une transaction</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem style={{ color: 'hsl(var(--destructive))' }}>
+											Supprimer
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</HStack>
+							<VStack gap="md">
+								<VStack gap="none">
+									<Text weight="medium">{source.name}</Text>
+									<Text size="xs" color="muted">
+										{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
+									</Text>
+								</VStack>
+								<VStack gap="none">
+									<Text size="2xl" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{formatCurrency(source.value)}
+									</Text>
+									<Text
+										size="sm"
+										weight="medium"
+										style={{ color: isPositive ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)' }}
+									>
+										{isPositive ? '+' : ''}
+										{formatCurrency(gain)} ({isPositive ? '+' : ''}
+										{source.performance.toFixed(2)}%)
+									</Text>
+								</VStack>
+							</VStack>
+						</GlassCard>
 					);
 				})}
-			</div>
+			</Grid>
 
 			{/* Positions Table */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-medium">Positions</CardTitle>
-							<p className="mt-1 text-sm text-muted-foreground">
-								Toutes vos positions d&apos;investissement
-							</p>
-						</div>
-						<Button variant="outline" size="sm" className="text-sm">
-							Voir tout
-						</Button>
-					</div>
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-2">
-						{positions.map((pos) => (
-							<div
-								key={pos.id}
-								className="flex items-center justify-between rounded-xl bg-muted/30 p-4 transition-colors hover:bg-muted/50"
-							>
-								<div className="flex items-center gap-4">
-									<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background font-mono text-sm font-semibold text-muted-foreground">
-										{pos.ticker.slice(0, 3)}
-									</div>
-									<div>
-										<p className="font-medium">{pos.name}</p>
-										<p className="text-xs text-muted-foreground">
-											{pos.ticker} · {pos.source}
-										</p>
-									</div>
-								</div>
-								<div className="flex items-center gap-8">
-									<div className="text-right hidden sm:block">
-										<p className="text-xs text-muted-foreground">Quantité</p>
-										<p className="font-medium number-display">{pos.quantity}</p>
-									</div>
-									<div className="text-right hidden md:block">
-										<p className="text-xs text-muted-foreground">PRU</p>
-										<p className="font-medium number-display">{formatCurrency(pos.avgPrice)}</p>
-									</div>
-									<div className="text-right">
-										<p className="text-xs text-muted-foreground">Valeur</p>
-										<p className="font-medium number-display">{formatCurrency(pos.value)}</p>
-									</div>
-									<div className="text-right min-w-[100px]">
-										<p
-											className={`font-medium number-display ${
-												pos.gain >= 0 ? 'value-positive' : 'value-negative'
-											}`}
-										>
-											{pos.gain >= 0 ? '+' : ''}
-											{formatCurrency(pos.gain)}
-										</p>
-										<p
-											className={`text-xs ${
-												pos.gainPercent >= 0 ? 'value-positive' : 'value-negative'
-											}`}
-										>
-											{pos.gainPercent >= 0 ? '+' : ''}
-											{pos.gainPercent.toFixed(2)}%
-										</p>
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
+			<GlassCard padding="lg">
+				<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
+					<VStack gap="none">
+						<Heading level={3} size="lg" weight="medium">
+							Positions
+						</Heading>
+						<Text size="sm" color="muted">
+							Toutes vos positions d&apos;investissement
+						</Text>
+					</VStack>
+					<Button variant="outline" size="sm">
+						Voir tout
+					</Button>
+				</HStack>
+				<VStack gap="sm">
+					{positions.map((pos) => (
+						<HStack
+							key={pos.id}
+							justify="between"
+							align="center"
+							p="md"
+							style={{
+								borderRadius: '0.75rem',
+								backgroundColor: 'hsl(var(--background) / 0.5)',
+								transition: 'background-color 0.2s',
+							}}
+						>
+							<HStack gap="md" align="center">
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										height: '2.5rem',
+										width: '2.5rem',
+										borderRadius: '0.5rem',
+										backgroundColor: 'hsl(var(--background))',
+										fontFamily: 'monospace',
+										fontSize: '0.875rem',
+										fontWeight: 600,
+										color: 'hsl(var(--muted-foreground))',
+									}}
+								>
+									{pos.ticker.slice(0, 3)}
+								</Flex>
+								<VStack gap="none">
+									<Text weight="medium">{pos.name}</Text>
+									<Text size="xs" color="muted">
+										{pos.ticker} · {pos.source}
+									</Text>
+								</VStack>
+							</HStack>
+							<HStack gap="xl" align="center">
+								<Box style={{ display: 'none', textAlign: 'right' }} data-show-sm>
+									<Text size="xs" color="muted">
+										Quantité
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{pos.quantity}
+									</Text>
+								</Box>
+								<Box style={{ display: 'none', textAlign: 'right' }} data-show-md>
+									<Text size="xs" color="muted">
+										PRU
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{formatCurrency(pos.avgPrice)}
+									</Text>
+								</Box>
+								<Box style={{ textAlign: 'right' }}>
+									<Text size="xs" color="muted">
+										Valeur
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{formatCurrency(pos.value)}
+									</Text>
+								</Box>
+								<Box style={{ textAlign: 'right', minWidth: '100px' }}>
+									<Text
+										weight="medium"
+										style={{
+											fontVariantNumeric: 'tabular-nums',
+											color: pos.gain >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
+										}}
+									>
+										{pos.gain >= 0 ? '+' : ''}
+										{formatCurrency(pos.gain)}
+									</Text>
+									<Text
+										size="xs"
+										style={{
+											color: pos.gainPercent >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
+										}}
+									>
+										{pos.gainPercent >= 0 ? '+' : ''}
+										{pos.gainPercent.toFixed(2)}%
+									</Text>
+								</Box>
+							</HStack>
+						</HStack>
+					))}
+				</VStack>
+			</GlassCard>
 
 			{/* Performance Chart */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-medium">Évolution du portefeuille</CardTitle>
-							<p className="mt-1 text-sm text-muted-foreground">Performance sur 12 mois</p>
-						</div>
-						<div className="flex items-center gap-4">
-							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<div className="h-2 w-4 rounded-sm bg-[oklch(0.55_0.18_270)]" />
-								<span>Valeur</span>
-							</div>
-							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<div className="h-0.5 w-4 border-t-2 border-dashed border-[oklch(0.5_0.01_280)]" />
-								<span>Investi</span>
-							</div>
-						</div>
-					</div>
-				</CardHeader>
-				<CardContent>
-					<InvestmentPerformanceChart data={demoInvestmentPerformance} className="h-72" />
-				</CardContent>
-			</Card>
-		</div>
+			<GlassCard padding="lg">
+				<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
+					<VStack gap="none">
+						<Heading level={3} size="lg" weight="medium">
+							Évolution du portefeuille
+						</Heading>
+						<Text size="sm" color="muted">
+							Performance sur 12 mois
+						</Text>
+					</VStack>
+					<HStack gap="md" align="center">
+						<HStack gap="sm" align="center">
+							<Box
+								style={{
+									height: '0.5rem',
+									width: '1rem',
+									borderRadius: '0.125rem',
+									backgroundColor: 'oklch(0.55 0.18 270)',
+								}}
+							/>
+							<Text size="sm" color="muted">
+								Valeur
+							</Text>
+						</HStack>
+						<HStack gap="sm" align="center">
+							<Box
+								style={{
+									height: '2px',
+									width: '1rem',
+									borderTop: '2px dashed oklch(0.5 0.01 280)',
+								}}
+							/>
+							<Text size="sm" color="muted">
+								Investi
+							</Text>
+						</HStack>
+					</HStack>
+				</HStack>
+				<InvestmentPerformanceChart data={demoInvestmentPerformance} height="lg" />
+			</GlassCard>
+		</VStack>
 	);
 }

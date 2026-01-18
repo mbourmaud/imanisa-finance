@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	AlertDialog,
@@ -9,17 +9,17 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from '@/components/ui/alert-dialog';
 
 interface ConfirmDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	title: string
-	description: string
-	confirmLabel?: string
-	cancelLabel?: string
-	variant?: 'default' | 'destructive'
-	onConfirm: () => void
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	title: string;
+	description: string;
+	confirmLabel?: string;
+	cancelLabel?: string;
+	variant?: 'default' | 'destructive';
+	onConfirm: () => void;
 }
 
 export function ConfirmDialog({
@@ -33,9 +33,9 @@ export function ConfirmDialog({
 	onConfirm,
 }: ConfirmDialogProps) {
 	const handleConfirm = () => {
-		onConfirm()
-		onOpenChange(false)
-	}
+		onConfirm();
+		onOpenChange(false);
+	};
 
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -59,5 +59,5 @@ export function ConfirmDialog({
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
-	)
+	);
 }

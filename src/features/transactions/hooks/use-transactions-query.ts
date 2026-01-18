@@ -6,7 +6,8 @@
  * the Zustand store depending on the use case.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { PaginatedResponse } from '@/shared/types';
 import { transactionService } from '../services/transaction-service';
 import type {
 	CreateTransactionInput,
@@ -15,7 +16,6 @@ import type {
 	TransactionPagination,
 	UpdateTransactionInput,
 } from '../types';
-import type { PaginatedResponse } from '@/shared/types';
 
 /**
  * Query key factory for transactions
@@ -136,8 +136,13 @@ export function useBulkCategorizeMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ transactionIds, categoryId }: { transactionIds: string[]; categoryId: string }) =>
-			transactionService.bulkCategorize(transactionIds, categoryId),
+		mutationFn: ({
+			transactionIds,
+			categoryId,
+		}: {
+			transactionIds: string[];
+			categoryId: string;
+		}) => transactionService.bulkCategorize(transactionIds, categoryId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: transactionKeys.lists() });
 			queryClient.invalidateQueries({ queryKey: [...transactionKeys.all, 'summary'] });

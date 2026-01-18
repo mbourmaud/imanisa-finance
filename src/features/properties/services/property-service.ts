@@ -4,18 +4,18 @@
  */
 
 import type {
-	PropertyWithDetails,
-	PropertySummary,
-	PropertyFilters,
 	CreatePropertyInput,
+	PropertyFilters,
+	PropertySummary,
+	PropertyWithDetails,
 	UpdatePropertyInput,
-} from '../types'
+} from '../types';
 
-const API_BASE = '/api/properties'
+const API_BASE = '/api/properties';
 
 export interface PropertiesResponse {
-	properties: PropertyWithDetails[]
-	summary: PropertySummary
+	properties: PropertyWithDetails[];
+	summary: PropertySummary;
 }
 
 export const propertyService = {
@@ -23,32 +23,32 @@ export const propertyService = {
 	 * Fetch all properties with optional filters
 	 */
 	async getAll(filters?: PropertyFilters): Promise<PropertiesResponse> {
-		const params = new URLSearchParams()
-		if (filters?.type) params.set('type', filters.type)
-		if (filters?.usage) params.set('usage', filters.usage)
-		if (filters?.search) params.set('search', filters.search)
+		const params = new URLSearchParams();
+		if (filters?.type) params.set('type', filters.type);
+		if (filters?.usage) params.set('usage', filters.usage);
+		if (filters?.search) params.set('search', filters.search);
 
-		const url = params.toString() ? `${API_BASE}?${params}` : API_BASE
-		const response = await fetch(url)
+		const url = params.toString() ? `${API_BASE}?${params}` : API_BASE;
+		const response = await fetch(url);
 
 		if (!response.ok) {
-			throw new Error('Failed to fetch properties')
+			throw new Error('Failed to fetch properties');
 		}
 
-		return response.json()
+		return response.json();
 	},
 
 	/**
 	 * Fetch a single property by ID
 	 */
 	async getById(id: string): Promise<PropertyWithDetails> {
-		const response = await fetch(`${API_BASE}/${id}`)
+		const response = await fetch(`${API_BASE}/${id}`);
 
 		if (!response.ok) {
-			throw new Error('Failed to fetch property')
+			throw new Error('Failed to fetch property');
 		}
 
-		return response.json()
+		return response.json();
 	},
 
 	/**
@@ -59,14 +59,14 @@ export const propertyService = {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(input),
-		})
+		});
 
 		if (!response.ok) {
-			const error = await response.json()
-			throw new Error(error.error || 'Failed to create property')
+			const error = await response.json();
+			throw new Error(error.error || 'Failed to create property');
 		}
 
-		return response.json()
+		return response.json();
 	},
 
 	/**
@@ -77,14 +77,14 @@ export const propertyService = {
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(input),
-		})
+		});
 
 		if (!response.ok) {
-			const error = await response.json()
-			throw new Error(error.error || 'Failed to update property')
+			const error = await response.json();
+			throw new Error(error.error || 'Failed to update property');
 		}
 
-		return response.json()
+		return response.json();
 	},
 
 	/**
@@ -93,10 +93,10 @@ export const propertyService = {
 	async delete(id: string): Promise<void> {
 		const response = await fetch(`${API_BASE}/${id}`, {
 			method: 'DELETE',
-		})
+		});
 
 		if (!response.ok) {
-			throw new Error('Failed to delete property')
+			throw new Error('Failed to delete property');
 		}
 	},
-}
+};

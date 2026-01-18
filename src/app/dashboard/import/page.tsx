@@ -3,24 +3,33 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
 	AlertCircle,
+	Box,
+	Button,
 	CheckCircle2,
 	Clock,
+	EmptyState,
 	FileSpreadsheet,
+	GlassCard,
+	Grid,
+	Heading,
+	HStack,
+	Label,
 	Loader2,
+	PageHeader,
 	RefreshCw,
 	RotateCcw,
-	Trash2,
-	Upload,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
+	StatCard,
+	StatCardGrid,
+	Text,
+	Trash2,
+	Upload,
+	VStack,
+} from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 interface RawImport {
@@ -56,13 +65,26 @@ interface Account {
 function getStatusIcon(status: RawImport['status']) {
 	switch (status) {
 		case 'PROCESSED':
-			return <CheckCircle2 className="h-4 w-4 text-[oklch(0.55_0.15_145)]" />;
+			return (
+				<CheckCircle2 style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.15 145)' }} />
+			);
 		case 'PROCESSING':
-			return <Loader2 className="h-4 w-4 text-primary animate-spin" />;
+			return (
+				<Loader2
+					style={{
+						height: '1rem',
+						width: '1rem',
+						color: 'hsl(var(--primary))',
+						animation: 'spin 1s linear infinite',
+					}}
+				/>
+			);
 		case 'FAILED':
-			return <AlertCircle className="h-4 w-4 text-[oklch(0.55_0.2_25)]" />;
+			return <AlertCircle style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.2 25)' }} />;
 		default:
-			return <Clock className="h-4 w-4 text-muted-foreground" />;
+			return (
+				<Clock style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
+			);
 	}
 }
 
@@ -310,348 +332,476 @@ export default function ImportPage() {
 	const canUpload = selectedBankId && selectedAccountId && !isUploading;
 
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Import</h1>
-					<p className="mt-1 text-muted-foreground">
-						Importez vos relevés bancaires et conservez les fichiers bruts
-					</p>
-				</div>
-				<Button variant="outline" className="gap-2" onClick={fetchData}>
-					<RefreshCw className="h-4 w-4" />
-					Actualiser
-				</Button>
-			</div>
+			<PageHeader
+				title="Import"
+				description="Importez vos relevés bancaires et conservez les fichiers bruts"
+				actions={
+					<Button
+						variant="outline"
+						onClick={fetchData}
+						iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
+					>
+						Actualiser
+					</Button>
+				}
+			/>
 
 			{/* Error message */}
 			{error && (
-				<div className="rounded-lg border border-[oklch(0.55_0.2_25)]/20 bg-[oklch(0.55_0.2_25)]/5 p-4">
-					<div className="flex items-center gap-2 text-[oklch(0.55_0.2_25)]">
-						<AlertCircle className="h-4 w-4" />
-						<span className="font-medium">{error}</span>
+				<Box
+					rounded="lg"
+					border="default"
+					p="md"
+					style={{
+						borderColor: 'oklch(0.55 0.2 25 / 0.2)',
+						backgroundColor: 'oklch(0.55 0.2 25 / 0.05)',
+					}}
+				>
+					<HStack gap="sm" align="center" style={{ color: 'oklch(0.55 0.2 25)' }}>
+						<AlertCircle style={{ height: '1rem', width: '1rem' }} />
+						<Text weight="medium">{error}</Text>
 						<Button
 							variant="ghost"
 							size="sm"
-							className="ml-auto h-6 px-2"
 							onClick={() => setError(null)}
+							style={{ marginLeft: 'auto', height: '1.5rem', padding: '0 0.5rem' }}
 						>
 							Fermer
 						</Button>
-					</div>
-				</div>
+					</HStack>
+				</Box>
 			)}
 
 			{/* Upload Section */}
-			<div className="grid gap-6 md:grid-cols-2">
+			<Grid cols={2} gap="lg">
 				{/* CSV Import */}
-				<Card className="border-border/60 overflow-hidden">
-					<CardContent className="pt-6">
-						<div className="space-y-4">
-							{/* Bank selector */}
-							<div className="space-y-2">
-								<label htmlFor="import-bank-select" className="text-sm font-medium">
-									1. Banque <span className="text-muted-foreground">*</span>
-								</label>
-								<Select value={selectedBankId} onValueChange={setSelectedBankId}>
-									<SelectTrigger id="import-bank-select" className="w-full">
-										<SelectValue placeholder="Sélectionner une banque..." />
-									</SelectTrigger>
-									<SelectContent>
-										{banks.map((bank) => (
-											<SelectItem key={bank.id} value={bank.id}>
-												{bank.name}
-												{bank.template && (
-													<span className="text-muted-foreground ml-2">
-														({bank.template})
-													</span>
-												)}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								{banks.length === 0 && !isLoading && (
-									<p className="text-xs text-muted-foreground">
-										Aucune banque configurée. Ajoutez d&apos;abord une banque dans les
-										paramètres.
-									</p>
-								)}
-							</div>
+				<GlassCard padding="lg">
+					<VStack gap="md">
+						{/* Bank selector */}
+						<VStack gap="xs">
+							<Label htmlFor="import-bank-select">
+								1. Banque{' '}
+								<Text as="span" color="muted">
+									*
+								</Text>
+							</Label>
+							<Select value={selectedBankId} onValueChange={setSelectedBankId}>
+								<SelectTrigger id="import-bank-select" style={{ width: '100%' }}>
+									<SelectValue placeholder="Sélectionner une banque..." />
+								</SelectTrigger>
+								<SelectContent>
+									{banks.map((bank) => (
+										<SelectItem key={bank.id} value={bank.id}>
+											{bank.name}
+											{bank.template && (
+												<Text as="span" color="muted" style={{ marginLeft: '0.5rem' }}>
+													({bank.template})
+												</Text>
+											)}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							{banks.length === 0 && !isLoading && (
+								<Text size="xs" color="muted">
+									Aucune banque configurée. Ajoutez d&apos;abord une banque dans les paramètres.
+								</Text>
+							)}
+						</VStack>
 
-							{/* Account selector */}
-							<div className="space-y-2">
-								<label htmlFor="import-account-select" className="text-sm font-medium">
-									2. Compte <span className="text-muted-foreground">*</span>
-								</label>
-								<Select
-									value={selectedAccountId}
-									onValueChange={setSelectedAccountId}
-									disabled={!selectedBankId}
-								>
-									<SelectTrigger id="import-account-select" className="w-full">
-										<SelectValue
-											placeholder={
-												selectedBankId
-													? 'Sélectionner un compte...'
-													: 'Sélectionnez d\'abord une banque'
-											}
-										/>
-									</SelectTrigger>
-									<SelectContent>
-										{filteredAccounts.map((account) => (
-											<SelectItem key={account.id} value={account.id}>
-												{account.name}
-												<span className="text-muted-foreground ml-2">
-													({account.type})
-												</span>
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								{selectedBankId && filteredAccounts.length === 0 && (
-									<p className="text-xs text-muted-foreground">
-										Aucun compte pour cette banque. Ajoutez d&apos;abord un compte.
-									</p>
-								)}
-							</div>
+						{/* Account selector */}
+						<VStack gap="xs">
+							<Label htmlFor="import-account-select">
+								2. Compte{' '}
+								<Text as="span" color="muted">
+									*
+								</Text>
+							</Label>
+							<Select
+								value={selectedAccountId}
+								onValueChange={setSelectedAccountId}
+								disabled={!selectedBankId}
+							>
+								<SelectTrigger id="import-account-select" style={{ width: '100%' }}>
+									<SelectValue
+										placeholder={
+											selectedBankId
+												? 'Sélectionner un compte...'
+												: "Sélectionnez d'abord une banque"
+										}
+									/>
+								</SelectTrigger>
+								<SelectContent>
+									{filteredAccounts.map((account) => (
+										<SelectItem key={account.id} value={account.id}>
+											{account.name}
+											<Text as="span" color="muted" style={{ marginLeft: '0.5rem' }}>
+												({account.type})
+											</Text>
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							{selectedBankId && filteredAccounts.length === 0 && (
+								<Text size="xs" color="muted">
+									Aucun compte pour cette banque. Ajoutez d&apos;abord un compte.
+								</Text>
+							)}
+						</VStack>
 
-							{/* Drop zone */}
-							<div className="space-y-2">
-								<label htmlFor="import-file-input" className="text-sm font-medium">3. Fichier</label>
-								<div
-									role="presentation"
-									onDragEnter={handleDrag}
-									onDragLeave={handleDrag}
-									onDragOver={handleDrag}
-									onDrop={handleDrop}
-									className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors ${
-										!canUpload
-											? 'border-border/40 bg-muted/10 opacity-60'
-											: dragActive
-												? 'border-primary bg-primary/5'
-												: 'border-border/60 bg-muted/20 hover:border-primary/50 hover:bg-muted/30'
-									}`}
+						{/* Drop zone */}
+						<VStack gap="xs">
+							<Label htmlFor="import-file-input">3. Fichier</Label>
+							<Box
+								role="presentation"
+								onDragEnter={handleDrag}
+								onDragLeave={handleDrag}
+								onDragOver={handleDrag}
+								onDrop={handleDrop}
+								display="flex"
+								rounded="xl"
+								p="xl"
+								style={{
+									flexDirection: 'column',
+									alignItems: 'center',
+									justifyContent: 'center',
+									border: '2px dashed',
+									transition: 'all 0.2s',
+									borderColor: !canUpload
+										? 'hsl(var(--border) / 0.4)'
+										: dragActive
+											? 'hsl(var(--primary))'
+											: 'hsl(var(--border) / 0.6)',
+									backgroundColor: !canUpload
+										? 'hsl(var(--muted) / 0.1)'
+										: dragActive
+											? 'hsl(var(--primary) / 0.05)'
+											: 'hsl(0 0% 100% / 0.5)',
+									opacity: !canUpload ? 0.6 : 1,
+								}}
+							>
+								<Box
+									display="flex"
+									rounded="2xl"
+									style={{
+										height: '3.5rem',
+										width: '3.5rem',
+										alignItems: 'center',
+										justifyContent: 'center',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
 								>
-									<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-										{isUploading ? (
-											<Loader2 className="h-7 w-7 animate-spin" />
-										) : (
-											<FileSpreadsheet className="h-7 w-7" />
-										)}
-									</div>
-									<h3 className="mt-3 text-base font-medium">
-										{isUploading ? 'Upload en cours...' : 'Import CSV / Excel'}
-									</h3>
-									<p className="mt-1 text-center text-sm text-muted-foreground max-w-xs">
-										Glissez votre fichier ici ou cliquez pour sélectionner
-									</p>
-									<label htmlFor="import-file-input" className="mt-4">
-										<input
-											id="import-file-input"
-											type="file"
-											accept=".csv,.xlsx,.xls"
-											onChange={handleFileSelect}
-											className="hidden"
-											disabled={!canUpload}
+									{isUploading ? (
+										<Loader2
+											style={{
+												height: '1.75rem',
+												width: '1.75rem',
+												animation: 'spin 1s linear infinite',
+											}}
 										/>
-										<Button className="gap-2" disabled={!canUpload} asChild>
-											<span>
-												<Upload className="h-4 w-4" />
-												Sélectionner un fichier
-											</span>
-										</Button>
-									</label>
-									<p className="mt-2 text-xs text-muted-foreground">
-										.csv, .xlsx · Max 10 MB
-									</p>
-								</div>
-							</div>
-						</div>
-					</CardContent>
-				</Card>
+									) : (
+										<FileSpreadsheet style={{ height: '1.75rem', width: '1.75rem' }} />
+									)}
+								</Box>
+								<Heading level={3} size="md" style={{ marginTop: '0.5rem' }}>
+									{isUploading ? 'Upload en cours...' : 'Import CSV / Excel'}
+								</Heading>
+								<Text
+									size="sm"
+									color="muted"
+									align="center"
+									style={{ marginTop: '0.25rem', maxWidth: '20rem' }}
+								>
+									Glissez votre fichier ici ou cliquez pour sélectionner
+								</Text>
+								<label htmlFor="import-file-input" style={{ marginTop: '1rem' }}>
+									<input
+										id="import-file-input"
+										type="file"
+										accept=".csv,.xlsx,.xls"
+										onChange={handleFileSelect}
+										style={{ display: 'none' }}
+										disabled={!canUpload}
+									/>
+									<Button
+										disabled={!canUpload}
+										asChild
+										iconLeft={<Upload style={{ height: '1rem', width: '1rem' }} />}
+									>
+										<span>Sélectionner un fichier</span>
+									</Button>
+								</label>
+								<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
+									.csv, .xlsx · Max 10 MB
+								</Text>
+							</Box>
+						</VStack>
+					</VStack>
+				</GlassCard>
 
 				{/* Stats */}
-				<Card className="border-border/60">
-					<CardHeader className="pb-3">
-						<CardTitle className="text-lg font-medium">Statistiques d&apos;import</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="grid grid-cols-3 gap-3">
-							<div className="text-center rounded-lg bg-muted/30 p-3">
-								<p className="text-2xl font-semibold">{imports.length}</p>
-								<p className="text-xs text-muted-foreground">Fichiers</p>
-							</div>
-							<div className="text-center rounded-lg bg-muted/30 p-3">
-								<p className="text-2xl font-semibold">{processedCount}</p>
-								<p className="text-xs text-muted-foreground">Traités</p>
-							</div>
-							<div className="text-center rounded-lg bg-muted/30 p-3">
-								<p className="text-2xl font-semibold">{totalRecords}</p>
-								<p className="text-xs text-muted-foreground">Transactions</p>
-							</div>
-						</div>
+				<GlassCard padding="lg">
+					<VStack gap="md">
+						<Heading level={3} size="md">
+							Statistiques d&apos;import
+						</Heading>
+						<StatCardGrid columns={3}>
+							<StatCard label="Fichiers" value={String(imports.length)} icon={FileSpreadsheet} />
+							<StatCard label="Traités" value={String(processedCount)} icon={CheckCircle2} />
+							<StatCard label="Transactions" value={String(totalRecords)} icon={RefreshCw} />
+						</StatCardGrid>
 
 						{pendingCount > 0 && (
-							<div className="rounded-lg border border-[oklch(0.7_0.15_75)]/20 bg-[oklch(0.7_0.15_75)]/5 p-3">
-								<div className="flex items-center gap-2 text-[oklch(0.7_0.15_75)]">
-									<Clock className="h-4 w-4" />
-									<span className="text-sm font-medium">
-										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de
-										traitement
-									</span>
-								</div>
-							</div>
+							<Box
+								rounded="lg"
+								border="default"
+								p="sm"
+								style={{
+									borderColor: 'oklch(0.7 0.15 75 / 0.2)',
+									backgroundColor: 'oklch(0.7 0.15 75 / 0.05)',
+								}}
+							>
+								<HStack gap="sm" align="center" style={{ color: 'oklch(0.7 0.15 75)' }}>
+									<Clock style={{ height: '1rem', width: '1rem' }} />
+									<Text size="sm" weight="medium">
+										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de traitement
+									</Text>
+								</HStack>
+							</Box>
 						)}
 
-						<div className="rounded-lg bg-muted/30 p-4">
-							<h4 className="font-medium mb-2">Comment ça marche ?</h4>
-							<ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-								<li>Sélectionnez la banque source</li>
-								<li>Choisissez le compte cible</li>
-								<li>Uploadez votre fichier CSV/Excel</li>
-								<li>Le fichier brut est stocké dans le cloud</li>
-								<li>Les transactions sont importées automatiquement</li>
+						<Box
+							style={{
+								borderRadius: '0.5rem',
+								padding: '1rem',
+								backgroundColor: 'hsl(0 0% 100% / 0.5)',
+							}}
+						>
+							<Text weight="medium" style={{ marginBottom: '0.5rem' }}>
+								Comment ça marche ?
+							</Text>
+							<ol
+								style={{
+									listStyleType: 'decimal',
+									paddingLeft: '1.25rem',
+									display: 'flex',
+									flexDirection: 'column',
+									gap: '0.25rem',
+								}}
+							>
+								<li>
+									<Text size="sm" color="muted">
+										Sélectionnez la banque source
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Choisissez le compte cible
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Uploadez votre fichier CSV/Excel
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Le fichier brut est stocké dans le cloud
+									</Text>
+								</li>
+								<li>
+									<Text size="sm" color="muted">
+										Les transactions sont importées automatiquement
+									</Text>
+								</li>
 							</ol>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
+						</Box>
+					</VStack>
+				</GlassCard>
+			</Grid>
 
 			{/* Import History */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-medium">Historique des imports</CardTitle>
-							<p className="mt-1 text-sm text-muted-foreground">
-								Fichiers bruts stockés et leur statut de traitement
-							</p>
-						</div>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-2">
-					{isLoading ? (
-						<div className="flex items-center justify-center py-8">
-							<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-						</div>
-					) : imports.length === 0 ? (
-						<div className="text-center py-8 text-muted-foreground">
-							<FileSpreadsheet className="h-12 w-12 mx-auto mb-3 opacity-50" />
-							<p>Aucun import pour le moment</p>
-							<p className="text-sm">Uploadez votre premier fichier ci-dessus</p>
-						</div>
-					) : (
-						imports.map((imp) => (
-							<div
-								key={imp.id}
-								className={`flex items-center justify-between rounded-xl p-4 transition-colors ${
-									imp.status === 'FAILED'
-										? 'bg-[oklch(0.55_0.2_25)]/5 border border-[oklch(0.55_0.2_25)]/20'
-										: 'bg-muted/30 hover:bg-muted/50'
-								}`}
+			<GlassCard padding="lg">
+				<VStack gap="md">
+					<VStack gap="xs">
+						<Heading level={3} size="md">
+							Historique des imports
+						</Heading>
+						<Text size="sm" color="muted">
+							Fichiers bruts stockés et leur statut de traitement
+						</Text>
+					</VStack>
+					<VStack gap="xs">
+						{isLoading ? (
+							<Box
+								display="flex"
+								py="xl"
+								style={{ alignItems: 'center', justifyContent: 'center' }}
 							>
-								<div className="flex items-center gap-4">
-									<div
-										className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+								<Loader2
+									style={{
+										height: '1.5rem',
+										width: '1.5rem',
+										color: 'hsl(var(--muted-foreground))',
+										animation: 'spin 1s linear infinite',
+									}}
+								/>
+							</Box>
+						) : imports.length === 0 ? (
+							<EmptyState
+								icon={FileSpreadsheet}
+								title="Aucun import"
+								description="Uploadez votre premier fichier ci-dessus"
+							/>
+						) : (
+							imports.map((imp) => (
+								<HStack
+									key={imp.id}
+									justify="between"
+									align="center"
+									p="md"
+									style={{
+										borderRadius: '0.75rem',
+										transition: 'background-color 0.2s',
+										backgroundColor:
 											imp.status === 'FAILED'
-												? 'bg-[oklch(0.55_0.2_25)]/10'
-												: 'bg-background'
-										}`}
-									>
-										<FileSpreadsheet
-											className={`h-5 w-5 ${
-												imp.status === 'FAILED'
-													? 'text-[oklch(0.55_0.2_25)]'
-													: 'text-muted-foreground'
-											}`}
-										/>
-									</div>
-									<div>
-										<div className="flex items-center gap-2">
-											<p className="font-medium">{imp.filename}</p>
-											<div
-												className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${
-													imp.status === 'PROCESSED'
-														? 'bg-[oklch(0.55_0.15_145)]/10 text-[oklch(0.55_0.15_145)]'
-														: imp.status === 'PROCESSING'
-															? 'bg-primary/10 text-primary'
-															: imp.status === 'FAILED'
-																? 'bg-[oklch(0.55_0.2_25)]/10 text-[oklch(0.55_0.2_25)]'
-																: 'bg-muted text-muted-foreground'
-												}`}
+												? 'oklch(0.55 0.2 25 / 0.05)'
+												: 'hsl(0 0% 100% / 0.5)',
+										border: imp.status === 'FAILED' ? '1px solid oklch(0.55 0.2 25 / 0.2)' : 'none',
+									}}
+								>
+									<HStack gap="md" align="center">
+										<Box
+											display="flex"
+											rounded="lg"
+											style={{
+												height: '2.5rem',
+												width: '2.5rem',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor:
+													imp.status === 'FAILED'
+														? 'oklch(0.55 0.2 25 / 0.1)'
+														: 'hsl(var(--background))',
+											}}
+										>
+											<FileSpreadsheet
+												style={{
+													height: '1.25rem',
+													width: '1.25rem',
+													color:
+														imp.status === 'FAILED'
+															? 'oklch(0.55 0.2 25)'
+															: 'hsl(var(--muted-foreground))',
+												}}
+											/>
+										</Box>
+										<VStack gap="none">
+											<HStack gap="sm" align="center">
+												<Text weight="medium">{imp.filename}</Text>
+												<Box
+													display="flex"
+													rounded="full"
+													px="sm"
+													py="xs"
+													style={{
+														alignItems: 'center',
+														gap: '0.25rem',
+														fontSize: '0.75rem',
+														backgroundColor:
+															imp.status === 'PROCESSED'
+																? 'oklch(0.55 0.15 145 / 0.1)'
+																: imp.status === 'PROCESSING'
+																	? 'hsl(var(--primary) / 0.1)'
+																	: imp.status === 'FAILED'
+																		? 'oklch(0.55 0.2 25 / 0.1)'
+																		: 'hsl(var(--muted))',
+														color:
+															imp.status === 'PROCESSED'
+																? 'oklch(0.55 0.15 145)'
+																: imp.status === 'PROCESSING'
+																	? 'hsl(var(--primary))'
+																	: imp.status === 'FAILED'
+																		? 'oklch(0.55 0.2 25)'
+																		: 'hsl(var(--muted-foreground))',
+													}}
+												>
+													{getStatusIcon(imp.status)}
+													<span>{getStatusLabel(imp.status)}</span>
+												</Box>
+											</HStack>
+											<Text size="xs" color="muted">
+												{getBankNameForImport(imp.bankKey)}
+												{imp.account && ` → ${imp.account.name}`} · {formatFileSize(imp.fileSize)} ·{' '}
+												{formatDate(imp.createdAt)}
+												{imp.recordsCount !== null && (
+													<Text as="span" style={{ color: 'oklch(0.55 0.15 145)' }}>
+														{' '}
+														· {imp.recordsCount} transactions
+													</Text>
+												)}
+												{imp.errorMessage && (
+													<Text as="span" style={{ color: 'oklch(0.55 0.2 25)' }}>
+														{' '}
+														· {imp.errorMessage}
+													</Text>
+												)}
+											</Text>
+										</VStack>
+									</HStack>
+									<HStack gap="sm" align="center">
+										{imp.status === 'PENDING' && (
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={() => handleProcess(imp.id, imp.account?.id)}
+												iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
 											>
-												{getStatusIcon(imp.status)}
-												<span>{getStatusLabel(imp.status)}</span>
-											</div>
-										</div>
-										<p className="text-xs text-muted-foreground">
-											{getBankNameForImport(imp.bankKey)}
-											{imp.account && ` → ${imp.account.name}`} ·{' '}
-											{formatFileSize(imp.fileSize)} · {formatDate(imp.createdAt)}
-											{imp.recordsCount !== null && (
-												<span className="text-[oklch(0.55_0.15_145)]">
-													{' '}
-													· {imp.recordsCount} transactions
-												</span>
-											)}
-											{imp.errorMessage && (
-												<span className="text-[oklch(0.55_0.2_25)]">
-													{' '}
-													· {imp.errorMessage}
-												</span>
-											)}
-										</p>
-									</div>
-								</div>
-								<div className="flex items-center gap-2">
-									{imp.status === 'PENDING' && (
-										<Button
-											variant="outline"
-											size="sm"
-											className="gap-1"
-											onClick={() => handleProcess(imp.id, imp.account?.id)}
-										>
-											<RefreshCw className="h-4 w-4" />
-											Traiter
-										</Button>
-									)}
-									{imp.status === 'PROCESSED' && (
+												Traiter
+											</Button>
+										)}
+										{imp.status === 'PROCESSED' && (
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={() => handleReprocess(imp.id, imp.account?.id)}
+												iconLeft={<RotateCcw style={{ height: '1rem', width: '1rem' }} />}
+											>
+												Retraiter
+											</Button>
+										)}
+										{imp.status === 'FAILED' && (
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={() => handleProcess(imp.id, imp.account?.id)}
+												iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
+											>
+												Réessayer
+											</Button>
+										)}
 										<Button
 											variant="ghost"
-											size="sm"
-											className="gap-1"
-											onClick={() => handleReprocess(imp.id, imp.account?.id)}
+											size="icon"
+											onClick={() => setDeleteImportId(imp.id)}
+											style={{
+												height: '2rem',
+												width: '2rem',
+												color: 'hsl(var(--muted-foreground))',
+											}}
 										>
-											<RotateCcw className="h-4 w-4" />
-											Retraiter
+											<Trash2 style={{ height: '1rem', width: '1rem' }} />
 										</Button>
-									)}
-									{imp.status === 'FAILED' && (
-										<Button
-											variant="ghost"
-											size="sm"
-											className="gap-1"
-											onClick={() => handleProcess(imp.id, imp.account?.id)}
-										>
-											<RefreshCw className="h-4 w-4" />
-											Réessayer
-										</Button>
-									)}
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-8 w-8 text-muted-foreground hover:text-[oklch(0.55_0.2_25)]"
-										onClick={() => setDeleteImportId(imp.id)}
-									>
-										<Trash2 className="h-4 w-4" />
-									</Button>
-								</div>
-							</div>
-						))
-					)}
-				</CardContent>
-			</Card>
+									</HStack>
+								</HStack>
+							))
+						)}
+					</VStack>
+				</VStack>
+			</GlassCard>
 
 			<ConfirmDialog
 				open={deleteImportId !== null}
@@ -662,6 +812,6 @@ export default function ImportPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteImport}
 			/>
-		</div>
+		</VStack>
 	);
 }

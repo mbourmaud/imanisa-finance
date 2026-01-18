@@ -6,8 +6,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { utilityContractRepository } from '@/server/repositories';
 import type { UtilityType } from '@/lib/prisma';
+import { utilityContractRepository } from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -25,10 +25,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(contract);
 	} catch (error) {
 		console.error('Error fetching utility contract:', error);
-		return NextResponse.json(
-			{ error: 'Failed to fetch utility contract' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to fetch utility contract' }, { status: 500 });
 	}
 }
 
@@ -51,7 +48,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 			if (!validTypes.includes(type)) {
 				return NextResponse.json(
 					{ error: `Invalid type: ${type}. Must be one of: ${validTypes.join(', ')}` },
-					{ status: 400 }
+					{ status: 400 },
 				);
 			}
 		}
@@ -67,7 +64,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 				return NextResponse.json({ error: 'monthlyAmount must be a number' }, { status: 400 });
 			}
 			if (monthlyAmount < 0) {
-				return NextResponse.json({ error: 'monthlyAmount must be a non-negative number' }, { status: 400 });
+				return NextResponse.json(
+					{ error: 'monthlyAmount must be a non-negative number' },
+					{ status: 400 },
+				);
 			}
 		}
 
@@ -85,10 +85,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(contract);
 	} catch (error) {
 		console.error('Error updating utility contract:', error);
-		return NextResponse.json(
-			{ error: 'Failed to update utility contract' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to update utility contract' }, { status: 500 });
 	}
 }
 
@@ -107,9 +104,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json({ success: true });
 	} catch (error) {
 		console.error('Error deleting utility contract:', error);
-		return NextResponse.json(
-			{ error: 'Failed to delete utility contract' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to delete utility contract' }, { status: 500 });
 	}
 }

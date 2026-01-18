@@ -1,2 +1,2 @@
-export * from './data';
 export * from './charts-data';
+export * from './data';

@@ -3,8 +3,8 @@
  * Handles data access for accounts with Bank relation
  */
 
-import { prisma } from '@/lib/prisma';
 import type { Account, AccountMember, AccountType, Bank } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Types
 export interface AccountWithMembers extends Account {
@@ -279,9 +279,7 @@ export const accountRepository = {
 		}
 
 		// Build date filter if initialBalanceDate is set
-		const dateFilter = account.initialBalanceDate
-			? { gte: account.initialBalanceDate }
-			: undefined;
+		const dateFilter = account.initialBalanceDate ? { gte: account.initialBalanceDate } : undefined;
 
 		// Get transactions grouped by type to calculate correctly
 		const incomeSum = await prisma.transaction.aggregate({

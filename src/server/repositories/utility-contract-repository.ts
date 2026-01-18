@@ -4,8 +4,8 @@
  * 1:N relationship with Property
  */
 
-import { prisma } from '@/lib/prisma';
 import type { UtilityContract, UtilityType } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // Types
 export interface CreateUtilityContractDTO {

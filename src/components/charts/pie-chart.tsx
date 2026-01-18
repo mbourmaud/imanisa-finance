@@ -9,13 +9,22 @@ interface PieDataPoint {
 	color: string;
 }
 
+type ChartHeight = 'sm' | 'md' | 'lg' | 'xl';
+
+const heightMap: Record<ChartHeight, string> = {
+	sm: 'h-48',
+	md: 'h-60',
+	lg: 'h-72',
+	xl: 'h-96',
+};
+
 interface DonutChartProps {
 	data: PieDataPoint[];
 	showLabel?: boolean;
-	className?: string;
+	height?: ChartHeight;
 }
 
-export function DonutChart({ data, showLabel = true, className }: DonutChartProps) {
+export function DonutChart({ data, showLabel = true, height = 'lg' }: DonutChartProps) {
 	const total = data.reduce((sum, item) => sum + item.value, 0);
 
 	return (
@@ -27,7 +36,7 @@ export function DonutChart({ data, showLabel = true, className }: DonutChartProp
 			showLabel={showLabel}
 			label={formatMoneyCompact(total)}
 			valueFormatter={(value) => formatMoneyCompact(value)}
-			className={className}
+			className={heightMap[height]}
 		/>
 	);
 }
@@ -46,19 +55,14 @@ export function ChartLegend({ items, total }: { items: LegendItem[]; total: numb
 				return (
 					<div key={item.name} className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
-							<div
-								className="h-3 w-3 rounded-full"
-								style={{ backgroundColor: item.color }}
-							/>
+							<div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
 							<span className="text-sm">{item.name}</span>
 						</div>
 						<div className="flex items-center gap-3">
 							<span className="text-sm font-medium number-display">
 								{formatMoneyCompact(item.value)}
 							</span>
-							<span className="text-xs text-muted-foreground w-12 text-right">
-								{percentage}%
-							</span>
+							<span className="text-xs text-muted-foreground w-12 text-right">{percentage}%</span>
 						</div>
 					</div>
 				);

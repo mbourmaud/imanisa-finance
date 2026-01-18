@@ -7,20 +7,31 @@
  * Uses TanStack Query for data fetching.
  */
 
-import { useMemo } from 'react';
 import Link from 'next/link';
+import { useMemo } from 'react';
 import {
+	Box,
 	Building,
+	Button,
 	ChevronRight,
 	CreditCard,
+	EmptyState,
+	Flex,
+	GlassCard,
+	Heading,
+	HStack,
 	Loader2,
+	PageHeader,
 	PiggyBank,
 	Plus,
+	StatCard,
+	StatCardGrid,
+	Text,
 	TrendingUp,
+	VStack,
 	Wallet,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from '@/components';
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 import { useAccountsQuery } from '@/features/accounts';
 import { formatMoneyCompact } from '@/shared/utils';
 
@@ -61,7 +72,11 @@ function getOwnerShare(account: ApiAccount): number {
 
 export default function AccountsPage() {
 	// Use TanStack Query for data fetching
-	const { data: accounts = [], isLoading, isError } = useAccountsQuery() as {
+	const {
+		data: accounts = [],
+		isLoading,
+		isError,
+	} = useAccountsQuery() as {
 		data: ApiAccount[] | undefined;
 		isLoading: boolean;
 		isError: boolean;
@@ -78,16 +93,13 @@ export default function AccountsPage() {
 				acc[type].push(account);
 				return acc;
 			},
-			{} as Record<string, ApiAccount[]>
+			{} as Record<string, ApiAccount[]>,
 		);
 	}, [accounts]);
 
 	// Calculate total balance
 	const totalBalance = useMemo(() => {
-		return accounts.reduce(
-			(sum, acc) => sum + acc.balance * (getOwnerShare(acc) / 100),
-			0
-		);
+		return accounts.reduce((sum, acc) => sum + acc.balance * (getOwnerShare(acc) / 100), 0);
 	}, [accounts]);
 
 	// Group accounts by type for display
@@ -120,162 +132,210 @@ export default function AccountsPage() {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center h-64">
-				<div className="flex flex-col items-center gap-4">
-					<div className="relative">
-						<div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 animate-pulse" />
-						<Loader2 className="h-6 w-6 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-					</div>
-					<p className="text-sm text-muted-foreground">Chargement des comptes...</p>
-				</div>
-			</div>
+			<EmptyState
+				title="Chargement des comptes..."
+				iconElement={
+					<Box position="relative">
+						<Box
+							rounded="full"
+							style={{
+								height: '3rem',
+								width: '3rem',
+								background:
+									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
+								animation: 'pulse 2s ease-in-out infinite',
+							}}
+						/>
+						<Loader2
+							style={{
+								height: '1.5rem',
+								width: '1.5rem',
+								animation: 'spin 1s linear infinite',
+								color: 'hsl(var(--primary))',
+								position: 'absolute',
+								top: '50%',
+								left: '50%',
+								transform: 'translate(-50%, -50%)',
+							}}
+						/>
+					</Box>
+				}
+				size="md"
+			/>
 		);
 	}
 
 	if (isError) {
 		return (
-			<div className="flex items-center justify-center h-64">
-				<div className="text-muted-foreground">Erreur lors du chargement des comptes</div>
-			</div>
+			<EmptyState
+				icon={Wallet}
+				title="Erreur de chargement"
+				description="Impossible de charger vos comptes. Veuillez réessayer."
+				size="md"
+			/>
 		);
 	}
 
 	return (
-		<div className="space-y-8">
+		<VStack gap="xl">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Comptes</h1>
-					<p className="mt-1 text-muted-foreground">Gérez vos comptes bancaires et suivez vos soldes</p>
-				</div>
-				<Button className="gap-2">
-					<Plus className="h-4 w-4" />
-					Ajouter un compte
-				</Button>
-			</div>
+			<PageHeader
+				title="Comptes"
+				description="Gérez vos comptes bancaires et suivez vos soldes"
+				actions={
+					<Button style={{ gap: '0.5rem' }}>
+						<Plus style={{ height: '1rem', width: '1rem' }} />
+						Ajouter un compte
+					</Button>
+				}
+			/>
 
 			{/* Stats Overview */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Solde total</p>
-							<p className="stat-card-value">{formatMoneyCompact(totalBalance)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<Wallet className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+			<StatCardGrid columns={4}>
+				<StatCard
+					label="Solde total"
+					value={formatMoneyCompact(totalBalance)}
+					icon={Wallet}
+					variant="default"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Comptes courants</p>
-							<p className="stat-card-value">{formatMoneyCompact(checkingTotal)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+				<StatCard
+					label="Comptes courants"
+					value={formatMoneyCompact(checkingTotal)}
+					icon={CreditCard}
+					variant="default"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Épargne</p>
-							<p className="stat-card-value">{formatMoneyCompact(savingsTotal)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<PiggyBank className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+				<StatCard
+					label="Épargne"
+					value={formatMoneyCompact(savingsTotal)}
+					icon={PiggyBank}
+					variant="teal"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Investissements</p>
-							<p className="stat-card-value">{formatMoneyCompact(investmentTotal)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-			</div>
+				<StatCard
+					label="Investissements"
+					value={formatMoneyCompact(investmentTotal)}
+					icon={TrendingUp}
+					variant="mint"
+				/>
+			</StatCardGrid>
 
 			{/* Accounts by Type */}
-			<div className="space-y-6">
+			<VStack gap="lg">
 				{accountGroups.map((group) => {
 					const Icon = group.icon;
 					return (
-						<Card key={group.type} className="border-border/60">
-							<CardHeader className="pb-4">
-								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-										<Icon className="h-5 w-5" />
-									</div>
-									<div>
-										<CardTitle className="text-lg font-medium">{group.label}</CardTitle>
-										<p className="text-sm text-muted-foreground">
-											{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
-										</p>
-									</div>
-								</div>
-							</CardHeader>
-							<CardContent className="space-y-2">
+						<GlassCard key={group.type} padding="lg">
+							{/* Group Header */}
+							<HStack gap="sm" align="center" style={{ marginBottom: '1rem' }}>
+								<Flex
+									align="center"
+									justify="center"
+									style={{
+										height: '2.5rem',
+										width: '2.5rem',
+										borderRadius: '0.75rem',
+										backgroundColor: 'hsl(var(--primary) / 0.1)',
+										color: 'hsl(var(--primary))',
+									}}
+								>
+									<Icon style={{ height: '1.25rem', width: '1.25rem' }} />
+								</Flex>
+								<VStack gap="none">
+									<Heading level={3} size="lg" weight="semibold">
+										{group.label}
+									</Heading>
+									<Text size="sm" color="muted">
+										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
+									</Text>
+								</VStack>
+							</HStack>
+
+							{/* Account List */}
+							<VStack gap="sm">
 								{group.accounts.map((account) => (
 									<Link
 										key={account.id}
 										href={`/dashboard/accounts/${account.id}`}
-										className="flex items-center justify-between rounded-xl bg-muted/30 p-4 transition-colors hover:bg-muted/50 group"
+										style={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											alignItems: 'center',
+											borderRadius: '0.75rem',
+											padding: '1rem',
+											border: '1px solid hsl(var(--border) / 0.2)',
+											backgroundColor: 'hsl(var(--background) / 0.5)',
+											transition: 'all 0.2s',
+										}}
 									>
-										<div className="flex items-center gap-4">
-											<div
-												className="flex h-10 w-10 items-center justify-center rounded-lg"
+										<HStack gap="md" align="center">
+											<Flex
+												align="center"
+												justify="center"
 												style={{
-													backgroundColor: account.bank?.color ? `${account.bank.color}20` : undefined,
+													height: '2.5rem',
+													width: '2.5rem',
+													borderRadius: '0.5rem',
+													backgroundColor: account.bank?.color
+														? `${account.bank.color}20`
+														: undefined,
 												}}
 											>
 												<Building
-													className="h-5 w-5"
-													style={{ color: account.bank?.color || undefined }}
+													style={{
+														height: '1.25rem',
+														width: '1.25rem',
+														color: account.bank?.color || undefined,
+													}}
 												/>
-											</div>
-											<div>
-												<p className="font-medium">{account.name}</p>
-												<p className="text-xs text-muted-foreground">{account.bank?.name || 'Banque'}</p>
-											</div>
-										</div>
-										<div className="flex items-center gap-4">
-											<p className="font-medium number-display">{formatMoneyCompact(account.balance)}</p>
-											<ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
-										</div>
+											</Flex>
+											<VStack gap="none">
+												<Text weight="medium">{account.name}</Text>
+												<Text size="xs" color="muted">
+													{account.bank?.name || 'Banque'}
+												</Text>
+											</VStack>
+										</HStack>
+										<HStack gap="md" align="center">
+											<MoneyDisplay
+												amount={account.balance}
+												format="compact"
+												size="md"
+												weight="semibold"
+											/>
+											<ChevronRight
+												style={{
+													height: '1rem',
+													width: '1rem',
+													color: 'hsl(var(--muted-foreground) / 0.5)',
+													transition: 'color 0.2s',
+												}}
+											/>
+										</HStack>
 									</Link>
 								))}
-							</CardContent>
-						</Card>
+							</VStack>
+						</GlassCard>
 					);
 				})}
 
 				{/* Empty state */}
 				{accountGroups.length === 0 && (
-					<div className="text-center py-16">
-						<div className="h-20 w-20 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
-							<Wallet className="h-10 w-10 text-muted-foreground/50" />
-						</div>
-						<p className="font-semibold text-foreground">Aucun compte</p>
-						<p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
-							Ajoutez votre premier compte pour commencer à suivre vos finances
-						</p>
-						<Button className="mt-6 gap-2">
-							<Plus className="h-4 w-4" />
-							Ajouter un compte
-						</Button>
-					</div>
+					<EmptyState
+						icon={Wallet}
+						title="Aucun compte"
+						description="Ajoutez votre premier compte pour commencer à suivre vos finances"
+						size="lg"
+						action={
+							<Button style={{ gap: '0.5rem' }}>
+								<Plus style={{ height: '1rem', width: '1rem' }} />
+								Ajouter un compte
+							</Button>
+						}
+					/>
 				)}
-			</div>
-		</div>
+			</VStack>
+		</VStack>
 	);
 }

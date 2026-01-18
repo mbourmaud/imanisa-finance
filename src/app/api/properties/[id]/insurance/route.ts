@@ -6,11 +6,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import {
-	propertyRepository,
-	propertyInsuranceRepository,
-} from '@/server/repositories';
 import type { InsuranceType } from '@/lib/prisma';
+import { propertyInsuranceRepository, propertyRepository } from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -35,10 +32,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 		});
 	} catch (error) {
 		console.error('Error fetching property insurance:', error);
-		return NextResponse.json(
-			{ error: 'Failed to fetch property insurance' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to fetch property insurance' }, { status: 500 });
 	}
 }
 
@@ -62,7 +56,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			);
 		}
 
-		const { type, provider, contractNumber, monthlyPremium, startDate, endDate, coverage, link, notes } = body;
+		const {
+			type,
+			provider,
+			contractNumber,
+			monthlyPremium,
+			startDate,
+			endDate,
+			coverage,
+			link,
+			notes,
+		} = body;
 
 		// Validate required fields
 		if (!type) {
@@ -70,16 +74,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 		}
 		const validTypes: InsuranceType[] = ['PNO', 'MRH'];
 		if (!validTypes.includes(type)) {
-			return NextResponse.json({ error: `Invalid type: ${type}. Must be PNO or MRH` }, { status: 400 });
+			return NextResponse.json(
+				{ error: `Invalid type: ${type}. Must be PNO or MRH` },
+				{ status: 400 },
+			);
 		}
 		if (!provider || typeof provider !== 'string' || provider.trim() === '') {
 			return NextResponse.json({ error: 'provider is required' }, { status: 400 });
 		}
 		if (monthlyPremium === undefined || typeof monthlyPremium !== 'number') {
-			return NextResponse.json({ error: 'monthlyPremium is required and must be a number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'monthlyPremium is required and must be a number' },
+				{ status: 400 },
+			);
 		}
 		if (monthlyPremium < 0) {
-			return NextResponse.json({ error: 'monthlyPremium must be a non-negative number' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'monthlyPremium must be a non-negative number' },
+				{ status: 400 },
+			);
 		}
 		if (!startDate) {
 			return NextResponse.json({ error: 'startDate is required' }, { status: 400 });
@@ -115,10 +128,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(insurance, { status: 201 });
 	} catch (error) {
 		console.error('Error creating property insurance:', error);
-		return NextResponse.json(
-			{ error: 'Failed to create property insurance' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to create property insurance' }, { status: 500 });
 	}
 }
 
@@ -142,13 +152,26 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 			);
 		}
 
-		const { type, provider, contractNumber, monthlyPremium, startDate, endDate, coverage, link, notes } = body;
+		const {
+			type,
+			provider,
+			contractNumber,
+			monthlyPremium,
+			startDate,
+			endDate,
+			coverage,
+			link,
+			notes,
+		} = body;
 
 		// Validate type if provided
 		if (type !== undefined) {
 			const validTypes: InsuranceType[] = ['PNO', 'MRH'];
 			if (!validTypes.includes(type)) {
-				return NextResponse.json({ error: `Invalid type: ${type}. Must be PNO or MRH` }, { status: 400 });
+				return NextResponse.json(
+					{ error: `Invalid type: ${type}. Must be PNO or MRH` },
+					{ status: 400 },
+				);
 			}
 		}
 
@@ -163,7 +186,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 				return NextResponse.json({ error: 'monthlyPremium must be a number' }, { status: 400 });
 			}
 			if (monthlyPremium < 0) {
-				return NextResponse.json({ error: 'monthlyPremium must be a non-negative number' }, { status: 400 });
+				return NextResponse.json(
+					{ error: 'monthlyPremium must be a non-negative number' },
+					{ status: 400 },
+				);
 			}
 		}
 
@@ -200,10 +226,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json(insurance);
 	} catch (error) {
 		console.error('Error updating property insurance:', error);
-		return NextResponse.json(
-			{ error: 'Failed to update property insurance' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to update property insurance' }, { status: 500 });
 	}
 }
 
@@ -228,9 +251,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 		return NextResponse.json({ success: true });
 	} catch (error) {
 		console.error('Error deleting property insurance:', error);
-		return NextResponse.json(
-			{ error: 'Failed to delete property insurance' },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Failed to delete property insurance' }, { status: 500 });
 	}
 }

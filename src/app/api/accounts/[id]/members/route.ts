@@ -51,7 +51,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 			);
 		}
 
-		const accountMember = await accountRepository.addMemberToAccount(accountId, memberId, ownerShare);
+		const accountMember = await accountRepository.addMemberToAccount(
+			accountId,
+			memberId,
+			ownerShare,
+		);
 
 		return NextResponse.json(accountMember, { status: 201 });
 	} catch (error) {
@@ -68,7 +72,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 		const memberId = searchParams.get('memberId');
 
 		if (!memberId) {
-			return NextResponse.json({ error: 'Missing required query param: memberId' }, { status: 400 });
+			return NextResponse.json(
+				{ error: 'Missing required query param: memberId' },
+				{ status: 400 },
+			);
 		}
 
 		// Verify account exists
@@ -80,7 +87,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 		// Verify member is associated with account
 		const existingMember = account.accountMembers.find((am) => am.memberId === memberId);
 		if (!existingMember) {
-			return NextResponse.json({ error: 'Member is not associated with this account' }, { status: 404 });
+			return NextResponse.json(
+				{ error: 'Member is not associated with this account' },
+				{ status: 404 },
+			);
 		}
 
 		await accountRepository.removeMemberFromAccount(accountId, memberId);
@@ -119,10 +129,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 		// Verify member is associated with account
 		const existingMember = account.accountMembers.find((am) => am.memberId === memberId);
 		if (!existingMember) {
-			return NextResponse.json({ error: 'Member is not associated with this account' }, { status: 404 });
+			return NextResponse.json(
+				{ error: 'Member is not associated with this account' },
+				{ status: 404 },
+			);
 		}
 
-		const accountMember = await accountRepository.updateMemberShare(accountId, memberId, ownerShare);
+		const accountMember = await accountRepository.updateMemberShare(
+			accountId,
+			memberId,
+			ownerShare,
+		);
 
 		return NextResponse.json(accountMember);
 	} catch (error) {
