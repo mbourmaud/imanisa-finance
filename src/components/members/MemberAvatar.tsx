@@ -90,22 +90,21 @@ export const MemberAvatar = forwardRef<HTMLSpanElement, MemberAvatarProps>(
 		const initials = getInitials(member.name);
 		const bgColor = member.color || getDefaultColor(colorIndex);
 		const textColor = getContrastColor(bgColor);
+		const colorStyle = {
+			'--member-bg': bgColor,
+			'--member-text': textColor,
+		} as React.CSSProperties;
 
 		return (
 			<Avatar
 				ref={ref}
 				data-slot="member-avatar"
 				className={cn(sizeClasses[size], showBorder && 'ring-2 ring-background', className)}
+				style={colorStyle}
 				{...props}
 			>
 				{member.avatarUrl && <AvatarImage src={member.avatarUrl} alt={member.name} />}
-				<AvatarFallback
-					className="font-medium"
-					style={{
-						backgroundColor: bgColor,
-						color: textColor,
-					}}
-				>
+				<AvatarFallback className="font-medium bg-[var(--member-bg)] text-[var(--member-text)]">
 					{initials}
 				</AvatarFallback>
 			</Avatar>
@@ -227,18 +226,16 @@ export const MemberAvatarGroup = forwardRef<HTMLDivElement, MemberAvatarGroupPro
 						size={size}
 						colorIndex={index}
 						showBorder
-						className="relative"
-						style={{ zIndex: visibleMembers.length - index }}
+						className={cn('relative', `z-[${visibleMembers.length - index}]`)}
 					/>
 				))}
 				{remainingCount > 0 && (
 					<div
 						data-slot="member-avatar-overflow"
 						className={cn(
-							'relative flex items-center justify-center rounded-full bg-muted ring-2 ring-background font-medium text-muted-foreground',
+							'relative z-0 flex items-center justify-center rounded-full bg-muted ring-2 ring-background font-medium text-muted-foreground',
 							sizeClasses[size],
 						)}
-						style={{ zIndex: 0 }}
 					>
 						+{remainingCount}
 					</div>
