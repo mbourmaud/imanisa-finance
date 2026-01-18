@@ -337,24 +337,24 @@ function getUtilityTypeIcon(type: UtilityType): React.ElementType {
 
 function DetailItemSkeleton() {
 	return (
-		<VStack gap="xs">
+		<div className="flex flex-col gap-2">
 			<Skeleton style={{ height: '0.75rem', width: '4rem' }} />
 			<Skeleton style={{ height: '1.25rem', width: '6rem' }} />
-		</VStack>
+		</div>
 	);
 }
 
 function SectionSkeleton() {
 	return (
 		<GlassCard padding="lg">
-			<VStack gap="md">
+			<div className="flex flex-col gap-4">
 				<Skeleton style={{ height: '1.25rem', width: '8rem' }} />
 				<Grid cols={1} colsSm={2} colsLg={3} gap="md">
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
 				</Grid>
-			</VStack>
+			</div>
 		</GlassCard>
 	);
 }
@@ -380,8 +380,8 @@ function LoanCard({
 
 	return (
 		<div className="rounded-xl border border-border p-4" style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
-			<VStack gap="md">
-				<HStack justify="between" align="start" gap="md">
+			<div className="flex flex-col gap-4">
+				<div className="flex justify-between items-start gap-4">
 					<div className="min-w-0">
 						<Text
 							weight="medium"
@@ -403,45 +403,45 @@ function LoanCard({
 							restant
 						</Text>
 					</div>
-				</HStack>
+				</div>
 
-				<VStack gap="xs">
-					<HStack justify="between">
+				<div className="flex flex-col gap-2">
+					<div className="flex justify-between">
 						<Text size="xs" color="muted">
 							Progression du remboursement
 						</Text>
 						<Text size="xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{paidPercent.toFixed(0)}%
 						</Text>
-					</HStack>
+					</div>
 					<Progress value={paidPercent} style={{ height: '0.5rem' }} />
-				</VStack>
+				</div>
 
 				<Grid cols={3} gap="md" style={{ paddingTop: '0.5rem', fontSize: '0.875rem' }}>
-					<VStack gap="none">
+					<div className="flex flex-col">
 						<Text size="xs" color="muted">
 							Mensualité
 						</Text>
 						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.monthlyPayment)}
 						</Text>
-					</VStack>
-					<VStack gap="none">
+					</div>
+					<div className="flex flex-col">
 						<Text size="xs" color="muted">
 							Taux
 						</Text>
 						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{loan.rate}%
 						</Text>
-					</VStack>
-					<VStack gap="none">
+					</div>
+					<div className="flex flex-col">
 						<Text size="xs" color="muted">
 							Montant initial
 						</Text>
 						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.initialAmount)}
 						</Text>
-					</VStack>
+					</div>
 				</Grid>
 
 				{loan.loanNumber && (
@@ -467,7 +467,7 @@ function LoanCard({
 							textAlign: 'left',
 						}}
 					>
-						<HStack gap="sm" align="center">
+						<div className="flex items-center gap-3">
 							<Shield
 								style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
@@ -486,8 +486,8 @@ function LoanCard({
 									</Text>
 								)}
 							</Text>
-						</HStack>
-						<HStack gap="sm" align="center">
+						</div>
+						<div className="flex items-center gap-3">
 							{hasInsurances && (
 								<Text size="xs" color="muted">
 									{formatCurrency(totalInsurancePremium)}/mois · {totalCoverage}%
@@ -502,39 +502,27 @@ function LoanCard({
 									style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 								/>
 							)}
-						</HStack>
+						</div>
 					</button>
 
 					{isExpanded && (
-						<VStack gap="sm" style={{ marginTop: '0.75rem' }}>
+						<div className="flex flex-col gap-3 mt-3">
 							{hasInsurances ? (
-								<VStack gap="sm">
+								<div className="flex flex-col gap-3">
 									{loan.loanInsurances?.map((insurance) => (
-										<HStack
+										<div
 											key={insurance.id}
-											gap="sm"
-											align="center"
-											p="sm"
-											style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+											className="flex items-center gap-3 p-3 rounded-lg"
+											style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 										>
-											<Flex
-												align="center"
-												justify="center"
-												style={{
-													height: '2rem',
-													width: '2rem',
-													borderRadius: '9999px',
-													fontSize: '0.75rem',
-													fontWeight: 500,
-													color: 'white',
-													flexShrink: 0,
-													backgroundColor: insurance.member.color || '#6b7280',
-												}}
+											<div
+												className="flex items-center justify-center h-8 w-8 rounded-full text-xs font-medium text-white shrink-0"
+												style={{ backgroundColor: insurance.member.color || '#6b7280' }}
 											>
 												{insurance.member.name.charAt(0).toUpperCase()}
-											</Flex>
+											</div>
 											<div className="flex-1 min-w-0">
-												<HStack gap="sm" align="center" style={{ flexWrap: 'wrap' }}>
+												<div className="flex items-center gap-3 flex-wrap">
 													<Text
 														size="sm"
 														weight="medium"
@@ -557,7 +545,7 @@ function LoanCard({
 													>
 														{insurance.coveragePercent}%
 													</Text>
-												</HStack>
+												</div>
 												<Text
 													size="xs"
 													color="muted"
@@ -570,9 +558,9 @@ function LoanCard({
 													{insurance.provider} · {formatCurrency(insurance.monthlyPremium)}/mois
 												</Text>
 											</div>
-										</HStack>
+										</div>
 									))}
-								</VStack>
+								</div>
 							) : (
 								<div className="text-center py-3">
 									<Text size="sm" color="muted" style={{ marginBottom: '0.5rem' }}>
