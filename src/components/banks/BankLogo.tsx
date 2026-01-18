@@ -112,14 +112,16 @@ export function BankLogo({
 	};
 
 	const showLogo = currentLogo && !imageError;
+	const colorStyle = !showLogo
+		? { '--bank-color': bankColor } as React.CSSProperties
+		: undefined;
 
 	return (
 		<div
-			className={`relative flex items-center justify-center rounded-lg font-semibold cursor-pointer overflow-hidden transition-all duration-200 ${sizeClasses[size]}`}
-			style={{
-				backgroundColor: showLogo ? 'transparent' : bankColor,
-				color: showLogo ? undefined : '#fff',
-			}}
+			className={`relative flex items-center justify-center rounded-lg font-semibold cursor-pointer overflow-hidden transition-all duration-200 ${sizeClasses[size]} ${
+				showLogo ? 'bg-transparent' : 'bg-[var(--bank-color)] text-white'
+			}`}
+			style={colorStyle}
 			onClick={handleClick}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
