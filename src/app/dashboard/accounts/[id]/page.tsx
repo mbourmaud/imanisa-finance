@@ -28,7 +28,12 @@ import {
 	Trash2,
 	Upload,
 	X,
-} from 'lucide-react';
+} from '@/components/ui/icon';
+import { Box } from '@/components/ui/box';
+import { VStack, HStack } from '@/components/ui/stack';
+import { Flex } from '@/components/ui/flex';
+import { Text, Heading } from '@/components/ui/typography';
+import { GlassCard } from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {

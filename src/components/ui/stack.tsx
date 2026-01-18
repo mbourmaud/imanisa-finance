@@ -168,6 +168,9 @@ const HStack = forwardRef<HTMLDivElement, HStackProps>(
 			wrap = false,
 			fullHeight,
 			fullWidth,
+			grow,
+			shrink,
+			minW0,
 			...props
 		},
 		ref
@@ -184,6 +187,9 @@ const HStack = forwardRef<HTMLDivElement, HStackProps>(
 					wrap && 'flex-wrap',
 					fullHeight && 'h-full',
 					fullWidth && 'w-full',
+					grow && 'flex-1',
+					shrink === false && 'shrink-0',
+					minW0 && 'min-w-0',
 					className
 				)}
 				{...props}
