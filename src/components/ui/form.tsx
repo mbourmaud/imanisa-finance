@@ -2,7 +2,6 @@
 
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
-import type { FieldApi } from '@tanstack/react-form';
 import * as React from 'react';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -15,13 +14,30 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue);
 
+/**
+ * Minimal interface for TanStack Form field state.
+ * Used to display validation errors in form components.
+ */
+interface FormFieldState {
+	name: string;
+	state: {
+		meta: {
+			errors?: Array<string | { message?: string }>;
+		};
+	};
+}
+
 interface FormItemProps extends React.ComponentProps<'div'> {
-	field?: FieldApi<unknown, string, undefined, undefined, unknown>;
+	field?: FormFieldState;
 }
 
 function FormItem({ className, field, children, ...props }: FormItemProps) {
 	const id = React.useId();
-	const error = field?.state.meta.errors?.[0]?.toString();
+	const firstError = field?.state.meta.errors?.[0];
+	const error =
+		typeof firstError === 'string'
+			? firstError
+			: (firstError as { message?: string } | undefined)?.message;
 
 	return (
 		<FormItemContext.Provider value={{ id, name: field?.name ?? '', error }}>
