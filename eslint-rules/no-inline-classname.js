@@ -38,6 +38,15 @@ module.exports = {
 		return {
 			JSXAttribute(node) {
 				if (node.name && node.name.name === 'className') {
+					// Allow className on html and body elements (for fonts, global styles)
+					const parent = node.parent;
+					if (parent && parent.type === 'JSXOpeningElement' && parent.name) {
+						const elementName = parent.name.name;
+						if (elementName === 'html' || elementName === 'body') {
+							return;
+						}
+					}
+
 					context.report({
 						node,
 						messageId: 'noInlineClassName',
