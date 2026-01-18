@@ -66,19 +66,14 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 		const percentage = (spent / budget) * 100
 		const isOverBudget = spent > budget
 		const remainingBudget = budget - spent
+		const colorStyle = { '--category-color': color } as React.CSSProperties
 
 		return (
-			<GlassCard ref={ref} padding="md">
+			<GlassCard ref={ref} padding="md" style={colorStyle}>
 				<Flex direction="col" gap="sm">
 					<Flex direction="row" justify="between" align="start">
 						<Flex direction="row" gap="sm" align="center">
-							<div
-								className="flex h-10 w-10 items-center justify-center rounded-xl"
-								style={{
-									backgroundColor: `${color}20`,
-									color: color,
-								}}
-							>
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--category-color)]/10 text-[var(--category-color)]">
 								<Icon className="h-5 w-5" />
 							</div>
 							<Flex direction="col" gap="none">
@@ -90,8 +85,8 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 						</Flex>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" size="icon" style={{ height: '2rem', width: '2rem' }}>
-									<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
+								<Button variant="ghost" size="icon" className="h-8 w-8">
+									<MoreHorizontal className="h-4 w-4" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
@@ -100,10 +95,7 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 								</DropdownMenuItem>
 								<DropdownMenuItem onClick={onEditBudget}>Modifier le budget</DropdownMenuItem>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem
-									onClick={onDelete}
-									style={{ color: 'hsl(var(--destructive))' }}
-								>
+								<DropdownMenuItem onClick={onDelete} className="text-destructive">
 									Supprimer
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -112,13 +104,7 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 					<Flex direction="col" gap="xs">
 						<Progress
 							value={Math.min(percentage, 100)}
-							style={{
-								height: '0.5rem',
-								...(isOverBudget &&
-									({
-										'--progress-foreground': 'hsl(var(--destructive))',
-									} as React.CSSProperties)),
-							}}
+							className={cn('h-2', isOverBudget && '[&>div]:bg-destructive')}
 						/>
 						<Flex direction="row" justify="between">
 							<span
