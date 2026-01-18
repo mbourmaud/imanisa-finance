@@ -19,7 +19,6 @@ export async function GET() {
 				email: true,
 				name: true,
 				createdAt: true,
-				updatedAt: true,
 			},
 		});
 
@@ -81,7 +80,6 @@ export async function PATCH(request: Request) {
 				email: true,
 				name: true,
 				createdAt: true,
-				updatedAt: true,
 			},
 		});
 

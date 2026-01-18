@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useStore } from '@tanstack/react-store';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
 	AlertCircle,
@@ -24,12 +25,12 @@ import {
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
 	importFormSchema,
+	type RawImport,
 	useDeleteImportMutation,
 	useImportsQuery,
 	useProcessImportMutation,
 	useReprocessImportMutation,
 	useUploadImportMutation,
-	type RawImport,
 } from '@/features/imports';
 import { SelectField, useAppForm } from '@/lib/forms';
 
@@ -109,7 +110,11 @@ export default function ImportPage() {
 	const [deleteImportId, setDeleteImportId] = useState<string | null>(null);
 
 	// TanStack Query for data
-	const { data: imports = [], isLoading: isLoadingImports, refetch: refetchImports } = useImportsQuery();
+	const {
+		data: imports = [],
+		isLoading: isLoadingImports,
+		refetch: refetchImports,
+	} = useImportsQuery();
 
 	const { data: banksData, isLoading: isLoadingBanks } = useQuery<{ banks: Bank[] }>({
 		queryKey: ['banks'],
@@ -134,8 +139,8 @@ export default function ImportPage() {
 	});
 
 	// Watch form values for filtering accounts
-	const selectedBankId = form.useStore((state) => state.values.bankId);
-	const selectedAccountId = form.useStore((state) => state.values.accountId);
+	const selectedBankId = useStore(form.store, (state) => state.values.bankId);
+	const selectedAccountId = useStore(form.store, (state) => state.values.accountId);
 
 	// Reset account when bank changes
 	const filteredAccounts = useMemo(() => {
@@ -183,7 +188,7 @@ export default function ImportPage() {
 			});
 			toast.success('Fichier importé avec succès');
 		} catch (err) {
-			toast.error(err instanceof Error ? err.message : 'Échec de l\'upload');
+			toast.error(err instanceof Error ? err.message : "Échec de l'upload");
 		}
 	};
 
@@ -338,7 +343,11 @@ export default function ImportPage() {
 									label="1. Banque *"
 									placeholder="Sélectionner une banque..."
 									options={bankOptions}
-									helpText={banks.length === 0 && !isLoading ? "Aucune banque configurée. Ajoutez d'abord une banque dans les paramètres." : undefined}
+									helpText={
+										banks.length === 0 && !isLoading
+											? "Aucune banque configurée. Ajoutez d'abord une banque dans les paramètres."
+											: undefined
+									}
 								/>
 							)}
 						</form.AppField>
@@ -355,10 +364,16 @@ export default function ImportPage() {
 							{() => (
 								<SelectField
 									label="2. Compte *"
-									placeholder={selectedBankId ? 'Sélectionner un compte...' : "Sélectionnez d'abord une banque"}
+									placeholder={
+										selectedBankId ? 'Sélectionner un compte...' : "Sélectionnez d'abord une banque"
+									}
 									options={accountOptions}
 									disabled={!selectedBankId}
-									helpText={selectedBankId && filteredAccounts.length === 0 ? "Aucun compte pour cette banque. Ajoutez d'abord un compte." : undefined}
+									helpText={
+										selectedBankId && filteredAccounts.length === 0
+											? "Aucun compte pour cette banque. Ajoutez d'abord un compte."
+											: undefined
+									}
 								/>
 							)}
 						</form.AppField>
@@ -575,15 +590,19 @@ interface ImportRowProps {
 	onDelete: () => void;
 }
 
-function ImportRow({ imp, getBankNameForImport, onProcess, onReprocess, onDelete }: ImportRowProps) {
+function ImportRow({
+	imp,
+	getBankNameForImport,
+	onProcess,
+	onReprocess,
+	onDelete,
+}: ImportRowProps) {
 	return (
 		<div
 			className="flex justify-between items-center p-4 rounded-xl transition-colors"
 			style={{
 				backgroundColor:
-					imp.status === 'FAILED'
-						? 'oklch(0.55 0.2 25 / 0.05)'
-						: 'hsl(0 0% 100% / 0.5)',
+					imp.status === 'FAILED' ? 'oklch(0.55 0.2 25 / 0.05)' : 'hsl(0 0% 100% / 0.5)',
 				border: imp.status === 'FAILED' ? '1px solid oklch(0.55 0.2 25 / 0.2)' : 'none',
 			}}
 		>
@@ -596,9 +615,7 @@ function ImportRow({ imp, getBankNameForImport, onProcess, onReprocess, onDelete
 						alignItems: 'center',
 						justifyContent: 'center',
 						backgroundColor:
-							imp.status === 'FAILED'
-								? 'oklch(0.55 0.2 25 / 0.1)'
-								: 'hsl(var(--background))',
+							imp.status === 'FAILED' ? 'oklch(0.55 0.2 25 / 0.1)' : 'hsl(var(--background))',
 					}}
 				>
 					<FileSpreadsheet
@@ -606,9 +623,7 @@ function ImportRow({ imp, getBankNameForImport, onProcess, onReprocess, onDelete
 							height: '1.25rem',
 							width: '1.25rem',
 							color:
-								imp.status === 'FAILED'
-									? 'oklch(0.55 0.2 25)'
-									: 'hsl(var(--muted-foreground))',
+								imp.status === 'FAILED' ? 'oklch(0.55 0.2 25)' : 'hsl(var(--muted-foreground))',
 						}}
 					/>
 				</div>

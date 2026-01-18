@@ -73,14 +73,9 @@ export function ProfileForm() {
 			</div>
 
 			<div className="flex justify-end mt-4">
-				<form.Subscribe
-					selector={(state) => [state.canSubmit, state.isSubmitting]}
-				>
+				<form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
 					{([canSubmit, isSubmitting]) => (
-						<Button
-							type="submit"
-							disabled={!canSubmit || updateMutation.isPending}
-						>
+						<Button type="submit" disabled={!canSubmit || updateMutation.isPending}>
 							{isSubmitting || updateMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
 						</Button>
 					)}

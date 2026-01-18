@@ -9,10 +9,7 @@ export const profileFormSchema = v.object({
 		v.minLength(1, 'Le nom est requis'),
 		v.maxLength(100, 'Le nom ne peut pas dépasser 100 caractères'),
 	),
-	email: v.pipe(
-		v.string(),
-		v.email('Veuillez entrer un email valide'),
-	),
+	email: v.pipe(v.string(), v.email('Veuillez entrer un email valide')),
 });
 
 export type ProfileFormValues = v.InferOutput<typeof profileFormSchema>;
