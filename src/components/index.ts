@@ -395,6 +395,7 @@ export type { AccountListItemProps } from './accounts/AccountListItem';
 export { AccountListItem } from './accounts/AccountListItem';
 export type { AccountTypeHeaderProps } from './accounts/AccountTypeHeader';
 export { AccountTypeHeader } from './accounts/AccountTypeHeader';
+export { AddAccountButton } from './accounts/AddAccountButton';
 export type { SearchInputProps, SearchInputSize } from './common/SearchInput';
 export { SearchInput } from './common/SearchInput';
 export type { ListHeaderProps } from './common/ListHeader';

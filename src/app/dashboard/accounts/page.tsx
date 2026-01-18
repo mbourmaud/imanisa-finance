@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import {
 	AccountListItem,
 	AccountTypeHeader,
-	Button,
+	AddAccountButton,
 	CreditCard,
 	EmptyState,
 	Flex,
@@ -19,7 +19,6 @@ import {
 	LoadingSpinner,
 	PageHeader,
 	PiggyBank,
-	Plus,
 	StatCard,
 	StatCardGrid,
 	TrendingUp,
@@ -150,12 +149,7 @@ export default function AccountsPage() {
 			<PageHeader
 				title="Comptes"
 				description="Gérez vos comptes bancaires et suivez vos soldes"
-				actions={
-					<Button style={{ gap: '0.5rem' }}>
-						<Plus style={{ height: '1rem', width: '1rem' }} />
-						Ajouter un compte
-					</Button>
-				}
+				actions={<AddAccountButton />}
 			/>
 
 			{/* Stats Overview */}
@@ -224,12 +218,7 @@ export default function AccountsPage() {
 						title="Aucun compte"
 						description="Ajoutez votre premier compte pour commencer à suivre vos finances"
 						size="lg"
-						action={
-							<Button style={{ gap: '0.5rem' }}>
-								<Plus style={{ height: '1rem', width: '1rem' }} />
-								Ajouter un compte
-							</Button>
-						}
+						action={<AddAccountButton />}
 					/>
 				)}
 			</Flex>
