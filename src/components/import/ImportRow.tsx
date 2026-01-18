@@ -27,7 +27,7 @@ export interface ImportData {
 	status: ImportStatus
 	recordsCount: number | null
 	errorMessage: string | null
-	account: ImportAccount | null
+	account?: ImportAccount | null
 }
 
 interface ImportRowProps {

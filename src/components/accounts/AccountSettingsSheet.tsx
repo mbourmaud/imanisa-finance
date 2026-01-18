@@ -16,7 +16,7 @@ import {
 	Trash2,
 	X,
 } from '@/components'
-import { ImportRow } from './ImportRow'
+import { AccountImportRow } from './AccountImportRow'
 import { MemberChip } from './MemberChip'
 import { AddMemberDropdown } from './AddMemberDropdown'
 
@@ -352,7 +352,7 @@ export function AccountSettingsSheet({
 						) : (
 							<Flex direction="col" gap="sm">
 								{(showAllImports ? imports : imports.slice(0, 5)).map((imp) => (
-									<ImportRow
+									<AccountImportRow
 										key={imp.id}
 										id={imp.id}
 										filename={imp.filename}

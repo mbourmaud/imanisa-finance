@@ -8,11 +8,6 @@
    Warm, friendly, personal finance for families
    ============================================ */
 
-/* ============================================
-   📐 DESIGN TOKENS - Spacing & Layout
-   See src/styles/tokens.ts for TypeScript values
-   ============================================ */
-
 @theme inline {
 	/* Color tokens */
 	--color-background: var(--background);
@@ -57,29 +52,6 @@
 	--radius-2xl: calc(var(--radius) + 8px);
 	--radius-3xl: calc(var(--radius) + 12px);
 	--radius-4xl: calc(var(--radius) + 16px);
-
-	/* Spacing tokens - extends Tailwind spacing scale */
-	--spacing-xs: 0.25rem; /* 4px */
-	--spacing-sm: 0.5rem; /* 8px */
-	--spacing-md: 1rem; /* 16px */
-	--spacing-lg: 1.5rem; /* 24px */
-	--spacing-xl: 2rem; /* 32px */
-	--spacing-2xl: 3rem; /* 48px */
-	--spacing-3xl: 4rem; /* 64px */
-
-	/* Container max-widths */
-	--container-sm: 640px;
-	--container-md: 768px;
-	--container-lg: 1024px;
-	--container-xl: 1280px;
-	--container-2xl: 1536px;
-
-	/* Layout tokens */
-	--page-gutter-mobile: 1rem; /* 16px */
-	--page-gutter-desktop: 1.5rem; /* 24px */
-	--section-gap: 2rem; /* 32px */
-	--card-padding-sm: 1rem; /* 16px */
-	--card-padding-md: 1.5rem; /* 24px */
 }
 
 :root {
@@ -265,47 +237,6 @@
 }
 
 @layer components {
-	/* ✨ Fun gradient backgrounds */
-	.gradient-warm {
-		background: linear-gradient(
-			135deg,
-			oklch(0.98 0.02 60 / 0.6) 0%,
-			oklch(0.96 0.03 25 / 0.4) 50%,
-			oklch(0.97 0.02 290 / 0.3) 100%
-		);
-	}
-
-	.dark .gradient-warm {
-		background: linear-gradient(
-			135deg,
-			oklch(0.22 0.03 60 / 0.4) 0%,
-			oklch(0.2 0.03 25 / 0.3) 50%,
-			oklch(0.2 0.02 290 / 0.2) 100%
-		);
-	}
-
-	/* 🌈 Rainbow subtle underline */
-	.rainbow-underline {
-		background: linear-gradient(
-			90deg,
-			oklch(0.7 0.2 25),
-			oklch(0.75 0.15 85),
-			oklch(0.7 0.15 165),
-			oklch(0.65 0.18 290)
-		);
-		background-size: 200% 100%;
-		animation: shimmer 3s linear infinite;
-	}
-
-	@keyframes shimmer {
-		0% {
-			background-position: 200% 0;
-		}
-		100% {
-			background-position: -200% 0;
-		}
-	}
-
 	/* 🎴 Stat card - warm & friendly */
 	.stat-card {
 		@apply relative rounded-2xl bg-card p-5 sm:p-6 overflow-hidden transition-all duration-300;
@@ -409,22 +340,6 @@
 		background: linear-gradient(135deg, oklch(0.7 0.15 160), oklch(0.6 0.18 145));
 	}
 
-	/* 💫 Fun button styles */
-	.btn-fun {
-		@apply relative overflow-hidden font-semibold transition-all duration-300;
-		background: linear-gradient(135deg, oklch(0.65 0.18 25) 0%, oklch(0.6 0.2 15) 100%);
-		box-shadow: 0 4px 14px oklch(0.65 0.18 25 / 0.3);
-	}
-
-	.btn-fun:hover {
-		@apply -translate-y-0.5;
-		box-shadow: 0 6px 20px oklch(0.65 0.18 25 / 0.4);
-	}
-
-	.btn-fun:active {
-		@apply translate-y-0;
-	}
-
 	/* Number display - for financial figures */
 	.number-display {
 		@apply tabular-nums tracking-tight;
@@ -432,7 +347,7 @@
 		font-feature-settings: "tnum" 1;
 	}
 
-	/* 📈 Positive/Negative indicators with icons feel */
+	/* 📈 Positive/Negative indicators */
 	.value-positive {
 		@apply text-[oklch(0.55_0.18_145)] font-semibold;
 	}
@@ -449,44 +364,20 @@
 		@apply text-[oklch(0.65_0.2_25)];
 	}
 
-	/* 🏷️ Fun badge/tag style */
+	/* 🏷️ Badge style */
 	.badge-fun {
 		@apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
-	}
-
-	.badge-coral {
-		@apply bg-[oklch(0.95_0.06_25)] text-[oklch(0.5_0.15_25)];
-	}
-
-	.badge-teal {
-		@apply bg-[oklch(0.94_0.05_180)] text-[oklch(0.45_0.12_180)];
 	}
 
 	.badge-purple {
 		@apply bg-[oklch(0.94_0.05_290)] text-[oklch(0.5_0.15_290)];
 	}
 
-	.badge-gold {
-		@apply bg-[oklch(0.95_0.06_85)] text-[oklch(0.5_0.12_60)];
-	}
-
-	.dark .badge-coral {
-		@apply bg-[oklch(0.3_0.08_25)] text-[oklch(0.8_0.12_25)];
-	}
-
-	.dark .badge-teal {
-		@apply bg-[oklch(0.28_0.06_180)] text-[oklch(0.8_0.1_180)];
-	}
-
 	.dark .badge-purple {
 		@apply bg-[oklch(0.28_0.06_290)] text-[oklch(0.8_0.12_290)];
 	}
 
-	.dark .badge-gold {
-		@apply bg-[oklch(0.3_0.08_85)] text-[oklch(0.85_0.1_85)];
-	}
-
-	/* 📊 Account card with fun accents */
+	/* 📊 Account card */
 	.account-card {
 		@apply relative rounded-2xl bg-card p-4 transition-all duration-300 cursor-pointer;
 		box-shadow: 0 2px 8px oklch(0.3 0.02 260 / 0.05);
@@ -505,95 +396,13 @@
 		box-shadow: 0 4px 16px oklch(0 0 0 / 0.2);
 	}
 
-	/* Emoji icon container */
-	.emoji-icon {
-		@apply flex items-center justify-center text-2xl w-12 h-12 rounded-xl;
-		background: linear-gradient(135deg, oklch(0.97 0.02 80) 0%, oklch(0.95 0.03 60) 100%);
-	}
-
-	.dark .emoji-icon {
-		background: linear-gradient(135deg, oklch(0.25 0.02 280) 0%, oklch(0.28 0.03 60) 100%);
-	}
-
-	/* Divider with gradient */
-	.divider-fun {
-		@apply h-0.5 w-full rounded-full;
-		background: linear-gradient(
-			90deg,
-			transparent 0%,
-			oklch(0.9 0.04 25) 20%,
-			oklch(0.92 0.03 180) 50%,
-			oklch(0.9 0.04 290) 80%,
-			transparent 100%
-		);
-	}
-
-	.dark .divider-fun {
-		background: linear-gradient(
-			90deg,
-			transparent 0%,
-			oklch(0.35 0.04 25) 20%,
-			oklch(0.35 0.03 180) 50%,
-			oklch(0.35 0.04 290) 80%,
-			transparent 100%
-		);
-	}
-
-	/* ============================================
-	   📐 LAYOUT UTILITY CLASSES
-	   Use these for consistent spacing across pages
-	   ============================================ */
-
-	/* Page gutter - horizontal padding for page content */
+	/* Layout utilities */
 	.gutter {
 		@apply px-4 sm:px-6;
 	}
 
-	/* Section spacing - vertical gap between page sections */
-	.section-spacing {
-		@apply py-8;
-	}
-
-	/* Card padding variants */
 	.card-padding {
 		@apply p-4 sm:p-6;
-	}
-
-	.card-padding-sm {
-		@apply p-4;
-	}
-
-	.card-padding-lg {
-		@apply p-6 sm:p-8;
-	}
-
-	/* Gap utility classes using token scale */
-	.gap-token-xs {
-		gap: var(--spacing-xs);
-	}
-
-	.gap-token-sm {
-		gap: var(--spacing-sm);
-	}
-
-	.gap-token-md {
-		gap: var(--spacing-md);
-	}
-
-	.gap-token-lg {
-		gap: var(--spacing-lg);
-	}
-
-	.gap-token-xl {
-		gap: var(--spacing-xl);
-	}
-
-	.gap-token-2xl {
-		gap: var(--spacing-2xl);
-	}
-
-	.gap-token-3xl {
-		gap: var(--spacing-3xl);
 	}
 }
 
@@ -626,13 +435,9 @@
 		background: oklch(0.3 0.02 280);
 	}
 
-	/* 🎬 Fun animations */
+	/* Fade in animation */
 	.animate-fade-in {
 		animation: fadeIn 0.5s ease-out forwards;
-	}
-
-	.animate-fade-in-fast {
-		animation: fadeInFast 0.2s ease-out forwards;
 	}
 
 	@keyframes fadeIn {
@@ -646,21 +451,12 @@
 		}
 	}
 
-	@keyframes fadeInFast {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
+	/* Floating animation */
+	.float {
+		animation: float 3s ease-in-out infinite;
 	}
 
-	/* Bounce on hover */
-	.hover-bounce:hover {
-		animation: bounce 0.5s ease-in-out;
-	}
-
-	@keyframes bounce {
+	@keyframes float {
 		0%,
 		100% {
 			transform: translateY(0);
@@ -670,84 +466,7 @@
 		}
 	}
 
-	/* Pulse glow effect */
-	.pulse-glow {
-		animation: pulseGlow 2s ease-in-out infinite;
-	}
-
-	@keyframes pulseGlow {
-		0%,
-		100% {
-			box-shadow: 0 0 0 0 oklch(0.65 0.18 25 / 0.4);
-		}
-		50% {
-			box-shadow: 0 0 0 8px oklch(0.65 0.18 25 / 0);
-		}
-	}
-
-	/* Stagger children animation */
-	.stagger-children > * {
-		animation: fadeIn 0.4s ease-out forwards;
-		opacity: 0;
-	}
-
-	.stagger-children > *:nth-child(1) {
-		animation-delay: 0.05s;
-	}
-	.stagger-children > *:nth-child(2) {
-		animation-delay: 0.1s;
-	}
-	.stagger-children > *:nth-child(3) {
-		animation-delay: 0.15s;
-	}
-	.stagger-children > *:nth-child(4) {
-		animation-delay: 0.2s;
-	}
-	.stagger-children > *:nth-child(5) {
-		animation-delay: 0.25s;
-	}
-	.stagger-children > *:nth-child(6) {
-		animation-delay: 0.3s;
-	}
-	.stagger-children > *:nth-child(7) {
-		animation-delay: 0.35s;
-	}
-	.stagger-children > *:nth-child(8) {
-		animation-delay: 0.4s;
-	}
-
-	/* Wiggle animation for fun interactions */
-	.wiggle:hover {
-		animation: wiggle 0.5s ease-in-out;
-	}
-
-	@keyframes wiggle {
-		0%,
-		100% {
-			transform: rotate(0deg);
-		}
-		25% {
-			transform: rotate(-3deg);
-		}
-		75% {
-			transform: rotate(3deg);
-		}
-	}
-
-	/* Gradient text */
-	.text-gradient-fun {
-		background: linear-gradient(135deg, oklch(0.65 0.18 25), oklch(0.6 0.18 290));
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-	}
-
-	/* ============================================
-	   🌟 GLASSMORPHISM DESIGN SYSTEM
-	   Modern frosted glass effects
-	   ============================================ */
-
-	/* Glass card - main glassmorphism effect */
+	/* 🌟 Glass card - glassmorphism effect */
 	.glass-card {
 		@apply relative rounded-2xl border border-white/20 overflow-hidden;
 		background: linear-gradient(
@@ -774,238 +493,5 @@
 			0 4px 24px oklch(0 0 0 / 0.25),
 			0 1px 2px oklch(0 0 0 / 0.15),
 			inset 0 1px 0 oklch(1 0 0 / 0.08);
-	}
-
-	/* Glass card with colored accent */
-	.glass-card-accent {
-		@apply relative rounded-2xl border border-white/20 overflow-hidden;
-		background: linear-gradient(
-			135deg,
-			oklch(0.995 0.005 90 / 0.85) 0%,
-			oklch(0.99 0.008 85 / 0.75) 100%
-		);
-		backdrop-filter: blur(20px) saturate(180%);
-		-webkit-backdrop-filter: blur(20px) saturate(180%);
-		box-shadow:
-			0 4px 24px oklch(0.3 0.02 260 / 0.08),
-			0 1px 2px oklch(0.3 0.02 260 / 0.04),
-			inset 0 1px 0 oklch(1 0 0 / 0.5);
-		position: relative;
-	}
-
-	.glass-card-accent::before {
-		content: "";
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: 3px;
-		background: var(
-			--accent-gradient,
-			linear-gradient(90deg, oklch(0.65 0.18 25), oklch(0.7 0.15 180))
-		);
-		border-radius: 1rem 1rem 0 0;
-	}
-
-	/* Glass surface - lighter variant */
-	.glass-surface {
-		@apply rounded-xl border border-white/15;
-		background: oklch(1 0 0 / 0.5);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-	}
-
-	.dark .glass-surface {
-		background: oklch(1 0 0 / 0.05);
-		border-color: oklch(1 0 0 / 0.08);
-	}
-
-	/* Glass input - for form fields */
-	.glass-input {
-		@apply rounded-xl border border-white/20 px-4 py-3 transition-all duration-200;
-		background: oklch(1 0 0 / 0.6);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-	}
-
-	.glass-input:focus {
-		@apply ring-2 ring-primary/30 border-primary/50;
-		background: oklch(1 0 0 / 0.8);
-	}
-
-	.dark .glass-input {
-		background: oklch(1 0 0 / 0.06);
-		border-color: oklch(1 0 0 / 0.1);
-	}
-
-	.dark .glass-input:focus {
-		background: oklch(1 0 0 / 0.1);
-	}
-
-	/* Glass button */
-	.glass-button {
-		@apply relative rounded-xl px-4 py-2.5 font-medium transition-all duration-200;
-		background: linear-gradient(135deg, oklch(1 0 0 / 0.8) 0%, oklch(0.98 0.005 85 / 0.7) 100%);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border: 1px solid oklch(1 0 0 / 0.3);
-		box-shadow:
-			0 2px 8px oklch(0.3 0.02 260 / 0.06),
-			inset 0 1px 0 oklch(1 0 0 / 0.5);
-	}
-
-	.glass-button:hover {
-		background: linear-gradient(135deg, oklch(1 0 0 / 0.95) 0%, oklch(0.99 0.005 85 / 0.85) 100%);
-		box-shadow:
-			0 4px 12px oklch(0.3 0.02 260 / 0.1),
-			inset 0 1px 0 oklch(1 0 0 / 0.6);
-		transform: translateY(-1px);
-	}
-
-	.dark .glass-button {
-		background: linear-gradient(
-			135deg,
-			oklch(0.3 0.015 260 / 0.6) 0%,
-			oklch(0.25 0.02 260 / 0.5) 100%
-		);
-		border-color: oklch(1 0 0 / 0.1);
-		box-shadow:
-			0 2px 8px oklch(0 0 0 / 0.2),
-			inset 0 1px 0 oklch(1 0 0 / 0.1);
-	}
-
-	.dark .glass-button:hover {
-		background: linear-gradient(
-			135deg,
-			oklch(0.35 0.015 260 / 0.7) 0%,
-			oklch(0.3 0.02 260 / 0.6) 100%
-		);
-	}
-
-	/* Glass list item */
-	.glass-list-item {
-		@apply rounded-xl px-4 py-3 transition-all duration-200;
-		background: transparent;
-	}
-
-	.glass-list-item:hover {
-		background: oklch(0.65 0.18 25 / 0.06);
-	}
-
-	.dark .glass-list-item:hover {
-		background: oklch(1 0 0 / 0.05);
-	}
-
-	/* Shimmer effect for loading or accent */
-	.shimmer-effect {
-		position: relative;
-		overflow: hidden;
-	}
-
-	.shimmer-effect::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		left: -100%;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(90deg, transparent 0%, oklch(1 0 0 / 0.2) 50%, transparent 100%);
-		animation: shimmerMove 2s ease-in-out infinite;
-	}
-
-	@keyframes shimmerMove {
-		0% {
-			left: -100%;
-		}
-		100% {
-			left: 100%;
-		}
-	}
-
-	/* Glow effect for important elements */
-	.glow-primary {
-		box-shadow:
-			0 0 20px oklch(0.65 0.18 25 / 0.2),
-			0 0 40px oklch(0.65 0.18 25 / 0.1);
-	}
-
-	.dark .glow-primary {
-		box-shadow:
-			0 0 20px oklch(0.7 0.19 25 / 0.25),
-			0 0 40px oklch(0.7 0.19 25 / 0.15);
-	}
-
-	/* Gradient border effect */
-	.gradient-border {
-		position: relative;
-	}
-
-	.gradient-border::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		border-radius: inherit;
-		padding: 1px;
-		background: linear-gradient(
-			135deg,
-			oklch(0.65 0.18 25 / 0.5),
-			oklch(0.7 0.15 180 / 0.5),
-			oklch(0.6 0.18 290 / 0.5)
-		);
-		-webkit-mask:
-			linear-gradient(#fff 0 0) content-box,
-			linear-gradient(#fff 0 0);
-		mask:
-			linear-gradient(#fff 0 0) content-box,
-			linear-gradient(#fff 0 0);
-		-webkit-mask-composite: xor;
-		mask-composite: exclude;
-		pointer-events: none;
-	}
-
-	/* Floating animation */
-	.float {
-		animation: float 3s ease-in-out infinite;
-	}
-
-	@keyframes float {
-		0%,
-		100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(-4px);
-		}
-	}
-
-	/* Scale on hover */
-	.hover-scale {
-		transition: transform 0.2s ease-out;
-	}
-
-	.hover-scale:hover {
-		transform: scale(1.02);
-	}
-
-	/* Shine effect on hover */
-	.hover-shine {
-		position: relative;
-		overflow: hidden;
-	}
-
-	.hover-shine::before {
-		content: "";
-		position: absolute;
-		top: 0;
-		left: -75%;
-		width: 50%;
-		height: 100%;
-		background: linear-gradient(90deg, transparent 0%, oklch(1 0 0 / 0.15) 50%, transparent 100%);
-		transform: skewX(-25deg);
-		transition: left 0.5s ease-out;
-	}
-
-	.hover-shine:hover::before {
-		left: 125%;
 	}
 }

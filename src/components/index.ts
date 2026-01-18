@@ -404,7 +404,7 @@ export { AccountEditSheet } from './accounts/AccountEditSheet';
 export { AccountSettingsSheet } from './accounts/AccountSettingsSheet';
 export { FloatingToast } from './accounts/FloatingToast';
 export { ImportStatusIcon } from './accounts/ImportStatusIcon';
-export { ImportRow } from './accounts/ImportRow';
+export { AccountImportRow } from './accounts/AccountImportRow';
 export { MemberChip } from './accounts/MemberChip';
 export { AddMemberDropdown } from './accounts/AddMemberDropdown';
 export { TransactionRow } from './accounts/TransactionRow';

@@ -10,21 +10,21 @@ import {
 	Plus,
 } from '@/components'
 
-interface Bank {
+interface BaseBank {
 	id: string
 	name: string
 	color: string
 }
 
-interface AddBankDropdownProps {
-	banks: Bank[]
-	onSelectBank: (bank: Bank) => void
+interface AddBankDropdownProps<T extends BaseBank> {
+	banks: T[]
+	onSelectBank: (bank: T) => void
 }
 
 /**
  * Dropdown for selecting a bank to add an account
  */
-export function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
+export function AddBankDropdown<T extends BaseBank>({ banks, onSelectBank }: AddBankDropdownProps<T>) {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>

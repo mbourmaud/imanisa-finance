@@ -6,7 +6,7 @@ import { ImportStatusIcon } from './ImportStatusIcon'
 
 type ImportStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
 
-interface ImportRowProps {
+interface AccountImportRowProps {
 	id: string
 	filename: string
 	status: ImportStatus
@@ -21,9 +21,9 @@ interface ImportRowProps {
 }
 
 /**
- * Row displaying an import with actions
+ * Row displaying an import with actions (for account settings sheet)
  */
-export function ImportRow({
+export function AccountImportRow({
 	id,
 	filename,
 	status,
@@ -35,7 +35,7 @@ export function ImportRow({
 	isProcessing = false,
 	isReprocessing = false,
 	isDeleting = false,
-}: ImportRowProps) {
+}: AccountImportRowProps) {
 	const statusBgClass =
 		status === 'FAILED'
 			? 'bg-destructive/5 border-destructive/20'
