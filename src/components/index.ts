@@ -539,3 +539,19 @@ export { AccountRowLink } from './banks/AccountRowLink';
 export { AddBankDropdown } from './banks/AddBankDropdown';
 export { AddAccountDialog } from './banks/AddAccountDialog';
 export { MemberSelectorChips } from './banks/MemberSelectorChips';
+
+// =============================================================================
+// REAL ESTATE COMPONENTS
+// =============================================================================
+
+export { FormErrorBanner } from './real-estate/FormErrorBanner';
+export { LoanProgressCard } from './real-estate/LoanProgressCard';
+export { MemberShareRow } from './real-estate/MemberShareRow';
+export { PropertiesEmptyState } from './real-estate/PropertiesEmptyState';
+export { PropertyBadge } from './real-estate/PropertyBadge';
+export { PropertyCardSkeleton } from './real-estate/PropertyCardSkeleton';
+export { PropertyFormGrid } from './real-estate/PropertyFormGrid';
+export { PropertyInfoItem } from './real-estate/PropertyInfoItem';
+export { PropertyRentBox } from './real-estate/PropertyRentBox';
+export { PropertyValueBox } from './real-estate/PropertyValueBox';
+export { StatsCardSkeleton } from './real-estate/StatsCardSkeleton';
