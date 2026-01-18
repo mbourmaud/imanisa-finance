@@ -48,11 +48,13 @@ src/
 
 ### UI Architecture
 - **Zero className in pages** - Use shadcn + business components
+- **Zero style={{}} anywhere** - Use Tailwind classes or CSS variables
 - **One layout primitive: Flex** - No Box, Stack, Row, Grid
 - className allowed ONLY in `src/components/`
 - See `.claude/rules/ui-architecture.md` for details
 
 ### Forms (TanStack Form + Valibot)
+- **ALWAYS use TanStack Form** - No manual useState for forms
 - Always use `useAppForm` with Valibot schema
 - Always use `mutateAsync` (not `mutate`) in onSubmit
 - One hook per entity: `useAccountForm`, `useMemberForm`
@@ -62,6 +64,7 @@ src/
 - **TanStack Query** for server data (API responses, mutations)
 - **Zustand** for client-only state (UI, selection, preferences)
 - **NEVER use Zustand for server data** - Use Query instead
+- **Stores location**: `src/shared/stores/` for global UI state
 - See `.claude/rules/zustand.md` for patterns
 
 ### Error Handling

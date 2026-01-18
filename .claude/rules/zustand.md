@@ -126,11 +126,23 @@ export const useTransactionSelectionStore = create<SelectionState>((set, get) =>
 
 ```
 src/shared/stores/
+├── index.ts           # Barrel export for all shared stores
 ├── ui-store.ts        # Global UI state (sidebar, command palette)
 └── entity-store.ts    # User preferences (selected entity)
 
 src/features/[feature]/stores/
 └── selection-store.ts # Feature-specific selection state (optional)
+```
+
+### Barrel Export Pattern
+
+```typescript
+// src/shared/stores/index.ts
+export { useUIStore } from './ui-store'
+export { useEntityStore } from './entity-store'
+
+// Usage in components
+import { useUIStore, useEntityStore } from '@/shared/stores'
 ```
 
 ## Best Practices

@@ -1,6 +1,8 @@
 # UI Architecture - shadcn/ui + Tailwind
 
-## FUNDAMENTAL RULE - Zero className in Pages
+## FUNDAMENTAL RULES
+
+### Rule 1: Zero className in Pages
 
 **Pages in `src/app/` must NEVER use `className=`.**
 
@@ -19,6 +21,37 @@ Styling goes through **shadcn components and business components**, not inline T
   </CardContent>
 </Card>
 ```
+
+### Rule 2: Zero style={{}} Anywhere
+
+**NEVER use inline style={{}} in any file.** This includes pages AND components.
+
+```tsx
+// ❌ FORBIDDEN - inline styles
+<div style={{ backgroundColor: color }}>...</div>
+<span style={{ width: `${percent}%` }}>...</span>
+<Progress style={{ '--progress-value': value } as CSSProperties} />
+
+// ✅ CORRECT - Use Tailwind classes
+<div className="bg-primary">...</div>
+
+// ✅ CORRECT - Use CSS custom properties via className
+<div className="w-full" style={{ '--color': color } as CSSProperties}>
+  <span className="bg-[var(--color)]">...</span>
+</div>
+
+// ✅ CORRECT - For dynamic values, use CSS variables in component
+// In component: set CSS variable
+// In Tailwind: use arbitrary value [var(--my-var)]
+```
+
+**Why no inline styles?**
+- Breaks Tailwind's utility-first approach
+- Makes styles harder to maintain and override
+- No responsive/hover/dark mode support
+- Inconsistent with the rest of the codebase
+
+**Exception:** CSS custom properties (variables) can be set via style when the value is truly dynamic (e.g., user-defined colors). But the actual styling should still use Tailwind's arbitrary value syntax: `bg-[var(--color)]`.
 
 ## Layer System
 
@@ -73,9 +106,10 @@ import { Flex, FlexItem } from '@/components';
 ## Strict Rules
 
 1. **No className in pages** - Create business components that encapsulate styling
-2. **No custom layout primitives** - Only `Flex` and `FlexItem` are allowed
-3. **className allowed in `src/components/`** - That's where Tailwind belongs
-4. **Extend shadcn, don't replace** - Add variants with cva, don't rebuild
+2. **No style={{}} anywhere** - Use Tailwind classes or CSS variables
+3. **No custom layout primitives** - Only `Flex` and `FlexItem` are allowed
+4. **className allowed in `src/components/`** - That's where Tailwind belongs
+5. **Extend shadcn, don't replace** - Add variants with cva, don't rebuild
 
 ## Available shadcn Components
 
@@ -104,3 +138,4 @@ npx shadcn@latest add <component>
 - Native `alert()`, `confirm()`, `prompt()` - use shadcn's `AlertDialog`
 - Custom Stack, Row, Grid, Box components - use `Flex`
 - `className` in pages - create components
+- `style={{}}` anywhere - use Tailwind classes

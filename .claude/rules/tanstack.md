@@ -136,11 +136,41 @@ export function AccountFormSheet({ open, onOpenChange }: Props) {
 
 ### Form Rules - CRITICAL
 
-1. **ALWAYS use `mutateAsync`** in onSubmit (not `mutate`) for loading tracking
-2. **Mappers obligatoires** - API → Form and Form → API, never direct binding
-3. **One hook per entity** - `useAccountForm`, `useTransactionForm`
-4. **Valibot schema** - onChange validation by default
-5. **No local state** - Everything through TanStack Form (except isolated mini-inputs)
+1. **ALWAYS use TanStack Form** - No manual `useState` for form data
+2. **ALWAYS use `mutateAsync`** in onSubmit (not `mutate`) for loading tracking
+3. **Mappers obligatoires** - API → Form and Form → API, never direct binding
+4. **One hook per entity** - `useAccountForm`, `useTransactionForm`
+5. **Valibot schema** - onChange validation by default
+6. **No local state** - Everything through TanStack Form (except isolated mini-inputs)
+
+### NEVER Do This
+
+```typescript
+// ❌ FORBIDDEN - Manual form state with useState
+function MyForm() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [errors, setErrors] = useState({})
+
+  const handleSubmit = async () => {
+    // Manual validation...
+    // Manual submission...
+  }
+}
+
+// ✅ REQUIRED - TanStack Form with useAppForm
+function MyForm() {
+  const { form } = useMyEntityForm()
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }}>
+      <form.AppField name="name">
+        {(field) => <field.TextField label="Nom" />}
+      </form.AppField>
+    </form>
+  )
+}
+```
 
 ---
 
