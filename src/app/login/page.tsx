@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, GlassCard, Heading, Text, Wallet } from '@/components';
+import { Button, GlassCard, Wallet } from '@/components';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -74,11 +74,9 @@ export default function LoginPage() {
 					/>
 				</div>
 				<div className="flex flex-col items-center gap-2">
-					<Heading
-						level={1}
-						size="2xl"
+					<h1
+						className="text-2xl font-bold tracking-tight"
 						style={{
-							fontWeight: 700,
 							letterSpacing: '-0.025em',
 							backgroundImage:
 								'linear-gradient(to right, hsl(var(--foreground)), hsl(var(--foreground) / 0.7))',
@@ -87,10 +85,8 @@ export default function LoginPage() {
 						}}
 					>
 						Imanisa
-					</Heading>
-					<Text color="muted" size="lg">
-						Finance familiale
-					</Text>
+					</h1>
+					<p className="text-lg text-muted-foreground">Finance familiale</p>
 				</div>
 			</div>
 
@@ -98,9 +94,7 @@ export default function LoginPage() {
 			<div className="w-full max-w-sm">
 				<GlassCard padding="lg" variant="elevated">
 					<div className="flex flex-col gap-6">
-						<Heading level={2} size="lg" align="center">
-							Connexion
-						</Heading>
+						<h2 className="text-lg font-semibold tracking-tight text-center">Connexion</h2>
 
 						<Button
 							onClick={handleGoogleLogin}
@@ -142,18 +136,18 @@ export default function LoginPage() {
 							{isLoading ? 'Connexion...' : 'Continuer avec Google'}
 						</Button>
 
-						<Text color="muted" size="sm" align="center">
+						<p className="text-sm text-muted-foreground text-center">
 							Vos donnees restent privees et securisees
-						</Text>
+						</p>
 					</div>
 				</GlassCard>
 			</div>
 
 			{/* Footer */}
 			<div className="absolute bottom-6">
-				<Text size="sm" style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }}>
+				<p className="text-sm" style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }}>
 					100% prive - Self-hosted
-				</Text>
+				</p>
 			</div>
 		</div>
 	);

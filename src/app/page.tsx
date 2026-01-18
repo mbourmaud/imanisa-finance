@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button, ChevronRight, Heading, Text, User, Wallet } from '@/components';
+import { Button, ChevronRight, User, Wallet } from '@/components';
 import { useEntityStore } from '@/shared/stores/entity-store';
 
 export default function HomePage() {
@@ -63,11 +63,9 @@ export default function HomePage() {
 					/>
 				</div>
 				<div className="flex flex-col items-center gap-2">
-					<Heading
-						level={1}
-						size="2xl"
+					<h1
+						className="text-2xl font-bold tracking-tight"
 						style={{
-							fontWeight: 700,
 							letterSpacing: '-0.025em',
 							backgroundImage:
 								'linear-gradient(to right, hsl(var(--foreground)), hsl(var(--foreground) / 0.7))',
@@ -76,18 +74,16 @@ export default function HomePage() {
 						}}
 					>
 						Imanisa
-					</Heading>
-					<Text color="muted" size="lg">
-						Finance familiale
-					</Text>
+					</h1>
+					<p className="text-lg text-muted-foreground">Finance familiale</p>
 				</div>
 			</div>
 
 			{/* Profile selector */}
 			<div className="w-full max-w-sm">
-				<Text size="xl" weight="semibold" align="center" style={{ marginBottom: '1.5rem' }}>
+				<p className="text-xl font-semibold text-center" style={{ marginBottom: '1.5rem' }}>
 					Qui êtes-vous ?
-				</Text>
+				</p>
 
 				<div className="flex flex-col gap-4">
 					{individualEntities.map((entity, index) => (
@@ -120,12 +116,10 @@ export default function HomePage() {
 								<User style={{ height: '2rem', width: '2rem', color: 'hsl(var(--primary))' }} />
 							</div>
 							<div className="flex-1 text-left">
-								<Text size="lg" weight="semibold">
-									{entity.name}
-								</Text>
-								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+								<p className="text-lg font-semibold">{entity.name}</p>
+								<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									Accéder à mon espace
-								</Text>
+								</p>
 							</div>
 							<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
 								<ChevronRight
@@ -139,9 +133,9 @@ export default function HomePage() {
 
 			{/* Footer */}
 			<div className="absolute bottom-6">
-				<Text size="sm" style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }}>
+				<p className="text-sm" style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }}>
 					100% privé • Self-hosted
-				</Text>
+				</p>
 			</div>
 		</div>
 	);

@@ -2,16 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-	AlertTriangle,
-	ArrowLeft,
-	Button,
-	GlassCard,
-	Heading,
-	RefreshCw,
-	Text,
-	Wallet,
-} from '@/components';
+import { AlertTriangle, ArrowLeft, Button, GlassCard, RefreshCw, Wallet } from '@/components';
 
 export default function AuthCodeErrorPage() {
 	const router = useRouter();
@@ -67,15 +58,15 @@ export default function AuthCodeErrorPage() {
 							</div>
 
 							{/* Title */}
-							<Heading level={1} size="xl" align="center">
+							<h1 className="text-xl font-semibold tracking-tight text-center">
 								Erreur d'authentification
-							</Heading>
+							</h1>
 
 							{/* Description */}
-							<Text color="muted" align="center">
+							<p className="text-muted-foreground text-center">
 								Une erreur s'est produite lors de la connexion avec Google. Veuillez réessayer ou
 								contacter le support si le problème persiste.
-							</Text>
+							</p>
 
 							{/* Actions */}
 							<div className="flex flex-col gap-3 w-full">
@@ -102,9 +93,7 @@ export default function AuthCodeErrorPage() {
 
 				{/* Footer */}
 				<div className="absolute bottom-6">
-					<Text size="sm" color="muted">
-						Besoin d'aide ? Contactez le support
-					</Text>
+					<p className="text-sm text-muted-foreground">Besoin d'aide ? Contactez le support</p>
 				</div>
 			</div>
 		</div>

@@ -16,14 +16,12 @@ import {
 	CreditCard,
 	EmptyState,
 	GlassCard,
-	Heading,
 	Loader2,
 	PageHeader,
 	PiggyBank,
 	Plus,
 	StatCard,
 	StatCardGrid,
-	Text,
 	TrendingUp,
 	Wallet,
 } from '@/components';
@@ -233,12 +231,12 @@ export default function AccountsPage() {
 									<Icon style={{ height: '1.25rem', width: '1.25rem' }} />
 								</div>
 								<div className="flex flex-col">
-									<Heading level={3} size="lg" weight="semibold">
+									<h3 className="text-lg font-semibold tracking-tight">
 										{group.label}
-									</Heading>
-									<Text size="sm" color="muted">
+									</h3>
+									<p className="text-sm text-muted-foreground">
 										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
-									</Text>
+									</p>
 								</div>
 							</div>
 
@@ -277,10 +275,10 @@ export default function AccountsPage() {
 												/>
 											</div>
 											<div className="flex flex-col">
-												<Text weight="medium">{account.name}</Text>
-												<Text size="xs" color="muted">
+												<p className="font-medium">{account.name}</p>
+												<p className="text-xs text-muted-foreground">
 													{account.bank?.name || 'Banque'}
-												</Text>
+												</p>
 											</div>
 										</div>
 										<div className="flex items-center gap-4">

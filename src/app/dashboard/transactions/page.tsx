@@ -16,7 +16,6 @@ import {
 	Download,
 	Filter,
 	GlassCard,
-	Heading,
 	Input,
 	PageHeader,
 	Search,
@@ -27,7 +26,6 @@ import {
 	SelectValue,
 	StatCard,
 	StatCardGrid,
-	Text,
 } from '@/components';
 import { MoneyDifference } from '@/components/common/MoneyDisplay';
 import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
@@ -250,12 +248,12 @@ export default function TransactionsPage() {
 					className="flex justify-between items-center p-4"
 					style={{ borderBottom: '1px solid hsl(var(--border))' }}
 				>
-					<Heading level={3} size="md">
+					<h3 className="text-base font-semibold tracking-tight">
 						Toutes les transactions
-					</Heading>
-					<Text size="sm" color="muted">
+					</h3>
+					<p className="text-sm text-muted-foreground">
 						{transactions.length} opérations
-					</Text>
+					</p>
 				</div>
 
 				{/* List */}
