@@ -7,23 +7,19 @@ import {
 	Coffee,
 	CreditCard,
 	Film,
+	Flex,
 	GlassCard,
-	Grid,
 	Heart,
-	Heading,
 	Home,
 	PageHeader,
 	PieChart,
 	Plus,
 	Progress,
-	Row,
 	Settings,
 	ShoppingBag,
 	ShoppingCart,
-	Stack,
 	StatCard,
 	StatCardGrid,
-	Text,
 	Utensils,
 	Zap,
 } from '@/components';
@@ -126,13 +122,13 @@ function formatCurrency(amount: number): string {
 
 export default function BudgetPage() {
 	return (
-		<Stack gap="xl">
+		<Flex direction="col" gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Budget"
 				description="Suivez vos dépenses par catégorie"
 				actions={
-					<Row gap="sm">
+					<Flex direction="row" gap="sm">
 						<Button
 							variant="outline"
 							iconLeft={<Settings style={{ height: '1rem', width: '1rem' }} />}
@@ -142,7 +138,7 @@ export default function BudgetPage() {
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 							Nouvelle catégorie
 						</Button>
-					</Row>
+					</Flex>
 				}
 			/>
 
@@ -167,20 +163,26 @@ export default function BudgetPage() {
 
 			{/* Global Progress */}
 			<GlassCard padding="lg">
-				<Row justify="between" align="center">
-					<Text weight="medium">Progression du mois</Text>
-					<Text size="sm" color="muted">
+				<Flex direction="row" justify="between" align="center">
+					<span className="font-medium">Progression du mois</span>
+					<span className="text-sm text-muted-foreground">
 						{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
-					</Text>
-				</Row>
+					</span>
+				</Flex>
 				<Progress value={(totalSpent / totalBudget) * 100} style={{ height: '0.75rem', marginTop: '0.5rem' }} />
-				<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
+				<span className="text-xs text-muted-foreground" style={{ display: 'block', marginTop: '0.5rem' }}>
 					Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
-				</Text>
+				</span>
 			</GlassCard>
 
 			{/* Categories Grid */}
-			<Grid cols={3} gap="md">
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+					gap: '1rem',
+				}}
+			>
 				{categories.map((category) => (
 					<BudgetCategoryCard
 						key={category.id}
@@ -192,25 +194,31 @@ export default function BudgetPage() {
 						formatCurrency={formatCurrency}
 					/>
 				))}
-			</Grid>
+			</div>
 
 			{/* Chart */}
 			<GlassCard padding="lg">
-				<Stack gap="md">
-					<Stack gap="xs">
-						<Heading level={3} size="md" weight="semibold">
+				<Flex direction="col" gap="md">
+					<Flex direction="col" gap="xs">
+						<h3 className="text-md font-semibold">
 							Répartition des dépenses
-						</Heading>
-						<Text size="sm" color="muted">
+						</h3>
+						<span className="text-sm text-muted-foreground">
 							Vue graphique par catégorie
-						</Text>
-					</Stack>
-					<Grid cols={2} gap="xl">
+						</span>
+					</Flex>
+					<div
+						style={{
+							display: 'grid',
+							gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+							gap: '1.5rem',
+						}}
+					>
 						<DonutChart data={chartData} height="lg" />
 						<ChartLegend items={chartData} total={totalSpent} />
-					</Grid>
-				</Stack>
+					</div>
+				</Flex>
 			</GlassCard>
-		</Stack>
+		</Flex>
 	);
 }
