@@ -21,6 +21,7 @@ interface RawImport {
 	processedAt: string | null;
 	createdAt: string;
 	accountId: string | null;
+	account?: { id: string; name: string } | null;
 }
 
 interface ImportFilters {

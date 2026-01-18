@@ -1,6 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useStore } from '@tanstack/react-store';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import {
 	AlertCircle,
 	Button,
@@ -14,46 +17,35 @@ import {
 	PageHeader,
 	RefreshCw,
 	RotateCcw,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 	StatCard,
 	StatCardGrid,
 	Trash2,
 	Upload,
 } from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-
-interface RawImport {
-	id: string;
-	bankKey: string;
-	filename: string;
-	fileSize: number;
-	mimeType: string;
-	status: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
-	errorMessage: string | null;
-	recordsCount: number | null;
-	account: { id: string; name: string } | null;
-	processedAt: string | null;
-	createdAt: string;
-}
+import {
+	importFormSchema,
+	type RawImport,
+	useDeleteImportMutation,
+	useImportsQuery,
+	useProcessImportMutation,
+	useReprocessImportMutation,
+	useUploadImportMutation,
+} from '@/features/imports';
+import { SelectField, useAppForm } from '@/lib/forms';
 
 interface Bank {
 	id: string;
 	name: string;
 	template: string | null;
 	accountCount: number;
-}
-
-interface Account {
-	id: string;
-	name: string;
-	bankId: string;
-	bankName: string;
-	type: string;
-	balance: number;
+	accounts: {
+		id: string;
+		name: string;
+		bankId: string;
+		type: string;
+		balance: number;
+	}[];
 }
 
 function getStatusIcon(status: RawImport['status']) {
@@ -113,102 +105,90 @@ function formatDate(dateStr: string): string {
 }
 
 export default function ImportPage() {
-	const [imports, setImports] = useState<RawImport[]>([]);
-	const [banks, setBanks] = useState<Bank[]>([]);
-	const [accounts, setAccounts] = useState<Account[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
-	const [isUploading, setIsUploading] = useState(false);
-	const [selectedBankId, setSelectedBankId] = useState<string>('');
-	const [selectedAccountId, setSelectedAccountId] = useState<string>('');
+	// UI state only
 	const [dragActive, setDragActive] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 	const [deleteImportId, setDeleteImportId] = useState<string | null>(null);
 
-	// Get accounts filtered by selected bank
-	const filteredAccounts = selectedBankId
-		? accounts.filter((acc) => acc.bankId === selectedBankId)
-		: [];
+	// TanStack Query for data
+	const {
+		data: imports = [],
+		isLoading: isLoadingImports,
+		refetch: refetchImports,
+	} = useImportsQuery();
+
+	const { data: banksData, isLoading: isLoadingBanks } = useQuery<{ banks: Bank[] }>({
+		queryKey: ['banks'],
+		queryFn: async () => {
+			const response = await fetch('/api/banks');
+			if (!response.ok) throw new Error('Failed to fetch banks');
+			return response.json();
+		},
+	});
+
+	const banks = banksData?.banks ?? [];
+
+	// TanStack Form for bank/account selection
+	const form = useAppForm({
+		defaultValues: {
+			bankId: '',
+			accountId: '',
+		},
+		validators: {
+			onChange: importFormSchema,
+		},
+	});
+
+	// Watch form values for filtering accounts
+	const selectedBankId = useStore(form.store, (state) => state.values.bankId);
+	const selectedAccountId = useStore(form.store, (state) => state.values.accountId);
+
+	// Reset account when bank changes
+	const filteredAccounts = useMemo(() => {
+		if (!selectedBankId) return [];
+		const bank = banks.find((b) => b.id === selectedBankId);
+		return bank?.accounts ?? [];
+	}, [selectedBankId, banks]);
 
 	// Get selected bank info
 	const selectedBank = banks.find((b) => b.id === selectedBankId);
 
-	// Fetch data
-	const fetchData = useCallback(async () => {
-		try {
-			const [importsRes, banksRes, accountsRes] = await Promise.all([
-				fetch('/api/imports'),
-				fetch('/api/banks'),
-				fetch('/api/accounts'),
-			]);
+	// Mutations
+	const uploadMutation = useUploadImportMutation();
+	const processMutation = useProcessImportMutation();
+	const reprocessMutation = useReprocessImportMutation();
+	const deleteMutation = useDeleteImportMutation();
 
-			if (importsRes.ok) {
-				const data = await importsRes.json();
-				setImports(data.items || []);
-			}
-
-			if (banksRes.ok) {
-				const data = await banksRes.json();
-				setBanks(data.banks || []);
-			}
-
-			if (accountsRes.ok) {
-				const data = await accountsRes.json();
-				setAccounts(data || []);
-			}
-		} catch (err) {
-			console.error('Failed to fetch data:', err);
-		} finally {
-			setIsLoading(false);
-		}
-	}, []);
-
-	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
-
-	// Reset account selection when bank changes
-	useEffect(() => {
-		setSelectedAccountId('');
-	}, []);
+	const isUploading = uploadMutation.isPending;
+	const isLoading = isLoadingImports || isLoadingBanks;
 
 	// Handle file upload
 	const handleUpload = async (file: File) => {
-		if (!selectedBankId) {
-			setError('Veuillez sélectionner une banque');
+		// Validate form first
+		const bankId = form.getFieldValue('bankId');
+		const accountId = form.getFieldValue('accountId');
+
+		if (!bankId) {
+			toast.error('Veuillez sélectionner une banque');
 			return;
 		}
 
-		if (!selectedAccountId) {
-			setError('Veuillez sélectionner un compte');
+		if (!accountId) {
+			toast.error('Veuillez sélectionner un compte');
 			return;
 		}
 
-		setIsUploading(true);
-		setError(null);
+		// Use bank template as bankKey, or bank name if no template
+		const bankKey = selectedBank?.template || selectedBank?.name || 'other';
 
 		try {
-			const formData = new FormData();
-			formData.append('file', file);
-			// Use bank template as bankKey, or bank name if no template
-			formData.append('bankKey', selectedBank?.template || selectedBank?.name || 'other');
-			formData.append('accountId', selectedAccountId);
-
-			const response = await fetch('/api/imports/upload', {
-				method: 'POST',
-				body: formData,
+			await uploadMutation.mutateAsync({
+				file,
+				bankKey,
+				accountId,
 			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Upload failed');
-			}
-
-			// Refresh imports list
-			await fetchData();
+			toast.success('Fichier importé avec succès');
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Upload failed');
-		} finally {
-			setIsUploading(false);
+			toast.error(err instanceof Error ? err.message : "Échec de l'upload");
 		}
 	};
 
@@ -246,41 +226,23 @@ export default function ImportPage() {
 
 	// Process import
 	const handleProcess = async (importId: string, accountId?: string) => {
+		if (!accountId) return;
 		try {
-			const response = await fetch(`/api/imports/${importId}/process`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ accountId }),
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Processing failed');
-			}
-
-			await fetchData();
+			await processMutation.mutateAsync({ importId, accountId });
+			toast.success('Import traité avec succès');
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Processing failed');
+			toast.error(err instanceof Error ? err.message : 'Échec du traitement');
 		}
 	};
 
 	// Reprocess import
 	const handleReprocess = async (importId: string, accountId?: string) => {
+		if (!accountId) return;
 		try {
-			const response = await fetch(`/api/imports/${importId}/reprocess`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ accountId }),
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Reprocessing failed');
-			}
-
-			await fetchData();
+			await reprocessMutation.mutateAsync({ importId, accountId });
+			toast.success('Import retraité avec succès');
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Reprocessing failed');
+			toast.error(err instanceof Error ? err.message : 'Échec du retraitement');
 		}
 	};
 
@@ -289,18 +251,10 @@ export default function ImportPage() {
 		if (!deleteImportId) return;
 
 		try {
-			const response = await fetch(`/api/imports/${deleteImportId}`, {
-				method: 'DELETE',
-			});
-
-			if (!response.ok) {
-				const data = await response.json();
-				throw new Error(data.error || 'Delete failed');
-			}
-
-			await fetchData();
+			await deleteMutation.mutateAsync({ importId: deleteImportId });
+			toast.success('Import supprimé');
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Delete failed');
+			toast.error(err instanceof Error ? err.message : 'Échec de la suppression');
 		} finally {
 			setDeleteImportId(null);
 		}
@@ -325,6 +279,17 @@ export default function ImportPage() {
 
 	const canUpload = selectedBankId && selectedAccountId && !isUploading;
 
+	// Build options for selects
+	const bankOptions = banks.map((bank) => ({
+		value: bank.id,
+		label: bank.template ? `${bank.name} (${bank.template})` : bank.name,
+	}));
+
+	const accountOptions = filteredAccounts.map((account) => ({
+		value: account.id,
+		label: `${account.name} (${account.type})`,
+	}));
+
 	return (
 		<div className="flex flex-col gap-8">
 			{/* Header */}
@@ -334,7 +299,7 @@ export default function ImportPage() {
 				actions={
 					<Button
 						variant="outline"
-						onClick={fetchData}
+						onClick={() => refetchImports()}
 						iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
 					>
 						Actualiser
@@ -342,8 +307,8 @@ export default function ImportPage() {
 				}
 			/>
 
-			{/* Error message */}
-			{error && (
+			{/* Error message from mutations */}
+			{uploadMutation.error && (
 				<div
 					className="rounded-lg border p-4"
 					style={{
@@ -353,11 +318,11 @@ export default function ImportPage() {
 				>
 					<div className="flex items-center gap-3" style={{ color: 'oklch(0.55 0.2 25)' }}>
 						<AlertCircle style={{ height: '1rem', width: '1rem' }} />
-						<span className="font-medium">{error}</span>
+						<span className="font-medium">{uploadMutation.error.message}</span>
 						<Button
 							variant="ghost"
 							size="sm"
-							onClick={() => setError(null)}
+							onClick={() => uploadMutation.reset()}
 							style={{ marginLeft: 'auto', height: '1.5rem', padding: '0 0.5rem' }}
 						>
 							Fermer
@@ -371,71 +336,47 @@ export default function ImportPage() {
 				{/* CSV Import */}
 				<GlassCard padding="lg">
 					<div className="flex flex-col gap-4">
-						{/* Bank selector */}
-						<div className="flex flex-col gap-2">
-							<Label htmlFor="import-bank-select">
-								1. Banque <span className="text-muted-foreground">*</span>
-							</Label>
-							<Select value={selectedBankId} onValueChange={setSelectedBankId}>
-								<SelectTrigger id="import-bank-select" style={{ width: '100%' }}>
-									<SelectValue placeholder="Sélectionner une banque..." />
-								</SelectTrigger>
-								<SelectContent>
-									{banks.map((bank) => (
-										<SelectItem key={bank.id} value={bank.id}>
-											{bank.name}
-											{bank.template && (
-												<span className="text-muted-foreground" style={{ marginLeft: '0.5rem' }}>
-													({bank.template})
-												</span>
-											)}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							{banks.length === 0 && !isLoading && (
-								<p className="text-xs text-muted-foreground">
-									Aucune banque configurée. Ajoutez d&apos;abord une banque dans les paramètres.
-								</p>
+						{/* Bank selector with TanStack Form */}
+						<form.AppField name="bankId">
+							{() => (
+								<SelectField
+									label="1. Banque *"
+									placeholder="Sélectionner une banque..."
+									options={bankOptions}
+									helpText={
+										banks.length === 0 && !isLoading
+											? "Aucune banque configurée. Ajoutez d'abord une banque dans les paramètres."
+											: undefined
+									}
+								/>
 							)}
-						</div>
+						</form.AppField>
 
-						{/* Account selector */}
-						<div className="flex flex-col gap-2">
-							<Label htmlFor="import-account-select">
-								2. Compte <span className="text-muted-foreground">*</span>
-							</Label>
-							<Select
-								value={selectedAccountId}
-								onValueChange={setSelectedAccountId}
-								disabled={!selectedBankId}
-							>
-								<SelectTrigger id="import-account-select" style={{ width: '100%' }}>
-									<SelectValue
-										placeholder={
-											selectedBankId
-												? 'Sélectionner un compte...'
-												: "Sélectionnez d'abord une banque"
-										}
-									/>
-								</SelectTrigger>
-								<SelectContent>
-									{filteredAccounts.map((account) => (
-										<SelectItem key={account.id} value={account.id}>
-											{account.name}
-											<span className="text-muted-foreground" style={{ marginLeft: '0.5rem' }}>
-												({account.type})
-											</span>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							{selectedBankId && filteredAccounts.length === 0 && (
-								<p className="text-xs text-muted-foreground">
-									Aucun compte pour cette banque. Ajoutez d&apos;abord un compte.
-								</p>
+						{/* Account selector with TanStack Form */}
+						<form.AppField
+							name="accountId"
+							listeners={{
+								onChange: () => {
+									// Reset accountId when bankId changes by clearing it if bank changed
+								},
+							}}
+						>
+							{() => (
+								<SelectField
+									label="2. Compte *"
+									placeholder={
+										selectedBankId ? 'Sélectionner un compte...' : "Sélectionnez d'abord une banque"
+									}
+									options={accountOptions}
+									disabled={!selectedBankId}
+									helpText={
+										selectedBankId && filteredAccounts.length === 0
+											? "Aucun compte pour cette banque. Ajoutez d'abord un compte."
+											: undefined
+									}
+								/>
 							)}
-						</div>
+						</form.AppField>
 
 						{/* Drop zone */}
 						<div className="flex flex-col gap-2">
@@ -613,134 +554,14 @@ export default function ImportPage() {
 							/>
 						) : (
 							imports.map((imp) => (
-								<div
+								<ImportRow
 									key={imp.id}
-									className="flex justify-between items-center p-4 rounded-xl transition-colors"
-									style={{
-										backgroundColor:
-											imp.status === 'FAILED'
-												? 'oklch(0.55 0.2 25 / 0.05)'
-												: 'hsl(0 0% 100% / 0.5)',
-										border: imp.status === 'FAILED' ? '1px solid oklch(0.55 0.2 25 / 0.2)' : 'none',
-									}}
-								>
-									<div className="flex items-center gap-4">
-										<div
-											className="flex rounded-lg"
-											style={{
-												height: '2.5rem',
-												width: '2.5rem',
-												alignItems: 'center',
-												justifyContent: 'center',
-												backgroundColor:
-													imp.status === 'FAILED'
-														? 'oklch(0.55 0.2 25 / 0.1)'
-														: 'hsl(var(--background))',
-											}}
-										>
-											<FileSpreadsheet
-												style={{
-													height: '1.25rem',
-													width: '1.25rem',
-													color:
-														imp.status === 'FAILED'
-															? 'oklch(0.55 0.2 25)'
-															: 'hsl(var(--muted-foreground))',
-												}}
-											/>
-										</div>
-										<div className="flex flex-col">
-											<div className="flex items-center gap-3">
-												<span className="font-medium">{imp.filename}</span>
-												<div
-													className="flex rounded-full px-2 py-1"
-													style={{
-														alignItems: 'center',
-														gap: '0.25rem',
-														fontSize: '0.75rem',
-														backgroundColor:
-															imp.status === 'PROCESSED'
-																? 'oklch(0.55 0.15 145 / 0.1)'
-																: imp.status === 'PROCESSING'
-																	? 'hsl(var(--primary) / 0.1)'
-																	: imp.status === 'FAILED'
-																		? 'oklch(0.55 0.2 25 / 0.1)'
-																		: 'hsl(var(--muted))',
-														color:
-															imp.status === 'PROCESSED'
-																? 'oklch(0.55 0.15 145)'
-																: imp.status === 'PROCESSING'
-																	? 'hsl(var(--primary))'
-																	: imp.status === 'FAILED'
-																		? 'oklch(0.55 0.2 25)'
-																		: 'hsl(var(--muted-foreground))',
-													}}
-												>
-													{getStatusIcon(imp.status)}
-													<span>{getStatusLabel(imp.status)}</span>
-												</div>
-											</div>
-											<p className="text-xs text-muted-foreground">
-												{getBankNameForImport(imp.bankKey)}
-												{imp.account && ` → ${imp.account.name}`} · {formatFileSize(imp.fileSize)} ·{' '}
-												{formatDate(imp.createdAt)}
-												{imp.recordsCount !== null && (
-													<span style={{ color: 'oklch(0.55 0.15 145)' }}>
-														{' '}
-														· {imp.recordsCount} transactions
-													</span>
-												)}
-												{imp.errorMessage && (
-													<span style={{ color: 'oklch(0.55 0.2 25)' }}> · {imp.errorMessage}</span>
-												)}
-											</p>
-										</div>
-									</div>
-									<div className="flex items-center gap-3">
-										{imp.status === 'PENDING' && (
-											<Button
-												variant="outline"
-												size="sm"
-												onClick={() => handleProcess(imp.id, imp.account?.id)}
-												iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
-											>
-												Traiter
-											</Button>
-										)}
-										{imp.status === 'PROCESSED' && (
-											<Button
-												variant="ghost"
-												size="sm"
-												onClick={() => handleReprocess(imp.id, imp.account?.id)}
-												iconLeft={<RotateCcw style={{ height: '1rem', width: '1rem' }} />}
-											>
-												Retraiter
-											</Button>
-										)}
-										{imp.status === 'FAILED' && (
-											<Button
-												variant="ghost"
-												size="sm"
-												onClick={() => handleProcess(imp.id, imp.account?.id)}
-												iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
-											>
-												Réessayer
-											</Button>
-										)}
-										<Button
-											variant="ghost"
-											size="icon"
-											onClick={() => setDeleteImportId(imp.id)}
-											style={{
-												height: '2rem',
-												width: '2rem',
-												color: 'hsl(var(--muted-foreground))',
-											}}
-										>
-											<Trash2 style={{ height: '1rem', width: '1rem' }} />
-										</Button>
-									</div>
-								</div>
+									imp={imp}
+									getBankNameForImport={getBankNameForImport}
+									onProcess={handleProcess}
+									onReprocess={handleReprocess}
+									onDelete={() => setDeleteImportId(imp.id)}
+								/>
 							))
 						)}
 					</div>
@@ -756,6 +577,147 @@ export default function ImportPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteImport}
 			/>
+		</div>
+	);
+}
+
+// Separate component for import row to keep code clean
+interface ImportRowProps {
+	imp: RawImport;
+	getBankNameForImport: (bankKey: string) => string;
+	onProcess: (importId: string, accountId?: string) => void;
+	onReprocess: (importId: string, accountId?: string) => void;
+	onDelete: () => void;
+}
+
+function ImportRow({
+	imp,
+	getBankNameForImport,
+	onProcess,
+	onReprocess,
+	onDelete,
+}: ImportRowProps) {
+	return (
+		<div
+			className="flex justify-between items-center p-4 rounded-xl transition-colors"
+			style={{
+				backgroundColor:
+					imp.status === 'FAILED' ? 'oklch(0.55 0.2 25 / 0.05)' : 'hsl(0 0% 100% / 0.5)',
+				border: imp.status === 'FAILED' ? '1px solid oklch(0.55 0.2 25 / 0.2)' : 'none',
+			}}
+		>
+			<div className="flex items-center gap-4">
+				<div
+					className="flex rounded-lg"
+					style={{
+						height: '2.5rem',
+						width: '2.5rem',
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor:
+							imp.status === 'FAILED' ? 'oklch(0.55 0.2 25 / 0.1)' : 'hsl(var(--background))',
+					}}
+				>
+					<FileSpreadsheet
+						style={{
+							height: '1.25rem',
+							width: '1.25rem',
+							color:
+								imp.status === 'FAILED' ? 'oklch(0.55 0.2 25)' : 'hsl(var(--muted-foreground))',
+						}}
+					/>
+				</div>
+				<div className="flex flex-col">
+					<div className="flex items-center gap-3">
+						<span className="font-medium">{imp.filename}</span>
+						<div
+							className="flex rounded-full px-2 py-1"
+							style={{
+								alignItems: 'center',
+								gap: '0.25rem',
+								fontSize: '0.75rem',
+								backgroundColor:
+									imp.status === 'PROCESSED'
+										? 'oklch(0.55 0.15 145 / 0.1)'
+										: imp.status === 'PROCESSING'
+											? 'hsl(var(--primary) / 0.1)'
+											: imp.status === 'FAILED'
+												? 'oklch(0.55 0.2 25 / 0.1)'
+												: 'hsl(var(--muted))',
+								color:
+									imp.status === 'PROCESSED'
+										? 'oklch(0.55 0.15 145)'
+										: imp.status === 'PROCESSING'
+											? 'hsl(var(--primary))'
+											: imp.status === 'FAILED'
+												? 'oklch(0.55 0.2 25)'
+												: 'hsl(var(--muted-foreground))',
+							}}
+						>
+							{getStatusIcon(imp.status)}
+							<span>{getStatusLabel(imp.status)}</span>
+						</div>
+					</div>
+					<p className="text-xs text-muted-foreground">
+						{getBankNameForImport(imp.bankKey)}
+						{imp.account && ` → ${imp.account.name}`} · {formatFileSize(imp.fileSize)} ·{' '}
+						{formatDate(imp.createdAt)}
+						{imp.recordsCount !== null && (
+							<span style={{ color: 'oklch(0.55 0.15 145)' }}>
+								{' '}
+								· {imp.recordsCount} transactions
+							</span>
+						)}
+						{imp.errorMessage && (
+							<span style={{ color: 'oklch(0.55 0.2 25)' }}> · {imp.errorMessage}</span>
+						)}
+					</p>
+				</div>
+			</div>
+			<div className="flex items-center gap-3">
+				{imp.status === 'PENDING' && (
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => onProcess(imp.id, imp.account?.id)}
+						iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
+					>
+						Traiter
+					</Button>
+				)}
+				{imp.status === 'PROCESSED' && (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => onReprocess(imp.id, imp.account?.id)}
+						iconLeft={<RotateCcw style={{ height: '1rem', width: '1rem' }} />}
+					>
+						Retraiter
+					</Button>
+				)}
+				{imp.status === 'FAILED' && (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => onProcess(imp.id, imp.account?.id)}
+						iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
+					>
+						Réessayer
+					</Button>
+				)}
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={onDelete}
+					style={{
+						height: '2rem',
+						width: '2rem',
+						color: 'hsl(var(--muted-foreground))',
+					}}
+				>
+					<Trash2 style={{ height: '1rem', width: '1rem' }} />
+				</Button>
+			</div>
 		</div>
 	);
 }

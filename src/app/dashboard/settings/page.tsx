@@ -47,6 +47,7 @@ import {
 } from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { MemberAvatar } from '@/components/members/MemberAvatar';
+import { ProfileForm } from '@/features/profile';
 
 interface Member {
 	id: string;
@@ -228,16 +229,7 @@ export default function SettingsPage() {
 									<p className="text-sm text-muted-foreground">Vos informations personnelles</p>
 								</div>
 							</div>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="name">Nom</Label>
-									<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="email">Email</Label>
-									<Input id="email" type="email" placeholder="votre@email.com" />
-								</div>
-							</div>
+							<ProfileForm />
 							<div className="flex flex-col gap-2">
 								<Label htmlFor="currency">Devise par défaut</Label>
 								<Select defaultValue="eur">
