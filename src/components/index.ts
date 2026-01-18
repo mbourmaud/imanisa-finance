@@ -422,3 +422,12 @@ export { ListHeader } from './common/ListHeader';
 
 export type { TransactionListItemProps } from './transactions/TransactionListItem';
 export { TransactionListItem } from './transactions/TransactionListItem';
+export type { GridProps, GridCols, GridGap } from './common/Grid';
+export { Grid } from './common/Grid';
+
+// =============================================================================
+// BUDGET COMPONENTS
+// =============================================================================
+
+export type { BudgetCategoryCardProps } from './budget/BudgetCategoryCard';
+export { BudgetCategoryCard } from './budget/BudgetCategoryCard';
