@@ -16,7 +16,6 @@ import {
 	Heading,
 	Heart,
 	Home,
-	HStack,
 	MoreHorizontal,
 	PageHeader,
 	PieChart,
@@ -29,7 +28,6 @@ import {
 	StatCardGrid,
 	Text,
 	Utensils,
-	VStack,
 	Zap,
 } from '@/components';
 import { ChartLegend, DonutChart } from '@/components/charts';
@@ -131,13 +129,13 @@ function formatCurrency(amount: number): string {
 
 export default function BudgetPage() {
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader
 				title="Budget"
 				description="Suivez vos dépenses par catégorie"
 				actions={
-					<HStack gap="sm">
+					<div className="flex gap-3">
 						<Button
 							variant="outline"
 							iconLeft={<Settings style={{ height: '1rem', width: '1rem' }} />}
@@ -147,7 +145,7 @@ export default function BudgetPage() {
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 							Nouvelle catégorie
 						</Button>
-					</HStack>
+					</div>
 				}
 			/>
 
@@ -172,12 +170,12 @@ export default function BudgetPage() {
 
 			{/* Global Progress */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center" style={{ marginBottom: '0.5rem' }}>
+				<div className="flex justify-between items-center mb-2">
 					<Text weight="medium">Progression du mois</Text>
 					<Text size="sm" color="muted">
 						{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
 					</Text>
-				</HStack>
+				</div>
 				<Progress value={(totalSpent / totalBudget) * 100} style={{ height: '0.75rem' }} />
 				<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
 					Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
@@ -193,9 +191,9 @@ export default function BudgetPage() {
 
 					return (
 						<GlassCard key={category.id} padding="md">
-							<VStack gap="sm">
-								<HStack justify="between" align="start">
-									<HStack gap="sm" align="center">
+							<div className="flex flex-col gap-3">
+								<div className="flex justify-between items-start">
+									<div className="flex items-center gap-3">
 										<div
 											className="flex h-10 w-10 items-center justify-center rounded-xl"
 											style={{
@@ -205,15 +203,15 @@ export default function BudgetPage() {
 										>
 											<category.icon style={{ height: '1.25rem', width: '1.25rem' }} />
 										</div>
-										<VStack gap="none">
+										<div className="flex flex-col">
 											<Text size="md" weight="medium">
 												{category.name}
 											</Text>
 											<Text size="xs" color="muted">
 												{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
 											</Text>
-										</VStack>
-									</HStack>
+										</div>
+									</div>
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button variant="ghost" size="icon" style={{ height: '2rem', width: '2rem' }}>
@@ -229,8 +227,8 @@ export default function BudgetPage() {
 											</DropdownMenuItem>
 										</DropdownMenuContent>
 									</DropdownMenu>
-								</HStack>
-								<VStack gap="xs">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Progress
 										value={Math.min(percentage, 100)}
 										style={{
@@ -241,7 +239,7 @@ export default function BudgetPage() {
 												} as React.CSSProperties)),
 										}}
 									/>
-									<HStack justify="between">
+									<div className="flex justify-between">
 										<Text
 											size="xs"
 											weight={isOverBudget ? 'medium' : 'normal'}
@@ -255,9 +253,9 @@ export default function BudgetPage() {
 										<Text size="xs" color="muted">
 											{Math.round(percentage)}%
 										</Text>
-									</HStack>
-								</VStack>
-							</VStack>
+									</div>
+								</div>
+							</div>
 						</GlassCard>
 					);
 				})}
@@ -265,21 +263,21 @@ export default function BudgetPage() {
 
 			{/* Chart */}
 			<GlassCard padding="lg">
-				<VStack gap="md">
-					<VStack gap="xs">
+				<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-2">
 						<Heading level={3} size="md">
 							Répartition des dépenses
 						</Heading>
 						<Text size="sm" color="muted">
 							Vue graphique par catégorie
 						</Text>
-					</VStack>
+					</div>
 					<Grid cols={2} gap="xl" style={{ alignItems: 'center' }}>
 						<DonutChart data={chartData} height="lg" />
 						<ChartLegend items={chartData} total={totalSpent} />
 					</Grid>
-				</VStack>
+				</div>
 			</GlassCard>
-		</VStack>
+		</div>
 	);
 }

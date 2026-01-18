@@ -11,7 +11,6 @@ import {
 	GlassCard,
 	Grid,
 	Heading,
-	HStack,
 	Label,
 	Loader2,
 	PageHeader,
@@ -27,7 +26,6 @@ import {
 	Text,
 	Trash2,
 	Upload,
-	VStack,
 } from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
@@ -331,7 +329,7 @@ export default function ImportPage() {
 	const canUpload = selectedBankId && selectedAccountId && !isUploading;
 
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader
 				title="Import"
@@ -356,7 +354,7 @@ export default function ImportPage() {
 						backgroundColor: 'oklch(0.55 0.2 25 / 0.05)',
 					}}
 				>
-					<HStack gap="sm" align="center" style={{ color: 'oklch(0.55 0.2 25)' }}>
+					<div className="flex items-center gap-3" style={{ color: 'oklch(0.55 0.2 25)' }}>
 						<AlertCircle style={{ height: '1rem', width: '1rem' }} />
 						<Text weight="medium">{error}</Text>
 						<Button
@@ -367,7 +365,7 @@ export default function ImportPage() {
 						>
 							Fermer
 						</Button>
-					</HStack>
+					</div>
 				</div>
 			)}
 
@@ -375,9 +373,9 @@ export default function ImportPage() {
 			<Grid cols={2} gap="lg">
 				{/* CSV Import */}
 				<GlassCard padding="lg">
-					<VStack gap="md">
+					<div className="flex flex-col gap-4">
 						{/* Bank selector */}
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="import-bank-select">
 								1. Banque{' '}
 								<Text as="span" color="muted">
@@ -406,10 +404,10 @@ export default function ImportPage() {
 									Aucune banque configurée. Ajoutez d&apos;abord une banque dans les paramètres.
 								</Text>
 							)}
-						</VStack>
+						</div>
 
 						{/* Account selector */}
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="import-account-select">
 								2. Compte{' '}
 								<Text as="span" color="muted">
@@ -446,10 +444,10 @@ export default function ImportPage() {
 									Aucun compte pour cette banque. Ajoutez d&apos;abord un compte.
 								</Text>
 							)}
-						</VStack>
+						</div>
 
 						{/* Drop zone */}
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="import-file-input">3. Fichier</Label>
 							<div
 								role="presentation"
@@ -532,13 +530,13 @@ export default function ImportPage() {
 									.csv, .xlsx · Max 10 MB
 								</Text>
 							</div>
-						</VStack>
-					</VStack>
+						</div>
+					</div>
 				</GlassCard>
 
 				{/* Stats */}
 				<GlassCard padding="lg">
-					<VStack gap="md">
+					<div className="flex flex-col gap-4">
 						<Heading level={3} size="md">
 							Statistiques d&apos;import
 						</Heading>
@@ -556,12 +554,12 @@ export default function ImportPage() {
 									backgroundColor: 'oklch(0.7 0.15 75 / 0.05)',
 								}}
 							>
-								<HStack gap="sm" align="center" style={{ color: 'oklch(0.7 0.15 75)' }}>
+								<div className="flex items-center gap-3" style={{ color: 'oklch(0.7 0.15 75)' }}>
 									<Clock style={{ height: '1rem', width: '1rem' }} />
 									<Text size="sm" weight="medium">
 										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de traitement
 									</Text>
-								</HStack>
+								</div>
 							</div>
 						)}
 
@@ -611,22 +609,22 @@ export default function ImportPage() {
 								</li>
 							</ol>
 						</div>
-					</VStack>
+					</div>
 				</GlassCard>
 			</Grid>
 
 			{/* Import History */}
 			<GlassCard padding="lg">
-				<VStack gap="md">
-					<VStack gap="xs">
+				<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-2">
 						<Heading level={3} size="md">
 							Historique des imports
 						</Heading>
 						<Text size="sm" color="muted">
 							Fichiers bruts stockés et leur statut de traitement
 						</Text>
-					</VStack>
-					<VStack gap="xs">
+					</div>
+					<div className="flex flex-col gap-2">
 						{isLoading ? (
 							<div
 								className="flex py-8"
@@ -649,14 +647,10 @@ export default function ImportPage() {
 							/>
 						) : (
 							imports.map((imp) => (
-								<HStack
+								<div
 									key={imp.id}
-									justify="between"
-									align="center"
-									p="md"
+									className="flex justify-between items-center p-4 rounded-xl transition-colors"
 									style={{
-										borderRadius: '0.75rem',
-										transition: 'background-color 0.2s',
 										backgroundColor:
 											imp.status === 'FAILED'
 												? 'oklch(0.55 0.2 25 / 0.05)'
@@ -664,7 +658,7 @@ export default function ImportPage() {
 										border: imp.status === 'FAILED' ? '1px solid oklch(0.55 0.2 25 / 0.2)' : 'none',
 									}}
 								>
-									<HStack gap="md" align="center">
+									<div className="flex items-center gap-4">
 										<div
 											className="flex rounded-lg"
 											style={{
@@ -689,8 +683,8 @@ export default function ImportPage() {
 												}}
 											/>
 										</div>
-										<VStack gap="none">
-											<HStack gap="sm" align="center">
+										<div className="flex flex-col">
+											<div className="flex items-center gap-3">
 												<Text weight="medium">{imp.filename}</Text>
 												<div
 													className="flex rounded-full px-2 py-1"
@@ -719,7 +713,7 @@ export default function ImportPage() {
 													{getStatusIcon(imp.status)}
 													<span>{getStatusLabel(imp.status)}</span>
 												</div>
-											</HStack>
+											</div>
 											<Text size="xs" color="muted">
 												{getBankNameForImport(imp.bankKey)}
 												{imp.account && ` → ${imp.account.name}`} · {formatFileSize(imp.fileSize)} ·{' '}
@@ -737,9 +731,9 @@ export default function ImportPage() {
 													</Text>
 												)}
 											</Text>
-										</VStack>
-									</HStack>
-									<HStack gap="sm" align="center">
+										</div>
+									</div>
+									<div className="flex items-center gap-3">
 										{imp.status === 'PENDING' && (
 											<Button
 												variant="outline"
@@ -782,12 +776,12 @@ export default function ImportPage() {
 										>
 											<Trash2 style={{ height: '1rem', width: '1rem' }} />
 										</Button>
-									</HStack>
-								</HStack>
+									</div>
+								</div>
 							))
 						)}
-					</VStack>
-				</VStack>
+					</div>
+				</div>
 			</GlassCard>
 
 			<ConfirmDialog
@@ -799,6 +793,6 @@ export default function ImportPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteImport}
 			/>
-		</VStack>
+		</div>
 	);
 }

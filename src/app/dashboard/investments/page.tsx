@@ -12,11 +12,9 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	Flex,
 	GlassCard,
 	Grid,
 	Heading,
-	HStack,
 	MoreHorizontal,
 	PageHeader,
 	Plus,
@@ -25,7 +23,6 @@ import {
 	StatCardGrid,
 	Text,
 	TrendingUp,
-	VStack,
 	Wallet,
 } from '@/components';
 import { InvestmentPerformanceChart } from '@/components/charts';
@@ -151,13 +148,13 @@ function formatCurrency(amount: number): string {
 
 export default function InvestmentsPage() {
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader
 				title="Investissements"
 				description="PEA, CTO, Assurance-vie, Crypto"
 				actions={
-					<HStack gap="sm">
+					<div className="flex gap-3">
 						<Button
 							variant="outline"
 							iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
@@ -167,7 +164,7 @@ export default function InvestmentsPage() {
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 							Nouvelle source
 						</Button>
-					</HStack>
+					</div>
 				}
 			/>
 
@@ -214,20 +211,16 @@ export default function InvestmentsPage() {
 							padding="md"
 							style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
 						>
-							<HStack justify="between" align="start">
-								<Flex
-									align="center"
-									justify="center"
+							<div className="flex justify-between items-start">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-xl"
 									style={{
-										height: '2.5rem',
-										width: '2.5rem',
-										borderRadius: '0.75rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
 										color: 'hsl(var(--primary))',
 									}}
 								>
 									<source.icon style={{ height: '1.25rem', width: '1.25rem' }} />
-								</Flex>
+								</div>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
@@ -252,15 +245,15 @@ export default function InvestmentsPage() {
 										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
-							</HStack>
-							<VStack gap="md">
-								<VStack gap="none">
+							</div>
+							<div className="flex flex-col gap-4">
+								<div className="flex flex-col">
 									<Text weight="medium">{source.name}</Text>
 									<Text size="xs" color="muted">
 										{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
 									</Text>
-								</VStack>
-								<VStack gap="none">
+								</div>
+								<div className="flex flex-col">
 									<Text size="2xl" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(source.value)}
 									</Text>
@@ -273,8 +266,8 @@ export default function InvestmentsPage() {
 										{formatCurrency(gain)} ({isPositive ? '+' : ''}
 										{source.performance.toFixed(2)}%)
 									</Text>
-								</VStack>
-							</VStack>
+								</div>
+							</div>
 						</GlassCard>
 					);
 				})}
@@ -282,57 +275,46 @@ export default function InvestmentsPage() {
 
 			{/* Positions Table */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
-					<VStack gap="none">
+				<div className="flex justify-between items-center mb-4">
+					<div className="flex flex-col">
 						<Heading level={3} size="lg" weight="medium">
 							Positions
 						</Heading>
 						<Text size="sm" color="muted">
 							Toutes vos positions d&apos;investissement
 						</Text>
-					</VStack>
+					</div>
 					<Button variant="outline" size="sm">
 						Voir tout
 					</Button>
-				</HStack>
-				<VStack gap="sm">
+				</div>
+				<div className="flex flex-col gap-3">
 					{positions.map((pos) => (
-						<HStack
+						<div
 							key={pos.id}
-							justify="between"
-							align="center"
-							p="md"
+							className="flex justify-between items-center p-4 rounded-xl transition-colors"
 							style={{
-								borderRadius: '0.75rem',
 								backgroundColor: 'hsl(var(--background) / 0.5)',
-								transition: 'background-color 0.2s',
 							}}
 						>
-							<HStack gap="md" align="center">
-								<Flex
-									align="center"
-									justify="center"
+							<div className="flex items-center gap-4">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-lg font-mono text-sm font-semibold"
 									style={{
-										height: '2.5rem',
-										width: '2.5rem',
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--background))',
-										fontFamily: 'monospace',
-										fontSize: '0.875rem',
-										fontWeight: 600,
 										color: 'hsl(var(--muted-foreground))',
 									}}
 								>
 									{pos.ticker.slice(0, 3)}
-								</Flex>
-								<VStack gap="none">
+								</div>
+								<div className="flex flex-col">
 									<Text weight="medium">{pos.name}</Text>
 									<Text size="xs" color="muted">
 										{pos.ticker} · {pos.source}
 									</Text>
-								</VStack>
-							</HStack>
-							<HStack gap="xl" align="center">
+								</div>
+							</div>
+							<div className="flex items-center gap-8">
 								<div className="hidden text-right sm:block" data-show-sm>
 									<Text size="xs" color="muted">
 										Quantité
@@ -378,25 +360,25 @@ export default function InvestmentsPage() {
 										{pos.gainPercent.toFixed(2)}%
 									</Text>
 								</div>
-							</HStack>
-						</HStack>
+							</div>
+						</div>
 					))}
-				</VStack>
+				</div>
 			</GlassCard>
 
 			{/* Performance Chart */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
-					<VStack gap="none">
+				<div className="flex justify-between items-center mb-4">
+					<div className="flex flex-col">
 						<Heading level={3} size="lg" weight="medium">
 							Évolution du portefeuille
 						</Heading>
 						<Text size="sm" color="muted">
 							Performance sur 12 mois
 						</Text>
-					</VStack>
-					<HStack gap="md" align="center">
-						<HStack gap="sm" align="center">
+					</div>
+					<div className="flex items-center gap-4">
+						<div className="flex items-center gap-3">
 							<div
 								className="h-2 w-4 rounded-sm"
 								style={{ backgroundColor: 'oklch(0.55 0.18 270)' }}
@@ -404,8 +386,8 @@ export default function InvestmentsPage() {
 							<Text size="sm" color="muted">
 								Valeur
 							</Text>
-						</HStack>
-						<HStack gap="sm" align="center">
+						</div>
+						<div className="flex items-center gap-3">
 							<div
 								className="h-0.5 w-4"
 								style={{ borderTop: '2px dashed oklch(0.5 0.01 280)' }}
@@ -413,11 +395,11 @@ export default function InvestmentsPage() {
 							<Text size="sm" color="muted">
 								Investi
 							</Text>
-						</HStack>
-					</HStack>
-				</HStack>
+						</div>
+					</div>
+				</div>
 				<InvestmentPerformanceChart data={demoInvestmentPerformance} height="lg" />
 			</GlassCard>
-		</VStack>
+		</div>
 	);
 }

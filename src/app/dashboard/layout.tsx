@@ -1,4 +1,4 @@
-import { HStack, SidebarInset, SidebarProvider, SidebarTrigger, Text } from '@/components';
+import { SidebarInset, SidebarProvider, SidebarTrigger, Text } from '@/components';
 import { AppSidebar } from '@/components/app-sidebar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -10,10 +10,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 				<header
 					className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b border-border bg-background/80 px-6 backdrop-blur-sm"
 				>
-					<HStack gap="md" align="center" style={{ display: 'flex' }} data-hide-desktop>
+					<div className="flex items-center gap-4 lg:hidden">
 						<SidebarTrigger />
 						<Text weight="semibold">Imanisa Finance</Text>
-					</HStack>
+					</div>
 				</header>
 				<main className="flex-1 p-6">
 					<div

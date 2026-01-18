@@ -15,10 +15,8 @@ import {
 	ChevronRight,
 	CreditCard,
 	EmptyState,
-	Flex,
 	GlassCard,
 	Heading,
-	HStack,
 	Loader2,
 	PageHeader,
 	PiggyBank,
@@ -27,7 +25,6 @@ import {
 	StatCardGrid,
 	Text,
 	TrendingUp,
-	VStack,
 	Wallet,
 } from '@/components';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
@@ -174,7 +171,7 @@ export default function AccountsPage() {
 	}
 
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader
 				title="Comptes"
@@ -219,38 +216,34 @@ export default function AccountsPage() {
 			</StatCardGrid>
 
 			{/* Accounts by Type */}
-			<VStack gap="lg">
+			<div className="flex flex-col gap-6">
 				{accountGroups.map((group) => {
 					const Icon = group.icon;
 					return (
 						<GlassCard key={group.type} padding="lg">
 							{/* Group Header */}
-							<HStack gap="sm" align="center" style={{ marginBottom: '1rem' }}>
-								<Flex
-									align="center"
-									justify="center"
+							<div className="flex items-center gap-3 mb-4">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-xl"
 									style={{
-										height: '2.5rem',
-										width: '2.5rem',
-										borderRadius: '0.75rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
 										color: 'hsl(var(--primary))',
 									}}
 								>
 									<Icon style={{ height: '1.25rem', width: '1.25rem' }} />
-								</Flex>
-								<VStack gap="none">
+								</div>
+								<div className="flex flex-col">
 									<Heading level={3} size="lg" weight="semibold">
 										{group.label}
 									</Heading>
 									<Text size="sm" color="muted">
 										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
 									</Text>
-								</VStack>
-							</HStack>
+								</div>
+							</div>
 
 							{/* Account List */}
-							<VStack gap="sm">
+							<div className="flex flex-col gap-3">
 								{group.accounts.map((account) => (
 									<Link
 										key={account.id}
@@ -266,14 +259,10 @@ export default function AccountsPage() {
 											transition: 'all 0.2s',
 										}}
 									>
-										<HStack gap="md" align="center">
-											<Flex
-												align="center"
-												justify="center"
+										<div className="flex items-center gap-4">
+											<div
+												className="flex items-center justify-center h-10 w-10 rounded-lg"
 												style={{
-													height: '2.5rem',
-													width: '2.5rem',
-													borderRadius: '0.5rem',
 													backgroundColor: account.bank?.color
 														? `${account.bank.color}20`
 														: undefined,
@@ -286,15 +275,15 @@ export default function AccountsPage() {
 														color: account.bank?.color || undefined,
 													}}
 												/>
-											</Flex>
-											<VStack gap="none">
+											</div>
+											<div className="flex flex-col">
 												<Text weight="medium">{account.name}</Text>
 												<Text size="xs" color="muted">
 													{account.bank?.name || 'Banque'}
 												</Text>
-											</VStack>
-										</HStack>
-										<HStack gap="md" align="center">
+											</div>
+										</div>
+										<div className="flex items-center gap-4">
 											<MoneyDisplay
 												amount={account.balance}
 												format="compact"
@@ -309,10 +298,10 @@ export default function AccountsPage() {
 													transition: 'color 0.2s',
 												}}
 											/>
-										</HStack>
+										</div>
 									</Link>
 								))}
-							</VStack>
+							</div>
 						</GlassCard>
 					);
 				})}
@@ -332,7 +321,7 @@ export default function AccountsPage() {
 						}
 					/>
 				)}
-			</VStack>
-		</VStack>
+			</div>
+		</div>
 	);
 }

@@ -17,7 +17,6 @@ import {
 	Filter,
 	GlassCard,
 	Heading,
-	HStack,
 	Input,
 	PageHeader,
 	Search,
@@ -29,7 +28,6 @@ import {
 	StatCard,
 	StatCardGrid,
 	Text,
-	VStack,
 } from '@/components';
 import { MoneyDifference } from '@/components/common/MoneyDisplay';
 import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
@@ -140,7 +138,7 @@ function formatDate(dateStr: string): string {
 
 export default function TransactionsPage() {
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader
 				title="Transactions"
@@ -182,7 +180,7 @@ export default function TransactionsPage() {
 			{/* Filters */}
 			<GlassCard padding="md">
 				<div className="flex flex-col gap-4">
-					<HStack gap="md" style={{ flexWrap: 'wrap' }}>
+					<div className="flex flex-wrap gap-4">
 						<div className="relative flex-1 min-w-[200px]">
 							<Search
 								style={{
@@ -241,17 +239,15 @@ export default function TransactionsPage() {
 						>
 							<Filter style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</HStack>
+					</div>
 				</div>
 			</GlassCard>
 
 			{/* Transactions List */}
 			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
-				<HStack
-					justify="between"
-					align="center"
-					p="md"
+				<div
+					className="flex justify-between items-center p-4"
 					style={{ borderBottom: '1px solid hsl(var(--border))' }}
 				>
 					<Heading level={3} size="md">
@@ -260,22 +256,16 @@ export default function TransactionsPage() {
 					<Text size="sm" color="muted">
 						{transactions.length} opérations
 					</Text>
-				</HStack>
+				</div>
 
 				{/* List */}
-				<VStack gap="xs" p="md">
+				<div className="flex flex-col gap-2 p-4">
 					{transactions.map((tx) => (
-						<HStack
+						<div
 							key={tx.id}
-							justify="between"
-							align="center"
-							p="md"
-							style={{
-								borderRadius: '0.75rem',
-								transition: 'background-color 0.2s',
-							}}
+							className="flex justify-between items-center p-4 rounded-xl transition-colors"
 						>
-							<HStack gap="md" align="center">
+							<div className="flex items-center gap-4">
 								<div
 									className="flex h-10 w-10 items-center justify-center rounded-xl"
 									style={{
@@ -297,23 +287,23 @@ export default function TransactionsPage() {
 										/>
 									)}
 								</div>
-								<VStack gap="none">
+								<div className="flex flex-col">
 									<Text weight="medium">{tx.description}</Text>
 									<Text size="xs" color="muted">
 										{tx.category} · {tx.account}
 									</Text>
-								</VStack>
-							</HStack>
-							<VStack gap="none" align="end">
+								</div>
+							</div>
+							<div className="flex flex-col items-end">
 								<MoneyDifference amount={tx.amount} size="md" />
 								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
 									{formatDate(tx.date)}
 								</Text>
-							</VStack>
-						</HStack>
+							</div>
+						</div>
 					))}
-				</VStack>
+				</div>
 			</GlassCard>
-		</VStack>
+		</div>
 	);
 }
