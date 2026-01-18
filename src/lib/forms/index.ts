@@ -24,5 +24,9 @@ export {
 export { TextField } from './fields/TextField';
 export { SelectField } from './fields/SelectField';
 
+// Form components
+export { SubmitButton } from './components/SubmitButton';
+export { FormActions } from './components/FormActions';
+
 // Re-export types
 export type { FormApi, FieldApi } from './form-context';

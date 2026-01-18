@@ -223,9 +223,9 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 						)}
 					</div>
 					{bank.description && (
-						<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+						<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 							{bank.description}
-						</Text>
+						</p>
 					)}
 				</div>
 				{hasAccounts ? (
