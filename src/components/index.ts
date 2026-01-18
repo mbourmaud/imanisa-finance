@@ -26,8 +26,6 @@ export type {
 	SpacingSize,
 } from './ui/box';
 export { Box } from './ui/box';
-export type { GridAlign, GridCols, GridJustify, GridProps } from './ui/grid';
-export { Grid } from './ui/grid';
 export type {
 	ContainerMaxWidth,
 	ContainerProps,

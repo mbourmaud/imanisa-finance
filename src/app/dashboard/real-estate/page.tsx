@@ -19,7 +19,6 @@ import {
 	DropdownMenuTrigger,
 	EmptyState,
 	GlassCard,
-	Grid,
 	Heading,
 	Home,
 	Input,
@@ -139,10 +138,10 @@ function PropertyCardSkeleton() {
 						</div>
 					</div>
 				</div>
-				<Grid cols={2} gap="md">
+				<div className="grid grid-cols-2 gap-4">
 					<Skeleton style={{ height: '5rem', borderRadius: '0.75rem' }} />
 					<Skeleton style={{ height: '5rem', borderRadius: '0.75rem' }} />
-				</Grid>
+				</div>
 				<Skeleton style={{ height: '1.5rem', width: '100%' }} />
 			</div>
 		</GlassCard>
@@ -361,7 +360,7 @@ export default function RealEstatePage() {
 										<Text size="sm" weight="medium" color="muted">
 											Informations générales
 										</Text>
-										<Grid cols={1} colsSm={2} gap="md">
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 											<div className="flex flex-col gap-3">
 												<Label htmlFor="name">Nom du bien *</Label>
 												<Input
@@ -436,7 +435,7 @@ export default function RealEstatePage() {
 													onChange={(e) => handleInputChange('bedrooms', e.target.value)}
 												/>
 											</div>
-										</Grid>
+										</div>
 									</div>
 
 									{/* Address */}
@@ -463,7 +462,7 @@ export default function RealEstatePage() {
 													onChange={(e) => handleInputChange('address2', e.target.value)}
 												/>
 											</div>
-											<Grid cols={1} colsSm={2} gap="md">
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 												<div className="flex flex-col gap-3">
 													<Label htmlFor="city">Ville *</Label>
 													<Input
@@ -482,7 +481,7 @@ export default function RealEstatePage() {
 														onChange={(e) => handleInputChange('postalCode', e.target.value)}
 													/>
 												</div>
-											</Grid>
+											</div>
 										</div>
 									</div>
 
@@ -491,7 +490,7 @@ export default function RealEstatePage() {
 										<Text size="sm" weight="medium" color="muted">
 											Achat
 										</Text>
-										<Grid cols={1} colsSm={2} gap="md">
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 											<div className="flex flex-col gap-3">
 												<Label htmlFor="purchasePrice">Prix d&apos;achat (€) *</Label>
 												<Input
@@ -537,7 +536,7 @@ export default function RealEstatePage() {
 													onChange={(e) => handleInputChange('agencyFees', e.target.value)}
 												/>
 											</div>
-										</Grid>
+										</div>
 									</div>
 
 									{/* Current value */}
@@ -565,7 +564,7 @@ export default function RealEstatePage() {
 											<Text size="sm" weight="medium" color="muted">
 												Informations locatives
 											</Text>
-											<Grid cols={1} colsSm={2} gap="md">
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 												<div className="flex flex-col gap-3">
 													<Label htmlFor="rentAmount">Loyer mensuel (€)</Label>
 													<Input
@@ -590,7 +589,7 @@ export default function RealEstatePage() {
 														onChange={(e) => handleInputChange('rentCharges', e.target.value)}
 													/>
 												</div>
-											</Grid>
+											</div>
 										</div>
 									)}
 
@@ -849,14 +848,14 @@ export default function RealEstatePage() {
 
 			{/* Properties Grid */}
 			{isLoading ? (
-				<Grid cols={1} colsLg={2} gap="lg">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					<PropertyCardSkeleton />
 					<PropertyCardSkeleton />
-				</Grid>
+				</div>
 			) : properties.length === 0 ? (
 				<PropertiesEmptyState onAddClick={() => setIsDialogOpen(true)} />
 			) : (
-				<Grid cols={1} colsLg={2} gap="lg">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					{properties.map((property: PropertyWithDetails) => {
 						const totalLoansRemaining = property.loans.reduce(
 							(sum, loan) => sum + loan.remainingAmount,
@@ -1001,7 +1000,7 @@ export default function RealEstatePage() {
 										)}
 									</div>
 									{/* Value & Equity */}
-									<Grid cols={2} gap="md">
+									<div className="grid grid-cols-2 gap-4">
 										<div
 											className="rounded-xl p-3"
 											style={{
@@ -1056,7 +1055,7 @@ export default function RealEstatePage() {
 													: '-'}
 											</Text>
 										</div>
-									</Grid>
+									</div>
 
 									{/* Loan Progress */}
 									{totalLoansRemaining > 0 && (
@@ -1075,14 +1074,7 @@ export default function RealEstatePage() {
 									)}
 
 									{/* Info Grid */}
-									<Grid
-										cols={3}
-										gap="md"
-										style={{
-											paddingTop: '0.5rem',
-											borderTop: '1px solid hsl(var(--border) / 0.4)',
-										}}
-									>
+									<div className="grid grid-cols-3 gap-4 pt-2 border-t border-border/40">
 										<div className="text-center">
 											<div
 												className="flex items-center justify-center gap-1"
@@ -1119,7 +1111,7 @@ export default function RealEstatePage() {
 												{property.bedrooms || '-'}
 											</Text>
 										</div>
-									</Grid>
+									</div>
 
 									{/* Rent Info if rental */}
 									{isRentalProperty && property.rentAmount && (
@@ -1162,7 +1154,7 @@ export default function RealEstatePage() {
 							</GlassCard>
 						);
 					})}
-				</Grid>
+				</div>
 			)}
 		</div>
 	);

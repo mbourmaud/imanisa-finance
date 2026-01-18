@@ -35,7 +35,6 @@ import {
 	ExternalLink,
 	Flame,
 	GlassCard,
-	Grid,
 	Heading,
 	Home,
 	Input,
@@ -349,11 +348,11 @@ function SectionSkeleton() {
 		<GlassCard padding="lg">
 			<div className="flex flex-col gap-4">
 				<Skeleton style={{ height: '1.25rem', width: '8rem' }} />
-				<Grid cols={1} colsSm={2} colsLg={3} gap="md">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
-				</Grid>
+				</div>
 			</div>
 		</GlassCard>
 	);
@@ -379,7 +378,10 @@ function LoanCard({
 		loan.loanInsurances?.reduce((sum, ins) => sum + ins.coveragePercent, 0) || 0;
 
 	return (
-		<div className="rounded-xl border border-border p-4" style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
+		<div
+			className="rounded-xl border border-border p-4"
+			style={{ borderColor: 'hsl(var(--border) / 0.6)' }}
+		>
 			<div className="flex flex-col gap-4">
 				<div className="flex justify-between items-start gap-4">
 					<div className="min-w-0">
@@ -417,7 +419,7 @@ function LoanCard({
 					<Progress value={paidPercent} style={{ height: '0.5rem' }} />
 				</div>
 
-				<Grid cols={3} gap="md" style={{ paddingTop: '0.5rem', fontSize: '0.875rem' }}>
+				<div className="grid grid-cols-3 gap-4 pt-2 text-sm">
 					<div className="flex flex-col">
 						<Text size="xs" color="muted">
 							Mensualité
@@ -442,7 +444,7 @@ function LoanCard({
 							{formatCurrency(loan.initialAmount)}
 						</Text>
 					</div>
-				</Grid>
+				</div>
 
 				{loan.loanNumber && (
 					<Text
@@ -1537,7 +1539,7 @@ export default function PropertyDetailPage() {
 							Informations
 						</Heading>
 					</div>
-					<Grid cols={1} colsSm={2} colsLg={3} gap="lg">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{/* Caractéristiques */}
 						<div className="flex flex-col gap-3">
 							<Text
@@ -1593,7 +1595,7 @@ export default function PropertyDetailPage() {
 								)}
 							</div>
 						</div>
-					</Grid>
+					</div>
 
 					{/* Notes */}
 					{property.notes && (
@@ -1738,7 +1740,7 @@ export default function PropertyDetailPage() {
 											/>
 										</div>
 
-										<Grid cols={1} colsSm={2} gap="md">
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 											<div className="flex flex-col gap-2">
 												<Label htmlFor="loan-lender">Organisme prêteur</Label>
 												<Input
@@ -1757,7 +1759,7 @@ export default function PropertyDetailPage() {
 													onChange={(e) => handleLoanInputChange('loanNumber', e.target.value)}
 												/>
 											</div>
-										</Grid>
+										</div>
 									</div>
 
 									{/* Amounts */}
@@ -1765,7 +1767,7 @@ export default function PropertyDetailPage() {
 										<Text size="sm" weight="medium" color="muted">
 											Montants
 										</Text>
-										<Grid cols={1} colsSm={2} gap="md">
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 											<div className="flex flex-col gap-2">
 												<Label htmlFor="loan-initial">Montant initial (€) *</Label>
 												<Input
@@ -1790,11 +1792,11 @@ export default function PropertyDetailPage() {
 													onChange={(e) => handleLoanInputChange('remainingAmount', e.target.value)}
 												/>
 											</div>
-										</Grid>
+										</div>
 									</div>
 
 									{/* Rate and payment */}
-									<Grid cols={1} colsSm={2} gap="md">
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 										<div className="flex flex-col gap-2">
 											<Label htmlFor="loan-rate">Taux (%) *</Label>
 											<Input
@@ -1820,10 +1822,10 @@ export default function PropertyDetailPage() {
 												onChange={(e) => handleLoanInputChange('monthlyPayment', e.target.value)}
 											/>
 										</div>
-									</Grid>
+									</div>
 
 									{/* Dates */}
-									<Grid cols={1} colsSm={2} gap="md">
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 										<div className="flex flex-col gap-2">
 											<Label htmlFor="loan-start">Date de début *</Label>
 											<Input
@@ -1842,7 +1844,7 @@ export default function PropertyDetailPage() {
 												onChange={(e) => handleLoanInputChange('endDate', e.target.value)}
 											/>
 										</div>
-									</Grid>
+									</div>
 
 									{/* Notes */}
 									<div className="flex flex-col gap-2">
@@ -1891,11 +1893,9 @@ export default function PropertyDetailPage() {
 				) : (
 					<div className="flex flex-col gap-4">
 						{/* Summary stats */}
-						<Grid
-							cols={3}
-							gap="md"
-							p="md"
-							style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+						<div
+							className="grid grid-cols-3 gap-4 p-4 rounded-xl"
+							style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 						>
 							<div className="text-center">
 								<Text size="xs" color="muted">
@@ -1926,7 +1926,7 @@ export default function PropertyDetailPage() {
 									%
 								</Text>
 							</div>
-						</Grid>
+						</div>
 
 						{/* Loan cards */}
 						<div className="flex flex-col gap-3">
@@ -2063,12 +2063,7 @@ export default function PropertyDetailPage() {
 						</div>
 
 						{/* Insurance details */}
-						<Grid
-							cols={1}
-							colsSm={3}
-							gap="md"
-							style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-						>
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
 							<div>
 								<Text size="xs" color="muted">
 									Prime mensuelle
@@ -2094,7 +2089,7 @@ export default function PropertyDetailPage() {
 									<Text weight="medium">{formatDate(property.insurance.endDate.toString())}</Text>
 								</div>
 							)}
-						</Grid>
+						</div>
 
 						{/* Additional info */}
 						{(property.insurance.contractNumber ||
@@ -2306,12 +2301,7 @@ export default function PropertyDetailPage() {
 						</div>
 
 						{/* Amounts */}
-						<Grid
-							cols={1}
-							colsSm={2}
-							gap="md"
-							style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-						>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/40">
 							<div className="flex flex-col">
 								<Text size="xs" color="muted">
 									Charges trimestrielles
@@ -2328,7 +2318,7 @@ export default function PropertyDetailPage() {
 									{formatCurrency(property.coOwnership.quarterlyAmount * 4)}
 								</Text>
 							</div>
-						</Grid>
+						</div>
 
 						{/* Additional info */}
 						{property.coOwnership.link && (
@@ -2457,11 +2447,9 @@ export default function PropertyDetailPage() {
 				) : (
 					<div className="flex flex-col gap-4">
 						{/* Summary stats */}
-						<Grid
-							cols={2}
-							gap="md"
-							p="md"
-							style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+						<div
+							className="grid grid-cols-2 gap-4 p-4 rounded-xl"
+							style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 						>
 							<div className="flex flex-col items-center">
 								<Text size="xs" color="muted">
@@ -2481,7 +2469,7 @@ export default function PropertyDetailPage() {
 									)}
 								</Text>
 							</div>
-						</Grid>
+						</div>
 
 						{/* Contract list */}
 						<div className="flex flex-col gap-3">
@@ -2641,9 +2629,7 @@ export default function PropertyDetailPage() {
 										)}
 
 										{contract.notes && (
-											<div
-												className="mt-2 pt-2 border-t border-border/40"
-											>
+											<div className="mt-2 pt-2 border-t border-border/40">
 												<Text size="xs" color="muted">
 													{contract.notes}
 												</Text>
@@ -2724,7 +2710,7 @@ export default function PropertyDetailPage() {
 						</div>
 
 						{/* Insurance info */}
-						<Grid cols={1} colsSm={2} gap="md">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div className="flex flex-col gap-2">
 								<Label htmlFor="insurance-name">Nom de l'assurance *</Label>
 								<Input
@@ -2743,10 +2729,10 @@ export default function PropertyDetailPage() {
 									onChange={(e) => handleInsuranceInputChange('provider', e.target.value)}
 								/>
 							</div>
-						</Grid>
+						</div>
 
 						{/* Coverage and premium */}
-						<Grid cols={1} colsSm={2} gap="md">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div className="flex flex-col gap-2">
 								<Label htmlFor="insurance-coverage">Quotité (%) *</Label>
 								<Input
@@ -2775,7 +2761,7 @@ export default function PropertyDetailPage() {
 									onChange={(e) => handleInsuranceInputChange('monthlyPremium', e.target.value)}
 								/>
 							</div>
-						</Grid>
+						</div>
 
 						{/* Contract number */}
 						<div className="flex flex-col gap-2">
@@ -2907,7 +2893,7 @@ export default function PropertyDetailPage() {
 							</div>
 
 							{/* Provider and contract */}
-							<Grid cols={1} colsSm={2} gap="md">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div className="flex flex-col gap-2">
 									<Label htmlFor="property-insurance-provider">Assureur *</Label>
 									<Input
@@ -2928,7 +2914,7 @@ export default function PropertyDetailPage() {
 										}
 									/>
 								</div>
-							</Grid>
+							</div>
 
 							{/* Premium */}
 							<div className="flex flex-col gap-2">
@@ -2956,7 +2942,7 @@ export default function PropertyDetailPage() {
 							</div>
 
 							{/* Dates */}
-							<Grid cols={1} colsSm={2} gap="md">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div className="flex flex-col gap-2">
 									<Label htmlFor="property-insurance-start">Date de début *</Label>
 									<Input
@@ -2977,7 +2963,7 @@ export default function PropertyDetailPage() {
 										onChange={(e) => handlePropertyInsuranceInputChange('endDate', e.target.value)}
 									/>
 								</div>
-							</Grid>
+							</div>
 
 							{/* Coverage */}
 							<div className="flex flex-col gap-2">
@@ -3245,7 +3231,7 @@ export default function PropertyDetailPage() {
 							</div>
 
 							{/* Provider and contract number */}
-							<Grid cols={1} colsSm={2} gap="md">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div className="flex flex-col gap-2">
 									<Label htmlFor="utility-contract-provider">Fournisseur *</Label>
 									<Input
@@ -3266,7 +3252,7 @@ export default function PropertyDetailPage() {
 										}
 									/>
 								</div>
-							</Grid>
+							</div>
 
 							{/* Monthly amount */}
 							<div className="flex flex-col gap-2">
@@ -3383,7 +3369,7 @@ export default function PropertyDetailPage() {
 								<Text size="sm" weight="medium" color="muted">
 									Informations générales
 								</Text>
-								<Grid cols={1} colsSm={2} gap="md">
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-name">Nom du bien *</Label>
 										<Input
@@ -3458,7 +3444,7 @@ export default function PropertyDetailPage() {
 											onChange={(e) => handlePropertyInputChange('bedrooms', e.target.value)}
 										/>
 									</div>
-								</Grid>
+								</div>
 							</div>
 
 							{/* Address */}
@@ -3485,7 +3471,7 @@ export default function PropertyDetailPage() {
 											onChange={(e) => handlePropertyInputChange('address2', e.target.value)}
 										/>
 									</div>
-									<Grid cols={1} colsSm={2} gap="md">
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 										<div className="flex flex-col gap-2">
 											<Label htmlFor="edit-city">Ville *</Label>
 											<Input
@@ -3504,7 +3490,7 @@ export default function PropertyDetailPage() {
 												onChange={(e) => handlePropertyInputChange('postalCode', e.target.value)}
 											/>
 										</div>
-									</Grid>
+									</div>
 								</div>
 							</div>
 
@@ -3513,7 +3499,7 @@ export default function PropertyDetailPage() {
 								<Text size="sm" weight="medium" color="muted">
 									Achat
 								</Text>
-								<Grid cols={1} colsSm={2} gap="md">
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-purchasePrice">Prix d&apos;achat (€) *</Label>
 										<Input
@@ -3559,7 +3545,7 @@ export default function PropertyDetailPage() {
 											onChange={(e) => handlePropertyInputChange('agencyFees', e.target.value)}
 										/>
 									</div>
-								</Grid>
+								</div>
 							</div>
 
 							{/* Current value */}
@@ -3587,7 +3573,7 @@ export default function PropertyDetailPage() {
 									<Text size="sm" weight="medium" color="muted">
 										Informations locatives
 									</Text>
-									<Grid cols={1} colsSm={2} gap="md">
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 										<div className="flex flex-col gap-2">
 											<Label htmlFor="edit-rentAmount">Loyer mensuel (€)</Label>
 											<Input
@@ -3612,7 +3598,7 @@ export default function PropertyDetailPage() {
 												onChange={(e) => handlePropertyInputChange('rentCharges', e.target.value)}
 											/>
 										</div>
-									</Grid>
+									</div>
 								</div>
 							)}
 
