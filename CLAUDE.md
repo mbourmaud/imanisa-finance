@@ -1,38 +1,38 @@
 # Imanisa Finance
 
-Application de gestion financière familiale pour suivre les comptes bancaires, transactions, investissements et patrimoine immobilier.
+Family financial management application for tracking bank accounts, transactions, investments, and real estate assets.
 
-## SÉCURITÉ - RÈGLES CRITIQUES
+## SECURITY - CRITICAL RULES
 
-> **Ce repository est PUBLIC. Ne JAMAIS committer de données sensibles.**
+> **This repository is PUBLIC. NEVER commit sensitive data.**
 
-### Fichiers Interdits dans Git
+### Files Forbidden in Git
 
-- `.env`, `.env.local`, `.env.production` - Variables d'environnement
-- `.ralph/` - Dossier Ralph avec données de test (transactions réelles, noms, montants)
-- `*.pem`, `*.key`, `*.crt` - Certificats et clés
-- `credentials.json`, `secrets.json` - Fichiers de secrets
-- Screenshots avec données personnelles
+- `.env`, `.env.local`, `.env.production` - Environment variables
+- `.ralph/` - Ralph folder with test data (real transactions, names, amounts)
+- `*.pem`, `*.key`, `*.crt` - Certificates and keys
+- `credentials.json`, `secrets.json` - Secret files
+- Screenshots with personal data
 
-### Vérifications Avant Commit
+### Pre-Commit Checks
 
 ```bash
-# Vérifier qu'aucun secret n'est dans le staging
+# Check that no secret is staged
 git diff --cached | grep -E "(password|secret|api_key|token|DATABASE_URL|SUPABASE)" || echo "OK"
 
-# Vérifier les fichiers ajoutés
+# Check added files
 git status | grep -E "\.env|credential|secret|\.ralph"
 ```
 
-### Données à Ne Jamais Logger/Committer
+### Data That Must Never Be Logged/Committed
 
-- URLs de base de données avec credentials
-- Tokens Supabase, Vercel, GitHub
-- Noms réels des membres du foyer dans le code (utiliser des placeholders)
-- Montants réels de transactions/comptes dans les tests
-- Numéros de compte bancaire
+- Database URLs with credentials
+- Supabase, Vercel, GitHub tokens
+- Real household member names in code (use placeholders)
+- Real transaction/account amounts in tests
+- Bank account numbers
 
-### .gitignore Obligatoire
+### Required .gitignore
 
 ```gitignore
 .env*
@@ -42,14 +42,14 @@ git status | grep -E "\.env|credential|secret|\.ralph"
 credentials*.json
 ```
 
-### En Cas de Leak
+### In Case of Leak
 
-Si un secret a été commité par erreur :
-1. **Révoquer immédiatement** le secret concerné (régénérer le token)
-2. Utiliser `git filter-branch` ou BFG Repo-Cleaner pour supprimer de l'historique
-3. Force push après nettoyage
+If a secret was committed by mistake:
+1. **Immediately revoke** the concerned secret (regenerate the token)
+2. Use `git filter-branch` or BFG Repo-Cleaner to remove from history
+3. Force push after cleanup
 
-## Stack Technique
+## Tech Stack
 
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript (strict, no ANY)
@@ -64,34 +64,145 @@ Si un secret a été commité par erreur :
 - **Tables**: TanStack Table (sorting, filtering, pagination, selection)
 - **Charts**: Tremor (DonutChart, BarChart, AreaChart)
 
-## Principes Architecturaux
+## Architectural Principles
 
 ### Clean Architecture & DDD
 
-Le code suit les principes de Clean Architecture et Domain-Driven Design :
+The code follows Clean Architecture and Domain-Driven Design principles:
 
-1. **Séparation des responsabilités** - Chaque couche a un rôle précis
-2. **Dépendances vers l'intérieur** - Les couches externes dépendent des couches internes, jamais l'inverse
-3. **Domain au centre** - La logique métier est isolée et ne dépend pas des frameworks
+1. **Separation of concerns** - Each layer has a specific role
+2. **Dependencies point inward** - Outer layers depend on inner layers, never the reverse
+3. **Domain at the center** - Business logic is isolated and doesn't depend on frameworks
 
-### Composants UI Réutilisables
+### Reusable UI Components
 
-**IMPORTANT** : Ne jamais utiliser de styles inline ou de Tailwind custom dans les pages.
+**IMPORTANT**: Never use inline styles or custom Tailwind in pages.
 
-- Créer des composants réutilisables dans `src/components/`
-- Composer les pages uniquement avec des composants du design system
-- Étendre shadcn/ui pour les besoins spécifiques
-- Les composants encapsulent leur styling
+- Create reusable components in `src/components/`
+- Compose pages only with design system components
+- Extend shadcn/ui for specific needs
+- Components encapsulate their styling
 
 ```tsx
-// ❌ Mauvais - styles inline dans la page
+// ❌ Bad - inline styles in page
 <div className="flex h-14 w-14 items-center justify-center rounded-2xl text-white font-bold">
   {bank.shortName}
 </div>
 
-// ✅ Bon - composant réutilisable
+// ✅ Good - reusable component
 <BankAvatar bank={bank} size="lg" />
 ```
+
+### FUNDAMENTAL UI RULE - Zero className in Pages
+
+**Pages in `src/app/dashboard/` must NEVER use `className=`.**
+
+Styling goes through component **props**, not inline Tailwind classes.
+
+```tsx
+// ❌ FORBIDDEN - inline className in a page
+<div className="flex items-center gap-4 p-6 bg-muted rounded-lg">
+  <span className="text-sm text-muted-foreground">Label</span>
+  <Button className="gap-1 hover:bg-primary">
+    <Plus className="h-4 w-4" />
+    Add
+  </Button>
+</div>
+
+// ✅ CORRECT - use component props
+<Box display="flex" align="center" gap="md" p="lg" bg="muted" rounded="lg">
+  <Text size="sm" color="muted">Label</Text>
+  <Button variant="primary" iconLeft="plus">
+    Add
+  </Button>
+</Box>
+```
+
+#### Base Components (src/components/ui/)
+
+| Component | Props | Replaces |
+|-----------|-------|----------|
+| `Box` | `p`, `m`, `bg`, `rounded`, `shadow`, `display` | `<div className="...">` |
+| `Text` | `size`, `color`, `weight` | `<span>`, `<p>` with className |
+| `Heading` | `level`, `size`, `color` | `<h1-h6>` with className |
+| `Stack` | `gap`, `align` (VStack/HStack) | `<div className="flex flex-col gap-4">` |
+| `Grid` | `cols`, `gap`, `responsive` | `<div className="grid grid-cols-3 gap-4">` |
+| `Flex` | `direction`, `gap`, `align`, `justify` | `<div className="flex items-center">` |
+| `Icon` | `name`, `size`, `color` | Direct import from lucide-react |
+
+#### Strict Rules
+
+1. **No lucide-react import in pages** - Use `<Icon name="plus" />`
+2. **No `className` on UI components** - Use props
+3. **No Tailwind classes in pages** - Everything is encapsulated in components
+4. **Feature components compose UI components** - Clean hierarchy
+
+#### Maximize shadcn/ui Usage
+
+**BEFORE creating a new component, check if shadcn/ui already provides it.**
+
+shadcn/ui offers a wide collection of components: Button, Card, Dialog, Sheet, Input, Select, Checkbox, Switch, Avatar, Badge, Tooltip, Popover, DropdownMenu, Table, Tabs, etc.
+
+```bash
+# Add a shadcn component
+npx shadcn@latest add <component>
+```
+
+**Workflow:**
+1. **Need a component?** → First search in [shadcn/ui](https://ui.shadcn.com/docs/components)
+2. **shadcn has it?** → Install it with `npx shadcn@latest add`
+3. **Customization needed?** → Wrap the shadcn component in `src/components/ui/` with our props
+4. **shadcn doesn't have it?** → Create a custom component based on Radix UI
+
+```tsx
+// ❌ Bad - create a component from scratch
+export function CustomCard({ ... }) {
+  return <div className="rounded-lg border p-4">...</div>
+}
+
+// ✅ Good - use and wrap shadcn
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+
+export function AccountCard({ account }) {
+  return (
+    <Card>
+      <CardHeader>
+        <Heading level={3}>{account.name}</Heading>
+      </CardHeader>
+      <CardContent>
+        <MoneyDisplay amount={account.balance} />
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+**Available shadcn components:**
+- Layout: Card, Dialog, Sheet, Drawer, Popover, Tooltip
+- Forms: Input, Textarea, Select, Checkbox, Switch, RadioGroup, Slider
+- Navigation: Tabs, NavigationMenu, Breadcrumb, Pagination
+- Data: Table, DataTable, Avatar, Badge, Progress
+- Feedback: Alert, AlertDialog, Toast (Sonner)
+- Actions: Button, DropdownMenu, ContextMenu, Command
+
+#### Verification with ESLint
+
+We have **custom ESLint rules** that enforce these UI architecture rules:
+
+```bash
+# Run UI linting (enforces our rules)
+npm run lint:ui
+
+# This will fail if:
+# 1. className is used in src/app/ or src/features/
+# 2. Direct imports from @/components/ui/ outside src/components/
+```
+
+**ESLint Rules:**
+- `local/no-inline-classname` - ERROR: className not allowed in pages/features
+- `local/no-direct-shadcn-import` - ERROR: Import from @/components/ui/* only in src/components/
+
+The `npm run check` command runs both Biome and these ESLint rules.
 
 ## Architecture
 
@@ -99,14 +210,14 @@ Le code suit les principes de Clean Architecture et Domain-Driven Design :
 src/
 ├── app/                    # Next.js App Router (UI layer)
 │   ├── api/               # API Routes (Interface adapters)
-│   ├── dashboard/         # Pages (composées de components)
+│   ├── dashboard/         # Pages (composed of components)
 │   └── login/
 ├── components/
 │   ├── ui/                # shadcn/ui base components
-│   ├── common/            # Composants génériques réutilisables
-│   └── [feature]/         # Composants spécifiques par feature
+│   ├── common/            # Generic reusable components
+│   └── [feature]/         # Feature-specific components
 ├── domain/                # Domain layer (pure business logic)
-│   ├── entities/          # Entités métier
+│   ├── entities/          # Business entities
 │   ├── value-objects/     # Value objects
 │   └── services/          # Domain services
 ├── features/              # Feature modules (Application layer)
@@ -119,35 +230,35 @@ src/
     └── utils/             # Pure utility functions
 ```
 
-### Couches et Responsabilités
+### Layers and Responsibilities
 
-| Couche | Responsabilité | Exemples |
-|--------|----------------|----------|
-| **Domain** | Logique métier pure, entités, règles | `Transaction`, `Account`, calculs de solde |
+| Layer | Responsibility | Examples |
+|-------|----------------|----------|
+| **Domain** | Pure business logic, entities, rules | `Transaction`, `Account`, balance calculations |
 | **Application** | Use cases, orchestration | `ImportTransactionsUseCase`, `CreateAccountUseCase` |
-| **Infrastructure** | Accès données, services externes | Repositories Prisma, clients API |
-| **Interface** | UI, API routes | Pages Next.js, composants React |
+| **Infrastructure** | Data access, external services | Prisma repositories, API clients |
+| **Interface** | UI, API routes | Next.js pages, React components |
 
-## Concepts Clés
+## Key Concepts
 
-### Membres vs Users
-- **Member**: Membre du foyer (Isaac, Mathieu, Ninon) - peut ou non avoir un compte
-- **User**: Compte Supabase Auth - lié optionnellement à un Member
-- Tous les users connectés voient tous les comptes/membres
+### Members vs Users
+- **Member**: Household member (Isaac, Mathieu, Ninon) - may or may not have an account
+- **User**: Supabase Auth account - optionally linked to a Member
+- All connected users see all accounts/members
 
-### Banques Supportées
-Les banques sont des **constantes** dans `src/shared/constants/supported-banks.ts`, pas des entités en base.
-Chaque compte a un `supportedBankKey` qui référence une banque supportée.
+### Supported Banks
+Banks are **constants** in `src/shared/constants/supported-banks.ts`, not database entities.
+Each account has a `supportedBankKey` that references a supported bank.
 
-### Comptes et Titulaires
-- Un compte peut avoir plusieurs titulaires (AccountMember junction table)
-- Chaque titulaire a un pourcentage de propriété (ownerShare)
+### Accounts and Holders
+- An account can have multiple holders (AccountMember junction table)
+- Each holder has an ownership percentage (ownerShare)
 
-### Transactions et Déduplication
-- Import CSV avec déduplication via contrainte unique `[accountId, date, amount, description]`
-- Catégorisation manuelle ou automatique
+### Transactions and Deduplication
+- CSV import with deduplication via unique constraint `[accountId, date, amount, description]`
+- Manual or automatic categorization
 
-## Commandes
+## Commands
 
 ```bash
 npm run dev          # Start dev server
@@ -161,80 +272,80 @@ npx prisma migrate dev --name <name>  # Create migration
 ## Conventions
 
 ### Code Style
-- Tabs pour l'indentation
-- Single quotes pour les strings
-- Pas de point-virgule en fin de ligne (selon config)
-- Français pour l'UI, anglais pour le code
-- Noms explicites et descriptifs (pas d'abréviations)
+- Tabs for indentation
+- Single quotes for strings
+- No semicolons at end of line (per config)
+- French for UI, English for code
+- Explicit and descriptive names (no abbreviations)
 
 ### Clean Code Principles
 
 ```typescript
-// ❌ Mauvais
+// ❌ Bad
 const d = new Date();
 const calc = (a: number, b: number) => a * b / 100;
 
-// ✅ Bon
+// ✅ Good
 const currentDate = new Date();
 const calculateOwnershipPercentage = (amount: number, sharePercent: number) =>
   amount * sharePercent / 100;
 ```
 
-- **Single Responsibility** : Une fonction/classe = une responsabilité
-- **DRY** : Ne pas répéter la logique, extraire dans des fonctions/composants
-- **Early Returns** : Sortir tôt des fonctions pour éviter les nesting
-- **Immutabilité** : Préférer les opérations immutables
+- **Single Responsibility**: One function/class = one responsibility
+- **DRY**: Don't repeat logic, extract into functions/components
+- **Early Returns**: Exit functions early to avoid nesting
+- **Immutability**: Prefer immutable operations
 
-### Composants UI
+### UI Components
 
-**Structure d'un composant** :
+**Component structure**:
 ```
 src/components/
-├── ui/                     # shadcn/ui (ne pas modifier directement)
-├── common/                 # Composants génériques
+├── ui/                     # shadcn/ui (don't modify directly)
+├── common/                 # Generic components
 │   ├── Avatar.tsx
 │   ├── MoneyDisplay.tsx
 │   ├── StatusBadge.tsx
 │   └── EmptyState.tsx
-├── accounts/               # Composants feature accounts
+├── accounts/               # Account feature components
 │   ├── AccountCard.tsx
 │   ├── AccountHeader.tsx
 │   └── AccountMemberBadge.tsx
-└── banks/                  # Composants feature banks
+└── banks/                  # Bank feature components
     ├── BankAvatar.tsx
     ├── BankCard.tsx
     └── BankList.tsx
 ```
 
-**Règles** :
-- Utiliser shadcn/ui comme base (`@/components/ui/`)
-- Créer des composants métier qui encapsulent le styling
-- Props typées avec des interfaces explicites
-- Pas de styles Tailwind custom dans les pages, uniquement dans les composants
-- **JAMAIS** de `alert()`, `confirm()`, `prompt()` natifs - utiliser `AlertDialog` de shadcn/ui
-- **Édition et paramètres** : Utiliser le composant `Sheet` (drawer) au lieu de modes inline ou modals. Les Sheet s'ouvrent sur le côté et offrent une meilleure UX sur mobile (100% width) et desktop (~400px).
+**Rules**:
+- Use shadcn/ui as base (`@/components/ui/`)
+- Create business components that encapsulate styling
+- Typed props with explicit interfaces
+- No custom Tailwind styles in pages, only in components
+- **NEVER** native `alert()`, `confirm()`, `prompt()` - use shadcn's `AlertDialog`
+- **Editing and settings**: Use `Sheet` component (drawer) instead of inline modes or modals. Sheets open from the side and offer better UX on mobile (100% width) and desktop (~400px).
 
-### Patterns UI Préférés
+### Preferred UI Patterns
 
-**Sheet (Drawer) pour l'édition** :
+**Sheet (Drawer) for editing**:
 ```tsx
-// ❌ Mauvais - édition inline qui casse le layout
+// ❌ Bad - inline editing that breaks layout
 {isEditing ? <EditForm /> : <ViewMode />}
 
-// ✅ Bon - Sheet qui s'ouvre sur le côté
+// ✅ Good - Sheet that opens from the side
 <Sheet open={isEditing} onOpenChange={setIsEditing}>
   <SheetContent side="right" className="w-full sm:w-[400px]">
     <SheetHeader>
-      <SheetTitle>Modifier le compte</SheetTitle>
+      <SheetTitle>Edit Account</SheetTitle>
     </SheetHeader>
     <EditForm />
   </SheetContent>
 </Sheet>
 ```
 
-**Infinite Scroll pour les listes** :
+**Infinite Scroll for lists**:
 ```tsx
-// Utiliser IntersectionObserver pour charger plus de données
+// Use IntersectionObserver to load more data
 const observerRef = useRef<IntersectionObserver | null>(null);
 const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -251,21 +362,21 @@ useEffect(() => {
   return () => observerRef.current?.disconnect();
 }, [hasMore, isLoading, loadMore]);
 
-// Dans le JSX
+// In JSX
 <div ref={loadMoreRef} className="h-4" /> {/* Trigger element */}
 ```
 
 ### API Routes
-- Pattern: `/api/[resource]/route.ts` pour CRUD
-- Pattern: `/api/[resource]/[id]/route.ts` pour opérations sur une ressource
-- Validation des inputs avec early returns
-- Toujours retourner JSON avec status approprié
-- Utiliser les Use Cases pour la logique métier complexe
+- Pattern: `/api/[resource]/route.ts` for CRUD
+- Pattern: `/api/[resource]/[id]/route.ts` for single resource operations
+- Input validation with early returns
+- Always return JSON with appropriate status
+- Use Use Cases for complex business logic
 
 ### Repositories (Infrastructure Layer)
-- Toute interaction avec Prisma passe par les repositories
-- Les repositories retournent des entités du domaine, pas des types Prisma
-- Export centralisé via `src/server/repositories/index.ts`
+- All Prisma interaction goes through repositories
+- Repositories return domain entities, not Prisma types
+- Centralized export via `src/server/repositories/index.ts`
 
 ### Use Cases (Application Layer)
 ```typescript
@@ -284,14 +395,14 @@ export class CreateAccountUseCase {
 }
 ```
 
-## Types Prisma Importants
+## Important Prisma Types
 
 ```typescript
 enum AccountType {
-  CHECKING    // Compte courant
-  SAVINGS     // Épargne
-  INVESTMENT  // Investissement
-  LOAN        // Prêt
+  CHECKING    // Checking account
+  SAVINGS     // Savings
+  INVESTMENT  // Investment
+  LOAN        // Loan
 }
 
 enum TransactionType {
@@ -304,7 +415,7 @@ enum TransactionType {
 
 ### TanStack Query (Data Fetching)
 
-**Query Key Factory Pattern** - Toujours utiliser un factory pour les clés de cache :
+**Query Key Factory Pattern** - Always use a factory for cache keys:
 
 ```typescript
 // src/features/transactions/hooks/use-transactions-query.ts
@@ -318,10 +429,10 @@ export const transactionKeys = {
 };
 ```
 
-**Hooks Query** - Un hook = une query, nommage explicite :
+**Query Hooks** - One hook = one query, explicit naming:
 
 ```typescript
-// ✅ Bon - hooks dédiés
+// ✅ Good - dedicated hooks
 export function useTransactionsQuery(filters, pagination) {
   return useQuery({
     queryKey: transactionKeys.list(filters, pagination),
@@ -338,7 +449,7 @@ export function useTransactionQuery(id: string) {
 }
 ```
 
-**Mutations avec Invalidation** :
+**Mutations with Invalidation**:
 
 ```typescript
 export function useCreateTransactionMutation() {
@@ -347,16 +458,16 @@ export function useCreateTransactionMutation() {
   return useMutation({
     mutationFn: (input: CreateTransactionInput) => transactionService.create(input),
     onSuccess: () => {
-      // Invalider les listes pour refetch
+      // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: transactionKeys.lists() });
-      // Invalider le summary aussi
+      // Invalidate summary too
       queryClient.invalidateQueries({ queryKey: [...transactionKeys.all, 'summary'] });
     },
   });
 }
 ```
 
-**Optimistic Updates** - Pour une UX réactive :
+**Optimistic Updates** - For responsive UX:
 
 ```typescript
 useMutation({
@@ -381,21 +492,21 @@ useMutation({
 
 ### TanStack Query vs Zustand
 
-**Quand utiliser quoi** :
+**When to use what**:
 
-| Cas d'usage | TanStack Query | Zustand |
-|-------------|----------------|---------|
-| Données serveur (fetch/cache) | ✅ | ❌ |
-| État UI (modals, sidebar) | ❌ | ✅ |
-| Sélection d'éléments | ❌ | ✅ |
-| Filtres locaux | ❌ | ✅ |
-| Pagination serveur | ✅ | ❌ |
-| Tri/filtre côté serveur | ✅ | ❌ |
+| Use Case | TanStack Query | Zustand |
+|----------|----------------|---------|
+| Server data (fetch/cache) | ✅ | ❌ |
+| UI state (modals, sidebar) | ❌ | ✅ |
+| Element selection | ❌ | ✅ |
+| Local filters | ❌ | ✅ |
+| Server-side pagination | ✅ | ❌ |
+| Server-side sort/filter | ✅ | ❌ |
 
-**Coexistence** - Les deux peuvent cohabiter :
+**Coexistence** - Both can work together:
 
 ```typescript
-// Store Zustand pour l'UI
+// Zustand store for UI
 const useTransactionUIStore = create((set) => ({
   selectedIds: [],
   isCreateModalOpen: false,
@@ -406,7 +517,7 @@ const useTransactionUIStore = create((set) => ({
   })),
 }));
 
-// Hook Query pour les données
+// Query hook for data
 function TransactionList() {
   const { data, isLoading } = useTransactionsQuery();
   const { selectedIds, toggleSelection } = useTransactionUIStore();
@@ -416,14 +527,14 @@ function TransactionList() {
 
 ### TanStack Table
 
-**Column Definitions** - Typage strict avec ColumnDef :
+**Column Definitions** - Strict typing with ColumnDef:
 
 ```typescript
 import type { ColumnDef } from '@tanstack/react-table';
 
 export function createTransactionColumns(options?: ColumnOptions): ColumnDef<Transaction>[] {
   return [
-    // Colonne de sélection
+    // Selection column
     {
       id: 'select',
       header: ({ table }) => (
@@ -441,18 +552,18 @@ export function createTransactionColumns(options?: ColumnOptions): ColumnDef<Tra
       ),
       enableSorting: false,
     },
-    // Colonne de données
+    // Data column
     {
       accessorKey: 'date',
       header: 'Date',
       cell: ({ row }) => formatDate(row.getValue('date')),
       sortingFn: 'datetime',
     },
-    // Colonne avec accessor function
+    // Column with accessor function
     {
       accessorFn: (row) => row.amount,
       id: 'amount',
-      header: () => <div className="text-right">Montant</div>,
+      header: () => <div className="text-right">Amount</div>,
       cell: ({ row }) => (
         <div className={cn('text-right', row.original.type === 'income' && 'text-emerald-600')}>
           {formatCurrency(row.original.amount)}
@@ -463,14 +574,14 @@ export function createTransactionColumns(options?: ColumnOptions): ColumnDef<Tra
 }
 ```
 
-**Table Instance** - Configurer useReactTable :
+**Table Instance** - Configure useReactTable:
 
 ```typescript
 const table = useReactTable({
   data,
   columns,
   state: { sorting, rowSelection, pagination },
-  // Handlers (utilisent le pattern Updater)
+  // Handlers (use Updater pattern)
   onSortingChange: setSorting,
   onRowSelectionChange: setRowSelection,
   onPaginationChange: setPagination,
@@ -481,12 +592,12 @@ const table = useReactTable({
   getPaginationRowModel: getPaginationRowModel(),
   // Options
   enableRowSelection: true,
-  manualPagination: true, // Si pagination serveur
+  manualPagination: true, // If server-side pagination
   pageCount: totalPages,
 });
 ```
 
-**DataTable Component** - Composant réutilisable dans `src/components/ui/data-table.tsx` :
+**DataTable Component** - Reusable component in `src/components/ui/data-table.tsx`:
 
 ```tsx
 <DataTable
@@ -502,21 +613,21 @@ const table = useReactTable({
   enableRowSelection
   rowSelection={rowSelection}
   onRowSelectionChange={handleRowSelectionChange}
-  emptyMessage="Aucune transaction trouvée"
+  emptyMessage="No transactions found"
 />
 ```
 
 ### TanStack Form
 
-**Form Setup avec Zod** :
+**Form Setup with Zod**:
 
 ```typescript
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 
 const transactionSchema = z.object({
-  amount: z.number().positive('Le montant doit être positif'),
-  description: z.string().min(1, 'Description requise'),
+  amount: z.number().positive('Amount must be positive'),
+  description: z.string().min(1, 'Description required'),
   date: z.date(),
   categoryId: z.string().optional(),
 });
@@ -543,7 +654,7 @@ function TransactionForm() {
         name="amount"
         children={(field) => (
           <div>
-            <Label htmlFor={field.name}>Montant</Label>
+            <Label htmlFor={field.name}>Amount</Label>
             <Input
               id={field.name}
               type="number"
@@ -562,7 +673,7 @@ function TransactionForm() {
         selector={(state) => [state.canSubmit, state.isSubmitting]}
         children={([canSubmit, isSubmitting]) => (
           <Button type="submit" disabled={!canSubmit}>
-            {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+            {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
         )}
       />
@@ -571,7 +682,7 @@ function TransactionForm() {
 }
 ```
 
-**Field Info Helper** :
+**Field Info Helper**:
 
 ```typescript
 function FieldInfo({ field }: { field: AnyFieldApi }) {
@@ -583,7 +694,7 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
         </p>
       )}
       {field.state.meta.isValidating && (
-        <p className="text-sm text-muted-foreground">Validation...</p>
+        <p className="text-sm text-muted-foreground">Validating...</p>
       )}
     </>
   );
@@ -592,15 +703,15 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 
 ## Tests
 
-Compte de test Playwright: `fr100828` / `1L0v31000niuM*`
+Playwright test account: `fr100828` / `1L0v31000niuM*`
 
-## Charts avec Tremor
+## Charts with Tremor
 
-On utilise **Tremor** pour les graphiques (pas Recharts ni shadcn/charts). API simple et déclarative.
+We use **Tremor** for charts (not Recharts or shadcn/charts). Simple and declarative API.
 
-### Composants disponibles
+### Available Components
 
-Nos composants wrappent Tremor dans `src/components/charts/` :
+Our components wrap Tremor in `src/components/charts/`:
 
 ```tsx
 import { DonutChart, ChartLegend } from '@/components/charts/pie-chart';
@@ -608,53 +719,53 @@ import { IncomeExpenseBarChart } from '@/components/charts/bar-chart';
 import { PatrimonyAreaChart, InvestmentPerformanceChart } from '@/components/charts/area-chart';
 ```
 
-### Usage DonutChart
+### DonutChart Usage
 
 ```tsx
 const data = [
-  { name: 'Alimentation', value: 450, color: '#10b981' },
+  { name: 'Food', value: 450, color: '#10b981' },
   { name: 'Transport', value: 200, color: '#3b82f6' },
-  { name: 'Loisirs', value: 150, color: '#8b5cf6' },
+  { name: 'Leisure', value: 150, color: '#8b5cf6' },
 ];
 
 <DonutChart data={data} className="h-72" />
 <ChartLegend items={data} total={800} />
 ```
 
-### Usage BarChart
+### BarChart Usage
 
 ```tsx
 const data = [
   { label: 'Jan', income: 3500, expenses: 2800 },
-  { label: 'Fév', income: 3200, expenses: 2600 },
+  { label: 'Feb', income: 3200, expenses: 2600 },
 ];
 
 <IncomeExpenseBarChart data={data} className="h-72" />
 ```
 
-### Usage AreaChart
+### AreaChart Usage
 
 ```tsx
-// Patrimoine simple
+// Simple patrimony
 const data = [
   { date: '2024-01', value: 50000, label: 'Jan' },
-  { date: '2024-02', value: 52000, label: 'Fév' },
+  { date: '2024-02', value: 52000, label: 'Feb' },
 ];
 
 <PatrimonyAreaChart data={data} className="h-72" />
 
-// Performance investissement (valeur vs investi)
+// Investment performance (value vs invested)
 const investData = [
   { date: '2024-01', value: 10500, invested: 10000, label: 'Jan' },
-  { date: '2024-02', value: 11200, invested: 10500, label: 'Fév' },
+  { date: '2024-02', value: 11200, invested: 10500, label: 'Feb' },
 ];
 
 <InvestmentPerformanceChart data={investData} className="h-72" />
 ```
 
-### Couleurs Tremor
+### Tremor Colors
 
-Tremor utilise des noms de couleurs prédéfinis : `emerald`, `rose`, `indigo`, `slate`, `amber`, `cyan`, etc.
+Tremor uses predefined color names: `emerald`, `rose`, `indigo`, `slate`, `amber`, `cyan`, etc.
 
 ```tsx
 <BarChart colors={['emerald', 'rose']} />
@@ -662,34 +773,34 @@ Tremor utilise des noms de couleurs prédéfinis : `emerald`, `rose`, `indigo`, 
 
 ## Design Guidelines (Vercel Style)
 
-### Principes Visuels
+### Visual Principles
 
-L'application suit les **Vercel Web Interface Guidelines** :
+The application follows **Vercel Web Interface Guidelines**:
 
-- **Minimalisme** - Pas de clutter visuel, chaque élément a une raison d'être
-- **Whitespace généreux** - Laisser respirer les éléments (`space-y-6`, `gap-4`, `p-6`)
-- **Bordures subtiles** - Utiliser `border-border/60` au lieu de `border-border`
-- **Couleurs muted** - Texte secondaire en `text-muted-foreground`
-- **Hiérarchie typographique claire** - Titres en `font-semibold`, descriptions en `text-sm text-muted-foreground`
-- **Mobile-first** - Toujours designer pour mobile d'abord
+- **Minimalism** - No visual clutter, every element has a purpose
+- **Generous whitespace** - Let elements breathe (`space-y-6`, `gap-4`, `p-6`)
+- **Subtle borders** - Use `border-border/60` instead of `border-border`
+- **Muted colors** - Secondary text in `text-muted-foreground`
+- **Clear typographic hierarchy** - Titles in `font-semibold`, descriptions in `text-sm text-muted-foreground`
+- **Mobile-first** - Always design for mobile first
 
-### Patterns Visuels
+### Visual Patterns
 
 ```tsx
-// ❌ Mauvais - trop de bordures, pas assez d'espace
+// ❌ Bad - too many borders, not enough space
 <Card className="border p-2">
-  <h3 className="font-bold text-lg">Titre</h3>
+  <h3 className="font-bold text-lg">Title</h3>
   <p className="text-gray-500">Description</p>
 </Card>
 
-// ✅ Bon - subtil et aéré
+// ✅ Good - subtle and airy
 <Card className="border-border/60">
   <CardHeader className="pb-4">
-    <CardTitle className="text-lg font-medium">Titre</CardTitle>
+    <CardTitle className="text-lg font-medium">Title</CardTitle>
     <p className="text-sm text-muted-foreground">Description</p>
   </CardHeader>
   <CardContent className="space-y-4">
-    {/* contenu */}
+    {/* content */}
   </CardContent>
 </Card>
 ```
@@ -718,19 +829,19 @@ L'application suit les **Vercel Web Interface Guidelines** :
 - Large: `xl:` (1280px+)
 
 ```tsx
-// Grid responsive
+// Responsive grid
 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
 
-// Texte responsive
+// Responsive text
 <p className="text-xs sm:text-sm">
 
-// Padding responsive
+// Responsive padding
 <div className="p-4 sm:p-6">
 ```
 
-## Gestion des Erreurs et Validation
+## Error Handling and Validation
 
-### Validation API (Early Returns)
+### API Validation (Early Returns)
 
 ```typescript
 // src/app/api/accounts/route.ts
@@ -765,28 +876,28 @@ export async function POST(request: Request) {
 }
 ```
 
-### Gestion des Erreurs TanStack Query
+### TanStack Query Error Handling
 
 ```tsx
 function AccountsList() {
   const { data, isLoading, isError, error } = useAccountsQuery();
 
   if (isLoading) {
-    return <LoadingState message="Chargement des comptes..." />;
+    return <LoadingState message="Loading accounts..." />;
   }
 
   if (isError) {
     return (
       <ErrorState
-        title="Erreur de chargement"
-        message={error?.message || 'Une erreur est survenue'}
+        title="Loading Error"
+        message={error?.message || 'An error occurred'}
         onRetry={() => queryClient.invalidateQueries({ queryKey: accountKeys.all })}
       />
     );
   }
 
   if (!data?.length) {
-    return <EmptyState title="Aucun compte" action={<CreateAccountButton />} />;
+    return <EmptyState title="No accounts" action={<CreateAccountButton />} />;
   }
 
   return <AccountsGrid accounts={data} />;
@@ -798,25 +909,25 @@ function AccountsList() {
 ```tsx
 import { toast } from 'sonner';
 
-// Succès
-toast.success('Compte créé avec succès');
+// Success
+toast.success('Account created successfully');
 
-// Erreur
-toast.error('Échec de la création du compte');
+// Error
+toast.error('Failed to create account');
 
-// Avec action
-toast.success('Transaction supprimée', {
+// With action
+toast.success('Transaction deleted', {
   action: {
-    label: 'Annuler',
+    label: 'Undo',
     onClick: () => undoDelete(),
   },
 });
 
 // Loading promise
 toast.promise(createAccount(data), {
-  loading: 'Création en cours...',
-  success: 'Compte créé !',
-  error: 'Échec de la création',
+  loading: 'Creating...',
+  success: 'Account created!',
+  error: 'Creation failed',
 });
 ```
 
@@ -824,7 +935,7 @@ toast.promise(createAccount(data), {
 
 ### Barrel Exports (index.ts)
 
-Chaque feature doit avoir un `index.ts` qui exporte tout :
+Each feature must have an `index.ts` that exports everything:
 
 ```typescript
 // src/features/accounts/index.ts
@@ -847,22 +958,22 @@ export type {
   UpdateAccountInput,
 } from './types';
 
-// Services (si nécessaire côté client)
+// Services (if needed client-side)
 export { accountService } from './services/account-service';
 ```
 
-### Imports dans les Pages
+### Imports in Pages
 
 ```typescript
-// ✅ Bon - import depuis le barrel
+// ✅ Good - import from barrel
 import { useAccountsQuery, useCreateAccountMutation, type Account } from '@/features/accounts';
 
-// ❌ Mauvais - import direct des fichiers internes
+// ❌ Bad - direct import from internal files
 import { useAccountsQuery } from '@/features/accounts/hooks/use-accounts-query';
 import type { Account } from '@/features/accounts/types';
 ```
 
-### Structure d'une Feature
+### Feature Structure
 
 ```
 src/features/accounts/
@@ -872,35 +983,35 @@ src/features/accounts/
 │   └── account-service.ts       # API calls (fetch)
 ├── types/
 │   └── index.ts                 # TypeScript types
-├── components/                  # (optionnel) Composants spécifiques
+├── components/                  # (optional) Specific components
 │   └── AccountCard.tsx
 └── index.ts                     # Barrel export
 ```
 
-## Conventions de Commit
+## Commit Conventions
 
 ### Format
 
 ```
-<type>: <description courte>
+<type>: <short description>
 
-[corps optionnel]
+[optional body]
 ```
 
 ### Types
 
 | Type | Usage |
 |------|-------|
-| `feat` | Nouvelle fonctionnalité |
-| `fix` | Correction de bug |
-| `refactor` | Refactoring sans changement de comportement |
-| `chore` | Tâches de maintenance (deps, config) |
-| `docs` | Documentation uniquement |
-| `style` | Formatage, pas de changement de code |
-| `test` | Ajout/modification de tests |
-| `perf` | Amélioration de performance |
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Refactoring without behavior change |
+| `chore` | Maintenance tasks (deps, config) |
+| `docs` | Documentation only |
+| `style` | Formatting, no code change |
+| `test` | Adding/modifying tests |
+| `perf` | Performance improvement |
 
-### Exemples
+### Examples
 
 ```bash
 feat: add transaction categorization
@@ -910,34 +1021,34 @@ chore: upgrade TanStack Query to v5
 docs: update README with setup instructions
 ```
 
-### Règles
+### Rules
 
-- Message en **anglais**
-- Première lettre en **minuscule**
-- Pas de point final
-- Impératif présent ("add" pas "added")
-- Max 72 caractères pour la première ligne
+- Message in **English**
+- First letter in **lowercase**
+- No period at the end
+- Present imperative ("add" not "added")
+- Max 72 characters for the first line
 
 ## Performance
 
 ### React Optimizations
 
-**useMemo pour calculs coûteux** :
+**useMemo for expensive calculations**:
 
 ```tsx
-// ✅ Bon - mémoïser les calculs dérivés
+// ✅ Good - memoize derived calculations
 const totalBalance = useMemo(() => {
   return accounts.reduce((sum, acc) => sum + acc.balance, 0);
 }, [accounts]);
 
-// ❌ Mauvais - recalcul à chaque render
+// ❌ Bad - recalculate on every render
 const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 ```
 
-**useCallback pour les handlers passés en props** :
+**useCallback for handlers passed as props**:
 
 ```tsx
-// ✅ Bon - stable reference
+// ✅ Good - stable reference
 const handleSelect = useCallback((id: string) => {
   setSelectedIds(prev => [...prev, id]);
 }, []);
@@ -945,31 +1056,31 @@ const handleSelect = useCallback((id: string) => {
 <AccountList onSelect={handleSelect} />
 ```
 
-**Éviter les re-renders inutiles** :
+**Avoid unnecessary re-renders**:
 
 ```tsx
-// ❌ Mauvais - nouvel objet à chaque render
+// ❌ Bad - new object on every render
 <AccountCard style={{ marginTop: 10 }} />
 
-// ✅ Bon - objet stable ou className
+// ✅ Good - stable object or className
 <AccountCard className="mt-2.5" />
 ```
 
 ### Next.js Optimizations
 
-**Dynamic imports pour code splitting** :
+**Dynamic imports for code splitting**:
 
 ```tsx
 import dynamic from 'next/dynamic';
 
-// Charger le composant lourd seulement quand nécessaire
+// Load heavy component only when needed
 const HeavyChart = dynamic(() => import('@/components/charts/HeavyChart'), {
   loading: () => <ChartSkeleton />,
-  ssr: false, // Si le composant utilise window/document
+  ssr: false, // If component uses window/document
 });
 ```
 
-**Image optimization** :
+**Image optimization**:
 
 ```tsx
 import Image from 'next/image';
@@ -985,24 +1096,24 @@ import Image from 'next/image';
 
 ### TanStack Query Optimizations
 
-**Stale time pour éviter refetch inutiles** :
+**Stale time to avoid unnecessary refetch**:
 
 ```typescript
 useQuery({
   queryKey: ['banks'],
   queryFn: fetchBanks,
-  staleTime: 5 * 60 * 1000, // 5 minutes - données qui changent peu
+  staleTime: 5 * 60 * 1000, // 5 minutes - data that changes infrequently
 });
 ```
 
-**Placeholder data pour UX instantanée** :
+**Placeholder data for instant UX**:
 
 ```typescript
 useQuery({
   queryKey: accountKeys.detail(id),
   queryFn: () => fetchAccount(id),
   placeholderData: () => {
-    // Utiliser les données de la liste si disponibles
+    // Use data from list if available
     return queryClient
       .getQueryData<Account[]>(accountKeys.lists())
       ?.find(a => a.id === id);
@@ -1010,14 +1121,14 @@ useQuery({
 });
 ```
 
-**Prefetch pour navigation anticipée** :
+**Prefetch for anticipated navigation**:
 
 ```tsx
 function AccountCard({ account }: { account: Account }) {
   const queryClient = useQueryClient();
 
   const handleMouseEnter = () => {
-    // Prefetch les détails au survol
+    // Prefetch details on hover
     queryClient.prefetchQuery({
       queryKey: accountKeys.detail(account.id),
       queryFn: () => fetchAccount(account.id),
@@ -1039,14 +1150,14 @@ function AccountCard({ account }: { account: Account }) {
 
 ### TanStack Query DevTools
 
-Les DevTools sont automatiquement activés en développement. Cliquer sur le logo React Query en bas à droite pour :
-- Voir toutes les queries et leur état
-- Invalider manuellement des queries
-- Voir le cache
+DevTools are automatically enabled in development. Click the React Query logo in the bottom right to:
+- See all queries and their state
+- Manually invalidate queries
+- View cache
 
 ### Prisma Logging
 
-Activer les logs SQL en développement :
+Enable SQL logs in development:
 
 ```typescript
 // src/lib/prisma.ts
@@ -1060,10 +1171,10 @@ export const prisma = new PrismaClient({
 ### Console Patterns
 
 ```typescript
-// Préfixer les logs pour filtrage facile
+// Prefix logs for easy filtering
 console.log('[AccountRepository]', 'Creating account:', data);
 console.error('[API/accounts]', 'Failed to fetch:', error);
 
-// Utiliser console.table pour les arrays
+// Use console.table for arrays
 console.table(accounts.map(a => ({ id: a.id, name: a.name, balance: a.balance })));
 ```
