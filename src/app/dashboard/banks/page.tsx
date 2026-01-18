@@ -149,9 +149,7 @@ function SectionHeaderWithIcon({ icon, title, iconBgClass, action }: SectionHead
 				>
 					{icon}
 				</div>
-				<h2 className="text-sm font-semibold tracking-tight">
-					{title}
-				</h2>
+				<h2 className="text-sm font-semibold tracking-tight">{title}</h2>
 				<div
 					className="flex-1"
 					style={{
@@ -201,7 +199,9 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 				/>
 				<div className="flex flex-col flex-grow min-w-0">
 					<div className="flex items-center gap-3">
-						<h3 className={`text-lg font-semibold tracking-tight ${!hasAccounts ? 'text-muted-foreground' : ''}`}>
+						<h3
+							className={`text-lg font-semibold tracking-tight ${!hasAccounts ? 'text-muted-foreground' : ''}`}
+						>
 							{bank.name}
 						</h3>
 						{hasAccounts ? (
@@ -217,9 +217,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 								{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
 							</span>
 						) : (
-							<span className="text-xs text-muted-foreground italic">
-								Aucun compte
-							</span>
+							<span className="text-xs text-muted-foreground italic">Aucun compte</span>
 						)}
 					</div>
 					{bank.description && (
@@ -348,9 +346,7 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 			<div className="flex items-center gap-3">
 				<div className="flex flex-col">
 					<div className="flex items-center gap-3">
-						<Text size="sm" weight="medium">
-							{account.name}
-						</Text>
+						<span className="text-sm font-medium">{account.name}</span>
 						<AccountTypeBadge
 							type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
 							variant="subtle"
@@ -394,7 +390,7 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" size="sm">
 					<Plus style={{ height: '0.875rem', width: '0.875rem' }} />
-					<Text size="xs">Ajouter</Text>
+					<span className="text-xs">Ajouter</span>
 					<ChevronDown style={{ height: '0.75rem', width: '0.75rem', opacity: 0.5 }} />
 				</Button>
 			</DropdownMenuTrigger>
@@ -406,7 +402,7 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 								className="rounded-full"
 								style={{ width: '0.5rem', height: '0.5rem', backgroundColor: bank.color }}
 							/>
-							<Text>{bank.name}</Text>
+							<span>{bank.name}</span>
 						</div>
 					</DropdownMenuItem>
 				))}
@@ -460,7 +456,7 @@ function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorC
 								backgroundColor: member.color || '#6b7280',
 							}}
 						/>
-						<Text>{member.name}</Text>
+						<span>{member.name}</span>
 					</Button>
 				);
 			})}
@@ -599,7 +595,7 @@ export default function BanksPage() {
 				</StatCardGrid>
 			) : error ? (
 				<div className="py-6">
-					<Text color="danger">{error}</Text>
+					<p className="text-destructive">{error}</p>
 				</div>
 			) : (
 				<StatCardGrid columns={3}>
@@ -726,9 +722,7 @@ export default function BanksPage() {
 									border: '1px solid hsl(var(--destructive) / 0.2)',
 								}}
 							>
-								<Text size="sm" color="danger">
-									{formError}
-								</Text>
+								<p className="text-sm text-destructive">{formError}</p>
 							</div>
 						)}
 
@@ -764,9 +758,9 @@ export default function BanksPage() {
 								}}
 							>
 								Description
-								<Text size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
+								<span className="text-xs font-normal" style={{ marginLeft: '0.25rem' }}>
 									(optionnel)
-								</Text>
+								</span>
 							</Label>
 							<Textarea
 								id="accountDescription"
@@ -813,9 +807,9 @@ export default function BanksPage() {
 								}}
 							>
 								Lien d'export
-								<Text size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
+								<span className="text-xs font-normal" style={{ marginLeft: '0.25rem' }}>
 									(optionnel)
-								</Text>
+								</span>
 							</Label>
 							<Input
 								id="accountExportUrl"
@@ -825,9 +819,9 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountExportUrl(e.target.value)}
 								style={{ height: '2.5rem' }}
 							/>
-							<Text size="xs" color="muted">
+							<p className="text-xs text-muted-foreground">
 								URL vers l'espace client pour exporter les relevés
-							</Text>
+							</p>
 						</div>
 
 						{/* Member selection */}

@@ -7,8 +7,8 @@
  * - useAppForm: Main form hook for creating forms
  * - fieldContext, formContext: React contexts for form/field state
  * - useFieldContext, useFormContext: Hooks to access form/field state in components
- * - Field components: TextField, SelectField, NumberField, TextAreaField (to be added)
- * - Form components: SubmitButton, FormActions, FieldError (to be added)
+ * - Field components: TextField, SelectField, NumberField, TextAreaField
+ * - Form components: SubmitButton, FormActions, FieldError
  */
 
 // Form context and hooks
@@ -23,6 +23,8 @@ export {
 // Field components
 export { TextField } from './fields/TextField';
 export { SelectField } from './fields/SelectField';
+export { NumberField } from './fields/NumberField';
+export { TextAreaField } from './fields/TextAreaField';
 
 // Form components
 export { SubmitButton } from './components/SubmitButton';
