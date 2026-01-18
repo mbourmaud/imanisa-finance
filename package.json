@@ -22,7 +22,6 @@
 		"seed": "npx tsx prisma/seed.ts"
 	},
 	"dependencies": {
-		"@hookform/resolvers": "^5.2.2",
 		"@prisma/adapter-pg": "^7.2.0",
 		"@prisma/client": "^7.2.0",
 		"@radix-ui/react-accordion": "^1.2.12",
@@ -47,7 +46,6 @@
 		"@tanstack/react-query": "^5.90.18",
 		"@tanstack/react-query-devtools": "^5.91.2",
 		"@tanstack/react-table": "^8.21.3",
-		"@tanstack/zod-form-adapter": "^0.42.1",
 		"@tremor/react": "^3.18.7",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
@@ -62,10 +60,9 @@
 		"prisma": "^7.2.0",
 		"react": "19.2.3",
 		"react-dom": "19.2.3",
-		"react-hook-form": "^7.71.1",
 		"sonner": "^2.0.7",
 		"tailwind-merge": "^3.4.0",
-		"zod": "^4.3.5",
+		"valibot": "^1.2.0",
 		"zustand": "^5.0.10"
 	},
 	"devDependencies": {
