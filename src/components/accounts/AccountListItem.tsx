@@ -35,7 +35,9 @@ interface AccountListItemProps {
  */
 const AccountListItem = forwardRef<HTMLAnchorElement, AccountListItemProps>(
 	({ id, name, bankName = 'Banque', bankColor, balance, currency = 'EUR' }, ref) => {
-		const bgColorWithAlpha = bankColor ? `${bankColor}20` : undefined
+		const colorStyle = bankColor
+			? { '--bank-color': bankColor } as React.CSSProperties
+			: undefined
 
 		return (
 			<Link
@@ -49,15 +51,20 @@ const AccountListItem = forwardRef<HTMLAnchorElement, AccountListItemProps>(
 					'transition-all duration-200',
 					'hover:border-border/40 hover:bg-background/80',
 				)}
+				style={colorStyle}
 			>
 				<div className="flex items-center gap-4">
 					<div
-						className="flex items-center justify-center h-10 w-10 rounded-lg"
-						style={{ backgroundColor: bgColorWithAlpha }}
+						className={cn(
+							'flex items-center justify-center h-10 w-10 rounded-lg',
+							bankColor ? 'bg-[var(--bank-color)]/10' : 'bg-muted',
+						)}
 					>
 						<Building
-							className="h-5 w-5"
-							style={{ color: bankColor || undefined }}
+							className={cn(
+								'h-5 w-5',
+								bankColor ? 'text-[var(--bank-color)]' : 'text-muted-foreground',
+							)}
 						/>
 					</div>
 					<div className="flex flex-col">
