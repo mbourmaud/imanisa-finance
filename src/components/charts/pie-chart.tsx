@@ -52,10 +52,11 @@ export function ChartLegend({ items, total }: { items: LegendItem[]; total: numb
 		<div className="space-y-2">
 			{items.map((item) => {
 				const percentage = ((item.value / total) * 100).toFixed(1);
+				const colorStyle = { '--legend-color': item.color } as React.CSSProperties;
 				return (
-					<div key={item.name} className="flex items-center justify-between">
+					<div key={item.name} className="flex items-center justify-between" style={colorStyle}>
 						<div className="flex items-center gap-2">
-							<div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
+							<div className="h-3 w-3 rounded-full bg-[var(--legend-color)]" />
 							<span className="text-sm">{item.name}</span>
 						</div>
 						<div className="flex items-center gap-3">
