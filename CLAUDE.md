@@ -60,9 +60,41 @@ If a secret was committed by mistake:
 - **State Management**:
   - **TanStack Query** - Data fetching, caching, mutations
   - **Zustand** - Client state (UI, selection, filters)
-- **Forms**: TanStack Form + Zod validation
+- **Forms**: TanStack Form + Valibot validation (migrated from Zod)
 - **Tables**: TanStack Table (sorting, filtering, pagination, selection)
 - **Charts**: Tremor (DonutChart, BarChart, AreaChart)
+
+### Validation: Valibot (not Zod)
+
+We use **Valibot** instead of Zod for schema validation. Valibot is:
+- **Smaller bundle** (~1KB vs ~12KB for Zod)
+- **Faster** runtime validation
+- **Same API** concepts (easy migration from Zod)
+- **TanStack Form compatible** natively (Standard Schema support, no adapter needed)
+
+```tsx
+// ❌ Don't use Zod
+import { z } from 'zod';
+const schema = z.object({ name: z.string().min(1) });
+
+// ✅ Use Valibot
+import * as v from 'valibot';
+const schema = v.object({ name: v.pipe(v.string(), v.minLength(1)) });
+```
+
+**Migration cheat sheet:**
+| Zod | Valibot |
+|-----|---------|
+| `z.string()` | `v.string()` |
+| `z.number()` | `v.number()` |
+| `z.boolean()` | `v.boolean()` |
+| `z.string().min(1)` | `v.pipe(v.string(), v.minLength(1))` |
+| `z.string().email()` | `v.pipe(v.string(), v.email())` |
+| `z.object({...})` | `v.object({...})` |
+| `z.array(z.string())` | `v.array(v.string())` |
+| `z.enum(['a', 'b'])` | `v.picklist(['a', 'b'])` |
+| `z.optional(z.string())` | `v.optional(v.string())` |
+| `z.infer<typeof schema>` | `v.InferOutput<typeof schema>` |
 
 ## Architectural Principles
 
@@ -619,17 +651,19 @@ const table = useReactTable({
 
 ### TanStack Form
 
-**Form Setup with Zod**:
+**Form Setup with Valibot**:
+
+TanStack Form supports **Standard Schema** natively - no adapter needed for Valibot v1.0.0+.
 
 ```typescript
 import { useForm } from '@tanstack/react-form';
-import { z } from 'zod';
+import * as v from 'valibot';
 
-const transactionSchema = z.object({
-  amount: z.number().positive('Amount must be positive'),
-  description: z.string().min(1, 'Description required'),
-  date: z.date(),
-  categoryId: z.string().optional(),
+const transactionSchema = v.object({
+  amount: v.pipe(v.number(), v.minValue(0.01, 'Amount must be positive')),
+  description: v.pipe(v.string(), v.minLength(1, 'Description required')),
+  date: v.date(),
+  categoryId: v.optional(v.string()),
 });
 
 function TransactionForm() {
@@ -641,7 +675,7 @@ function TransactionForm() {
       categoryId: undefined,
     },
     validators: {
-      onChange: transactionSchema,
+      onChange: transactionSchema,  // Direct schema, no adapter needed
     },
     onSubmit: async ({ value }) => {
       await createTransaction(value);
