@@ -577,37 +577,25 @@ function LoanCard({
 								<Plus style={{ height: '0.875rem', width: '0.875rem' }} />
 								Ajouter une assurance
 							</Button>
-						</VStack>
+						</div>
 					)}
 				</div>
-			</VStack>
+			</div>
 		</div>
 	);
 }
 
 function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
 	return (
-		<Flex
-			direction="col"
-			align="center"
-			justify="center"
-			style={{ padding: '2rem 0', textAlign: 'center' }}
-		>
-			<Flex
-				align="center"
-				justify="center"
-				style={{
-					height: '3rem',
-					width: '3rem',
-					borderRadius: '0.75rem',
-					backgroundColor: 'hsl(var(--muted) / 0.5)',
-					marginBottom: '0.75rem',
-				}}
+		<div className="flex flex-col items-center justify-center py-8 text-center">
+			<div
+				className="flex items-center justify-center h-12 w-12 rounded-xl mb-3"
+				style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}
 			>
 				<CreditCard
 					style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 				/>
-			</Flex>
+			</div>
 			<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
 				Aucun prêt
 			</Text>
@@ -618,7 +606,7 @@ function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
 				<Plus style={{ height: '1rem', width: '1rem' }} />
 				Ajouter un prêt
 			</Button>
-		</Flex>
+		</div>
 	);
 }
 
@@ -631,28 +619,28 @@ function DetailItem({
 }) {
 	if (value === null || value === undefined) return null;
 	return (
-		<VStack gap="none">
+		<div className="flex flex-col">
 			<Text size="xs" color="muted">
 				{label}
 			</Text>
 			<Text weight="medium">
 				{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
 			</Text>
-		</VStack>
+		</div>
 	);
 }
 
 function CurrencyItem({ label, value }: { label: string; value: number | null | undefined }) {
 	if (value === null || value === undefined) return null;
 	return (
-		<VStack gap="none">
+		<div className="flex flex-col">
 			<Text size="xs" color="muted">
 				{label}
 			</Text>
 			<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 				{formatCurrency(value)}
 			</Text>
-		</VStack>
+		</div>
 	);
 }
 
