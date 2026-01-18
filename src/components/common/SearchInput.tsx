@@ -49,11 +49,12 @@ interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 	({ size = 'md', minWidth = '200px', className, style, ...props }, ref) => {
 		const classes = sizeClasses[size]
+		const containerStyle = { '--search-min-width': minWidth, ...style } as React.CSSProperties
 
 		return (
 			<div
-				className={cn('relative flex-1', className)}
-				style={{ minWidth, ...style }}
+				className={cn('relative flex-1 min-w-[var(--search-min-width)]', className)}
+				style={containerStyle}
 			>
 				<Search
 					className={cn(
