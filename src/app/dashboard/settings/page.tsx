@@ -22,6 +22,9 @@ import {
 	EmptyState,
 	GlassCard,
 	Globe,
+	Grid,
+	Heading,
+	IconBox,
 	Input,
 	Key,
 	Label,
@@ -30,6 +33,7 @@ import {
 	Palette,
 	Pencil,
 	Plus,
+	Row,
 	Select,
 	SelectContent,
 	SelectItem,
@@ -38,8 +42,10 @@ import {
 	Separator,
 	Shield,
 	Skeleton,
+	Stack,
 	Sun,
 	Switch,
+	Text,
 	Trash2,
 	Upload,
 	User,
@@ -76,19 +82,24 @@ const MEMBER_COLORS = [
 
 function MemberSkeleton() {
 	return (
-		<div
-			className="flex justify-between items-center p-4 rounded-xl"
-			style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+		<Row
+			justify="between"
+			align="center"
+			style={{
+				padding: '1rem',
+				borderRadius: '0.75rem',
+				backgroundColor: 'hsl(var(--muted) / 0.3)',
+			}}
 		>
-			<div className="flex items-center gap-4">
+			<Row gap="md">
 				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.5rem' }} />
-				<div className="flex flex-col gap-2">
+				<Stack gap="sm">
 					<Skeleton style={{ height: '1.25rem', width: '6rem' }} />
 					<Skeleton style={{ height: '1rem', width: '4rem' }} />
-				</div>
-			</div>
+				</Stack>
+			</Row>
 			<Skeleton style={{ height: '2rem', width: '2rem' }} />
-		</div>
+		</Row>
 	);
 }
 
@@ -203,42 +214,38 @@ export default function SettingsPage() {
 	const memberToDelete = members.find((m) => m.id === deleteMemberId);
 
 	return (
-		<div className="flex flex-col gap-8">
+		<Stack gap="xl">
 			{/* Header */}
 			<PageHeader title="Paramètres" description="Configurez votre application" />
 
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+			<Grid cols={3} gap="lg" responsive={{ sm: 1, lg: 3 }}>
 				{/* Main Settings Column */}
-				<div className="flex flex-col gap-6" style={{ gridColumn: 'span 2' }}>
+				<Stack gap="lg" style={{ gridColumn: 'span 2' }}>
 					{/* Profile */}
 					<GlassCard padding="lg">
-						<div className="flex flex-col gap-4">
-							<div className="flex items-center gap-4 pb-2">
-								<div
-									className="flex items-center justify-center h-10 w-10 rounded-xl"
-									style={{
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										color: 'hsl(var(--primary))',
-									}}
-								>
-									<User style={{ height: '1.25rem', width: '1.25rem' }} />
-								</div>
-								<div className="flex flex-col">
-									<h3 className="text-lg font-medium tracking-tight">Profil</h3>
-									<p className="text-sm text-muted-foreground">Vos informations personnelles</p>
-								</div>
-							</div>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div className="flex flex-col gap-2">
+						<Stack gap="md">
+							<Row gap="md" style={{ paddingBottom: '0.5rem' }}>
+								<IconBox icon={User} size="md" variant="primary" rounded="xl" />
+								<Stack gap="xs">
+									<Heading level={3} size="lg" tracking="tight">
+										Profil
+									</Heading>
+									<Text size="sm" color="muted">
+										Vos informations personnelles
+									</Text>
+								</Stack>
+							</Row>
+							<Grid cols={2} gap="md" responsive={{ sm: 1, md: 2 }}>
+								<Stack gap="sm">
 									<Label htmlFor="name">Nom</Label>
 									<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
-								</div>
-								<div className="flex flex-col gap-2">
+								</Stack>
+								<Stack gap="sm">
 									<Label htmlFor="email">Email</Label>
 									<Input id="email" type="email" placeholder="votre@email.com" />
-								</div>
-							</div>
-							<div className="flex flex-col gap-2">
+								</Stack>
+							</Grid>
+							<Stack gap="sm">
 								<Label htmlFor="currency">Devise par défaut</Label>
 								<Select defaultValue="eur">
 									<SelectTrigger id="currency" style={{ width: '100%', maxWidth: '200px' }}>
@@ -251,31 +258,25 @@ export default function SettingsPage() {
 										<SelectItem value="chf">CHF</SelectItem>
 									</SelectContent>
 								</Select>
-							</div>
-						</div>
+							</Stack>
+						</Stack>
 					</GlassCard>
 
 					{/* Members (Household) */}
 					<GlassCard padding="lg">
-						<div className="flex flex-col gap-4">
-							<div className="flex justify-between items-center pb-2">
-								<div className="flex items-center gap-4">
-									<div
-										className="flex items-center justify-center h-10 w-10 rounded-xl"
-										style={{
-											backgroundColor: 'hsl(var(--primary) / 0.1)',
-											color: 'hsl(var(--primary))',
-										}}
-									>
-										<Users style={{ height: '1.25rem', width: '1.25rem' }} />
-									</div>
-									<div className="flex flex-col">
-										<h3 className="text-lg font-medium tracking-tight">Membres du foyer</h3>
-										<p className="text-sm text-muted-foreground">
+						<Stack gap="md">
+							<Row justify="between" align="center" style={{ paddingBottom: '0.5rem' }}>
+								<Row gap="md">
+									<IconBox icon={Users} size="md" variant="primary" rounded="xl" />
+									<Stack gap="xs">
+										<Heading level={3} size="lg" tracking="tight">
+											Membres du foyer
+										</Heading>
+										<Text size="sm" color="muted">
 											Gérez les membres associés aux comptes
-										</p>
-									</div>
-								</div>
+										</Text>
+									</Stack>
+								</Row>
 								<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
 									<DialogTrigger asChild>
 										<Button
@@ -290,8 +291,8 @@ export default function SettingsPage() {
 										<DialogHeader>
 											<DialogTitle>Ajouter un membre</DialogTitle>
 										</DialogHeader>
-										<div className="flex flex-col gap-4 pt-4">
-											<div className="flex flex-col gap-2">
+										<Stack gap="md" style={{ paddingTop: '1rem' }}>
+											<Stack gap="sm">
 												<Label htmlFor="memberName">Nom</Label>
 												<Input
 													id="memberName"
@@ -299,10 +300,10 @@ export default function SettingsPage() {
 													value={newMemberName}
 													onChange={(e) => setNewMemberName(e.target.value)}
 												/>
-											</div>
-											<div className="flex flex-col gap-2">
+											</Stack>
+											<Stack gap="sm">
 												<Label>Couleur</Label>
-												<div className="flex flex-wrap gap-3">
+												<Row gap="sm" style={{ flexWrap: 'wrap' }}>
 													{MEMBER_COLORS.map((color) => (
 														<button
 															key={color.value}
@@ -325,9 +326,9 @@ export default function SettingsPage() {
 															title={color.name}
 														/>
 													))}
-												</div>
-											</div>
-											<div className="flex justify-end gap-3 pt-4">
+												</Row>
+											</Stack>
+											<Row gap="sm" justify="end" style={{ paddingTop: '1rem' }}>
 												<Button variant="outline" onClick={() => setShowAddMember(false)}>
 													Annuler
 												</Button>
@@ -337,12 +338,12 @@ export default function SettingsPage() {
 												>
 													{savingMember ? 'Ajout...' : 'Ajouter'}
 												</Button>
-											</div>
-										</div>
+											</Row>
+										</Stack>
 									</DialogContent>
 								</Dialog>
-							</div>
-							<div className="flex flex-col gap-2">
+							</Row>
+							<Stack gap="sm">
 								{loadingMembers ? (
 									<>
 										<MemberSkeleton />
@@ -358,15 +359,18 @@ export default function SettingsPage() {
 									/>
 								) : (
 									members.map((member) => (
-										<div
+										<Row
 											key={member.id}
-											className="flex justify-between items-center p-4 rounded-xl"
+											justify="between"
+											align="center"
 											style={{
+												padding: '1rem',
+												borderRadius: '0.75rem',
 												backgroundColor: 'hsl(var(--background) / 0.5)',
 												transition: 'background-color 0.2s',
 											}}
 										>
-											<div className="flex items-center gap-4">
+											<Row gap="md">
 												<MemberAvatar
 													member={{
 														id: member.id,
@@ -376,15 +380,15 @@ export default function SettingsPage() {
 													}}
 													size="md"
 												/>
-												<div className="flex flex-col">
-													<p className="font-medium">{member.name}</p>
-													<p className="text-xs text-muted-foreground">
+												<Stack gap="xs">
+													<Text weight="medium">{member.name}</Text>
+													<Text size="xs" color="muted">
 														{member.accountMembers.length} compte
 														{member.accountMembers.length !== 1 ? 's' : ''}
-													</p>
-												</div>
-											</div>
-											<div className="flex items-center gap-3">
+													</Text>
+												</Stack>
+											</Row>
+											<Row gap="sm">
 												<Dialog
 													open={editingMember?.id === member.id}
 													onOpenChange={(open) => !open && setEditingMember(null)}
@@ -404,8 +408,8 @@ export default function SettingsPage() {
 															<DialogTitle>Modifier le membre</DialogTitle>
 														</DialogHeader>
 														{editingMember && (
-															<div className="flex flex-col gap-4 pt-4">
-																<div className="flex flex-col gap-2">
+															<Stack gap="md" style={{ paddingTop: '1rem' }}>
+																<Stack gap="sm">
 																	<Label htmlFor="editMemberName">Nom</Label>
 																	<Input
 																		id="editMemberName"
@@ -414,10 +418,10 @@ export default function SettingsPage() {
 																			setEditingMember({ ...editingMember, name: e.target.value })
 																		}
 																	/>
-																</div>
-																<div className="flex flex-col gap-2">
+																</Stack>
+																<Stack gap="sm">
 																	<Label>Couleur</Label>
-																	<div className="flex flex-wrap gap-3">
+																	<Row gap="sm" style={{ flexWrap: 'wrap' }}>
 																		{MEMBER_COLORS.map((color) => (
 																			<button
 																				key={color.value}
@@ -442,17 +446,17 @@ export default function SettingsPage() {
 																				title={color.name}
 																			/>
 																		))}
-																	</div>
-																</div>
-																<div className="flex justify-end gap-3 pt-4">
+																	</Row>
+																</Stack>
+																<Row gap="sm" justify="end" style={{ paddingTop: '1rem' }}>
 																	<Button variant="outline" onClick={() => setEditingMember(null)}>
 																		Annuler
 																	</Button>
 																	<Button onClick={handleUpdateMember} disabled={savingMember}>
 																		{savingMember ? 'Sauvegarde...' : 'Sauvegarder'}
 																	</Button>
-																</div>
-															</div>
+																</Row>
+															</Stack>
 														)}
 													</DialogContent>
 												</Dialog>
@@ -468,37 +472,33 @@ export default function SettingsPage() {
 												>
 													<Trash2 style={{ height: '1rem', width: '1rem' }} />
 												</Button>
-											</div>
-										</div>
+											</Row>
+										</Row>
 									))
 								)}
-							</div>
-						</div>
+							</Stack>
+						</Stack>
 					</GlassCard>
 
 					{/* Appearance */}
 					<GlassCard padding="lg">
-						<div className="flex flex-col gap-6">
-							<div className="flex items-center gap-4 pb-2">
-								<div
-									className="flex items-center justify-center h-10 w-10 rounded-xl"
-									style={{
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										color: 'hsl(var(--primary))',
-									}}
-								>
-									<Palette style={{ height: '1.25rem', width: '1.25rem' }} />
-								</div>
-								<div className="flex flex-col">
-									<h3 className="text-lg font-medium tracking-tight">Apparence</h3>
-									<p className="text-sm text-muted-foreground">Personnalisez l&apos;interface</p>
-								</div>
-							</div>
+						<Stack gap="lg">
+							<Row gap="md" style={{ paddingBottom: '0.5rem' }}>
+								<IconBox icon={Palette} size="md" variant="primary" rounded="xl" />
+								<Stack gap="xs">
+									<Heading level={3} size="lg" tracking="tight">
+										Apparence
+									</Heading>
+									<Text size="sm" color="muted">
+										Personnalisez l&apos;interface
+									</Text>
+								</Stack>
+							</Row>
 
 							{/* Theme Selection */}
-							<div className="flex flex-col gap-3">
+							<Stack gap="sm">
 								<Label>Thème</Label>
-								<div className="grid grid-cols-3 gap-2">
+								<Grid cols={3} gap="sm">
 									<button
 										type="button"
 										onClick={() => setTheme('light')}
@@ -520,7 +520,9 @@ export default function SettingsPage() {
 										}}
 									>
 										<Sun style={{ height: '1.25rem', width: '1.25rem' }} />
-										<span className="text-sm font-medium">Clair</span>
+										<Text size="sm" weight="medium">
+											Clair
+										</Text>
 									</button>
 									<button
 										type="button"
@@ -543,7 +545,9 @@ export default function SettingsPage() {
 										}}
 									>
 										<Moon style={{ height: '1.25rem', width: '1.25rem' }} />
-										<span className="text-sm font-medium">Sombre</span>
+										<Text size="sm" weight="medium">
+											Sombre
+										</Text>
 									</button>
 									<button
 										type="button"
@@ -568,15 +572,17 @@ export default function SettingsPage() {
 										}}
 									>
 										<Globe style={{ height: '1.25rem', width: '1.25rem' }} />
-										<span className="text-sm font-medium">Système</span>
+										<Text size="sm" weight="medium">
+											Système
+										</Text>
 									</button>
-								</div>
-							</div>
+								</Grid>
+							</Stack>
 
 							<Separator />
 
 							{/* Language */}
-							<div className="flex flex-col gap-2">
+							<Stack gap="sm">
 								<Label htmlFor="language">Langue</Label>
 								<Select defaultValue="fr">
 									<SelectTrigger id="language" style={{ width: '100%', maxWidth: '200px' }}>
@@ -587,29 +593,25 @@ export default function SettingsPage() {
 										<SelectItem value="en">English</SelectItem>
 									</SelectContent>
 								</Select>
-							</div>
-						</div>
+							</Stack>
+						</Stack>
 					</GlassCard>
 
 					{/* Data & Privacy */}
 					<GlassCard padding="lg">
-						<div className="flex flex-col gap-4">
-							<div className="flex items-center gap-4 pb-2">
-								<div
-									className="flex items-center justify-center h-10 w-10 rounded-xl"
-									style={{
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										color: 'hsl(var(--primary))',
-									}}
-								>
-									<Database style={{ height: '1.25rem', width: '1.25rem' }} />
-								</div>
-								<div className="flex flex-col">
-									<h3 className="text-lg font-medium tracking-tight">Données</h3>
-									<p className="text-sm text-muted-foreground">Export et sauvegarde</p>
-								</div>
-							</div>
-							<div className="flex flex-col gap-3">
+						<Stack gap="md">
+							<Row gap="md" style={{ paddingBottom: '0.5rem' }}>
+								<IconBox icon={Database} size="md" variant="primary" rounded="xl" />
+								<Stack gap="xs">
+									<Heading level={3} size="lg" tracking="tight">
+										Données
+									</Heading>
+									<Text size="sm" color="muted">
+										Export et sauvegarde
+									</Text>
+								</Stack>
+							</Row>
+							<Stack gap="sm">
 								<Button
 									variant="outline"
 									style={{ flex: 1 }}
@@ -624,73 +626,67 @@ export default function SettingsPage() {
 								>
 									Importer une sauvegarde
 								</Button>
-							</div>
-							<p className="text-xs text-muted-foreground">
+							</Stack>
+							<Text size="xs" color="muted">
 								Vos données sont stockées localement sur votre serveur. Effectuez des sauvegardes
 								régulières pour éviter toute perte de données.
-							</p>
-						</div>
+							</Text>
+						</Stack>
 					</GlassCard>
-				</div>
+				</Stack>
 
 				{/* Sidebar Settings */}
-				<div className="flex flex-col gap-6">
+				<Stack gap="lg">
 					{/* Notifications */}
 					<GlassCard padding="lg">
-						<div className="flex flex-col gap-4">
-							<div className="flex items-center gap-4 pb-2">
-								<div
-									className="flex items-center justify-center h-10 w-10 rounded-xl"
-									style={{
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										color: 'hsl(var(--primary))',
-									}}
-								>
-									<Bell style={{ height: '1.25rem', width: '1.25rem' }} />
-								</div>
-								<h3 className="text-lg font-medium tracking-tight">Notifications</h3>
-							</div>
-							<div className="flex justify-between items-center">
-								<div className="flex flex-col">
-									<p className="font-medium">Alertes budget</p>
-									<p className="text-xs text-muted-foreground">Dépassement de budget</p>
-								</div>
+						<Stack gap="md">
+							<Row gap="md" style={{ paddingBottom: '0.5rem' }}>
+								<IconBox icon={Bell} size="md" variant="primary" rounded="xl" />
+								<Heading level={3} size="lg" tracking="tight">
+									Notifications
+								</Heading>
+							</Row>
+							<Row justify="between" align="center">
+								<Stack gap="xs">
+									<Text weight="medium">Alertes budget</Text>
+									<Text size="xs" color="muted">
+										Dépassement de budget
+									</Text>
+								</Stack>
 								<Switch defaultChecked />
-							</div>
+							</Row>
 							<Separator />
-							<div className="flex justify-between items-center">
-								<div className="flex flex-col">
-									<p className="font-medium">Transactions</p>
-									<p className="text-xs text-muted-foreground">Nouvelles transactions</p>
-								</div>
+							<Row justify="between" align="center">
+								<Stack gap="xs">
+									<Text weight="medium">Transactions</Text>
+									<Text size="xs" color="muted">
+										Nouvelles transactions
+									</Text>
+								</Stack>
 								<Switch />
-							</div>
+							</Row>
 							<Separator />
-							<div className="flex justify-between items-center">
-								<div className="flex flex-col">
-									<p className="font-medium">Rappels</p>
-									<p className="text-xs text-muted-foreground">Échéances de prêts</p>
-								</div>
+							<Row justify="between" align="center">
+								<Stack gap="xs">
+									<Text weight="medium">Rappels</Text>
+									<Text size="xs" color="muted">
+										Échéances de prêts
+									</Text>
+								</Stack>
 								<Switch defaultChecked />
-							</div>
-						</div>
+							</Row>
+						</Stack>
 					</GlassCard>
 
 					{/* Security */}
 					<GlassCard padding="lg">
-						<div className="flex flex-col gap-4">
-							<div className="flex items-center gap-4 pb-2">
-								<div
-									className="flex items-center justify-center h-10 w-10 rounded-xl"
-									style={{
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										color: 'hsl(var(--primary))',
-									}}
-								>
-									<Shield style={{ height: '1.25rem', width: '1.25rem' }} />
-								</div>
-								<h3 className="text-lg font-medium tracking-tight">Sécurité</h3>
-							</div>
+						<Stack gap="md">
+							<Row gap="md" style={{ paddingBottom: '0.5rem' }}>
+								<IconBox icon={Shield} size="md" variant="primary" rounded="xl" />
+								<Heading level={3} size="lg" tracking="tight">
+									Sécurité
+								</Heading>
+							</Row>
 							<Button
 								variant="outline"
 								style={{ width: '100%', justifyContent: 'flex-start' }}
@@ -698,32 +694,38 @@ export default function SettingsPage() {
 							>
 								Changer le mot de passe
 							</Button>
-							<div className="flex justify-between items-center">
-								<div className="flex flex-col">
-									<p className="font-medium">2FA</p>
-									<p className="text-xs text-muted-foreground">Authentification double facteur</p>
-								</div>
+							<Row justify="between" align="center">
+								<Stack gap="xs">
+									<Text weight="medium">2FA</Text>
+									<Text size="xs" color="muted">
+										Authentification double facteur
+									</Text>
+								</Stack>
 								<Switch />
-							</div>
+							</Row>
 							<Separator />
-							<div className="flex justify-between items-center">
-								<div className="flex flex-col">
-									<p className="font-medium">Sessions</p>
-									<p className="text-xs text-muted-foreground">Déconnexion automatique</p>
-								</div>
+							<Row justify="between" align="center">
+								<Stack gap="xs">
+									<Text weight="medium">Sessions</Text>
+									<Text size="xs" color="muted">
+										Déconnexion automatique
+									</Text>
+								</Stack>
 								<Switch defaultChecked />
-							</div>
-						</div>
+							</Row>
+						</Stack>
 					</GlassCard>
 
 					{/* App Info */}
 					<GlassCard padding="lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.2)' }}>
-						<div className="flex flex-col items-center text-center">
-							<p className="font-medium">Imanisa Finance</p>
-							<p className="text-sm text-muted-foreground">Version 2.0.0</p>
-							<p className="text-xs text-muted-foreground" style={{ marginTop: '1rem' }}>
+						<Stack gap="xs" align="center">
+							<Text weight="medium">Imanisa Finance</Text>
+							<Text size="sm" color="muted">
+								Version 2.0.0
+							</Text>
+							<Text size="xs" color="muted" align="center" style={{ marginTop: '1rem' }}>
 								Application open source de gestion de patrimoine personnel
-							</p>
+							</Text>
 							<a
 								href="https://github.com/mbourmaud/imanisa-finance"
 								target="_blank"
@@ -732,10 +734,10 @@ export default function SettingsPage() {
 							>
 								Voir sur GitHub
 							</a>
-						</div>
+						</Stack>
 					</GlassCard>
-				</div>
-			</div>
+				</Stack>
+			</Grid>
 
 			<ConfirmDialog
 				open={deleteMemberId !== null}
@@ -750,6 +752,6 @@ export default function SettingsPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteMember}
 			/>
-		</div>
+		</Stack>
 	);
 }
