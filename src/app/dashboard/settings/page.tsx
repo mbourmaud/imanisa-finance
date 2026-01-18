@@ -9,6 +9,7 @@
 
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
 	Bell,
 	Button,
@@ -48,12 +49,15 @@ import {
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { MemberAvatar } from '@/components/members/MemberAvatar'
 import { ProfileForm } from '@/features/profile'
+import {
+	useCreateMemberMutation,
+	useDeleteMemberMutation,
+	useMembersQuery,
+	useUpdateMemberMutation,
+	type Member,
+} from '@/features/members'
 
-interface Member {
-	id: string
-	name: string
-	color: string | null
-	avatarUrl: string | null
+interface MemberWithAccounts extends Member {
 	accountMembers: {
 		id: string
 		ownerShare: number
@@ -79,34 +83,21 @@ export default function SettingsPage() {
 	const [mounted, setMounted] = useState(false)
 	const { theme, setTheme } = useTheme()
 
-	// Members state
-	const [members, setMembers] = useState<Member[]>([])
-	const [loadingMembers, setLoadingMembers] = useState(true)
-	const [editingMember, setEditingMember] = useState<Member | null>(null)
+	// TanStack Query for members
+	const { data: members = [], isLoading: loadingMembers } = useMembersQuery() as {
+		data: MemberWithAccounts[] | undefined
+		isLoading: boolean
+	}
+	const createMutation = useCreateMemberMutation()
+	const updateMutation = useUpdateMemberMutation()
+	const deleteMutation = useDeleteMemberMutation()
+
+	// UI state only
+	const [editingMember, setEditingMember] = useState<MemberWithAccounts | null>(null)
 	const [showAddMember, setShowAddMember] = useState(false)
 	const [newMemberName, setNewMemberName] = useState('')
 	const [newMemberColor, setNewMemberColor] = useState(MEMBER_COLORS[0].value)
-	const [savingMember, setSavingMember] = useState(false)
 	const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null)
-
-	// Fetch members
-	useEffect(() => {
-		async function fetchMembers() {
-			try {
-				const response = await fetch('/api/members')
-				if (response.ok) {
-					const data = await response.json()
-					setMembers(data.members)
-				}
-			} catch (error) {
-				console.error('Error fetching members:', error)
-			} finally {
-				setLoadingMembers(false)
-			}
-		}
-
-		fetchMembers()
-	}, [])
 
 	// Avoid hydration mismatch by only rendering theme-dependent UI after mount
 	useEffect(() => {
@@ -117,25 +108,14 @@ export default function SettingsPage() {
 	const handleAddMember = async () => {
 		if (!newMemberName.trim()) return
 
-		setSavingMember(true)
 		try {
-			const response = await fetch('/api/members', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name: newMemberName, color: newMemberColor }),
-			})
-
-			if (response.ok) {
-				const member = await response.json()
-				setMembers([...members, { ...member, accountMembers: [] }])
-				setNewMemberName('')
-				setNewMemberColor(MEMBER_COLORS[0].value)
-				setShowAddMember(false)
-			}
-		} catch (error) {
-			console.error('Error adding member:', error)
-		} finally {
-			setSavingMember(false)
+			await createMutation.mutateAsync({ name: newMemberName, color: newMemberColor })
+			toast.success('Membre ajouté avec succès')
+			setNewMemberName('')
+			setNewMemberColor(MEMBER_COLORS[0].value)
+			setShowAddMember(false)
+		} catch {
+			toast.error("Impossible d'ajouter le membre")
 		}
 	}
 
@@ -143,23 +123,15 @@ export default function SettingsPage() {
 	const handleUpdateMember = async () => {
 		if (!editingMember || !editingMember.name.trim()) return
 
-		setSavingMember(true)
 		try {
-			const response = await fetch(`/api/members/${editingMember.id}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name: editingMember.name, color: editingMember.color }),
+			await updateMutation.mutateAsync({
+				id: editingMember.id,
+				input: { name: editingMember.name, color: editingMember.color ?? undefined },
 			})
-
-			if (response.ok) {
-				const updated = await response.json()
-				setMembers(members.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)))
-				setEditingMember(null)
-			}
-		} catch (error) {
-			console.error('Error updating member:', error)
-		} finally {
-			setSavingMember(false)
+			toast.success('Membre mis à jour')
+			setEditingMember(null)
+		} catch {
+			toast.error('Impossible de mettre à jour le membre')
 		}
 	}
 
@@ -168,22 +140,17 @@ export default function SettingsPage() {
 		if (!deleteMemberId) return
 
 		try {
-			const response = await fetch(`/api/members/${deleteMemberId}`, { method: 'DELETE' })
-
-			if (response.ok) {
-				setMembers(members.filter((m) => m.id !== deleteMemberId))
-			} else {
-				const data = await response.json()
-				console.error(data.error || 'Impossible de supprimer ce membre')
-			}
-		} catch (error) {
-			console.error('Error deleting member:', error)
+			await deleteMutation.mutateAsync(deleteMemberId)
+			toast.success('Membre supprimé')
+		} catch {
+			toast.error('Impossible de supprimer le membre')
 		} finally {
 			setDeleteMemberId(null)
 		}
 	}
 
 	const memberToDelete = members.find((m) => m.id === deleteMemberId)
+	const isSaving = createMutation.isPending || updateMutation.isPending
 
 	return (
 		<Flex direction="col" gap="xl">
@@ -257,9 +224,9 @@ export default function SettingsPage() {
 											</Button>
 											<Button
 												onClick={handleAddMember}
-												disabled={savingMember || !newMemberName.trim()}
+												disabled={isSaving || !newMemberName.trim()}
 											>
-												{savingMember ? 'Ajout...' : 'Ajouter'}
+												{createMutation.isPending ? 'Ajout...' : 'Ajouter'}
 											</Button>
 										</Flex>
 									</Flex>
@@ -297,7 +264,7 @@ export default function SettingsPage() {
 											/>
 										}
 										name={member.name}
-										accountCount={member.accountMembers.length}
+										accountCount={member.accountMembers?.length ?? 0}
 										onEdit={() => setEditingMember(member)}
 										onDelete={() => setDeleteMemberId(member.id)}
 										editDialog={
@@ -332,8 +299,8 @@ export default function SettingsPage() {
 																<Button variant="outline" onClick={() => setEditingMember(null)}>
 																	Annuler
 																</Button>
-																<Button onClick={handleUpdateMember} disabled={savingMember}>
-																	{savingMember ? 'Sauvegarde...' : 'Sauvegarder'}
+																<Button onClick={handleUpdateMember} disabled={isSaving}>
+																	{updateMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
 																</Button>
 															</Flex>
 														</Flex>
