@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * Transactions Page
@@ -10,26 +10,17 @@
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
-	Button,
-	Calendar,
 	CreditCard,
-	Download,
-	Filter,
+	ExportButton,
 	Flex,
-	GlassCard,
-	ListHeader,
 	PageHeader,
-	SearchInput,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 	StatCard,
 	StatCardGrid,
+	TransactionFilters,
+	TransactionListContainer,
 	TransactionListItem,
-} from '@/components';
-import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
+} from '@/components'
+import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils'
 
 // Mock transaction data
 const transactions = [
@@ -113,46 +104,37 @@ const transactions = [
 		category: 'Abonnements',
 		account: 'Compte principal',
 	},
-];
+]
 
-const income = transactions.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+const income = transactions.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0)
 const expenses = transactions
 	.filter((t) => t.amount < 0)
-	.reduce((s, t) => s + Math.abs(t.amount), 0);
+	.reduce((s, t) => s + Math.abs(t.amount), 0)
 
 function formatDate(dateStr: string): string {
-	const date = new Date(dateStr);
-	const today = new Date();
-	const yesterday = new Date(today);
-	yesterday.setDate(yesterday.getDate() - 1);
+	const date = new Date(dateStr)
+	const today = new Date()
+	const yesterday = new Date(today)
+	yesterday.setDate(yesterday.getDate() - 1)
 
 	if (date.toDateString() === today.toDateString()) {
-		return "Aujourd'hui";
+		return "Aujourd'hui"
 	}
 	if (date.toDateString() === yesterday.toDateString()) {
-		return 'Hier';
+		return 'Hier'
 	}
-	return formatDateUtil(dateStr, 'D MMM');
+	return formatDateUtil(dateStr, 'D MMM')
 }
 
 export default function TransactionsPage() {
 	return (
 		<Flex direction="col" gap="xl">
-			{/* Header */}
 			<PageHeader
 				title="Transactions"
 				description="Historique de toutes vos transactions"
-				actions={
-					<Button
-						variant="outline"
-						iconLeft={<Download style={{ height: '1rem', width: '1rem' }} />}
-					>
-						Exporter
-					</Button>
-				}
+				actions={<ExportButton />}
 			/>
 
-			{/* Stats Overview */}
 			<StatCardGrid columns={3}>
 				<StatCard
 					label="Revenus"
@@ -176,78 +158,23 @@ export default function TransactionsPage() {
 				/>
 			</StatCardGrid>
 
-			{/* Filters */}
-			<GlassCard padding="md">
-				<Flex direction="col" gap="md">
-					<Flex direction="row" gap="md" wrap="wrap">
-						<SearchInput
-							placeholder="Rechercher une transaction..."
-							size="md"
-							minWidth="200px"
-						/>
-						<Select defaultValue="all">
-							<SelectTrigger style={{ width: '180px', height: '2.75rem', borderRadius: '0.75rem' }}>
-								<SelectValue placeholder="Catégorie" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">Toutes</SelectItem>
-								<SelectItem value="courses">Courses</SelectItem>
-								<SelectItem value="factures">Factures</SelectItem>
-								<SelectItem value="sorties">Sorties</SelectItem>
-								<SelectItem value="transport">Transport</SelectItem>
-								<SelectItem value="revenus">Revenus</SelectItem>
-							</SelectContent>
-						</Select>
-						<Select defaultValue="all">
-							<SelectTrigger style={{ width: '180px', height: '2.75rem', borderRadius: '0.75rem' }}>
-								<SelectValue placeholder="Compte" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">Tous les comptes</SelectItem>
-								<SelectItem value="principal">Compte principal</SelectItem>
-								<SelectItem value="joint">Compte joint</SelectItem>
-							</SelectContent>
-						</Select>
-						<Button
-							variant="outline"
-							iconLeft={<Calendar style={{ height: '1rem', width: '1rem' }} />}
-							style={{ height: '2.75rem', borderRadius: '0.75rem' }}
-						>
-							Janvier 2025
-						</Button>
-						<Button
-							variant="outline"
-							size="icon"
-							style={{ height: '2.75rem', width: '2.75rem', borderRadius: '0.75rem' }}
-						>
-							<Filter style={{ height: '1rem', width: '1rem' }} />
-						</Button>
-					</Flex>
-				</Flex>
-			</GlassCard>
+			<TransactionFilters />
 
-			{/* Transactions List */}
-			<GlassCard style={{ padding: 0 }}>
-				{/* Header */}
-				<ListHeader
-					title="Toutes les transactions"
-					subtitle={`${transactions.length} opérations`}
-				/>
-
-				{/* List */}
-				<Flex direction="col" gap="xs" style={{ padding: '1rem' }}>
-					{transactions.map((tx) => (
-						<TransactionListItem
-							key={tx.id}
-							description={tx.description}
-							amount={tx.amount}
-							category={tx.category}
-							account={tx.account}
-							dateLabel={formatDate(tx.date)}
-						/>
-					))}
-				</Flex>
-			</GlassCard>
+			<TransactionListContainer
+				title="Toutes les transactions"
+				subtitle={`${transactions.length} opérations`}
+			>
+				{transactions.map((tx) => (
+					<TransactionListItem
+						key={tx.id}
+						description={tx.description}
+						amount={tx.amount}
+						category={tx.category}
+						account={tx.account}
+						dateLabel={formatDate(tx.date)}
+					/>
+				))}
+			</TransactionListContainer>
 		</Flex>
-	);
+	)
 }

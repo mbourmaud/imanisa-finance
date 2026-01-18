@@ -407,6 +407,9 @@ export { ListHeader } from './common/ListHeader';
 
 export type { TransactionListItemProps } from './transactions/TransactionListItem';
 export { TransactionListItem } from './transactions/TransactionListItem';
+export { ExportButton } from './transactions/ExportButton';
+export { TransactionFilters } from './transactions/TransactionFilters';
+export { TransactionListContainer } from './transactions/TransactionListContainer';
 
 // =============================================================================
 // BUDGET COMPONENTS
