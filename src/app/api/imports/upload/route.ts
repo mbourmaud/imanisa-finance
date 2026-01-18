@@ -7,11 +7,10 @@
  * - Returns the import ID
  */
 
-import { type NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { uploadRawFile } from '@/lib/supabase/storage';
-import { rawImportRepository } from '@/server/repositories';
+import { type NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth'
+import { uploadRawFile } from '@/lib/supabase/storage'
+import { rawImportRepository, userRepository } from '@/server/repositories'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = [
@@ -33,30 +32,9 @@ export async function POST(request: NextRequest) {
 		console.log('[Upload] User authenticated:', { id: user.id, email: user.email });
 
 		// Ensure user exists in Prisma (sync from Supabase)
-		// Try to find existing user by ID or email, then update or create
-		console.log('[Upload] Syncing user to Prisma');
-		const existingUserById = await prisma.user.findUnique({ where: { id: user.id } });
-		const existingUserByEmail = await prisma.user.findUnique({ where: { email: user.email } });
-
-		if (existingUserById) {
-			// User exists with correct ID, update if needed
-			await prisma.user.update({
-				where: { id: user.id },
-				data: { email: user.email, name: user.name },
-			});
-		} else if (existingUserByEmail) {
-			// User exists with different ID (from seed), update ID to match Supabase
-			await prisma.user.update({
-				where: { email: user.email },
-				data: { id: user.id, name: user.name },
-			});
-		} else {
-			// No user exists, create new
-			await prisma.user.create({
-				data: { id: user.id, email: user.email, name: user.name },
-			});
-		}
-		console.log('[Upload] User synced successfully');
+		console.log('[Upload] Syncing user to Prisma')
+		await userRepository.syncFromAuth(user.id, user.email, user.name)
+		console.log('[Upload] User synced successfully')
 
 		const formData = await request.formData();
 		const file = formData.get('file') as File | null;
