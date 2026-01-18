@@ -20,26 +20,23 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
+	Flex,
 	GlassCard,
-	Heading,
 	IconBox,
 	Input,
 	Label,
 	Landmark,
 	PageHeader,
 	Plus,
-	Row,
 	SectionHeader,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	Stack,
 	StatCard,
 	StatCardGrid,
 	StatCardSkeleton,
-	Text,
 	Textarea,
 	TrendingUp,
 	Wallet,
@@ -110,14 +107,14 @@ interface BanksResponse {
 function BankRowSkeleton() {
 	return (
 		<GlassCard padding="sm">
-			<Row gap="md">
+			<Flex direction="row" gap="md">
 				<ContentSkeleton variant="icon" size="md" />
-				<Stack gap="sm" style={{ flex: 1 }}>
+				<Flex direction="col" gap="sm" style={{ flex: 1 }}>
 					<ContentSkeleton variant="title" size="sm" />
 					<ContentSkeleton variant="text" size="sm" />
-				</Stack>
+				</Flex>
 				<ContentSkeleton variant="text" size="lg" />
-			</Row>
+			</Flex>
 		</GlassCard>
 	);
 }
@@ -146,7 +143,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 	const contentMarkup = (
 		<>
 			{/* Bank header */}
-			<Row gap="md" style={{ padding: '0.75rem' }}>
+			<Flex direction="row" gap="md" style={{ padding: '0.75rem' }}>
 				<BankLogo
 					bankId={bank.id}
 					bankName={bank.name}
@@ -155,20 +152,16 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 					size="lg"
 					onLogoChange={onLogoChange}
 				/>
-				<Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
-					<Row gap="sm">
-						<Heading
-							level={3}
-							size="lg"
-							tracking="tight"
-							color={!hasAccounts ? 'muted' : 'default'}
+				<Flex direction="col" gap="xs" style={{ flex: 1, minWidth: 0 }}>
+					<Flex direction="row" gap="sm">
+						<h3
+							className={`text-lg font-bold tracking-tight ${!hasAccounts ? 'text-muted-foreground' : ''}`}
 						>
 							{bank.name}
-						</Heading>
+						</h3>
 						{hasAccounts ? (
-							<Text
-								as="span"
-								size="xs"
+							<span
+								className="text-xs"
 								style={{
 									padding: '0.125rem 0.5rem',
 									borderRadius: '9999px',
@@ -177,19 +170,19 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 								}}
 							>
 								{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-							</Text>
+							</span>
 						) : (
-							<Text as="span" size="xs" color="muted" style={{ fontStyle: 'italic' }}>
+							<span className="text-xs text-muted-foreground italic">
 								Aucun compte
-							</Text>
+							</span>
 						)}
-					</Row>
+					</Flex>
 					{bank.description && (
-						<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+						<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 							{bank.description}
-						</Text>
+						</p>
 					)}
-				</Stack>
+				</Flex>
 				{hasAccounts ? (
 					<>
 						<MoneyDisplay amount={bank.totalBalance} size="lg" weight="semibold" />
@@ -218,11 +211,12 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 						Ajouter un compte
 					</Button>
 				)}
-			</Row>
+			</Flex>
 
 			{/* Accounts list */}
 			{bank.accounts.length > 0 && (
-				<Stack
+				<Flex
+					direction="col"
 					gap="sm"
 					style={{
 						paddingLeft: '1rem',
@@ -234,7 +228,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 					{bank.accounts.map((account) => (
 						<AccountRowLink key={account.id} account={account} />
 					))}
-				</Stack>
+				</Flex>
 			)}
 		</>
 	);
@@ -307,26 +301,26 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 				backdropFilter: 'blur(8px)',
 			}}
 		>
-			<Row gap="sm">
-				<Stack gap="xs">
-					<Row gap="sm">
-						<Text as="span" size="sm" weight="medium">
+			<Flex direction="row" gap="sm">
+				<Flex direction="col" gap="xs">
+					<Flex direction="row" gap="sm">
+						<span className="text-sm font-medium">
 							{account.name}
-						</Text>
+						</span>
 						<AccountTypeBadge
 							type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
 							variant="subtle"
 							style={{ fontSize: '10px' }}
 						/>
-					</Row>
+					</Flex>
 					{account.members.length > 0 && (
 						<div style={{ marginTop: '0.375rem' }}>
 							<MemberAvatarGroup members={memberData} size="xs" max={4} spacing="normal" />
 						</div>
 					)}
-				</Stack>
-			</Row>
-			<Row gap="sm">
+				</Flex>
+			</Flex>
+			<Flex direction="row" gap="sm">
 				<MoneyDisplay amount={account.balance} size="sm" weight="semibold" autoColor />
 				<ChevronRight
 					style={{
@@ -336,7 +330,7 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 						transition: 'all 0.2s',
 					}}
 				/>
-			</Row>
+			</Flex>
 		</Link>
 	);
 }
@@ -356,19 +350,17 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" size="sm">
 					<Plus style={{ height: '0.875rem', width: '0.875rem' }} />
-					<Text as="span" size="xs">
-						Ajouter
-					</Text>
+					<span className="text-xs">Ajouter</span>
 					<ChevronDown style={{ height: '0.75rem', width: '0.75rem', opacity: 0.5 }} />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" style={{ width: '12rem' }}>
 				{banks.map((bank) => (
 					<DropdownMenuItem key={bank.id} onClick={() => onSelectBank(bank)}>
-						<Row gap="sm">
+						<Flex direction="row" gap="sm">
 							<ColorDot color={bank.color} size="sm" />
-							<Text as="span">{bank.name}</Text>
-						</Row>
+							<span>{bank.name}</span>
+						</Flex>
 					</DropdownMenuItem>
 				))}
 			</DropdownMenuContent>
@@ -388,7 +380,7 @@ interface MemberSelectorChipsProps {
 
 function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorChipsProps) {
 	return (
-		<Row gap="sm" wrap="wrap">
+		<Flex direction="row" gap="sm" wrap="wrap">
 			{members.map((member) => {
 				const isSelected = selectedIds.includes(member.id);
 				return (
@@ -414,11 +406,11 @@ function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorC
 						}}
 					>
 						<ColorDot color={member.color || '#6b7280'} size="md" />
-						<Text as="span">{member.name}</Text>
+						<span>{member.name}</span>
 					</Button>
 				);
 			})}
-		</Row>
+		</Flex>
 	);
 }
 
@@ -545,9 +537,9 @@ export default function BanksPage() {
 					<StatCardSkeleton variant="mint" />
 				</StatCardGrid>
 			) : error ? (
-				<Stack gap="lg" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
-					<Text color="destructive">{error}</Text>
-				</Stack>
+				<Flex direction="col" gap="lg" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
+					<span className="text-destructive">{error}</span>
+				</Flex>
 			) : (
 				<StatCardGrid columns={3}>
 					<StatCard
@@ -576,7 +568,7 @@ export default function BanksPage() {
 			)}
 
 			{/* Bank accounts section */}
-			<Stack gap="sm" style={{ marginTop: '2rem' }}>
+			<Flex direction="col" gap="sm" style={{ marginTop: '2rem' }}>
 				<SectionHeader
 					title="Comptes bancaires"
 					size="sm"
@@ -597,13 +589,13 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<Stack gap="sm">
+					<Flex direction="col" gap="sm">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</Stack>
+					</Flex>
 				) : (
-					<Stack gap="sm">
+					<Flex direction="col" gap="sm">
 						{data?.bankAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -614,12 +606,12 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</Stack>
+					</Flex>
 				)}
-			</Stack>
+			</Flex>
 
 			{/* Investments section */}
-			<Stack gap="sm" style={{ marginTop: '2rem' }}>
+			<Flex direction="col" gap="sm" style={{ marginTop: '2rem' }}>
 				<SectionHeader
 					title="Investissements"
 					size="sm"
@@ -645,12 +637,12 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<Stack gap="sm">
+					<Flex direction="col" gap="sm">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</Stack>
+					</Flex>
 				) : (
-					<Stack gap="sm">
+					<Flex direction="col" gap="sm">
 						{data?.investmentAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -661,9 +653,9 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</Stack>
+					</Flex>
 				)}
-			</Stack>
+			</Flex>
 
 			{/* Add Account Dialog */}
 			<Dialog open={showAddAccount} onOpenChange={setShowAddAccount}>
@@ -673,7 +665,7 @@ export default function BanksPage() {
 						<DialogDescription>{selectedBank?.name}</DialogDescription>
 					</DialogHeader>
 
-					<Stack gap="lg">
+					<Flex direction="col" gap="lg">
 						{/* Error message */}
 						{createAccountMutation.error && (
 							<div
@@ -684,14 +676,14 @@ export default function BanksPage() {
 									border: '1px solid hsl(var(--destructive) / 0.2)',
 								}}
 							>
-<Text size="sm" color="destructive">
+								<span className="text-sm text-destructive">
 									{createAccountMutation.error.message}
-								</Text>
+								</span>
 							</div>
 						)}
 
 						{/* Account name */}
-						<Stack gap="sm">
+						<Flex direction="col" gap="sm">
 							<Label
 								htmlFor="accountName"
 								style={{
@@ -709,10 +701,10 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountName(e.target.value)}
 								style={{ height: '2.5rem' }}
 							/>
-						</Stack>
+						</Flex>
 
 						{/* Description (optional) */}
-						<Stack gap="sm">
+						<Flex direction="col" gap="sm">
 							<Label
 								htmlFor="accountDescription"
 								style={{
@@ -722,9 +714,9 @@ export default function BanksPage() {
 								}}
 							>
 								Description
-								<Text as="span" size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
+								<span className="text-xs font-normal" style={{ marginLeft: '0.25rem' }}>
 									(optionnel)
-								</Text>
+								</span>
 							</Label>
 							<Textarea
 								id="accountDescription"
@@ -733,10 +725,10 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountDescription(e.target.value)}
 								style={{ minHeight: '80px', resize: 'none' }}
 							/>
-						</Stack>
+						</Flex>
 
 						{/* Account type */}
-						<Stack gap="sm">
+						<Flex direction="col" gap="sm">
 							<Label
 								htmlFor="accountType"
 								style={{
@@ -758,10 +750,10 @@ export default function BanksPage() {
 									<SelectItem value="LOAN">Prêt</SelectItem>
 								</SelectContent>
 							</Select>
-						</Stack>
+						</Flex>
 
 						{/* Export URL (optional) */}
-						<Stack gap="sm">
+						<Flex direction="col" gap="sm">
 							<Label
 								htmlFor="accountExportUrl"
 								style={{
@@ -771,9 +763,9 @@ export default function BanksPage() {
 								}}
 							>
 								Lien d'export
-								<Text as="span" size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
+								<span className="text-xs font-normal" style={{ marginLeft: '0.25rem' }}>
 									(optionnel)
-								</Text>
+								</span>
 							</Label>
 							<Input
 								id="accountExportUrl"
@@ -783,13 +775,13 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountExportUrl(e.target.value)}
 								style={{ height: '2.5rem' }}
 							/>
-							<Text size="xs" color="muted">
+							<span className="text-xs text-muted-foreground">
 								URL vers l'espace client pour exporter les relevés
-							</Text>
-						</Stack>
+							</span>
+						</Flex>
 
 						{/* Member selection */}
-						<Stack gap="sm">
+						<Flex direction="col" gap="sm">
 							<Label
 								style={{
 									fontSize: '0.875rem',
@@ -804,8 +796,8 @@ export default function BanksPage() {
 								selectedIds={newAccountMembers}
 								onToggle={toggleMember}
 							/>
-						</Stack>
-					</Stack>
+						</Flex>
+					</Flex>
 
 					<DialogFooter style={{ paddingTop: '1rem' }}>
 						<Button
