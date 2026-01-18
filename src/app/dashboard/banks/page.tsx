@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
 	AccountRowLink,
+	AccountTypeBadge,
 	AddAccountDialog,
 	AddBankDropdown,
 	BankRow,
@@ -12,6 +13,7 @@ import {
 	Flex,
 	IconBox,
 	Landmark,
+	MemberAvatarGroup,
 	PageHeader,
 	SectionHeader,
 	StatCard,
@@ -20,8 +22,6 @@ import {
 	TrendingUp,
 	Wallet,
 } from '@/components'
-import { AccountTypeBadge } from '@/components/accounts/AccountCard'
-import { MemberAvatarGroup } from '@/components/members/MemberAvatar'
 import { useCreateAccountMutation } from '@/features/accounts'
 
 // =============================================================================

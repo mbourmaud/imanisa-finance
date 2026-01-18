@@ -2,6 +2,27 @@
 // ACCOUNTS COMPONENTS
 // =============================================================================
 
+export type {
+	AccountBank,
+	AccountCardListItem,
+	AccountCardListProps,
+	AccountCardProps,
+	AccountCardSkeletonProps,
+	AccountCardVariant,
+	AccountData,
+	AccountIconProps,
+	AccountIconSize,
+	AccountMember,
+	AccountType,
+	AccountTypeBadgeProps,
+} from './AccountCard'
+export {
+	AccountCard,
+	AccountCardList,
+	AccountCardSkeleton,
+	AccountIcon,
+	AccountTypeBadge,
+} from './AccountCard'
 export { AccountListItem } from './AccountListItem'
 export type { AccountListItemProps } from './AccountListItem'
 export { AccountTypeHeader } from './AccountTypeHeader'

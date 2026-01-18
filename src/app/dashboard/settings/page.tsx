@@ -26,6 +26,7 @@ import {
 	Input,
 	Key,
 	Label,
+	MemberAvatar,
 	PageHeader,
 	Palette,
 	Plus,
@@ -47,7 +48,6 @@ import {
 	User,
 	Users,
 } from '@/components'
-import { MemberAvatar } from '@/components/members/MemberAvatar'
 import { ProfileForm } from '@/features/profile'
 import {
 	useCreateMemberMutation,
