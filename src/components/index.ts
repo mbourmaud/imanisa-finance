@@ -372,10 +372,16 @@ export { Separator } from './ui/separator';
 // LAYOUT COMPONENTS
 // =============================================================================
 
+export type { FlexProps, FlexItemProps, FlexDirection, FlexGap, FlexAlign, FlexJustify, FlexWrap } from './common/Flex';
+export { Flex, FlexItem } from './common/Flex';
+
+// Deprecated layout components (will be removed after migration to Flex)
 export type { StackProps, StackGap, StackAlign, StackJustify } from './common/Stack';
 export { Stack } from './common/Stack';
 export type { RowProps, RowGap, RowAlign, RowJustify, RowWrap } from './common/Row';
 export { Row } from './common/Row';
+export type { GridProps, GridCols, GridGap } from './common/Grid';
+export { Grid } from './common/Grid';
 
 // =============================================================================
 // TYPOGRAPHY COMPONENTS
@@ -422,8 +428,6 @@ export { ListHeader } from './common/ListHeader';
 
 export type { TransactionListItemProps } from './transactions/TransactionListItem';
 export { TransactionListItem } from './transactions/TransactionListItem';
-export type { GridProps, GridCols, GridGap } from './common/Grid';
-export { Grid } from './common/Grid';
 
 // =============================================================================
 // BUDGET COMPONENTS

@@ -68,7 +68,7 @@ const AccountListItem = forwardRef<HTMLAnchorElement, AccountListItemProps>(
 				<div className="flex items-center gap-4">
 					<MoneyDisplay
 						amount={balance}
-						currency={currency as 'EUR' | 'USD' | 'GBP' | 'CHF' | 'JPY'}
+						currency={currency as 'EUR' | 'USD' | 'GBP' | 'CHF'}
 						format="compact"
 						size="md"
 						weight="semibold"

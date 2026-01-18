@@ -3,16 +3,11 @@
 import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
-// =============================================================================
-// TYPES
-// =============================================================================
-
+/**
+ * @deprecated Use CSS grid directly or <Flex wrap="wrap">
+ */
 type GridCols = 1 | 2 | 3 | 4 | 5 | 6
 type GridGap = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-
-// =============================================================================
-// STYLE MAPS
-// =============================================================================
 
 const colsClasses: Record<GridCols, string> = {
 	1: 'grid-cols-1',
@@ -32,51 +27,40 @@ const gapClasses: Record<GridGap, string> = {
 	xl: 'gap-8',
 }
 
-// =============================================================================
-// GRID COMPONENT
-// =============================================================================
+interface ResponsiveConfig {
+	sm?: GridCols
+	md?: GridCols
+	lg?: GridCols
+}
 
 interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
-	/** Number of columns */
 	cols?: GridCols
-	/** Gap between items */
 	gap?: GridGap
-	/** Responsive: columns for sm breakpoint */
 	smCols?: GridCols
-	/** Responsive: columns for md breakpoint */
 	mdCols?: GridCols
-	/** Responsive: columns for lg breakpoint */
 	lgCols?: GridCols
+	responsive?: ResponsiveConfig
 }
 
 /**
- * CSS Grid layout component with responsive columns.
+ * @deprecated Use CSS grid directly or <Flex wrap="wrap">
  */
 const Grid = forwardRef<HTMLDivElement, GridProps>(
-	(
-		{
-			cols = 1,
-			gap = 'md',
-			smCols,
-			mdCols,
-			lgCols,
-			className,
-			children,
-			...props
-		},
-		ref,
-	) => {
+	({ cols = 1, gap = 'md', smCols, mdCols, lgCols, responsive, className, children, ...props }, ref) => {
+		const sm = responsive?.sm ?? smCols
+		const md = responsive?.md ?? mdCols
+		const lg = responsive?.lg ?? lgCols
+
 		return (
 			<div
 				ref={ref}
-				data-slot="grid"
 				className={cn(
 					'grid',
 					colsClasses[cols],
 					gapClasses[gap],
-					smCols && `sm:${colsClasses[smCols]}`,
-					mdCols && `md:${colsClasses[mdCols]}`,
-					lgCols && `lg:${colsClasses[lgCols]}`,
+					sm && `sm:${colsClasses[sm]}`,
+					md && `md:${colsClasses[md]}`,
+					lg && `lg:${colsClasses[lg]}`,
 					className,
 				)}
 				{...props}
@@ -87,10 +71,6 @@ const Grid = forwardRef<HTMLDivElement, GridProps>(
 	},
 )
 Grid.displayName = 'Grid'
-
-// =============================================================================
-// EXPORTS
-// =============================================================================
 
 export { Grid }
 export type { GridProps, GridCols, GridGap }

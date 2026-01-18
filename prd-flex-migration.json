@@ -1,0 +1,138 @@
+{
+  "id": "prd-flex-migration",
+  "title": "Migrate to Flex Component",
+  "description": "Replace Stack, Row, Grid, Text, Heading with Flex component and native HTML",
+  "stories": [
+    {
+      "id": "FLEX-001",
+      "title": "Update barrel exports",
+      "description": "Remove Stack, Row, Grid, Text, Heading exports from src/components/index.ts. Keep only Flex and FlexItem exports.",
+      "acceptanceCriteria": [
+        "src/components/index.ts no longer exports Stack, Row, Grid, Text, Heading",
+        "src/components/index.ts exports Flex and FlexItem from ./common/Flex"
+      ]
+    },
+    {
+      "id": "FLEX-002",
+      "title": "Delete old layout components",
+      "description": "Delete the old layout component files that are no longer needed.",
+      "acceptanceCriteria": [
+        "Delete src/components/common/Stack.tsx",
+        "Delete src/components/common/Row.tsx",
+        "Delete src/components/common/Grid.tsx",
+        "Delete src/components/common/Text.tsx",
+        "Delete src/components/common/Heading.tsx"
+      ]
+    },
+    {
+      "id": "FLEX-003",
+      "title": "Migrate dashboard/accounts pages",
+      "description": "Replace Stack/Row/Grid/Text/Heading with Flex and native HTML in accounts pages.",
+      "acceptanceCriteria": [
+        "src/app/dashboard/accounts/page.tsx uses Flex instead of Stack/Row",
+        "src/app/dashboard/accounts/[id]/page.tsx uses Flex instead of Stack/Row",
+        "Text replaced with <p> or <span> with className",
+        "Heading replaced with <h1>-<h6> with className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-004",
+      "title": "Migrate dashboard/banks page",
+      "description": "Replace Stack/Row/Grid/Text/Heading with Flex and native HTML in banks page.",
+      "acceptanceCriteria": [
+        "src/app/dashboard/banks/page.tsx uses Flex instead of Stack/Row",
+        "Text replaced with <p> or <span> with className",
+        "Heading replaced with <h1>-<h6> with className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-005",
+      "title": "Migrate dashboard/budget page",
+      "description": "Replace Stack/Row/Grid/Text/Heading with Flex and native HTML in budget page.",
+      "acceptanceCriteria": [
+        "src/app/dashboard/budget/page.tsx uses Flex instead of Stack/Row/Grid",
+        "Text replaced with <p> or <span> with className",
+        "Heading replaced with <h1>-<h6> with className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-006",
+      "title": "Migrate dashboard/investments page",
+      "description": "Replace Stack/Row/Grid/Text/Heading with Flex and native HTML in investments page.",
+      "acceptanceCriteria": [
+        "src/app/dashboard/investments/page.tsx uses Flex instead of Stack/Row",
+        "Text replaced with <p> or <span> with className",
+        "Heading replaced with <h1>-<h6> with className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-007",
+      "title": "Migrate dashboard/loans page",
+      "description": "Replace Stack/Row/Grid/Text/Heading with Flex and native HTML in loans page.",
+      "acceptanceCriteria": [
+        "src/app/dashboard/loans/page.tsx uses Flex instead of Stack/Row",
+        "Text replaced with <p> or <span> with className",
+        "Heading replaced with <h1>-<h6> with className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-008",
+      "title": "Migrate dashboard/real-estate page",
+      "description": "Replace Stack/Row/Grid/Text/Heading with Flex and native HTML in real-estate page.",
+      "acceptanceCriteria": [
+        "src/app/dashboard/real-estate/page.tsx uses Flex instead of Stack/Row",
+        "Text replaced with <p> or <span> with className",
+        "Heading replaced with <h1>-<h6> with className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-009",
+      "title": "Migrate dashboard/transactions page",
+      "description": "Replace Stack/Row/Grid/Text/Heading with Flex and native HTML in transactions page.",
+      "acceptanceCriteria": [
+        "src/app/dashboard/transactions/page.tsx uses Flex instead of Stack/Row",
+        "Text replaced with <p> or <span> with className",
+        "Heading replaced with <h1>-<h6> with className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-010",
+      "title": "Migrate business components",
+      "description": "Replace Stack/Row/Grid/Text/Heading in src/components/ folders.",
+      "acceptanceCriteria": [
+        "All files in src/components/accounts/ use Flex",
+        "All files in src/components/banks/ use Flex",
+        "All files in src/components/budget/ use Flex",
+        "All files in src/components/common/ use Flex",
+        "All files in src/components/transactions/ use Flex",
+        "Text replaced with native elements + className",
+        "Heading replaced with native elements + className",
+        "No build errors"
+      ]
+    },
+    {
+      "id": "FLEX-011",
+      "title": "Final validation",
+      "description": "Ensure build passes and no references to old components remain.",
+      "acceptanceCriteria": [
+        "npm run build succeeds",
+        "No imports of Stack, Row, Grid, Text, Heading anywhere",
+        "grep -r 'Stack\\|Row\\|Grid' src/ returns no results (except Flex.tsx and StatCardGrid)"
+      ]
+    }
+  ],
+  "migrationGuide": {
+    "Stack to Flex": "<Stack gap=\"md\"> → <Flex direction=\"col\" gap=\"md\">",
+    "Row to Flex": "<Row gap=\"sm\" align=\"center\"> → <Flex direction=\"row\" gap=\"sm\" align=\"center\">",
+    "Grid to Flex": "<Grid cols={3} gap=\"md\"> → <Flex direction=\"row\" gap=\"md\" wrap=\"wrap\"> (or use CSS grid directly)",
+    "Text to native": "<Text size=\"sm\" color=\"muted\">x</Text> → <span className=\"text-sm text-muted-foreground\">x</span>",
+    "Heading to native": "<Heading level={2} size=\"lg\">x</Heading> → <h2 className=\"text-lg font-semibold\">x</h2>"
+  }
+}

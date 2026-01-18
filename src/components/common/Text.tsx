@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 // TYPES
 // =============================================================================
 
-type TextSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type TextSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 type TextWeight = 'normal' | 'medium' | 'semibold' | 'bold'
 type TextColor = 'default' | 'muted' | 'destructive' | 'success' | 'warning' | 'primary'
 type TextAlign = 'left' | 'center' | 'right'
@@ -22,6 +22,8 @@ const sizeClasses: Record<TextSize, string> = {
 	md: 'text-base',
 	lg: 'text-lg',
 	xl: 'text-xl',
+	'2xl': 'text-2xl',
+	'3xl': 'text-3xl',
 }
 
 const weightClasses: Record<TextWeight, string> = {
@@ -50,7 +52,7 @@ const alignClasses: Record<TextAlign, string> = {
 // TEXT COMPONENT
 // =============================================================================
 
-interface TextProps extends React.HTMLAttributes<HTMLElement> {
+interface TextProps extends React.ComponentPropsWithoutRef<'span'> {
 	/** Text size */
 	size?: TextSize
 	/** Font weight */
@@ -61,41 +63,20 @@ interface TextProps extends React.HTMLAttributes<HTMLElement> {
 	align?: TextAlign
 	/** Truncate with ellipsis */
 	truncate?: boolean
-	/** Render as a different element */
 	as?: 'p' | 'span' | 'div' | 'label'
 }
 
-const Text = forwardRef<HTMLElement, TextProps>(
-	(
-		{
-			className,
-			size = 'md',
-			weight = 'normal',
-			color = 'default',
-			align,
-			truncate = false,
-			as: Component = 'p',
-			children,
-			...props
-		},
-		ref,
-	) => {
+const Text = forwardRef<HTMLSpanElement, TextProps>(
+	({ className, size = 'md', weight = 'normal', color = 'default', align, truncate = false, as: _as, children, ...props }, ref) => {
 		return (
-			<Component
-				ref={ref as React.Ref<HTMLParagraphElement>}
+			<span
+				ref={ref}
 				data-slot="text"
-				className={cn(
-					sizeClasses[size],
-					weightClasses[weight],
-					colorClasses[color],
-					align && alignClasses[align],
-					truncate && 'truncate',
-					className,
-				)}
+				className={cn(sizeClasses[size], weightClasses[weight], colorClasses[color], align && alignClasses[align], truncate && 'truncate', className)}
 				{...props}
 			>
 				{children}
-			</Component>
+			</span>
 		)
 	},
 )
