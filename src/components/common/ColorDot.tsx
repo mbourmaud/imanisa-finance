@@ -37,12 +37,13 @@ interface ColorDotProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const ColorDot = forwardRef<HTMLDivElement, ColorDotProps>(
 	({ color, size = 'sm', className, ...props }, ref) => {
+		const colorStyle = { '--dot-color': color } as React.CSSProperties
 		return (
 			<div
 				ref={ref}
 				data-slot="color-dot"
-				className={cn('rounded-full shrink-0', sizeClasses[size], className)}
-				style={{ backgroundColor: color }}
+				className={cn('rounded-full shrink-0 bg-[var(--dot-color)]', sizeClasses[size], className)}
+				style={colorStyle}
 				{...props}
 			/>
 		)
