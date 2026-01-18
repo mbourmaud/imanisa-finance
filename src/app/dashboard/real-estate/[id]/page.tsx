@@ -14,7 +14,6 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 	ArrowLeft,
-	Box,
 	Building2,
 	Button,
 	ChevronDown,
@@ -35,12 +34,8 @@ import {
 	Droplets,
 	ExternalLink,
 	Flame,
-	Flex,
 	GlassCard,
-	Grid,
-	Heading,
 	Home,
-	HStack,
 	Input,
 	Label,
 	Landmark,
@@ -59,10 +54,8 @@ import {
 	Skeleton,
 	StatCard,
 	StatCardGrid,
-	Text,
 	Trash2,
 	Users,
-	VStack,
 	Wallet,
 	Wifi,
 	X,
@@ -341,24 +334,24 @@ function getUtilityTypeIcon(type: UtilityType): React.ElementType {
 
 function DetailItemSkeleton() {
 	return (
-		<VStack gap="xs">
+		<div className="flex flex-col gap-2">
 			<Skeleton style={{ height: '0.75rem', width: '4rem' }} />
 			<Skeleton style={{ height: '1.25rem', width: '6rem' }} />
-		</VStack>
+		</div>
 	);
 }
 
 function SectionSkeleton() {
 	return (
 		<GlassCard padding="lg">
-			<VStack gap="md">
+			<div className="flex flex-col gap-4">
 				<Skeleton style={{ height: '1.25rem', width: '8rem' }} />
-				<Grid cols={1} colsSm={2} colsLg={3} gap="md">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
 					<DetailItemSkeleton />
-				</Grid>
-			</VStack>
+				</div>
+			</div>
 		</GlassCard>
 	);
 }
@@ -383,83 +376,71 @@ function LoanCard({
 		loan.loanInsurances?.reduce((sum, ins) => sum + ins.coveragePercent, 0) || 0;
 
 	return (
-		<Box rounded="xl" border="default" p="md" style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
-			<VStack gap="md">
-				<HStack justify="between" align="start" gap="md">
-					<Box style={{ minWidth: 0 }}>
-						<Text
-							weight="medium"
+		<div
+			className="rounded-xl border border-border p-4"
+			style={{ borderColor: 'hsl(var(--border) / 0.6)' }}
+		>
+			<div className="flex flex-col gap-4">
+				<div className="flex justify-between items-start gap-4">
+					<div className="min-w-0">
+						<p
+							className="font-medium"
 							style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
 						>
 							{loan.name}
-						</Text>
-						{loan.lender && (
-							<Text size="sm" color="muted">
-								{loan.lender}
-							</Text>
-						)}
-					</Box>
-					<Box style={{ textAlign: 'right', flexShrink: 0 }}>
-						<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						</p>
+						{loan.lender && <p className="text-sm text-muted-foreground">{loan.lender}</p>}
+					</div>
+					<div className="text-right shrink-0">
+						<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.remainingAmount)}
-						</Text>
-						<Text size="xs" color="muted">
-							restant
-						</Text>
-					</Box>
-				</HStack>
+						</p>
+						<p className="text-xs text-muted-foreground">restant</p>
+					</div>
+				</div>
 
-				<VStack gap="xs">
-					<HStack justify="between">
-						<Text size="xs" color="muted">
-							Progression du remboursement
-						</Text>
-						<Text size="xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
+				<div className="flex flex-col gap-2">
+					<div className="flex justify-between">
+						<p className="text-xs text-muted-foreground">Progression du remboursement</p>
+						<p className="text-xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{paidPercent.toFixed(0)}%
-						</Text>
-					</HStack>
+						</p>
+					</div>
 					<Progress value={paidPercent} style={{ height: '0.5rem' }} />
-				</VStack>
+				</div>
 
-				<Grid cols={3} gap="md" style={{ paddingTop: '0.5rem', fontSize: '0.875rem' }}>
-					<VStack gap="none">
-						<Text size="xs" color="muted">
-							Mensualité
-						</Text>
-						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+				<div className="grid grid-cols-3 gap-4 pt-2 text-sm">
+					<div className="flex flex-col">
+						<p className="text-xs text-muted-foreground">Mensualité</p>
+						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.monthlyPayment)}
-						</Text>
-					</VStack>
-					<VStack gap="none">
-						<Text size="xs" color="muted">
-							Taux
-						</Text>
-						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						</p>
+					</div>
+					<div className="flex flex-col">
+						<p className="text-xs text-muted-foreground">Taux</p>
+						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{loan.rate}%
-						</Text>
-					</VStack>
-					<VStack gap="none">
-						<Text size="xs" color="muted">
-							Montant initial
-						</Text>
-						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						</p>
+					</div>
+					<div className="flex flex-col">
+						<p className="text-xs text-muted-foreground">Montant initial</p>
+						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.initialAmount)}
-						</Text>
-					</VStack>
-				</Grid>
+						</p>
+					</div>
+				</div>
 
 				{loan.loanNumber && (
-					<Text
-						size="xs"
-						color="muted"
+					<p
+						className="text-xs text-muted-foreground"
 						style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 					>
 						N° contrat: {loan.loanNumber}
-					</Text>
+					</p>
 				)}
 
 				{/* Insurance section */}
-				<Box style={{ paddingTop: '0.75rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+				<div className="pt-3 border-t border-border/40">
 					<button
 						type="button"
 						onClick={() => setIsExpanded(!isExpanded)}
@@ -471,31 +452,28 @@ function LoanCard({
 							textAlign: 'left',
 						}}
 					>
-						<HStack gap="sm" align="center">
+						<div className="flex items-center gap-3">
 							<Shield
 								style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
-							<Text size="sm" weight="medium">
+							<p className="text-sm font-medium">
 								Assurance emprunteur
 								{hasInsurances && (
-									<Text
-										as="span"
-										size="xs"
-										color="muted"
-										weight="normal"
+									<span
+										className="text-xs text-muted-foreground font-normal"
 										style={{ marginLeft: '0.5rem' }}
 									>
 										({loan.loanInsurances?.length} contrat
 										{loan.loanInsurances && loan.loanInsurances.length > 1 ? 's' : ''})
-									</Text>
+									</span>
 								)}
-							</Text>
-						</HStack>
-						<HStack gap="sm" align="center">
+							</p>
+						</div>
+						<div className="flex items-center gap-3">
 							{hasInsurances && (
-								<Text size="xs" color="muted">
+								<p className="text-xs text-muted-foreground">
 									{formatCurrency(totalInsurancePremium)}/mois · {totalCoverage}%
-								</Text>
+								</p>
 							)}
 							{isExpanded ? (
 								<ChevronUp
@@ -506,42 +484,29 @@ function LoanCard({
 									style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 								/>
 							)}
-						</HStack>
+						</div>
 					</button>
 
 					{isExpanded && (
-						<VStack gap="sm" style={{ marginTop: '0.75rem' }}>
+						<div className="flex flex-col gap-3 mt-3">
 							{hasInsurances ? (
-								<VStack gap="sm">
+								<div className="flex flex-col gap-3">
 									{loan.loanInsurances?.map((insurance) => (
-										<HStack
+										<div
 											key={insurance.id}
-											gap="sm"
-											align="center"
-											p="sm"
-											style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+											className="flex items-center gap-3 p-3 rounded-lg"
+											style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 										>
-											<Flex
-												align="center"
-												justify="center"
-												style={{
-													height: '2rem',
-													width: '2rem',
-													borderRadius: '9999px',
-													fontSize: '0.75rem',
-													fontWeight: 500,
-													color: 'white',
-													flexShrink: 0,
-													backgroundColor: insurance.member.color || '#6b7280',
-												}}
+											<div
+												className="flex items-center justify-center h-8 w-8 rounded-full text-xs font-medium text-white shrink-0"
+												style={{ backgroundColor: insurance.member.color || '#6b7280' }}
 											>
 												{insurance.member.name.charAt(0).toUpperCase()}
-											</Flex>
-											<Box style={{ flex: 1, minWidth: 0 }}>
-												<HStack gap="sm" align="center" style={{ flexWrap: 'wrap' }}>
-													<Text
-														size="sm"
-														weight="medium"
+											</div>
+											<div className="flex-1 min-w-0">
+												<div className="flex items-center gap-3 flex-wrap">
+													<p
+														className="text-sm font-medium"
 														style={{
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
@@ -549,9 +514,9 @@ function LoanCard({
 														}}
 													>
 														{insurance.member.name}
-													</Text>
-													<Text
-														size="xs"
+													</p>
+													<span
+														className="text-xs"
 														style={{
 															padding: '0.125rem 0.375rem',
 															borderRadius: '9999px',
@@ -560,11 +525,10 @@ function LoanCard({
 														}}
 													>
 														{insurance.coveragePercent}%
-													</Text>
-												</HStack>
-												<Text
-													size="xs"
-													color="muted"
+													</span>
+												</div>
+												<p
+													className="text-xs text-muted-foreground"
 													style={{
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
@@ -572,17 +536,17 @@ function LoanCard({
 													}}
 												>
 													{insurance.provider} · {formatCurrency(insurance.monthlyPremium)}/mois
-												</Text>
-											</Box>
-										</HStack>
+												</p>
+											</div>
+										</div>
 									))}
-								</VStack>
+								</div>
 							) : (
-								<Box style={{ textAlign: 'center', padding: '0.75rem 0' }}>
-									<Text size="sm" color="muted" style={{ marginBottom: '0.5rem' }}>
+								<div className="text-center py-3">
+									<p className="text-sm text-muted-foreground" style={{ marginBottom: '0.5rem' }}>
 										Aucune assurance emprunteur
-									</Text>
-								</Box>
+									</p>
+								</div>
 							)}
 							<Button
 								variant="outline"
@@ -593,48 +557,36 @@ function LoanCard({
 								<Plus style={{ height: '0.875rem', width: '0.875rem' }} />
 								Ajouter une assurance
 							</Button>
-						</VStack>
+						</div>
 					)}
-				</Box>
-			</VStack>
-		</Box>
+				</div>
+			</div>
+		</div>
 	);
 }
 
 function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
 	return (
-		<Flex
-			direction="col"
-			align="center"
-			justify="center"
-			style={{ padding: '2rem 0', textAlign: 'center' }}
-		>
-			<Flex
-				align="center"
-				justify="center"
-				style={{
-					height: '3rem',
-					width: '3rem',
-					borderRadius: '0.75rem',
-					backgroundColor: 'hsl(var(--muted) / 0.5)',
-					marginBottom: '0.75rem',
-				}}
+		<div className="flex flex-col items-center justify-center py-8 text-center">
+			<div
+				className="flex items-center justify-center h-12 w-12 rounded-xl mb-3"
+				style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}
 			>
 				<CreditCard
 					style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 				/>
-			</Flex>
-			<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+			</div>
+			<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 				Aucun prêt
-			</Text>
-			<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+			</p>
+			<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 				Ajoutez les crédits immobiliers associés à ce bien.
-			</Text>
+			</p>
 			<Button variant="outline" size="sm" style={{ gap: '0.5rem' }} onClick={onAddClick}>
 				<Plus style={{ height: '1rem', width: '1rem' }} />
 				Ajouter un prêt
 			</Button>
-		</Flex>
+		</div>
 	);
 }
 
@@ -647,28 +599,24 @@ function DetailItem({
 }) {
 	if (value === null || value === undefined) return null;
 	return (
-		<VStack gap="none">
-			<Text size="xs" color="muted">
-				{label}
-			</Text>
-			<Text weight="medium">
+		<div className="flex flex-col">
+			<p className="text-xs text-muted-foreground">{label}</p>
+			<p className="font-medium">
 				{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
-			</Text>
-		</VStack>
+			</p>
+		</div>
 	);
 }
 
 function CurrencyItem({ label, value }: { label: string; value: number | null | undefined }) {
 	if (value === null || value === undefined) return null;
 	return (
-		<VStack gap="none">
-			<Text size="xs" color="muted">
-				{label}
-			</Text>
-			<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+		<div className="flex flex-col">
+			<p className="text-xs text-muted-foreground">{label}</p>
+			<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 				{formatCurrency(value)}
-			</Text>
-		</VStack>
+			</p>
+		</div>
 	);
 }
 
@@ -1349,27 +1297,27 @@ export default function PropertyDetailPage() {
 	// Loading state
 	if (loading) {
 		return (
-			<VStack gap="lg">
+			<div className="flex flex-col gap-6">
 				{/* Header skeleton */}
-				<HStack gap="md" align="center">
+				<div className="flex items-center gap-4">
 					<Skeleton style={{ height: '2rem', width: '2rem' }} />
-					<VStack gap="sm" style={{ flex: 1 }}>
+					<div className="flex flex-col gap-3" style={{ flex: 1 }}>
 						<Skeleton style={{ height: '1.75rem', width: '16rem' }} />
 						<Skeleton style={{ height: '1rem', width: '12rem' }} />
-					</VStack>
-				</HStack>
+					</div>
+				</div>
 
 				{/* Sections skeleton */}
 				<SectionSkeleton />
 				<SectionSkeleton />
-			</VStack>
+			</div>
 		);
 	}
 
 	// Error state
 	if (error || !property) {
 		return (
-			<VStack gap="lg">
+			<div className="flex flex-col gap-6">
 				<Link
 					href="/dashboard/real-estate"
 					style={{
@@ -1391,9 +1339,9 @@ export default function PropertyDetailPage() {
 						backgroundColor: 'hsl(var(--destructive) / 0.05)',
 					}}
 				>
-					<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+					<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 						{error || 'Bien non trouvé'}
-					</Text>
+					</p>
 					<Button
 						variant="outline"
 						size="sm"
@@ -1403,7 +1351,7 @@ export default function PropertyDetailPage() {
 						Retour à la liste
 					</Button>
 				</GlassCard>
-			</VStack>
+			</div>
 		);
 	}
 
@@ -1415,11 +1363,11 @@ export default function PropertyDetailPage() {
 	const isRental = property.usage === 'RENTAL';
 
 	return (
-		<VStack gap="lg">
+		<div className="flex flex-col gap-6">
 			{/* Header */}
-			<Flex direction="col" gap="md">
-				<HStack justify="between" align="start" gap="md" style={{ flexWrap: 'wrap' }}>
-					<HStack gap="md" align="start">
+			<div className="flex flex-col gap-4">
+				<div className="flex justify-between items-start gap-4 flex-wrap">
+					<div className="flex items-start gap-4">
 						<Link
 							href="/dashboard/real-estate"
 							style={{
@@ -1438,19 +1386,17 @@ export default function PropertyDetailPage() {
 						>
 							<ArrowLeft style={{ height: '1rem', width: '1rem' }} />
 						</Link>
-						<Box style={{ minWidth: 0 }}>
-							<HStack gap="sm" align="center" style={{ flexWrap: 'wrap' }}>
-								<Heading
-									level={1}
-									size="2xl"
-									weight="semibold"
+						<div className="min-w-0">
+							<div className="flex items-center gap-3 flex-wrap">
+								<h1
+									className="text-2xl font-semibold tracking-tight"
 									style={{ letterSpacing: '-0.025em' }}
 								>
 									{property.name}
-								</Heading>
-								<HStack gap="xs">
-									<Text
-										size="xs"
+								</h1>
+								<div className="flex gap-1">
+									<span
+										className="text-xs"
 										style={{
 											padding: '0.125rem 0.5rem',
 											borderRadius: '9999px',
@@ -1459,9 +1405,9 @@ export default function PropertyDetailPage() {
 										}}
 									>
 										{getPropertyTypeLabel(property.type)}
-									</Text>
-									<Text
-										size="xs"
+									</span>
+									<span
+										className="text-xs"
 										style={{
 											padding: '0.125rem 0.5rem',
 											borderRadius: '9999px',
@@ -1470,10 +1416,10 @@ export default function PropertyDetailPage() {
 										}}
 									>
 										{getPropertyUsageLabel(property.usage)}
-									</Text>
-								</HStack>
-							</HStack>
-							<HStack gap="xs" align="center" style={{ marginTop: '0.25rem' }}>
+									</span>
+								</div>
+							</div>
+							<div className="flex items-center gap-1 mt-1">
 								<MapPin
 									style={{
 										height: '0.875rem',
@@ -1482,15 +1428,15 @@ export default function PropertyDetailPage() {
 										color: 'hsl(var(--muted-foreground))',
 									}}
 								/>
-								<Text size="sm" color="muted">
+								<p className="text-sm text-muted-foreground">
 									{property.address}
 									{property.address2 && `, ${property.address2}`}, {property.postalCode}{' '}
 									{property.city}
-								</Text>
-							</HStack>
-						</Box>
-					</HStack>
-					<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div className="flex items-center gap-3 shrink-0">
 						<Button variant="outline" style={{ gap: '0.5rem' }} onClick={openEditPropertyDialog}>
 							<Pencil style={{ height: '1rem', width: '1rem' }} />
 							Modifier
@@ -1513,9 +1459,9 @@ export default function PropertyDetailPage() {
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
-					</HStack>
-				</HStack>
-			</Flex>
+					</div>
+				</div>
+			</div>
 
 			{/* Value Summary */}
 			<StatCardGrid columns={4}>
@@ -1556,62 +1502,54 @@ export default function PropertyDetailPage() {
 
 			{/* Informations Section */}
 			<GlassCard padding="lg">
-				<VStack gap="md">
-					<HStack gap="sm" align="center">
+				<div className="flex flex-col gap-4">
+					<div className="flex items-center gap-3">
 						<Home
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
-						<Heading level={3} size="md" weight="medium">
-							Informations
-						</Heading>
-					</HStack>
-					<Grid cols={1} colsSm={2} colsLg={3} gap="lg">
+						<h3 className="text-base font-semibold tracking-tight">Informations</h3>
+					</div>
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{/* Caractéristiques */}
-						<VStack gap="sm">
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+						<div className="flex flex-col gap-3">
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Caractéristiques
-							</Text>
-							<VStack gap="sm">
+							</p>
+							<div className="flex flex-col gap-3">
 								<DetailItem label="Surface" value={`${property.surface} m²`} />
 								<DetailItem label="Pièces" value={property.rooms} />
 								<DetailItem label="Chambres" value={property.bedrooms} />
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 
 						{/* Achat */}
-						<VStack gap="sm">
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+						<div className="flex flex-col gap-3">
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Achat
-							</Text>
-							<VStack gap="sm">
+							</p>
+							<div className="flex flex-col gap-3">
 								<CurrencyItem label="Prix d'achat" value={property.purchasePrice} />
 								<CurrencyItem label="Frais de notaire" value={property.notaryFees} />
 								<CurrencyItem label="Frais d'agence" value={property.agencyFees} />
 								<DetailItem label="Date d'achat" value={formatDate(property.purchaseDate)} />
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 
 						{/* Valeur & Rentabilité */}
-						<VStack gap="sm">
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+						<div className="flex flex-col gap-3">
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								{isRental ? 'Valeur & Revenus' : 'Valeur'}
-							</Text>
-							<VStack gap="sm">
+							</p>
+							<div className="flex flex-col gap-3">
 								<CurrencyItem label="Valeur actuelle" value={property.currentValue} />
 								{isRental && (
 									<>
@@ -1619,23 +1557,15 @@ export default function PropertyDetailPage() {
 										<CurrencyItem label="Charges locatives" value={property.rentCharges} />
 									</>
 								)}
-							</VStack>
-						</VStack>
-					</Grid>
+							</div>
+						</div>
+					</div>
 
 					{/* Notes */}
 					{property.notes && (
-						<Box
-							style={{
-								marginTop: '1.5rem',
-								paddingTop: '1.5rem',
-								borderTop: '1px solid hsl(var(--border) / 0.4)',
-							}}
-						>
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+						<div className="mt-6 pt-6 border-t border-border/40">
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{
 									textTransform: 'uppercase',
 									letterSpacing: '0.05em',
@@ -1643,46 +1573,38 @@ export default function PropertyDetailPage() {
 								}}
 							>
 								Notes
-							</Text>
-							<Text size="sm" color="muted">
-								{property.notes}
-							</Text>
-						</Box>
+							</p>
+							<p className="text-sm text-muted-foreground">{property.notes}</p>
+						</div>
 					)}
-				</VStack>
+				</div>
 			</GlassCard>
 
 			{/* Propriétaires Section */}
 			<GlassCard padding="lg">
-				<VStack gap="md">
-					<HStack gap="sm" align="center">
+				<div className="flex flex-col gap-4">
+					<div className="flex items-center gap-3">
 						<Users
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
-						<Heading level={3} size="md" weight="medium">
-							Propriétaires
-						</Heading>
-					</HStack>
+						<h3 className="text-base font-semibold tracking-tight">Propriétaires</h3>
+					</div>
 					{property.propertyMembers.length === 0 ? (
-						<Text size="sm" color="muted">
-							Aucun propriétaire renseigné
-						</Text>
+						<p className="text-sm text-muted-foreground">Aucun propriétaire renseigné</p>
 					) : (
-						<Flex style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
+						<div className="flex flex-wrap gap-3">
 							{property.propertyMembers.map((pm) => (
-								<HStack
+								<div
 									key={pm.id}
-									gap="sm"
-									align="center"
+									className="flex items-center gap-3"
 									style={{
 										borderRadius: '0.75rem',
 										padding: '0.75rem 1rem',
 										backgroundColor: 'hsl(var(--muted) / 0.3)',
 									}}
 								>
-									<Flex
-										align="center"
-										justify="center"
+									<div
+										className="flex items-center justify-center shrink-0"
 										style={{
 											height: '2.5rem',
 											width: '2.5rem',
@@ -1690,39 +1612,34 @@ export default function PropertyDetailPage() {
 											fontSize: '0.875rem',
 											fontWeight: 500,
 											color: 'white',
-											flexShrink: 0,
 											backgroundColor: pm.member.color || '#6b7280',
 										}}
 									>
 										{pm.member.name.charAt(0).toUpperCase()}
-									</Flex>
-									<VStack gap="none">
-										<Text weight="medium">{pm.member.name}</Text>
-										<Text size="sm" color="muted">
-											{pm.ownershipShare}%
-										</Text>
-									</VStack>
-								</HStack>
+									</div>
+									<div className="flex flex-col">
+										<p className="font-medium">{pm.member.name}</p>
+										<p className="text-sm text-muted-foreground">{pm.ownershipShare}%</p>
+									</div>
+								</div>
 							))}
-						</Flex>
+						</div>
 					)}
-				</VStack>
+				</div>
 			</GlassCard>
 
 			{/* Prêts Section */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+				<div className="flex justify-between items-center">
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<CreditCard
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
 						Prêts
-					</Heading>
+					</h3>
 					<Dialog
 						open={isLoanDialogOpen}
 						onOpenChange={(open) => {
@@ -1747,26 +1664,25 @@ export default function PropertyDetailPage() {
 								</DialogDescription>
 							</DialogHeader>
 							<form onSubmit={handleLoanSubmit}>
-								<VStack gap="md">
+								<div className="flex flex-col gap-4">
 									{/* Error message */}
 									{loanFormError && (
-										<Box
-											p="sm"
+										<div
+											className="p-3 rounded-lg"
 											style={{
-												borderRadius: '0.5rem',
 												backgroundColor: 'hsl(var(--destructive) / 0.1)',
 												border: '1px solid hsl(var(--destructive) / 0.2)',
 											}}
 										>
-											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+											<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 												{loanFormError}
-											</Text>
-										</Box>
+											</p>
+										</div>
 									)}
 
 									{/* Basic info */}
-									<VStack gap="md">
-										<VStack gap="xs">
+									<div className="flex flex-col gap-4">
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="loan-name">Nom du prêt *</Label>
 											<Input
 												id="loan-name"
@@ -1774,10 +1690,10 @@ export default function PropertyDetailPage() {
 												value={loanFormData.name}
 												onChange={(e) => handleLoanInputChange('name', e.target.value)}
 											/>
-										</VStack>
+										</div>
 
-										<Grid cols={1} colsSm={2} gap="md">
-											<VStack gap="xs">
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+											<div className="flex flex-col gap-2">
 												<Label htmlFor="loan-lender">Organisme prêteur</Label>
 												<Input
 													id="loan-lender"
@@ -1785,8 +1701,8 @@ export default function PropertyDetailPage() {
 													value={loanFormData.lender}
 													onChange={(e) => handleLoanInputChange('lender', e.target.value)}
 												/>
-											</VStack>
-											<VStack gap="xs">
+											</div>
+											<div className="flex flex-col gap-2">
 												<Label htmlFor="loan-number">N° de contrat</Label>
 												<Input
 													id="loan-number"
@@ -1794,17 +1710,15 @@ export default function PropertyDetailPage() {
 													value={loanFormData.loanNumber}
 													onChange={(e) => handleLoanInputChange('loanNumber', e.target.value)}
 												/>
-											</VStack>
-										</Grid>
-									</VStack>
+											</div>
+										</div>
+									</div>
 
 									{/* Amounts */}
-									<VStack gap="md">
-										<Text size="sm" weight="medium" color="muted">
-											Montants
-										</Text>
-										<Grid cols={1} colsSm={2} gap="md">
-											<VStack gap="xs">
+									<div className="flex flex-col gap-4">
+										<p className="text-sm font-medium text-muted-foreground">Montants</p>
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+											<div className="flex flex-col gap-2">
 												<Label htmlFor="loan-initial">Montant initial (€) *</Label>
 												<Input
 													id="loan-initial"
@@ -1815,8 +1729,8 @@ export default function PropertyDetailPage() {
 													value={loanFormData.initialAmount}
 													onChange={(e) => handleLoanInputChange('initialAmount', e.target.value)}
 												/>
-											</VStack>
-											<VStack gap="xs">
+											</div>
+											<div className="flex flex-col gap-2">
 												<Label htmlFor="loan-remaining">Capital restant (€) *</Label>
 												<Input
 													id="loan-remaining"
@@ -1827,13 +1741,13 @@ export default function PropertyDetailPage() {
 													value={loanFormData.remainingAmount}
 													onChange={(e) => handleLoanInputChange('remainingAmount', e.target.value)}
 												/>
-											</VStack>
-										</Grid>
-									</VStack>
+											</div>
+										</div>
+									</div>
 
 									{/* Rate and payment */}
-									<Grid cols={1} colsSm={2} gap="md">
-										<VStack gap="xs">
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="loan-rate">Taux (%) *</Label>
 											<Input
 												id="loan-rate"
@@ -1845,8 +1759,8 @@ export default function PropertyDetailPage() {
 												value={loanFormData.rate}
 												onChange={(e) => handleLoanInputChange('rate', e.target.value)}
 											/>
-										</VStack>
-										<VStack gap="xs">
+										</div>
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="loan-monthly">Mensualité (€) *</Label>
 											<Input
 												id="loan-monthly"
@@ -1857,12 +1771,12 @@ export default function PropertyDetailPage() {
 												value={loanFormData.monthlyPayment}
 												onChange={(e) => handleLoanInputChange('monthlyPayment', e.target.value)}
 											/>
-										</VStack>
-									</Grid>
+										</div>
+									</div>
 
 									{/* Dates */}
-									<Grid cols={1} colsSm={2} gap="md">
-										<VStack gap="xs">
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="loan-start">Date de début *</Label>
 											<Input
 												id="loan-start"
@@ -1870,8 +1784,8 @@ export default function PropertyDetailPage() {
 												value={loanFormData.startDate}
 												onChange={(e) => handleLoanInputChange('startDate', e.target.value)}
 											/>
-										</VStack>
-										<VStack gap="xs">
+										</div>
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="loan-end">Date de fin</Label>
 											<Input
 												id="loan-end"
@@ -1879,11 +1793,11 @@ export default function PropertyDetailPage() {
 												value={loanFormData.endDate}
 												onChange={(e) => handleLoanInputChange('endDate', e.target.value)}
 											/>
-										</VStack>
-									</Grid>
+										</div>
+									</div>
 
 									{/* Notes */}
-									<VStack gap="xs">
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="loan-notes">Notes</Label>
 										<Input
 											id="loan-notes"
@@ -1891,7 +1805,7 @@ export default function PropertyDetailPage() {
 											value={loanFormData.notes}
 											onChange={(e) => handleLoanInputChange('notes', e.target.value)}
 										/>
-									</VStack>
+									</div>
 
 									<DialogFooter style={{ paddingTop: '1rem' }}>
 										<Button
@@ -1904,7 +1818,7 @@ export default function PropertyDetailPage() {
 										</Button>
 										<Button type="submit" disabled={isSubmittingLoan}>
 											{isSubmittingLoan ? (
-												<HStack gap="sm" align="center">
+												<span className="flex items-center gap-3">
 													<Loader2
 														style={{
 															height: '1rem',
@@ -1913,83 +1827,73 @@ export default function PropertyDetailPage() {
 														}}
 													/>
 													Création...
-												</HStack>
+												</span>
 											) : (
 												'Créer le prêt'
 											)}
 										</Button>
 									</DialogFooter>
-								</VStack>
+								</div>
 							</form>
 						</DialogContent>
 					</Dialog>
-				</HStack>
+				</div>
 				{property.loans.length === 0 ? (
 					<LoansEmptyState onAddClick={() => setIsLoanDialogOpen(true)} />
 				) : (
-					<VStack gap="md">
+					<div className="flex flex-col gap-4">
 						{/* Summary stats */}
-						<Grid
-							cols={3}
-							gap="md"
-							p="md"
-							style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+						<div
+							className="grid grid-cols-3 gap-4 p-4 rounded-xl"
+							style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 						>
-							<Box style={{ textAlign: 'center' }}>
-								<Text size="xs" color="muted">
-									Capital restant
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+							<div className="text-center">
+								<p className="text-xs text-muted-foreground">Capital restant</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(totalLoansRemaining)}
-								</Text>
-							</Box>
-							<Box style={{ textAlign: 'center' }}>
-								<Text size="xs" color="muted">
-									Mensualités
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								</p>
+							</div>
+							<div className="text-center">
+								<p className="text-xs text-muted-foreground">Mensualités</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.loans.reduce((sum, l) => sum + l.monthlyPayment, 0))}
-								</Text>
-							</Box>
-							<Box style={{ textAlign: 'center' }}>
-								<Text size="xs" color="muted">
-									Taux moyen
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								</p>
+							</div>
+							<div className="text-center">
+								<p className="text-xs text-muted-foreground">Taux moyen</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{property.loans.length > 0
 										? (
 												property.loans.reduce((sum, l) => sum + l.rate, 0) / property.loans.length
 											).toFixed(2)
 										: 0}
 									%
-								</Text>
-							</Box>
-						</Grid>
+								</p>
+							</div>
+						</div>
 
 						{/* Loan cards */}
-						<VStack gap="sm">
+						<div className="flex flex-col gap-3">
 							{property.loans.map((loan) => (
 								<LoanCard key={loan.id} loan={loan} onAddInsurance={handleOpenInsuranceDialog} />
 							))}
-						</VStack>
-					</VStack>
+						</div>
+					</div>
 				)}
 			</GlassCard>
 
 			{/* Assurance Section */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+				<div className="flex justify-between items-center">
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<Shield
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
 						Assurance habitation
-					</Heading>
+					</h3>
 					{!property.insurance && (
 						<Button
 							variant="outline"
@@ -2000,36 +1904,33 @@ export default function PropertyDetailPage() {
 							Ajouter une assurance
 						</Button>
 					)}
-				</HStack>
+				</div>
 				{property.insurance ? (
-					<VStack
-						gap="md"
-						p="md"
+					<div
+						className="flex flex-col gap-4 p-4"
 						style={{ borderRadius: '0.75rem', border: '1px solid hsl(var(--border) / 0.6)' }}
 					>
 						{/* Header with type badge and actions */}
-						<HStack justify="between" align="start" gap="md">
-							<HStack gap="md" align="center">
-								<Flex
-									align="center"
-									justify="center"
+						<div className="flex justify-between items-start gap-4">
+							<div className="flex items-center gap-4">
+								<div
+									className="flex items-center justify-center shrink-0"
 									style={{
 										height: '2.5rem',
 										width: '2.5rem',
 										borderRadius: '0.75rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										flexShrink: 0,
 									}}
 								>
 									<Shield
 										style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }}
 									/>
-								</Flex>
-								<VStack gap="none">
-									<HStack gap="sm" align="center">
-										<Text weight="medium">{property.insurance.provider}</Text>
-										<Text
-											size="xs"
+								</div>
+								<div className="flex flex-col">
+									<div className="flex items-center gap-3">
+										<p className="font-medium">{property.insurance.provider}</p>
+										<span
+											className="text-xs"
 											style={{
 												padding: '0.125rem 0.5rem',
 												borderRadius: '9999px',
@@ -2038,14 +1939,14 @@ export default function PropertyDetailPage() {
 											}}
 										>
 											{getInsuranceTypeBadge(property.insurance.type)}
-										</Text>
-									</HStack>
-									<Text size="sm" color="muted">
+										</span>
+									</div>
+									<p className="text-sm text-muted-foreground">
 										{getInsuranceTypeLabel(property.insurance.type)}
-									</Text>
-								</VStack>
-							</HStack>
-							<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
+									</p>
+								</div>
+							</div>
+							<div className="flex items-center gap-3 shrink-0">
 								<Button
 									variant="ghost"
 									size="icon"
@@ -2083,7 +1984,7 @@ export default function PropertyDetailPage() {
 												}}
 											>
 												{isDeletingPropertyInsurance ? (
-													<HStack gap="sm" align="center">
+													<span className="flex items-center gap-3">
 														<Loader2
 															style={{
 																height: '1rem',
@@ -2092,7 +1993,7 @@ export default function PropertyDetailPage() {
 															}}
 														/>
 														Suppression...
-													</HStack>
+													</span>
 												) : (
 													'Supprimer'
 												)}
@@ -2100,66 +2001,55 @@ export default function PropertyDetailPage() {
 										</AlertDialogFooter>
 									</AlertDialogContent>
 								</AlertDialog>
-							</HStack>
-						</HStack>
+							</div>
+						</div>
 
 						{/* Insurance details */}
-						<Grid
-							cols={1}
-							colsSm={3}
-							gap="md"
-							style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-						>
-							<Box>
-								<Text size="xs" color="muted">
-									Prime mensuelle
-								</Text>
-								<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
+							<div>
+								<p className="text-xs text-muted-foreground">Prime mensuelle</p>
+								<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.insurance.monthlyPremium)}
-								</Text>
-								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
+								</p>
+								<p className="text-xs text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{formatCurrency(property.insurance.monthlyPremium * 12)}/an
-								</Text>
-							</Box>
-							<Box>
-								<Text size="xs" color="muted">
-									Date de début
-								</Text>
-								<Text weight="medium">{formatDate(property.insurance.startDate.toString())}</Text>
-							</Box>
+								</p>
+							</div>
+							<div>
+								<p className="text-xs text-muted-foreground">Date de début</p>
+								<p className="font-medium">{formatDate(property.insurance.startDate.toString())}</p>
+							</div>
 							{property.insurance.endDate && (
-								<Box>
-									<Text size="xs" color="muted">
-										Date de fin
-									</Text>
-									<Text weight="medium">{formatDate(property.insurance.endDate.toString())}</Text>
-								</Box>
+								<div>
+									<p className="text-xs text-muted-foreground">Date de fin</p>
+									<p className="font-medium">{formatDate(property.insurance.endDate.toString())}</p>
+								</div>
 							)}
-						</Grid>
+						</div>
 
 						{/* Additional info */}
 						{(property.insurance.contractNumber ||
 							property.insurance.coverage ||
 							property.insurance.link) && (
-							<VStack
-								gap="xs"
+							<div
+								className="flex flex-col gap-2"
 								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 							>
 								{property.insurance.contractNumber && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										N° contrat:{' '}
-										<Text as="span" style={{ color: 'hsl(var(--foreground))' }}>
+										<span style={{ color: 'hsl(var(--foreground))' }}>
 											{property.insurance.contractNumber}
-										</Text>
-									</Text>
+										</span>
+									</p>
 								)}
 								{property.insurance.coverage && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Couverture:{' '}
-										<Text as="span" style={{ color: 'hsl(var(--foreground))' }}>
+										<span style={{ color: 'hsl(var(--foreground))' }}>
 											{property.insurance.coverage}
-										</Text>
-									</Text>
+										</span>
+									</p>
 								)}
 								{property.insurance.link && (
 									<a
@@ -2179,32 +2069,25 @@ export default function PropertyDetailPage() {
 										Voir le contrat
 									</a>
 								)}
-							</VStack>
+							</div>
 						)}
 
 						{property.insurance.notes && (
-							<Box
-								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-							>
-								<Text size="xs" color="muted">
-									Notes
-								</Text>
-								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+							<div className="pt-2 border-t border-border/40">
+								<p className="text-xs text-muted-foreground">Notes</p>
+								<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{property.insurance.notes}
-								</Text>
-							</Box>
+								</p>
+							</div>
 						)}
-					</VStack>
+					</div>
 				) : (
-					<Flex
-						direction="col"
-						align="center"
-						justify="center"
-						style={{ padding: '2rem 0', textAlign: 'center' }}
+					<div
+						className="flex flex-col items-center justify-center text-center"
+						style={{ padding: '2rem 0' }}
 					>
-						<Flex
-							align="center"
-							justify="center"
+						<div
+							className="flex items-center justify-center"
 							style={{
 								height: '3rem',
 								width: '3rem',
@@ -2216,13 +2099,13 @@ export default function PropertyDetailPage() {
 							<Shield
 								style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
-						</Flex>
-						<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+						</div>
+						<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 							Aucune assurance
-						</Text>
-						<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+						</p>
+						<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 							Ajoutez l'assurance habitation de ce bien (MRH ou PNO).
-						</Text>
+						</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -2231,24 +2114,22 @@ export default function PropertyDetailPage() {
 						>
 							Ajouter une assurance
 						</Button>
-					</Flex>
+					</div>
 				)}
 			</GlassCard>
 
 			{/* Copropriété Section */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+				<div className="flex justify-between items-center">
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<Building2
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
 						Copropriété
-					</Heading>
+					</h3>
 					{!property.coOwnership && (
 						<Button
 							variant="outline"
@@ -2259,11 +2140,10 @@ export default function PropertyDetailPage() {
 							Ajouter
 						</Button>
 					)}
-				</HStack>
+				</div>
 				{property.coOwnership ? (
-					<VStack
-						gap="md"
-						p="md"
+					<div
+						className="flex flex-col gap-4 p-4"
 						style={{
 							borderRadius: '0.75rem',
 							border: '1px solid hsl(var(--border))',
@@ -2271,31 +2151,27 @@ export default function PropertyDetailPage() {
 						}}
 					>
 						{/* Header with syndic name and actions */}
-						<HStack justify="between" align="start" gap="md">
-							<HStack gap="md" align="center">
-								<Flex
-									align="center"
-									justify="center"
+						<div className="flex justify-between items-start gap-4">
+							<div className="flex items-center gap-4">
+								<div
+									className="flex items-center justify-center shrink-0"
 									style={{
 										height: '2.5rem',
 										width: '2.5rem',
 										borderRadius: '0.75rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										flexShrink: 0,
 									}}
 								>
 									<Building2
 										style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }}
 									/>
-								</Flex>
-								<VStack gap="none">
-									<Text weight="medium">{property.coOwnership.name}</Text>
-									<Text size="sm" color="muted">
-										Syndic de copropriété
-									</Text>
-								</VStack>
-							</HStack>
-							<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
+								</div>
+								<div className="flex flex-col">
+									<p className="font-medium">{property.coOwnership.name}</p>
+									<p className="text-sm text-muted-foreground">Syndic de copropriété</p>
+								</div>
+							</div>
+							<div className="flex items-center gap-3 shrink-0">
 								<Button
 									variant="ghost"
 									size="icon"
@@ -2351,39 +2227,28 @@ export default function PropertyDetailPage() {
 										</AlertDialogFooter>
 									</AlertDialogContent>
 								</AlertDialog>
-							</HStack>
-						</HStack>
+							</div>
+						</div>
 
 						{/* Amounts */}
-						<Grid
-							cols={1}
-							colsSm={2}
-							gap="md"
-							style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-						>
-							<VStack gap="none">
-								<Text size="xs" color="muted">
-									Charges trimestrielles
-								</Text>
-								<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/40">
+							<div className="flex flex-col">
+								<p className="text-xs text-muted-foreground">Charges trimestrielles</p>
+								<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.coOwnership.quarterlyAmount)}
-								</Text>
-							</VStack>
-							<VStack gap="none">
-								<Text size="xs" color="muted">
-									Charges annuelles
-								</Text>
-								<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								</p>
+							</div>
+							<div className="flex flex-col">
+								<p className="text-xs text-muted-foreground">Charges annuelles</p>
+								<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.coOwnership.quarterlyAmount * 4)}
-								</Text>
-							</VStack>
-						</Grid>
+								</p>
+							</div>
+						</div>
 
 						{/* Additional info */}
 						{property.coOwnership.link && (
-							<Box
-								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-							>
+							<div className="pt-2 border-t border-border/40">
 								<a
 									href={property.coOwnership.link}
 									target="_blank"
@@ -2399,32 +2264,25 @@ export default function PropertyDetailPage() {
 									<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 									Voir les documents
 								</a>
-							</Box>
+							</div>
 						)}
 
 						{property.coOwnership.notes && (
-							<Box
-								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-							>
-								<Text size="xs" color="muted">
-									Notes
-								</Text>
-								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+							<div className="pt-2 border-t border-border/40">
+								<p className="text-xs text-muted-foreground">Notes</p>
+								<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{property.coOwnership.notes}
-								</Text>
-							</Box>
+								</p>
+							</div>
 						)}
-					</VStack>
+					</div>
 				) : (
-					<Flex
-						direction="col"
-						align="center"
-						justify="center"
-						style={{ padding: '2rem 0', textAlign: 'center' }}
+					<div
+						className="flex flex-col items-center justify-center text-center"
+						style={{ padding: '2rem 0' }}
 					>
-						<Flex
-							align="center"
-							justify="center"
+						<div
+							className="flex items-center justify-center"
 							style={{
 								height: '3rem',
 								width: '3rem',
@@ -2436,13 +2294,13 @@ export default function PropertyDetailPage() {
 							<Building2
 								style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
-						</Flex>
-						<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+						</div>
+						<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 							Aucune copropriété
-						</Text>
-						<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+						</p>
+						<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 							Ajoutez les informations du syndic et des charges de copropriété.
-						</Text>
+						</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -2451,22 +2309,20 @@ export default function PropertyDetailPage() {
 						>
 							Ajouter
 						</Button>
-					</Flex>
+					</div>
 				)}
 			</GlassCard>
 
 			{/* Contrats Section */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+				<div className="flex justify-between items-center">
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<Zap style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
 						Contrats & Abonnements
-					</Heading>
+					</h3>
 					<Button
 						variant="outline"
 						size="sm"
@@ -2475,17 +2331,14 @@ export default function PropertyDetailPage() {
 					>
 						Ajouter un contrat
 					</Button>
-				</HStack>
+				</div>
 				{property.utilityContracts.length === 0 ? (
-					<Flex
-						direction="col"
-						align="center"
-						justify="center"
-						style={{ padding: '2rem 0', textAlign: 'center' }}
+					<div
+						className="flex flex-col items-center justify-center text-center"
+						style={{ padding: '2rem 0' }}
 					>
-						<Flex
-							align="center"
-							justify="center"
+						<div
+							className="flex items-center justify-center"
 							style={{
 								height: '3rem',
 								width: '3rem',
@@ -2497,13 +2350,13 @@ export default function PropertyDetailPage() {
 							<Zap
 								style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
-						</Flex>
-						<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+						</div>
+						<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 							Aucun contrat
-						</Text>
-						<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+						</p>
+						<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 							Ajoutez les contrats d'énergie et abonnements liés à ce bien.
-						</Text>
+						</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -2512,59 +2365,47 @@ export default function PropertyDetailPage() {
 						>
 							Ajouter un contrat
 						</Button>
-					</Flex>
+					</div>
 				) : (
-					<VStack gap="md">
+					<div className="flex flex-col gap-4">
 						{/* Summary stats */}
-						<Grid
-							cols={2}
-							gap="md"
-							p="md"
-							style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+						<div
+							className="grid grid-cols-2 gap-4 p-4 rounded-xl"
+							style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 						>
-							<VStack gap="none" align="center">
-								<Text size="xs" color="muted">
-									Nombre de contrats
-								</Text>
-								<Text size="lg" weight="semibold">
-									{property.utilityContracts.length}
-								</Text>
-							</VStack>
-							<VStack gap="none" align="center">
-								<Text size="xs" color="muted">
-									Total mensuel
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+							<div className="flex flex-col items-center">
+								<p className="text-xs text-muted-foreground">Nombre de contrats</p>
+								<p className="text-lg font-semibold">{property.utilityContracts.length}</p>
+							</div>
+							<div className="flex flex-col items-center">
+								<p className="text-xs text-muted-foreground">Total mensuel</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(
 										property.utilityContracts.reduce((sum, c) => sum + c.monthlyAmount, 0),
 									)}
-								</Text>
-							</VStack>
-						</Grid>
+								</p>
+							</div>
+						</div>
 
 						{/* Contract list */}
-						<VStack gap="sm">
+						<div className="flex flex-col gap-3">
 							{property.utilityContracts.map((contract) => {
 								const IconComponent = getUtilityTypeIcon(contract.type);
 								return (
-									<Box
+									<div
 										key={contract.id}
-										rounded="xl"
-										border="default"
-										p="md"
+										className="rounded-xl border border-border p-4"
 										style={{ borderColor: 'hsl(var(--border) / 0.6)' }}
 									>
-										<HStack justify="between" align="start" gap="md">
-											<HStack gap="md" align="center">
-												<Flex
-													align="center"
-													justify="center"
+										<div className="flex justify-between items-start gap-4">
+											<div className="flex items-center gap-4">
+												<div
+													className="flex items-center justify-center shrink-0"
 													style={{
 														height: '2.5rem',
 														width: '2.5rem',
 														borderRadius: '0.75rem',
 														backgroundColor: 'hsl(var(--primary) / 0.1)',
-														flexShrink: 0,
 													}}
 												>
 													<IconComponent
@@ -2574,12 +2415,12 @@ export default function PropertyDetailPage() {
 															color: 'hsl(var(--primary))',
 														}}
 													/>
-												</Flex>
-												<VStack gap="none">
-													<HStack gap="sm" align="center">
-														<Text weight="medium">{contract.provider}</Text>
-														<Box
-															rounded="full"
+												</div>
+												<div className="flex flex-col">
+													<div className="flex items-center gap-3">
+														<p className="font-medium">{contract.provider}</p>
+														<span
+															className="rounded-full"
 															style={{
 																fontSize: '0.75rem',
 																padding: '0.125rem 0.5rem',
@@ -2588,21 +2429,20 @@ export default function PropertyDetailPage() {
 															}}
 														>
 															{getUtilityTypeLabel(contract.type)}
-														</Box>
-													</HStack>
-													<Text
-														size="sm"
-														color="muted"
+														</span>
+													</div>
+													<p
+														className="text-sm text-muted-foreground"
 														style={{ fontVariantNumeric: 'tabular-nums' }}
 													>
 														{formatCurrency(contract.monthlyAmount)}/mois
 														<span style={{ fontSize: '0.75rem', marginLeft: '0.25rem' }}>
 															({formatCurrency(contract.monthlyAmount * 12)}/an)
 														</span>
-													</Text>
-												</VStack>
-											</HStack>
-											<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
+													</p>
+												</div>
+											</div>
+											<div className="flex items-center gap-3 shrink-0">
 												<Button
 													variant="ghost"
 													size="icon"
@@ -2662,15 +2502,13 @@ export default function PropertyDetailPage() {
 														</AlertDialogFooter>
 													</AlertDialogContent>
 												</AlertDialog>
-											</HStack>
-										</HStack>
+											</div>
+										</div>
 
 										{/* Additional info */}
 										{(contract.contractNumber || contract.link) && (
-											<HStack
-												justify="between"
-												align="center"
-												gap="md"
+											<div
+												className="flex justify-between items-center gap-4"
 												style={{
 													marginTop: '0.75rem',
 													paddingTop: '0.75rem',
@@ -2678,12 +2516,12 @@ export default function PropertyDetailPage() {
 												}}
 											>
 												{contract.contractNumber && (
-													<Text size="xs" color="muted">
+													<p className="text-xs text-muted-foreground">
 														N° contrat:{' '}
 														<span style={{ color: 'hsl(var(--foreground))' }}>
 															{contract.contractNumber}
 														</span>
-													</Text>
+													</p>
 												)}
 												{contract.link && (
 													<a
@@ -2702,27 +2540,19 @@ export default function PropertyDetailPage() {
 														Voir le contrat
 													</a>
 												)}
-											</HStack>
+											</div>
 										)}
 
 										{contract.notes && (
-											<Box
-												style={{
-													marginTop: '0.5rem',
-													paddingTop: '0.5rem',
-													borderTop: '1px solid hsl(var(--border) / 0.4)',
-												}}
-											>
-												<Text size="xs" color="muted">
-													{contract.notes}
-												</Text>
-											</Box>
+											<div className="mt-2 pt-2 border-t border-border/40">
+												<p className="text-xs text-muted-foreground">{contract.notes}</p>
+											</div>
 										)}
-									</Box>
+									</div>
 								);
 							})}
-						</VStack>
-					</VStack>
+						</div>
+					</div>
 				)}
 			</GlassCard>
 
@@ -2747,22 +2577,21 @@ export default function PropertyDetailPage() {
 					>
 						{/* Error message */}
 						{insuranceFormError && (
-							<Box
-								p="sm"
+							<div
+								className="p-3 rounded-lg"
 								style={{
-									borderRadius: '0.5rem',
 									backgroundColor: 'hsl(var(--destructive) / 0.1)',
 									border: '1px solid hsl(var(--destructive) / 0.2)',
 								}}
 							>
-								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+								<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 									{insuranceFormError}
-								</Text>
-							</Box>
+								</p>
+							</div>
 						)}
 
 						{/* Member selection */}
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="insurance-member">Emprunteur assuré *</Label>
 							{loadingMembers ? (
 								<Skeleton style={{ height: '2.5rem', width: '100%' }} />
@@ -2777,27 +2606,25 @@ export default function PropertyDetailPage() {
 									<SelectContent>
 										{members.map((member) => (
 											<SelectItem key={member.id} value={member.id}>
-												<HStack gap="sm" align="center">
-													<Box
-														rounded="full"
+												<span className="flex items-center gap-3">
+													<div
+														className="rounded-full h-4 w-4"
 														style={{
-															height: '1rem',
-															width: '1rem',
 															backgroundColor: member.color || '#6b7280',
 														}}
 													/>
 													{member.name}
-												</HStack>
+												</span>
 											</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
 							)}
-						</VStack>
+						</div>
 
 						{/* Insurance info */}
-						<Grid cols={1} colsSm={2} gap="md">
-							<VStack gap="xs">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="insurance-name">Nom de l'assurance *</Label>
 								<Input
 									id="insurance-name"
@@ -2805,8 +2632,8 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.name}
 									onChange={(e) => handleInsuranceInputChange('name', e.target.value)}
 								/>
-							</VStack>
-							<VStack gap="xs">
+							</div>
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="insurance-provider">Assureur *</Label>
 								<Input
 									id="insurance-provider"
@@ -2814,12 +2641,12 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.provider}
 									onChange={(e) => handleInsuranceInputChange('provider', e.target.value)}
 								/>
-							</VStack>
-						</Grid>
+							</div>
+						</div>
 
 						{/* Coverage and premium */}
-						<Grid cols={1} colsSm={2} gap="md">
-							<VStack gap="xs">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="insurance-coverage">Quotité (%) *</Label>
 								<Input
 									id="insurance-coverage"
@@ -2831,11 +2658,9 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.coveragePercent}
 									onChange={(e) => handleInsuranceInputChange('coveragePercent', e.target.value)}
 								/>
-								<Text size="xs" color="muted">
-									Pourcentage du capital couvert
-								</Text>
-							</VStack>
-							<VStack gap="xs">
+								<p className="text-xs text-muted-foreground">Pourcentage du capital couvert</p>
+							</div>
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="insurance-premium">Prime mensuelle (€) *</Label>
 								<Input
 									id="insurance-premium"
@@ -2846,11 +2671,11 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.monthlyPremium}
 									onChange={(e) => handleInsuranceInputChange('monthlyPremium', e.target.value)}
 								/>
-							</VStack>
-						</Grid>
+							</div>
+						</div>
 
 						{/* Contract number */}
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="insurance-contract">N° de contrat</Label>
 							<Input
 								id="insurance-contract"
@@ -2858,10 +2683,10 @@ export default function PropertyDetailPage() {
 								value={insuranceFormData.contractNumber}
 								onChange={(e) => handleInsuranceInputChange('contractNumber', e.target.value)}
 							/>
-						</VStack>
+						</div>
 
 						{/* Link */}
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="insurance-link">Lien vers le contrat</Label>
 							<Input
 								id="insurance-link"
@@ -2869,10 +2694,10 @@ export default function PropertyDetailPage() {
 								value={insuranceFormData.link}
 								onChange={(e) => handleInsuranceInputChange('link', e.target.value)}
 							/>
-						</VStack>
+						</div>
 
 						{/* Notes */}
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="insurance-notes">Notes</Label>
 							<Input
 								id="insurance-notes"
@@ -2880,7 +2705,7 @@ export default function PropertyDetailPage() {
 								value={insuranceFormData.notes}
 								onChange={(e) => handleInsuranceInputChange('notes', e.target.value)}
 							/>
-						</VStack>
+						</div>
 
 						<DialogFooter style={{ paddingTop: '1rem' }}>
 							<Button
@@ -2931,25 +2756,24 @@ export default function PropertyDetailPage() {
 						</DialogDescription>
 					</DialogHeader>
 					<form onSubmit={handlePropertyInsuranceSubmit}>
-						<VStack gap="md">
+						<div className="flex flex-col gap-4">
 							{/* Error message */}
 							{propertyInsuranceFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{propertyInsuranceFormError}
-									</Text>
-								</Box>
+									</p>
+								</div>
 							)}
 
 							{/* Type selection */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="property-insurance-type">Type d'assurance *</Label>
 								<Select
 									value={propertyInsuranceFormData.type}
@@ -2960,28 +2784,24 @@ export default function PropertyDetailPage() {
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value="MRH">
-											<VStack gap="none">
+											<div className="flex flex-col">
 												<span>MRH - Multirisque Habitation</span>
-												<Text size="xs" color="muted">
-													Pour les occupants du bien
-												</Text>
-											</VStack>
+												<p className="text-xs text-muted-foreground">Pour les occupants du bien</p>
+											</div>
 										</SelectItem>
 										<SelectItem value="PNO">
-											<VStack gap="none">
+											<div className="flex flex-col">
 												<span>PNO - Propriétaire Non-Occupant</span>
-												<Text size="xs" color="muted">
-													Pour les biens locatifs
-												</Text>
-											</VStack>
+												<p className="text-xs text-muted-foreground">Pour les biens locatifs</p>
+											</div>
 										</SelectItem>
 									</SelectContent>
 								</Select>
-							</VStack>
+							</div>
 
 							{/* Provider and contract */}
-							<Grid cols={1} colsSm={2} gap="md">
-								<VStack gap="xs">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="property-insurance-provider">Assureur *</Label>
 									<Input
 										id="property-insurance-provider"
@@ -2989,8 +2809,8 @@ export default function PropertyDetailPage() {
 										value={propertyInsuranceFormData.provider}
 										onChange={(e) => handlePropertyInsuranceInputChange('provider', e.target.value)}
 									/>
-								</VStack>
-								<VStack gap="xs">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="property-insurance-contract">N° de contrat</Label>
 									<Input
 										id="property-insurance-contract"
@@ -3000,11 +2820,11 @@ export default function PropertyDetailPage() {
 											handlePropertyInsuranceInputChange('contractNumber', e.target.value)
 										}
 									/>
-								</VStack>
-							</Grid>
+								</div>
+							</div>
 
 							{/* Premium */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="property-insurance-premium">Prime mensuelle (€) *</Label>
 								<Input
 									id="property-insurance-premium"
@@ -3018,19 +2838,19 @@ export default function PropertyDetailPage() {
 									}
 								/>
 								{propertyInsuranceFormData.monthlyPremium && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Soit{' '}
 										{formatCurrency(
 											Number.parseFloat(propertyInsuranceFormData.monthlyPremium) * 12,
 										)}
 										/an
-									</Text>
+									</p>
 								)}
-							</VStack>
+							</div>
 
 							{/* Dates */}
-							<Grid cols={1} colsSm={2} gap="md">
-								<VStack gap="xs">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="property-insurance-start">Date de début *</Label>
 									<Input
 										id="property-insurance-start"
@@ -3040,8 +2860,8 @@ export default function PropertyDetailPage() {
 											handlePropertyInsuranceInputChange('startDate', e.target.value)
 										}
 									/>
-								</VStack>
-								<VStack gap="xs">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="property-insurance-end">Date de fin</Label>
 									<Input
 										id="property-insurance-end"
@@ -3049,11 +2869,11 @@ export default function PropertyDetailPage() {
 										value={propertyInsuranceFormData.endDate}
 										onChange={(e) => handlePropertyInsuranceInputChange('endDate', e.target.value)}
 									/>
-								</VStack>
-							</Grid>
+								</div>
+							</div>
 
 							{/* Coverage */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="property-insurance-coverage">Couverture</Label>
 								<Input
 									id="property-insurance-coverage"
@@ -3061,10 +2881,10 @@ export default function PropertyDetailPage() {
 									value={propertyInsuranceFormData.coverage}
 									onChange={(e) => handlePropertyInsuranceInputChange('coverage', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							{/* Link */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="property-insurance-link">Lien vers le contrat</Label>
 								<Input
 									id="property-insurance-link"
@@ -3072,10 +2892,10 @@ export default function PropertyDetailPage() {
 									value={propertyInsuranceFormData.link}
 									onChange={(e) => handlePropertyInsuranceInputChange('link', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							{/* Notes */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="property-insurance-notes">Notes</Label>
 								<Input
 									id="property-insurance-notes"
@@ -3083,7 +2903,7 @@ export default function PropertyDetailPage() {
 									value={propertyInsuranceFormData.notes}
 									onChange={(e) => handlePropertyInsuranceInputChange('notes', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							<DialogFooter style={{ paddingTop: '1rem' }}>
 								<Button
@@ -3096,7 +2916,7 @@ export default function PropertyDetailPage() {
 								</Button>
 								<Button type="submit" disabled={isSubmittingPropertyInsurance}>
 									{isSubmittingPropertyInsurance ? (
-										<HStack gap="sm" align="center">
+										<span className="flex items-center gap-3">
 											<Loader2
 												style={{
 													height: '1rem',
@@ -3105,7 +2925,7 @@ export default function PropertyDetailPage() {
 												}}
 											/>
 											{isEditingPropertyInsurance ? 'Modification...' : 'Création...'}
-										</HStack>
+										</span>
 									) : isEditingPropertyInsurance ? (
 										'Modifier'
 									) : (
@@ -3113,7 +2933,7 @@ export default function PropertyDetailPage() {
 									)}
 								</Button>
 							</DialogFooter>
-						</VStack>
+						</div>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -3136,25 +2956,24 @@ export default function PropertyDetailPage() {
 						</DialogDescription>
 					</DialogHeader>
 					<form onSubmit={handleCoOwnershipSubmit}>
-						<VStack gap="md">
+						<div className="flex flex-col gap-4">
 							{/* Error message */}
 							{coOwnershipFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{coOwnershipFormError}
-									</Text>
-								</Box>
+									</p>
+								</div>
 							)}
 
 							{/* Syndic name */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="coownership-name">Nom du syndic *</Label>
 								<Input
 									id="coownership-name"
@@ -3162,10 +2981,10 @@ export default function PropertyDetailPage() {
 									value={coOwnershipFormData.name}
 									onChange={(e) => handleCoOwnershipInputChange('name', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							{/* Quarterly amount */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="coownership-amount">Charges trimestrielles (€) *</Label>
 								<Input
 									id="coownership-amount"
@@ -3177,15 +2996,15 @@ export default function PropertyDetailPage() {
 									onChange={(e) => handleCoOwnershipInputChange('quarterlyAmount', e.target.value)}
 								/>
 								{coOwnershipFormData.quarterlyAmount && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Soit{' '}
 										{formatCurrency(Number.parseFloat(coOwnershipFormData.quarterlyAmount) * 4)}/an
-									</Text>
+									</p>
 								)}
-							</VStack>
+							</div>
 
 							{/* Link */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="coownership-link">Lien vers les documents</Label>
 								<Input
 									id="coownership-link"
@@ -3193,10 +3012,10 @@ export default function PropertyDetailPage() {
 									value={coOwnershipFormData.link}
 									onChange={(e) => handleCoOwnershipInputChange('link', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							{/* Notes */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="coownership-notes">Notes</Label>
 								<Input
 									id="coownership-notes"
@@ -3204,7 +3023,7 @@ export default function PropertyDetailPage() {
 									value={coOwnershipFormData.notes}
 									onChange={(e) => handleCoOwnershipInputChange('notes', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							<DialogFooter style={{ paddingTop: '1rem' }}>
 								<Button
@@ -3217,7 +3036,7 @@ export default function PropertyDetailPage() {
 								</Button>
 								<Button type="submit" disabled={isSubmittingCoOwnership}>
 									{isSubmittingCoOwnership ? (
-										<HStack gap="sm" align="center">
+										<span className="flex items-center gap-3">
 											<Loader2
 												style={{
 													height: '1rem',
@@ -3226,7 +3045,7 @@ export default function PropertyDetailPage() {
 												}}
 											/>
 											{isEditingCoOwnership ? 'Modification...' : 'Création...'}
-										</HStack>
+										</span>
 									) : isEditingCoOwnership ? (
 										'Modifier'
 									) : (
@@ -3234,7 +3053,7 @@ export default function PropertyDetailPage() {
 									)}
 								</Button>
 							</DialogFooter>
-						</VStack>
+						</div>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -3257,25 +3076,24 @@ export default function PropertyDetailPage() {
 						</DialogDescription>
 					</DialogHeader>
 					<form onSubmit={handleUtilityContractSubmit}>
-						<VStack gap="md">
+						<div className="flex flex-col gap-4">
 							{/* Error message */}
 							{utilityContractFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{utilityContractFormError}
-									</Text>
-								</Box>
+									</p>
+								</div>
 							)}
 
 							{/* Type selection */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="utility-contract-type">Type de contrat *</Label>
 								<Select
 									value={utilityContractFormData.type}
@@ -3286,42 +3104,42 @@ export default function PropertyDetailPage() {
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value="ELECTRICITY">
-											<HStack gap="sm" align="center">
+											<span className="flex items-center gap-3">
 												<Zap style={{ height: '1rem', width: '1rem' }} />
 												Électricité
-											</HStack>
+											</span>
 										</SelectItem>
 										<SelectItem value="GAS">
-											<HStack gap="sm" align="center">
+											<span className="flex items-center gap-3">
 												<Flame style={{ height: '1rem', width: '1rem' }} />
 												Gaz
-											</HStack>
+											</span>
 										</SelectItem>
 										<SelectItem value="WATER">
-											<HStack gap="sm" align="center">
+											<span className="flex items-center gap-3">
 												<Droplets style={{ height: '1rem', width: '1rem' }} />
 												Eau
-											</HStack>
+											</span>
 										</SelectItem>
 										<SelectItem value="INTERNET">
-											<HStack gap="sm" align="center">
+											<span className="flex items-center gap-3">
 												<Wifi style={{ height: '1rem', width: '1rem' }} />
 												Internet
-											</HStack>
+											</span>
 										</SelectItem>
 										<SelectItem value="OTHER">
-											<HStack gap="sm" align="center">
+											<span className="flex items-center gap-3">
 												<Zap style={{ height: '1rem', width: '1rem' }} />
 												Autre
-											</HStack>
+											</span>
 										</SelectItem>
 									</SelectContent>
 								</Select>
-							</VStack>
+							</div>
 
 							{/* Provider and contract number */}
-							<Grid cols={1} colsSm={2} gap="md">
-								<VStack gap="xs">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="utility-contract-provider">Fournisseur *</Label>
 									<Input
 										id="utility-contract-provider"
@@ -3329,8 +3147,8 @@ export default function PropertyDetailPage() {
 										value={utilityContractFormData.provider}
 										onChange={(e) => handleUtilityContractInputChange('provider', e.target.value)}
 									/>
-								</VStack>
-								<VStack gap="xs">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="utility-contract-number">N° de contrat</Label>
 									<Input
 										id="utility-contract-number"
@@ -3340,11 +3158,11 @@ export default function PropertyDetailPage() {
 											handleUtilityContractInputChange('contractNumber', e.target.value)
 										}
 									/>
-								</VStack>
-							</Grid>
+								</div>
+							</div>
 
 							{/* Monthly amount */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="utility-contract-amount">Montant mensuel (€) *</Label>
 								<Input
 									id="utility-contract-amount"
@@ -3358,16 +3176,16 @@ export default function PropertyDetailPage() {
 									}
 								/>
 								{utilityContractFormData.monthlyAmount && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Soit{' '}
 										{formatCurrency(Number.parseFloat(utilityContractFormData.monthlyAmount) * 12)}
 										/an
-									</Text>
+									</p>
 								)}
-							</VStack>
+							</div>
 
 							{/* Link */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="utility-contract-link">Lien vers le contrat</Label>
 								<Input
 									id="utility-contract-link"
@@ -3375,10 +3193,10 @@ export default function PropertyDetailPage() {
 									value={utilityContractFormData.link}
 									onChange={(e) => handleUtilityContractInputChange('link', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							{/* Notes */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="utility-contract-notes">Notes</Label>
 								<Input
 									id="utility-contract-notes"
@@ -3386,7 +3204,7 @@ export default function PropertyDetailPage() {
 									value={utilityContractFormData.notes}
 									onChange={(e) => handleUtilityContractInputChange('notes', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							<DialogFooter style={{ paddingTop: '1rem' }}>
 								<Button
@@ -3399,7 +3217,7 @@ export default function PropertyDetailPage() {
 								</Button>
 								<Button type="submit" disabled={isSubmittingUtilityContract}>
 									{isSubmittingUtilityContract ? (
-										<HStack gap="sm" align="center">
+										<span className="flex items-center gap-3">
 											<Loader2
 												style={{
 													height: '1rem',
@@ -3408,7 +3226,7 @@ export default function PropertyDetailPage() {
 												}}
 											/>
 											{editingUtilityContractId ? 'Modification...' : 'Création...'}
-										</HStack>
+										</span>
 									) : editingUtilityContractId ? (
 										'Modifier'
 									) : (
@@ -3416,7 +3234,7 @@ export default function PropertyDetailPage() {
 									)}
 								</Button>
 							</DialogFooter>
-						</VStack>
+						</div>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -3437,30 +3255,27 @@ export default function PropertyDetailPage() {
 						</DialogDescription>
 					</DialogHeader>
 					<form onSubmit={handlePropertySubmit}>
-						<VStack gap="lg">
+						<div className="flex flex-col gap-6">
 							{/* Error message */}
 							{propertyFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{propertyFormError}
-									</Text>
-								</Box>
+									</p>
+								</div>
 							)}
 
 							{/* Basic info */}
-							<VStack gap="md">
-								<Text size="sm" weight="medium" color="muted">
-									Informations générales
-								</Text>
-								<Grid cols={1} colsSm={2} gap="md">
-									<VStack gap="xs">
+							<div className="flex flex-col gap-4">
+								<p className="text-sm font-medium text-muted-foreground">Informations générales</p>
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-name">Nom du bien *</Label>
 										<Input
 											id="edit-name"
@@ -3468,8 +3283,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.name}
 											onChange={(e) => handlePropertyInputChange('name', e.target.value)}
 										/>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-type">Type *</Label>
 										<Select
 											value={propertyFormData.type}
@@ -3483,8 +3298,8 @@ export default function PropertyDetailPage() {
 												<SelectItem value="HOUSE">Maison</SelectItem>
 											</SelectContent>
 										</Select>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-usage">Usage *</Label>
 										<Select
 											value={propertyFormData.usage}
@@ -3499,8 +3314,8 @@ export default function PropertyDetailPage() {
 												<SelectItem value="RENTAL">Locatif</SelectItem>
 											</SelectContent>
 										</Select>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-surface">Surface (m²) *</Label>
 										<Input
 											id="edit-surface"
@@ -3511,8 +3326,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.surface}
 											onChange={(e) => handlePropertyInputChange('surface', e.target.value)}
 										/>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-rooms">Pièces</Label>
 										<Input
 											id="edit-rooms"
@@ -3522,8 +3337,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.rooms}
 											onChange={(e) => handlePropertyInputChange('rooms', e.target.value)}
 										/>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-bedrooms">Chambres</Label>
 										<Input
 											id="edit-bedrooms"
@@ -3533,17 +3348,15 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.bedrooms}
 											onChange={(e) => handlePropertyInputChange('bedrooms', e.target.value)}
 										/>
-									</VStack>
-								</Grid>
-							</VStack>
+									</div>
+								</div>
+							</div>
 
 							{/* Address */}
-							<VStack gap="md">
-								<Text size="sm" weight="medium" color="muted">
-									Adresse
-								</Text>
-								<VStack gap="md">
-									<VStack gap="xs">
+							<div className="flex flex-col gap-4">
+								<p className="text-sm font-medium text-muted-foreground">Adresse</p>
+								<div className="flex flex-col gap-4">
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-address">Adresse *</Label>
 										<Input
 											id="edit-address"
@@ -3551,8 +3364,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.address}
 											onChange={(e) => handlePropertyInputChange('address', e.target.value)}
 										/>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-address2">Complément d&apos;adresse</Label>
 										<Input
 											id="edit-address2"
@@ -3560,9 +3373,9 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.address2}
 											onChange={(e) => handlePropertyInputChange('address2', e.target.value)}
 										/>
-									</VStack>
-									<Grid cols={1} colsSm={2} gap="md">
-										<VStack gap="xs">
+									</div>
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="edit-city">Ville *</Label>
 											<Input
 												id="edit-city"
@@ -3570,8 +3383,8 @@ export default function PropertyDetailPage() {
 												value={propertyFormData.city}
 												onChange={(e) => handlePropertyInputChange('city', e.target.value)}
 											/>
-										</VStack>
-										<VStack gap="xs">
+										</div>
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="edit-postalCode">Code postal *</Label>
 											<Input
 												id="edit-postalCode"
@@ -3579,18 +3392,16 @@ export default function PropertyDetailPage() {
 												value={propertyFormData.postalCode}
 												onChange={(e) => handlePropertyInputChange('postalCode', e.target.value)}
 											/>
-										</VStack>
-									</Grid>
-								</VStack>
-							</VStack>
+										</div>
+									</div>
+								</div>
+							</div>
 
 							{/* Purchase info */}
-							<VStack gap="md">
-								<Text size="sm" weight="medium" color="muted">
-									Achat
-								</Text>
-								<Grid cols={1} colsSm={2} gap="md">
-									<VStack gap="xs">
+							<div className="flex flex-col gap-4">
+								<p className="text-sm font-medium text-muted-foreground">Achat</p>
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-purchasePrice">Prix d&apos;achat (€) *</Label>
 										<Input
 											id="edit-purchasePrice"
@@ -3601,8 +3412,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.purchasePrice}
 											onChange={(e) => handlePropertyInputChange('purchasePrice', e.target.value)}
 										/>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-purchaseDate">Date d&apos;achat *</Label>
 										<Input
 											id="edit-purchaseDate"
@@ -3610,8 +3421,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.purchaseDate}
 											onChange={(e) => handlePropertyInputChange('purchaseDate', e.target.value)}
 										/>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-notaryFees">Frais de notaire (€) *</Label>
 										<Input
 											id="edit-notaryFees"
@@ -3622,8 +3433,8 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.notaryFees}
 											onChange={(e) => handlePropertyInputChange('notaryFees', e.target.value)}
 										/>
-									</VStack>
-									<VStack gap="xs">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-agencyFees">Frais d&apos;agence (€)</Label>
 										<Input
 											id="edit-agencyFees"
@@ -3634,16 +3445,14 @@ export default function PropertyDetailPage() {
 											value={propertyFormData.agencyFees}
 											onChange={(e) => handlePropertyInputChange('agencyFees', e.target.value)}
 										/>
-									</VStack>
-								</Grid>
-							</VStack>
+									</div>
+								</div>
+							</div>
 
 							{/* Current value */}
-							<VStack gap="md">
-								<Text size="sm" weight="medium" color="muted">
-									Valeur actuelle
-								</Text>
-								<VStack gap="xs">
+							<div className="flex flex-col gap-4">
+								<p className="text-sm font-medium text-muted-foreground">Valeur actuelle</p>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="edit-currentValue">Valeur estimée (€) *</Label>
 									<Input
 										id="edit-currentValue"
@@ -3654,17 +3463,17 @@ export default function PropertyDetailPage() {
 										value={propertyFormData.currentValue}
 										onChange={(e) => handlePropertyInputChange('currentValue', e.target.value)}
 									/>
-								</VStack>
-							</VStack>
+								</div>
+							</div>
 
 							{/* Rental info - only shown for RENTAL usage */}
 							{isEditFormRental && (
-								<VStack gap="md">
-									<Text size="sm" weight="medium" color="muted">
+								<div className="flex flex-col gap-4">
+									<p className="text-sm font-medium text-muted-foreground">
 										Informations locatives
-									</Text>
-									<Grid cols={1} colsSm={2} gap="md">
-										<VStack gap="xs">
+									</p>
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="edit-rentAmount">Loyer mensuel (€)</Label>
 											<Input
 												id="edit-rentAmount"
@@ -3675,8 +3484,8 @@ export default function PropertyDetailPage() {
 												value={propertyFormData.rentAmount}
 												onChange={(e) => handlePropertyInputChange('rentAmount', e.target.value)}
 											/>
-										</VStack>
-										<VStack gap="xs">
+										</div>
+										<div className="flex flex-col gap-2">
 											<Label htmlFor="edit-rentCharges">Charges locatives (€)</Label>
 											<Input
 												id="edit-rentCharges"
@@ -3687,17 +3496,15 @@ export default function PropertyDetailPage() {
 												value={propertyFormData.rentCharges}
 												onChange={(e) => handlePropertyInputChange('rentCharges', e.target.value)}
 											/>
-										</VStack>
-									</Grid>
-								</VStack>
+										</div>
+									</div>
+								</div>
 							)}
 
 							{/* Members/Owners */}
-							<VStack gap="md">
-								<HStack justify="between" align="center">
-									<Text size="sm" weight="medium" color="muted">
-										Propriétaires
-									</Text>
+							<div className="flex flex-col gap-4">
+								<div className="flex justify-between items-center">
+									<p className="text-sm font-medium text-muted-foreground">Propriétaires</p>
 									{members.length > editMemberShares.length && (
 										<Button
 											type="button"
@@ -3709,16 +3516,16 @@ export default function PropertyDetailPage() {
 											Ajouter
 										</Button>
 									)}
-								</HStack>
+								</div>
 								{loadingMembers ? (
 									<Skeleton style={{ height: '2.5rem', width: '100%' }} />
 								) : editMemberShares.length === 0 ? (
-									<Text size="sm" color="muted">
+									<p className="text-sm text-muted-foreground">
 										Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des
 										propriétaires.
-									</Text>
+									</p>
 								) : (
-									<VStack gap="sm">
+									<div className="flex flex-col gap-3">
 										{editMemberShares.map((ms, index) => {
 											const member = members.find((m) => m.id === ms.memberId);
 											const availableMembers = members.filter(
@@ -3727,19 +3534,16 @@ export default function PropertyDetailPage() {
 													!editMemberShares.some((other) => other.memberId === m.id),
 											);
 											return (
-												<HStack
+												<div
 													key={ms.memberId}
-													gap="md"
-													align="center"
-													p="sm"
+													className="flex items-center gap-4 p-3"
 													style={{
 														borderRadius: '0.5rem',
 														backgroundColor: 'hsl(var(--muted) / 0.3)',
 													}}
 												>
-													<Flex
-														align="center"
-														justify="center"
+													<div
+														className="flex items-center justify-center shrink-0"
 														style={{
 															borderRadius: '9999px',
 															height: '2rem',
@@ -3747,12 +3551,11 @@ export default function PropertyDetailPage() {
 															fontSize: '0.875rem',
 															fontWeight: 500,
 															color: 'white',
-															flexShrink: 0,
 															backgroundColor: member?.color || '#6b7280',
 														}}
 													>
 														{member?.name.charAt(0).toUpperCase()}
-													</Flex>
+													</div>
 													<Select
 														value={ms.memberId}
 														onValueChange={(value) => handleMemberChange(index, value)}
@@ -3768,7 +3571,7 @@ export default function PropertyDetailPage() {
 															))}
 														</SelectContent>
 													</Select>
-													<HStack gap="sm" align="center">
+													<div className="flex items-center gap-3">
 														<Input
 															type="number"
 															min="0"
@@ -3779,10 +3582,8 @@ export default function PropertyDetailPage() {
 																handleShareChange(index, Number.parseInt(e.target.value, 10) || 0)
 															}
 														/>
-														<Text size="sm" color="muted">
-															%
-														</Text>
-													</HStack>
+														<p className="text-sm text-muted-foreground">%</p>
+													</div>
 													<Button
 														type="button"
 														variant="ghost"
@@ -3792,29 +3593,26 @@ export default function PropertyDetailPage() {
 													>
 														<X style={{ height: '1rem', width: '1rem' }} />
 													</Button>
-												</HStack>
+												</div>
 											);
 										})}
 										{editMemberShares.length > 0 && (
-											<Text size="xs" color="muted" style={{ textAlign: 'right' }}>
+											<p className="text-xs text-muted-foreground" style={{ textAlign: 'right' }}>
 												Total: {editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
 												{editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !==
 													100 && (
-													<Text
-														as="span"
-														style={{ marginLeft: '0.25rem', color: 'hsl(var(--destructive))' }}
-													>
+													<span style={{ marginLeft: '0.25rem', color: 'hsl(var(--destructive))' }}>
 														(doit être 100%)
-													</Text>
+													</span>
 												)}
-											</Text>
+											</p>
 										)}
-									</VStack>
+									</div>
 								)}
-							</VStack>
+							</div>
 
 							{/* Notes */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="edit-notes">Notes</Label>
 								<Input
 									id="edit-notes"
@@ -3822,7 +3620,7 @@ export default function PropertyDetailPage() {
 									value={propertyFormData.notes}
 									onChange={(e) => handlePropertyInputChange('notes', e.target.value)}
 								/>
-							</VStack>
+							</div>
 
 							<DialogFooter style={{ paddingTop: '1rem' }}>
 								<Button
@@ -3835,7 +3633,7 @@ export default function PropertyDetailPage() {
 								</Button>
 								<Button type="submit" disabled={isSubmittingProperty}>
 									{isSubmittingProperty ? (
-										<HStack gap="sm" align="center">
+										<span className="flex items-center gap-3">
 											<Loader2
 												style={{
 													height: '1rem',
@@ -3844,13 +3642,13 @@ export default function PropertyDetailPage() {
 												}}
 											/>
 											Modification...
-										</HStack>
+										</span>
 									) : (
 										'Enregistrer'
 									)}
 								</Button>
 							</DialogFooter>
-						</VStack>
+						</div>
 					</form>
 				</DialogContent>
 			</Dialog>
@@ -3876,12 +3674,12 @@ export default function PropertyDetailPage() {
 							}}
 						>
 							{isDeletingProperty ? (
-								<HStack gap="sm" align="center">
+								<span className="flex items-center gap-3">
 									<Loader2
 										style={{ height: '1rem', width: '1rem', animation: 'spin 1s linear infinite' }}
 									/>
 									Suppression...
-								</HStack>
+								</span>
 							) : (
 								'Supprimer'
 							)}
@@ -3889,6 +3687,6 @@ export default function PropertyDetailPage() {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-		</VStack>
+		</div>
 	);
 }

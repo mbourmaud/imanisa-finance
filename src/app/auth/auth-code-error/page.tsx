@@ -2,118 +2,74 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-	AlertTriangle,
-	ArrowLeft,
-	Box,
-	Button,
-	Flex,
-	GlassCard,
-	Heading,
-	RefreshCw,
-	Text,
-	VStack,
-	Wallet,
-} from '@/components';
+import { AlertTriangle, ArrowLeft, Button, GlassCard, RefreshCw, Wallet } from '@/components';
 
 export default function AuthCodeErrorPage() {
 	const router = useRouter();
 
 	return (
-		<Box
-			display="flex"
-			position="relative"
-			overflow="hidden"
-			bg="background"
-			p="lg"
-			style={{ minHeight: '100vh' }}
-		>
+		<div className="relative flex min-h-screen overflow-hidden bg-background p-6">
 			{/* Background gradient blobs */}
-			<Box position="absolute" overflow="hidden" style={{ inset: 0, zIndex: -10 }}>
-				<Box
-					position="absolute"
-					rounded="full"
+			<div className="absolute inset-0 -z-10 overflow-hidden">
+				<div
+					className="absolute -right-40 -top-40 h-[500px] w-[500px] animate-pulse rounded-full"
 					style={{
-						top: '-10rem',
-						right: '-10rem',
-						height: '500px',
-						width: '500px',
 						backgroundColor: 'oklch(0.5 0.2 25 / 0.1)',
 						filter: 'blur(64px)',
-						animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 					}}
 				/>
-				<Box
-					position="absolute"
-					rounded="full"
+				<div
+					className="absolute -bottom-40 -left-40 h-[400px] w-[400px] animate-pulse rounded-full"
 					style={{
-						bottom: '-10rem',
-						left: '-10rem',
-						height: '400px',
-						width: '400px',
 						backgroundColor: 'oklch(0.6 0.2 40 / 0.1)',
 						filter: 'blur(64px)',
-						animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 						animationDelay: '1s',
 					}}
 				/>
-			</Box>
+			</div>
 
 			{/* Center content */}
-			<Flex direction="col" align="center" justify="center" fullWidth fullHeight>
+			<div className="flex flex-col items-center justify-center w-full h-full">
 				{/* Logo */}
-				<VStack gap="md" align="center" p="lg">
-					<Box
-						display="flex"
-						rounded="2xl"
-						shadow="xl"
+				<div className="flex flex-col items-center gap-4 p-6">
+					<div
+						className="flex h-16 w-16 items-center justify-center rounded-2xl shadow-xl"
 						style={{
-							height: '4rem',
-							width: '4rem',
-							alignItems: 'center',
-							justifyContent: 'center',
 							background:
 								'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
 						}}
 					>
 						<Wallet style={{ height: '2rem', width: '2rem', color: 'white' }} />
-					</Box>
-				</VStack>
+					</div>
+				</div>
 
 				{/* Error card */}
-				<Box style={{ maxWidth: '28rem', width: '100%' }}>
+				<div className="w-full max-w-md">
 					<GlassCard padding="lg" variant="elevated">
-						<VStack gap="lg" align="center">
+						<div className="flex flex-col items-center gap-6">
 							{/* Error icon */}
-							<Box
-								display="flex"
-								rounded="full"
-								style={{
-									height: '4rem',
-									width: '4rem',
-									alignItems: 'center',
-									justifyContent: 'center',
-									backgroundColor: 'oklch(0.9 0.05 25)',
-								}}
+							<div
+								className="flex h-16 w-16 items-center justify-center rounded-full"
+								style={{ backgroundColor: 'oklch(0.9 0.05 25)' }}
 							>
 								<AlertTriangle
 									style={{ height: '2rem', width: '2rem', color: 'oklch(0.55 0.2 25)' }}
 								/>
-							</Box>
+							</div>
 
 							{/* Title */}
-							<Heading level={1} size="xl" align="center">
+							<h1 className="text-xl font-semibold tracking-tight text-center">
 								Erreur d'authentification
-							</Heading>
+							</h1>
 
 							{/* Description */}
-							<Text color="muted" align="center">
+							<p className="text-muted-foreground text-center">
 								Une erreur s'est produite lors de la connexion avec Google. Veuillez réessayer ou
 								contacter le support si le problème persiste.
-							</Text>
+							</p>
 
 							{/* Actions */}
-							<VStack gap="sm" fullWidth>
+							<div className="flex flex-col gap-3 w-full">
 								<Button
 									onClick={() => router.push('/login')}
 									iconLeft={<RefreshCw style={{ height: '1.25rem', width: '1.25rem' }} />}
@@ -130,18 +86,16 @@ export default function AuthCodeErrorPage() {
 								>
 									<Link href="/">Retour à l'accueil</Link>
 								</Button>
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 					</GlassCard>
-				</Box>
+				</div>
 
 				{/* Footer */}
-				<Box position="absolute" style={{ bottom: '1.5rem' }}>
-					<Text size="sm" color="muted">
-						Besoin d'aide ? Contactez le support
-					</Text>
-				</Box>
-			</Flex>
-		</Box>
+				<div className="absolute bottom-6">
+					<p className="text-sm text-muted-foreground">Besoin d'aide ? Contactez le support</p>
+				</div>
+			</div>
+		</div>
 	);
 }

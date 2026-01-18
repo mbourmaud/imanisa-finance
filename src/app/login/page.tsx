@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Button, GlassCard, Heading, Text, VStack, Wallet } from '@/components';
+import { Button, GlassCard, Wallet } from '@/components';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -28,104 +28,55 @@ export default function LoginPage() {
 	};
 
 	return (
-		<Box
-			display="flex"
-			p="lg"
-			style={{
-				position: 'relative',
-				overflow: 'hidden',
-				backgroundColor: 'hsl(var(--background))',
-				minHeight: '100vh',
-				flexDirection: 'column',
-				alignItems: 'center',
-				justifyContent: 'center',
-			}}
-		>
+		<div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6">
 			{/* Background gradient blobs */}
-			<Box style={{ position: 'absolute', overflow: 'hidden', inset: 0, zIndex: -10 }}>
-				<Box
-					style={{
-						position: 'absolute',
-						borderRadius: '9999px',
-						top: '-10rem',
-						right: '-10rem',
-						height: '500px',
-						width: '500px',
-						backgroundColor: 'hsl(var(--primary) / 0.1)',
-						filter: 'blur(64px)',
-						animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-					}}
+			<div className="absolute inset-0 -z-10 overflow-hidden">
+				<div
+					className="absolute -right-40 -top-40 h-[500px] w-[500px] animate-pulse rounded-full bg-primary/10"
+					style={{ filter: 'blur(64px)' }}
 				/>
-				<Box
+				<div
+					className="absolute -bottom-40 -left-40 h-[400px] w-[400px] animate-pulse rounded-full"
 					style={{
-						position: 'absolute',
-						borderRadius: '9999px',
-						bottom: '-10rem',
-						left: '-10rem',
-						height: '400px',
-						width: '400px',
 						backgroundColor: 'oklch(0.6 0.2 280 / 0.1)',
 						filter: 'blur(64px)',
-						animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 						animationDelay: '1s',
 					}}
 				/>
-				<Box
-					style={{
-						position: 'absolute',
-						borderRadius: '9999px',
-						top: '50%',
-						left: '50%',
-						transform: 'translate(-50%, -50%)',
-						height: '600px',
-						width: '600px',
-						backgroundColor: 'hsl(var(--primary) / 0.05)',
-						filter: 'blur(64px)',
-					}}
+				<div
+					className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5"
+					style={{ filter: 'blur(64px)' }}
 				/>
-			</Box>
+			</div>
 
 			{/* Logo */}
-			<VStack
-				gap="lg"
-				align="center"
+			<div
+				className="flex flex-col items-center gap-6"
 				style={{ marginBottom: '1.5rem', animation: 'fadeIn 0.5s ease-out' }}
 			>
-				<Box style={{ position: 'relative' }}>
-					<Box
-						display="flex"
+				<div className="relative">
+					<div
+						className="flex h-20 w-20 items-center justify-center rounded-2xl"
 						style={{
-							borderRadius: '1rem',
-							height: '5rem',
-							width: '5rem',
-							alignItems: 'center',
-							justifyContent: 'center',
 							background:
 								'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary)) 50%, hsl(var(--primary) / 0.8))',
 							boxShadow: '0 25px 50px -12px hsl(var(--primary) / 0.4)',
 						}}
 					>
 						<Wallet style={{ height: '2.5rem', width: '2.5rem', color: 'white' }} />
-					</Box>
-					<Box
+					</div>
+					<div
+						className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full"
 						style={{
-							position: 'absolute',
-							borderRadius: '9999px',
-							bottom: '-0.25rem',
-							right: '-0.25rem',
-							height: '1.25rem',
-							width: '1.25rem',
 							backgroundColor: 'oklch(0.7 0.2 145)',
 							border: '4px solid hsl(var(--background))',
 						}}
 					/>
-				</Box>
-				<VStack gap="xs" align="center">
-					<Heading
-						level={1}
-						size="2xl"
+				</div>
+				<div className="flex flex-col items-center gap-2">
+					<h1
+						className="text-2xl font-bold tracking-tight"
 						style={{
-							fontWeight: 700,
 							letterSpacing: '-0.025em',
 							backgroundImage:
 								'linear-gradient(to right, hsl(var(--foreground)), hsl(var(--foreground) / 0.7))',
@@ -134,20 +85,16 @@ export default function LoginPage() {
 						}}
 					>
 						Imanisa
-					</Heading>
-					<Text color="muted" size="lg">
-						Finance familiale
-					</Text>
-				</VStack>
-			</VStack>
+					</h1>
+					<p className="text-lg text-muted-foreground">Finance familiale</p>
+				</div>
+			</div>
 
 			{/* Login card */}
-			<Box style={{ maxWidth: '24rem', width: '100%' }}>
+			<div className="w-full max-w-sm">
 				<GlassCard padding="lg" variant="elevated">
-					<VStack gap="lg">
-						<Heading level={2} size="lg" align="center">
-							Connexion
-						</Heading>
+					<div className="flex flex-col gap-6">
+						<h2 className="text-lg font-semibold tracking-tight text-center">Connexion</h2>
 
 						<Button
 							onClick={handleGoogleLogin}
@@ -189,19 +136,19 @@ export default function LoginPage() {
 							{isLoading ? 'Connexion...' : 'Continuer avec Google'}
 						</Button>
 
-						<Text color="muted" size="sm" align="center">
+						<p className="text-sm text-muted-foreground text-center">
 							Vos donnees restent privees et securisees
-						</Text>
-					</VStack>
+						</p>
+					</div>
 				</GlassCard>
-			</Box>
+			</div>
 
 			{/* Footer */}
-			<Box style={{ position: 'absolute', bottom: '1.5rem' }}>
-				<Text size="sm" style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }}>
+			<div className="absolute bottom-6">
+				<p className="text-sm" style={{ color: 'hsl(var(--muted-foreground) / 0.5)' }}>
 					100% prive - Self-hosted
-				</Text>
-			</Box>
-		</Box>
+				</p>
+			</div>
+		</div>
 	);
 }

@@ -14,8 +14,6 @@ import {
 	// Icons
 	AlertCircle,
 	ArrowLeft,
-	// Layout
-	Box,
 	// Form elements
 	Button,
 	Check,
@@ -25,11 +23,8 @@ import {
 	EmptyState,
 	ExternalLink,
 	FileSpreadsheet,
-	Flex,
 	// Cards
 	GlassCard,
-	Heading,
-	HStack,
 	IconWrapper,
 	Input,
 	Loader2,
@@ -45,11 +40,8 @@ import {
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-	// Typography
-	Text,
 	Trash2,
 	Upload,
-	VStack,
 	X,
 } from '@/components';
 import { AccountTypeBadge } from '@/components/accounts/AccountCard';
@@ -533,12 +525,10 @@ export default function AccountDetailPage() {
 			<EmptyState
 				title="Chargement du compte..."
 				iconElement={
-					<Box style={{ position: 'relative' }}>
-						<Box
+					<div className="relative">
+						<div
+							className="h-12 w-12 rounded-full"
 							style={{
-								height: '3rem',
-								width: '3rem',
-								borderRadius: '9999px',
 								background:
 									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
 								animation: 'pulse 2s ease-in-out infinite',
@@ -556,7 +546,7 @@ export default function AccountDetailPage() {
 								transform: 'translate(-50%, -50%)',
 							}}
 						/>
-					</Box>
+					</div>
 				}
 				size="md"
 			/>
@@ -580,7 +570,7 @@ export default function AccountDetailPage() {
 	}
 
 	return (
-		<VStack gap="lg">
+		<div className="flex flex-col gap-6">
 			{/* Back link */}
 			<Link
 				href="/dashboard/banks"
@@ -601,39 +591,28 @@ export default function AccountDetailPage() {
 			{/* Header - Glassmorphism card */}
 			<GlassCard padding="lg" style={{ position: 'relative' }}>
 				{/* Gradient accent bar */}
-				<Box
+				<div
+					className="absolute top-0 left-0 right-0 rounded-t-2xl"
 					style={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						right: 0,
 						height: '0.25rem',
-						borderRadius: '1rem 1rem 0 0',
 						background: `linear-gradient(90deg, ${account.bank.color}, ${account.bank.color}88, transparent)`,
 					}}
 				/>
 
-				<HStack gap="lg" align="start">
+				<div className="flex gap-6 items-start">
 					{/* Bank logo with glow */}
-					<Box style={{ position: 'relative', flexShrink: 0 }}>
-						<Box
+					<div className="relative shrink-0">
+						<div
+							className="absolute inset-0 rounded-2xl"
 							style={{
-								position: 'absolute',
-								inset: 0,
 								filter: 'blur(16px)',
 								opacity: 0.4,
-								borderRadius: '1rem',
 								backgroundColor: account.bank.color,
 							}}
 						/>
-						<Flex
-							align="center"
-							justify="center"
+						<div
+							className="flex items-center justify-center relative h-16 w-16 rounded-2xl"
 							style={{
-								position: 'relative',
-								height: '4rem',
-								width: '4rem',
-								borderRadius: '1rem',
 								boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
 								color: 'white',
 								fontWeight: 700,
@@ -643,18 +622,16 @@ export default function AccountDetailPage() {
 							}}
 						>
 							{getBankShortName(account.bank.name)}
-						</Flex>
-					</Box>
+						</div>
+					</div>
 
 					{/* Content */}
-					<Flex direction="col" grow minW0>
+					<div className="flex flex-col grow min-w-0">
 						{/* Top row: Name + Balance + Actions */}
-						<HStack justify="between" align="start" gap="md">
-							<Box minW0>
-								<HStack gap="sm" align="center">
-									<Heading level={1} size="2xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
-										{account.name}
-									</Heading>
+						<div className="flex justify-between items-start gap-4">
+							<div className="min-w-0">
+								<div className="flex items-center gap-3">
+									<h1 className="text-2xl font-bold tracking-tight">{account.name}</h1>
 									<Button
 										variant="ghost"
 										size="icon"
@@ -670,12 +647,12 @@ export default function AccountDetailPage() {
 									>
 										<Pencil style={{ height: '1rem', width: '1rem' }} />
 									</Button>
-								</HStack>
-							</Box>
+								</div>
+							</div>
 
 							{/* Balance + Actions */}
-							<HStack gap="md" align="center" style={{ flexShrink: 0 }}>
-								<VStack gap="none" align="end">
+							<div className="flex items-center gap-4 shrink-0">
+								<div className="flex flex-col items-end">
 									<MoneyDisplay
 										amount={account.balance}
 										currency={account.currency as 'EUR'}
@@ -683,14 +660,17 @@ export default function AccountDetailPage() {
 										weight="bold"
 										style={{ letterSpacing: '-0.025em' }}
 									/>
-									<Text size="xs" color="muted" weight="medium" style={{ marginTop: '0.25rem' }}>
+									<p
+										className="text-xs text-muted-foreground font-medium"
+										style={{ marginTop: '0.25rem' }}
+									>
 										{account._count.transactions} transaction
 										{account._count.transactions !== 1 ? 's' : ''}
-									</Text>
-								</VStack>
+									</p>
+								</div>
 
 								{/* Actions */}
-								<HStack gap="sm" align="center">
+								<div className="flex items-center gap-3">
 									<Button
 										variant="ghost"
 										size="icon"
@@ -724,16 +704,14 @@ export default function AccountDetailPage() {
 									>
 										<Trash2 style={{ height: '1rem', width: '1rem' }} />
 									</Button>
-								</HStack>
-							</HStack>
-						</HStack>
+								</div>
+							</div>
+						</div>
 
 						{/* Bottom row: Bank info + Members */}
-						<Flex wrap="wrap" align="center" gap="sm" style={{ marginTop: '0.75rem' }}>
-							<Text
-								as="span"
-								size="xs"
-								weight="medium"
+						<div className="flex flex-wrap items-center gap-3 mt-3">
+							<span
+								className="text-xs font-medium"
 								style={{
 									display: 'inline-flex',
 									alignItems: 'center',
@@ -745,7 +723,7 @@ export default function AccountDetailPage() {
 								}}
 							>
 								{account.bank.name}
-							</Text>
+							</span>
 							<AccountTypeBadge
 								type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
 								style={{
@@ -755,9 +733,8 @@ export default function AccountDetailPage() {
 								}}
 							/>
 							{account.accountNumber && (
-								<Text
-									as="span"
-									size="xs"
+								<span
+									className="text-xs"
 									style={{
 										display: 'none',
 										padding: '0.25rem 0.75rem',
@@ -768,15 +745,13 @@ export default function AccountDetailPage() {
 									}}
 								>
 									{account.accountNumber}
-								</Text>
+								</span>
 							)}
 							{/* Members */}
 							{account.accountMembers.length > 0 && (
 								<>
-									<Text as="span" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>
-										•
-									</Text>
-									<HStack gap="sm" align="center">
+									<span style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>•</span>
+									<div className="flex items-center gap-3">
 										<MemberAvatarGroup
 											members={account.accountMembers.map((am) => ({
 												id: am.memberId,
@@ -786,20 +761,20 @@ export default function AccountDetailPage() {
 											size="sm"
 											max={5}
 										/>
-										<Text size="xs" color="muted" weight="medium">
+										<p className="text-xs text-muted-foreground font-medium">
 											{account.accountMembers.map((am) => am.member.name).join(', ')}
-										</Text>
-									</HStack>
+										</p>
+									</div>
 								</>
 							)}
-						</Flex>
+						</div>
 						{account.description && (
-							<Text size="sm" color="muted" style={{ marginTop: '0.75rem' }}>
+							<p className="text-sm text-muted-foreground" style={{ marginTop: '0.75rem' }}>
 								{account.description}
-							</Text>
+							</p>
 						)}
-					</Flex>
-				</HStack>
+					</div>
+				</div>
 			</GlassCard>
 
 			{/* Account Edit Drawer */}
@@ -822,34 +797,20 @@ export default function AccountDetailPage() {
 						<SheetDescription>Modifiez les informations du compte.</SheetDescription>
 					</SheetHeader>
 
-					<VStack gap="lg">
+					<div className="flex flex-col gap-6">
 						{/* Bank logo centered with glow */}
-						<Box
-							style={{
-								position: 'relative',
-								width: 'fit-content',
-								marginLeft: 'auto',
-								marginRight: 'auto',
-							}}
-						>
-							<Box
+						<div className="relative mx-auto w-fit">
+							<div
+								className="absolute inset-0 rounded-2xl"
 								style={{
-									position: 'absolute',
-									inset: 0,
 									filter: 'blur(16px)',
 									opacity: 0.5,
-									borderRadius: '1rem',
 									backgroundColor: account.bank.color,
 								}}
 							/>
-							<Flex
-								align="center"
-								justify="center"
+							<div
+								className="flex items-center justify-center relative h-16 w-16 rounded-2xl"
 								style={{
-									position: 'relative',
-									height: '4rem',
-									width: '4rem',
-									borderRadius: '1rem',
 									boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
 									color: 'white',
 									fontWeight: 700,
@@ -858,11 +819,11 @@ export default function AccountDetailPage() {
 								}}
 							>
 								{getBankShortName(account.bank.name)}
-							</Flex>
-						</Box>
+							</div>
+						</div>
 
-						<VStack gap="md">
-							<VStack gap="sm">
+						<div className="flex flex-col gap-4">
+							<div className="flex flex-col gap-3">
 								<label
 									htmlFor="edit-account-name"
 									style={{ fontSize: '0.875rem', fontWeight: 600 }}
@@ -882,8 +843,8 @@ export default function AccountDetailPage() {
 										borderColor: 'hsl(var(--border) / 0.3)',
 									}}
 								/>
-							</VStack>
-							<VStack gap="sm">
+							</div>
+							<div className="flex flex-col gap-3">
 								<label
 									htmlFor="edit-account-number"
 									style={{ fontSize: '0.875rem', fontWeight: 600 }}
@@ -913,8 +874,8 @@ export default function AccountDetailPage() {
 										borderColor: 'hsl(var(--border) / 0.3)',
 									}}
 								/>
-							</VStack>
-							<VStack gap="sm">
+							</div>
+							<div className="flex flex-col gap-3">
 								<label
 									htmlFor="edit-account-description"
 									style={{ fontSize: '0.875rem', fontWeight: 600 }}
@@ -943,10 +904,10 @@ export default function AccountDetailPage() {
 										borderColor: 'hsl(var(--border) / 0.3)',
 									}}
 								/>
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 
-						<HStack gap="sm" style={{ paddingTop: '1rem' }}>
+						<div className="flex gap-3 pt-4">
 							<Button
 								variant="outline"
 								onClick={cancelEditingAccount}
@@ -985,23 +946,16 @@ export default function AccountDetailPage() {
 								)}
 								Enregistrer
 							</Button>
-						</HStack>
-					</VStack>
+						</div>
+					</div>
 				</SheetContent>
 			</Sheet>
 
 			{/* Error/Success message - floating toast style */}
 			{error && (
-				<Box
+				<div
+					className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl shadow-xl"
 					style={{
-						position: 'fixed',
-						bottom: '1.5rem',
-						right: '1.5rem',
-						zIndex: 50,
-						maxWidth: '28rem',
-						padding: '1rem',
-						borderRadius: '1rem',
-						boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
 						animation: 'fadeIn 0.3s ease-out',
 						backdropFilter: 'blur(16px)',
 						WebkitBackdropFilter: 'blur(16px)',
@@ -1013,15 +967,10 @@ export default function AccountDetailPage() {
 							: '1px solid oklch(0.55 0.2 25 / 0.2)',
 					}}
 				>
-					<HStack gap="sm" align="start">
-						<Flex
-							align="center"
-							justify="center"
+					<div className="flex items-start gap-3">
+						<div
+							className="flex items-center justify-center shrink-0 h-8 w-8 rounded-xl"
 							style={{
-								flexShrink: 0,
-								height: '2rem',
-								width: '2rem',
-								borderRadius: '0.75rem',
 								backgroundColor: error.includes('importées')
 									? 'oklch(0.55 0.15 145 / 0.2)'
 									: 'oklch(0.55 0.2 25 / 0.2)',
@@ -1036,11 +985,10 @@ export default function AccountDetailPage() {
 									style={{ height: '1rem', width: '1rem', color: 'oklch(0.55 0.2 25)' }}
 								/>
 							)}
-						</Flex>
-						<Flex direction="col" grow minW0>
-							<Text
-								size="sm"
-								weight="semibold"
+						</div>
+						<div className="flex flex-col grow min-w-0">
+							<p
+								className="text-sm font-semibold"
 								style={{
 									color: error.includes('importées')
 										? 'oklch(0.55 0.15 145)'
@@ -1048,14 +996,14 @@ export default function AccountDetailPage() {
 								}}
 							>
 								{error.includes('importées') ? 'Import réussi' : 'Erreur'}
-							</Text>
-							<Text
-								size="sm"
+							</p>
+							<p
+								className="text-sm"
 								style={{ color: 'hsl(var(--foreground) / 0.8)', marginTop: '0.125rem' }}
 							>
 								{error}
-							</Text>
-						</Flex>
+							</p>
+						</div>
 						<Button
 							variant="ghost"
 							size="icon"
@@ -1064,8 +1012,8 @@ export default function AccountDetailPage() {
 						>
 							<X style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</HStack>
-				</Box>
+					</div>
+				</div>
 			)}
 
 			{/* Settings Drawer - 33% width on desktop */}
@@ -1083,46 +1031,30 @@ export default function AccountDetailPage() {
 					}}
 				>
 					{/* Header */}
-					<Box
-						style={{
-							paddingLeft: '1rem',
-							paddingRight: '1rem',
-							paddingTop: '0.5rem',
-							paddingBottom: '0.5rem',
-							borderBottom: '1px solid hsl(var(--border))',
-						}}
-					>
+					<div className="px-4 py-2 border-b border-border">
 						<SheetHeader>
 							<SheetTitle style={{ fontSize: '1rem', fontWeight: 600 }}>Paramètres</SheetTitle>
 							<SheetDescription style={{ fontSize: '0.75rem' }}>
 								Informations et historique du compte
 							</SheetDescription>
 						</SheetHeader>
-					</Box>
+					</div>
 
-					<VStack gap="none">
+					<div className="flex flex-col">
 						{/* Section 1: Informations */}
-						<VStack
-							gap="md"
-							style={{
-								paddingLeft: '1rem',
-								paddingRight: '1rem',
-								paddingTop: '1rem',
-								paddingBottom: '1rem',
-								borderBottom: '1px solid hsl(var(--border))',
-							}}
+						<div
+							className="flex flex-col gap-4 px-4 py-4"
+							style={{ borderBottom: '1px solid hsl(var(--border))' }}
 						>
-							<Text
-								size="xs"
-								weight="semibold"
-								color="muted"
+							<p
+								className="text-xs font-semibold text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Informations
-							</Text>
+							</p>
 
 							{/* Account name */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<label
 									htmlFor="settings-account-name"
 									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
@@ -1144,10 +1076,10 @@ export default function AccountDetailPage() {
 									style={{ height: '2.5rem', fontSize: '0.875rem', fontWeight: 500 }}
 									placeholder="Nom du compte"
 								/>
-							</VStack>
+							</div>
 
 							{/* Description */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<label
 									htmlFor="settings-account-description"
 									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
@@ -1169,32 +1101,24 @@ export default function AccountDetailPage() {
 									style={{ height: '2.5rem', fontSize: '0.875rem' }}
 									placeholder="Description (optionnel)"
 								/>
-							</VStack>
+							</div>
 
 							{/* Owners - Multi-select */}
-							<VStack gap="xs">
-								<Text size="sm" color="muted">
-									Titulaires
-								</Text>
-								<Flex
-									wrap="wrap"
-									gap="sm"
-									align="center"
+							<div className="flex flex-col gap-2">
+								<p className="text-sm text-muted-foreground">Titulaires</p>
+								<div
+									className="flex flex-wrap items-center gap-3 p-2 rounded-md border"
 									style={{
-										padding: '0.5rem',
-										borderRadius: '0.375rem',
-										border: '1px solid hsl(var(--border))',
+										borderColor: 'hsl(var(--border))',
 										backgroundColor: 'hsl(var(--background))',
 										minHeight: '42px',
 									}}
 								>
 									{account.accountMembers.map((am) => (
-										<HStack
+										<div
 											key={am.id}
-											gap="xs"
-											align="center"
+											className="inline-flex items-center gap-1"
 											style={{
-												display: 'inline-flex',
 												paddingLeft: '0.375rem',
 												paddingRight: '0.25rem',
 												paddingTop: '0.25rem',
@@ -1210,18 +1134,9 @@ export default function AccountDetailPage() {
 														: 1,
 											}}
 										>
-											<Flex
-												align="center"
-												justify="center"
-												style={{
-													height: '1.25rem',
-													width: '1.25rem',
-													borderRadius: '9999px',
-													color: 'white',
-													fontSize: '0.75rem',
-													fontWeight: 500,
-													backgroundColor: am.member.color || '#6b7280',
-												}}
+											<div
+												className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium"
+												style={{ backgroundColor: am.member.color || '#6b7280' }}
 											>
 												{removeMemberMutation.isPending &&
 												removeMemberMutation.variables?.memberId === am.memberId ? (
@@ -1235,10 +1150,8 @@ export default function AccountDetailPage() {
 												) : (
 													am.member.name.charAt(0).toUpperCase()
 												)}
-											</Flex>
-											<Text as="span" weight="medium">
-												{am.member.name}
-											</Text>
+											</div>
+											<span className="font-medium">{am.member.name}</span>
 											<Button
 												variant="ghost"
 												size="icon"
@@ -1254,15 +1167,13 @@ export default function AccountDetailPage() {
 											>
 												<X style={{ height: '0.75rem', width: '0.75rem' }} />
 											</Button>
-										</HStack>
+										</div>
 									))}
 									{/* Loading indicator when adding */}
 									{addMemberMutation.isPending && addMemberMutation.variables && (
-										<HStack
-											gap="xs"
-											align="center"
+										<div
+											className="inline-flex items-center gap-1"
 											style={{
-												display: 'inline-flex',
 												paddingLeft: '0.375rem',
 												paddingRight: '0.5rem',
 												paddingTop: '0.25rem',
@@ -1273,16 +1184,9 @@ export default function AccountDetailPage() {
 												animation: 'pulse 2s ease-in-out infinite',
 											}}
 										>
-											<Flex
-												align="center"
-												justify="center"
+											<div
+												className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium"
 												style={{
-													height: '1.25rem',
-													width: '1.25rem',
-													borderRadius: '9999px',
-													color: 'white',
-													fontSize: '0.75rem',
-													fontWeight: 500,
 													backgroundColor:
 														allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
 															?.color || '#6b7280',
@@ -1295,17 +1199,17 @@ export default function AccountDetailPage() {
 														animation: 'spin 1s linear infinite',
 													}}
 												/>
-											</Flex>
-											<Text as="span" weight="medium" color="muted">
+											</div>
+											<span className="font-medium text-muted-foreground">
 												{
 													allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
 														?.name
 												}
-											</Text>
-										</HStack>
+											</span>
+										</div>
 									)}
 									{/* Add member button */}
-									<Box style={{ position: 'relative' }}>
+									<div className="relative">
 										<Button
 											variant="ghost"
 											size="sm"
@@ -1326,19 +1230,10 @@ export default function AccountDetailPage() {
 											Ajouter
 										</Button>
 										{showMemberDropdown && (
-											<Box
+											<div
+												className="absolute top-full left-0 z-50 min-w-[180px] p-1 rounded-md border border-border shadow-md bg-popover"
 												style={{
-													position: 'absolute',
-													top: '100%',
-													left: 0,
 													marginTop: '0.25rem',
-													zIndex: 50,
-													minWidth: '180px',
-													padding: '0.25rem',
-													borderRadius: '0.375rem',
-													border: '1px solid hsl(var(--border))',
-													boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-													backgroundColor: 'hsl(var(--popover))',
 												}}
 											>
 												{availableMembers.map((member) => (
@@ -1359,38 +1254,32 @@ export default function AccountDetailPage() {
 															transition: 'all 0.2s',
 														}}
 													>
-														<Flex
-															align="center"
-															justify="center"
-															style={{
-																height: '1.25rem',
-																width: '1.25rem',
-																borderRadius: '9999px',
-																color: 'white',
-																fontSize: '0.75rem',
-																fontWeight: 500,
-																backgroundColor: member.color || '#6b7280',
-															}}
+														<div
+															className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium"
+															style={{ backgroundColor: member.color || '#6b7280' }}
 														>
 															{member.name.charAt(0).toUpperCase()}
-														</Flex>
+														</div>
 														<span>{member.name}</span>
 													</Button>
 												))}
 												{availableMembers.length === 0 && (
-													<Text size="sm" color="muted" style={{ padding: '0.25rem 0.5rem' }}>
+													<p
+														className="text-sm text-muted-foreground"
+														style={{ padding: '0.25rem 0.5rem' }}
+													>
 														Tous les membres sont ajoutés
-													</Text>
+													</p>
 												)}
-											</Box>
+											</div>
 										)}
-									</Box>
-								</Flex>
-							</VStack>
+									</div>
+								</div>
+							</div>
 
 							{/* Export URL */}
-							<VStack gap="xs">
-								<HStack justify="between" align="center">
+							<div className="flex flex-col gap-2">
+								<div className="flex justify-between items-center">
 									<label
 										htmlFor="settings-export-url"
 										style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
@@ -1415,7 +1304,7 @@ export default function AccountDetailPage() {
 											<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 										</a>
 									)}
-								</HStack>
+								</div>
 								<Input
 									id="settings-export-url"
 									type="url"
@@ -1434,15 +1323,13 @@ export default function AccountDetailPage() {
 									placeholder="https://www.banque.fr/espace-client"
 									style={{ height: '2.5rem', fontSize: '0.875rem' }}
 								/>
-							</VStack>
+							</div>
 
 							{/* Initial Balance */}
-							<VStack gap="xs">
-								<Text size="sm" color="muted">
-									Solde initial
-								</Text>
-								<HStack gap="sm">
-									<Box grow style={{ position: 'relative' }}>
+							<div className="flex flex-col gap-2">
+								<p className="text-sm text-muted-foreground">Solde initial</p>
+								<div className="flex gap-3">
+									<div className="relative grow">
 										<Input
 											type="text"
 											value={
@@ -1496,7 +1383,7 @@ export default function AccountDetailPage() {
 										>
 											EUR
 										</span>
-									</Box>
+									</div>
 									<Input
 										type="date"
 										value={
@@ -1540,26 +1427,18 @@ export default function AccountDetailPage() {
 										}}
 										style={{ height: '2.5rem', fontSize: '0.875rem', flex: 1 }}
 									/>
-								</HStack>
-							</VStack>
-						</VStack>
+								</div>
+							</div>
+						</div>
 
 						{/* Section 2: Imports */}
-						<VStack
-							gap="sm"
-							style={{
-								paddingLeft: '1rem',
-								paddingRight: '1rem',
-								paddingTop: '1rem',
-								paddingBottom: '1rem',
-								borderBottom: '1px solid hsl(var(--border))',
-							}}
+						<div
+							className="flex flex-col gap-3 px-4 py-4"
+							style={{ borderBottom: '1px solid hsl(var(--border))' }}
 						>
-							<HStack justify="between" align="center">
-								<Text
-									size="xs"
-									weight="semibold"
-									color="muted"
+							<div className="flex justify-between items-center">
+								<p
+									className="text-xs font-semibold text-muted-foreground"
 									style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 								>
 									Imports
@@ -1570,7 +1449,7 @@ export default function AccountDetailPage() {
 											({accountImports.length})
 										</span>
 									)}
-								</Text>
+								</p>
 								{accountImports.length > 5 && (
 									<Button
 										variant="ghost"
@@ -1581,19 +1460,10 @@ export default function AccountDetailPage() {
 										{showAllImports ? 'Réduire' : 'Tout voir'}
 									</Button>
 								)}
-							</HStack>
+							</div>
 
 							{accountImports.length === 0 ? (
-								<Box
-									style={{
-										textAlign: 'center',
-										paddingTop: '1.5rem',
-										paddingBottom: '1.5rem',
-										borderRadius: '0.5rem',
-										border: '1px dashed hsl(var(--border))',
-										backgroundColor: 'hsl(var(--muted) / 0.2)',
-									}}
-								>
+								<div className="text-center py-6 rounded-lg border border-dashed border-border bg-muted/20">
 									<FileSpreadsheet
 										style={{
 											height: '1.5rem',
@@ -1604,18 +1474,14 @@ export default function AccountDetailPage() {
 											marginBottom: '0.5rem',
 										}}
 									/>
-									<Text size="xs" color="muted">
-										Aucun import
-									</Text>
-								</Box>
+									<p className="text-xs text-muted-foreground">Aucun import</p>
+								</div>
 							) : (
-								<VStack gap="sm">
+								<div className="flex flex-col gap-3">
 									{(showAllImports ? accountImports : accountImports.slice(0, 5)).map((imp) => (
-										<HStack
+										<div
 											key={imp.id}
-											gap="sm"
-											align="center"
-											p="sm"
+											className="flex items-center gap-3 p-3"
 											style={{
 												fontSize: '0.875rem',
 												borderRadius: '0.5rem',
@@ -1628,14 +1494,9 @@ export default function AccountDetailPage() {
 													imp.status === 'FAILED' ? 'hsl(var(--destructive) / 0.2)' : 'transparent',
 											}}
 										>
-											<Flex
-												align="center"
-												justify="center"
+											<div
+												className="flex items-center justify-center h-6 w-6 shrink-0 rounded-md"
 												style={{
-													height: '1.5rem',
-													width: '1.5rem',
-													flexShrink: 0,
-													borderRadius: '0.375rem',
 													backgroundColor:
 														imp.status === 'PROCESSED'
 															? 'oklch(0.55 0.15 145 / 0.1)'
@@ -1647,11 +1508,10 @@ export default function AccountDetailPage() {
 												}}
 											>
 												{getStatusIcon(imp.status)}
-											</Flex>
-											<Flex direction="col" grow minW0>
-												<Text
-													size="xs"
-													weight="medium"
+											</div>
+											<div className="flex flex-col grow min-w-0">
+												<p
+													className="text-xs font-medium"
 													style={{
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
@@ -1659,18 +1519,18 @@ export default function AccountDetailPage() {
 													}}
 												>
 													{imp.filename}
-												</Text>
-												<Text style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))' }}>
+												</p>
+												<p style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))' }}>
 													{formatRelativeTime(imp.createdAt)}
 													{imp.recordsCount !== null && (
-														<Text as="span" style={{ color: 'oklch(0.5 0.15 145)' }}>
+														<span style={{ color: 'oklch(0.5 0.15 145)' }}>
 															{' '}
 															• {imp.recordsCount} tx
-														</Text>
+														</span>
 													)}
-												</Text>
-											</Flex>
-											<HStack gap="none" align="center" style={{ flexShrink: 0 }}>
+												</p>
+											</div>
+											<div className="flex items-center shrink-0">
 												{imp.status === 'PENDING' && (
 													<Button
 														variant="outline"
@@ -1762,31 +1622,21 @@ export default function AccountDetailPage() {
 														<Trash2 style={{ height: '0.75rem', width: '0.75rem' }} />
 													)}
 												</Button>
-											</HStack>
-										</HStack>
+											</div>
+										</div>
 									))}
-								</VStack>
+								</div>
 							)}
-						</VStack>
+						</div>
 
 						{/* Section 3: Gestion du compte */}
-						<VStack
-							gap="sm"
-							style={{
-								paddingLeft: '1rem',
-								paddingRight: '1rem',
-								paddingTop: '0.5rem',
-								paddingBottom: '0.5rem',
-							}}
-						>
-							<Text
-								size="xs"
-								weight="semibold"
-								color="muted"
+						<div className="flex flex-col gap-3 px-4 py-2">
+							<p
+								className="text-xs font-semibold text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Gestion du compte
-							</Text>
+							</p>
 							<Button
 								variant="outline"
 								size="sm"
@@ -1806,7 +1656,7 @@ export default function AccountDetailPage() {
 								Supprimer le compte
 							</Button>
 							{account._count.transactions > 0 && (
-								<Text
+								<p
 									style={{
 										fontSize: '11px',
 										color: 'hsl(var(--muted-foreground))',
@@ -1817,29 +1667,25 @@ export default function AccountDetailPage() {
 									{account._count.transactions > 1 ? 's' : ''} sera
 									{account._count.transactions > 1 ? 'ont' : ''} également supprimée
 									{account._count.transactions > 1 ? 's' : ''}
-								</Text>
+								</p>
 							)}
-						</VStack>
-					</VStack>
+						</div>
+					</div>
 				</SheetContent>
 			</Sheet>
 
 			{/* Transactions - Glassmorphism Section with Infinite Scroll */}
 			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
-				<Box p="lg" style={{ paddingBottom: '1rem' }}>
-					<VStack gap="md">
+				<div className="p-6 pb-4">
+					<div className="flex flex-col gap-4">
 						{/* Title row */}
-						<HStack justify="between" align="center">
-							<HStack gap="sm" align="center">
-								<Heading level={2} size="xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
-									Transactions
-								</Heading>
+						<div className="flex justify-between items-center">
+							<div className="flex items-center gap-3">
+								<h2 className="text-xl font-bold tracking-tight">Transactions</h2>
 								{totalTransactions > 0 && (
-									<Text
-										as="span"
-										size="xs"
-										weight="semibold"
+									<span
+										className="text-xs font-semibold"
 										style={{
 											display: 'inline-flex',
 											alignItems: 'center',
@@ -1851,9 +1697,9 @@ export default function AccountDetailPage() {
 										}}
 									>
 										{totalTransactions}
-									</Text>
+									</span>
 								)}
-							</HStack>
+							</div>
 							<label htmlFor="transaction-import-file" style={{ cursor: 'pointer' }}>
 								<input
 									id="transaction-import-file"
@@ -1889,9 +1735,9 @@ export default function AccountDetailPage() {
 									</span>
 								</Button>
 							</label>
-						</HStack>
+						</div>
 						{/* Search row */}
-						<Box style={{ position: 'relative' }}>
+						<div className="relative">
 							<Search
 								style={{
 									position: 'absolute',
@@ -1919,62 +1765,47 @@ export default function AccountDetailPage() {
 									boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
 								}}
 							/>
-						</Box>
-					</VStack>
-				</Box>
+						</div>
+					</div>
+				</div>
 
 				{/* Content */}
-				<Box
+				<div
 					role="presentation"
 					onDragEnter={handleDrag}
 					onDragLeave={handleDrag}
 					onDragOver={handleDrag}
 					onDrop={handleDrop}
+					className="relative px-6 pb-6"
 					style={{
-						position: 'relative',
-						paddingLeft: '1.5rem',
-						paddingRight: '1.5rem',
-						paddingBottom: '1.5rem',
 						backgroundColor: dragActive ? 'hsl(var(--primary) / 0.05)' : 'transparent',
 					}}
 				>
 					{/* Drag overlay */}
 					{dragActive && (
-						<Flex
-							align="center"
-							justify="center"
+						<div
+							className="flex items-center justify-center absolute inset-0 m-2 rounded-2xl z-10"
 							style={{
-								position: 'absolute',
-								inset: 0,
-								margin: '0.5rem',
-								borderRadius: '1rem',
 								background:
 									'linear-gradient(to bottom right, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.05))',
 								border: '2px dashed hsl(var(--primary) / 0.5)',
-								zIndex: 10,
 							}}
 						>
-							<VStack gap="sm" align="center">
-								<Flex
-									align="center"
-									justify="center"
-									style={{
-										height: '4rem',
-										width: '4rem',
-										borderRadius: '1rem',
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-									}}
+							<div className="flex flex-col items-center gap-3">
+								<div
+									className="flex items-center justify-center h-16 w-16 rounded-2xl"
+									style={{ backgroundColor: 'hsl(var(--primary) / 0.1)' }}
 								>
 									<Upload style={{ height: '2rem', width: '2rem', color: 'hsl(var(--primary))' }} />
-								</Flex>
-								<Text size="sm" weight="semibold" style={{ color: 'hsl(var(--primary))' }}>
+								</div>
+								<p className="text-sm font-semibold" style={{ color: 'hsl(var(--primary))' }}>
 									Déposez votre fichier ici
-								</Text>
-								<Text size="xs" style={{ color: 'hsl(var(--primary) / 0.7)' }}>
+								</p>
+								<p className="text-xs" style={{ color: 'hsl(var(--primary) / 0.7)' }}>
 									CSV, XLSX ou XLS
-								</Text>
-							</VStack>
-						</Flex>
+								</p>
+							</div>
+						</div>
 					)}
 
 					{allTransactions.length === 0 && !isLoadingTransactions ? (
@@ -1985,41 +1816,29 @@ export default function AccountDetailPage() {
 							size="md"
 						/>
 					) : (
-						<VStack gap="xs">
+						<div className="flex flex-col gap-2">
 							{allTransactions.map((tx, index) => (
-								<HStack
+								<div
 									key={tx.id}
-									justify="between"
-									align="center"
+									className="flex justify-between items-center px-4 py-3.5 rounded-xl"
 									style={{
-										paddingLeft: '1rem',
-										paddingRight: '1rem',
-										paddingTop: '0.875rem',
-										paddingBottom: '0.875rem',
-										borderRadius: '0.75rem',
 										transition: 'all 0.2s',
 										cursor: 'default',
 										animationDelay: `${Math.min(index, 10) * 20}ms`,
 									}}
 								>
-									<HStack gap="md" align="center" minW0>
+									<div className="flex items-center gap-4 min-w-0">
 										{/* Date badge */}
-										<Box style={{ width: '4rem', flexShrink: 0 }}>
-											<VStack
-												gap="none"
-												align="center"
+										<div className="w-16 shrink-0">
+											<div
+												className="flex flex-col items-center px-2 py-1.5 rounded-lg"
 												style={{
-													paddingLeft: '0.5rem',
-													paddingRight: '0.5rem',
-													paddingTop: '0.375rem',
-													paddingBottom: '0.375rem',
-													borderRadius: '0.5rem',
 													backgroundColor: 'hsl(var(--muted) / 0.4)',
 													display: 'inline-flex',
 													transition: 'background-color 0.2s',
 												}}
 											>
-												<Text
+												<span
 													style={{
 														fontSize: '10px',
 														fontWeight: 600,
@@ -2029,15 +1848,15 @@ export default function AccountDetailPage() {
 													}}
 												>
 													{formatDate(tx.date, 'MMM')}
-												</Text>
-												<Text size="sm" weight="bold" style={{ marginTop: '-0.125rem' }}>
+												</span>
+												<span className="text-sm font-bold" style={{ marginTop: '-0.125rem' }}>
 													{formatDate(tx.date, 'D')}
-												</Text>
-											</VStack>
-										</Box>
-										<VStack gap="none" minW0>
-											<Text
-												weight="medium"
+												</span>
+											</div>
+										</div>
+										<div className="flex flex-col min-w-0">
+											<p
+												className="font-medium"
 												style={{
 													overflow: 'hidden',
 													textOverflow: 'ellipsis',
@@ -2046,19 +1865,19 @@ export default function AccountDetailPage() {
 												}}
 											>
 												{tx.description}
-											</Text>
+											</p>
 											{tx.transactionCategory?.category && (
-												<HStack gap="xs" align="center" style={{ marginTop: '0.125rem' }}>
-													<Text as="span" size="xs" color="muted">
+												<div className="flex items-center gap-1 mt-0.5">
+													<span className="text-xs text-muted-foreground">
 														{tx.transactionCategory.category.icon}
-													</Text>
-													<Text as="span" size="xs" color="muted">
+													</span>
+													<span className="text-xs text-muted-foreground">
 														{tx.transactionCategory.category.name}
-													</Text>
-												</HStack>
+													</span>
+												</div>
 											)}
-										</VStack>
-									</HStack>
+										</div>
+									</div>
 									<MoneyDisplay
 										amount={tx.type === 'INCOME' ? tx.amount : -tx.amount}
 										format="withSign"
@@ -2067,19 +1886,17 @@ export default function AccountDetailPage() {
 										variant={tx.type === 'INCOME' ? 'positive' : 'default'}
 										style={{ flexShrink: 0, marginLeft: '1rem' }}
 									/>
-								</HStack>
+								</div>
 							))}
 
 							{/* Infinite scroll trigger & loading indicator */}
-							<Box ref={loadMoreRef} py="xl">
+							<div ref={loadMoreRef} className="py-8">
 								{isLoadingMore ? (
-									<HStack gap="sm" justify="center" align="center">
-										<Box style={{ position: 'relative' }}>
-											<Box
+									<div className="flex items-center justify-center gap-3">
+										<div className="relative">
+											<div
+												className="h-8 w-8 rounded-full"
 												style={{
-													height: '2rem',
-													width: '2rem',
-													borderRadius: '9999px',
 													backgroundColor: 'hsl(var(--primary) / 0.1)',
 													animation: 'pulse 2s ease-in-out infinite',
 												}}
@@ -2096,13 +1913,11 @@ export default function AccountDetailPage() {
 													transform: 'translate(-50%, -50%)',
 												}}
 											/>
-										</Box>
-										<Text size="sm" color="muted" weight="medium">
-											Chargement...
-										</Text>
-									</HStack>
+										</div>
+										<p className="text-sm text-muted-foreground font-medium">Chargement...</p>
+									</div>
 								) : hasMore ? (
-									<Flex direction="col" align="center" gap="sm">
+									<div className="flex flex-col items-center gap-3">
 										<Button
 											variant="ghost"
 											size="sm"
@@ -2115,13 +1930,11 @@ export default function AccountDetailPage() {
 										>
 											Charger plus de transactions
 										</Button>
-									</Flex>
+									</div>
 								) : allTransactions.length > 0 ? (
-									<HStack
-										justify="center"
-										align="center"
-										gap="sm"
-										style={{ paddingTop: '1rem', borderTop: '1px solid hsl(var(--border) / 0.3)' }}
+									<div
+										className="flex items-center justify-center gap-3 pt-4"
+										style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
 									>
 										<CheckCircle2
 											style={{
@@ -2130,15 +1943,15 @@ export default function AccountDetailPage() {
 												color: 'hsl(var(--muted-foreground) / 0.5)',
 											}}
 										/>
-										<Text size="sm" color="muted">
+										<p className="text-sm text-muted-foreground">
 											{allTransactions.length} transactions affichées
-										</Text>
-									</HStack>
+										</p>
+									</div>
 								) : null}
-							</Box>
-						</VStack>
+							</div>
+						</div>
 					)}
-				</Box>
+				</div>
 			</GlassCard>
 
 			{/* Confirmation Dialogs */}
@@ -2165,6 +1978,6 @@ export default function AccountDetailPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteImport}
 			/>
-		</VStack>
+		</div>
 	);
 }

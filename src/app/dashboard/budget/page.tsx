@@ -1,7 +1,6 @@
 'use client';
 
 import {
-	Box,
 	Button,
 	Car,
 	Coffee,
@@ -13,11 +12,8 @@ import {
 	DropdownMenuTrigger,
 	Film,
 	GlassCard,
-	Grid,
-	Heading,
 	Heart,
 	Home,
-	HStack,
 	MoreHorizontal,
 	PageHeader,
 	PieChart,
@@ -28,9 +24,7 @@ import {
 	ShoppingCart,
 	StatCard,
 	StatCardGrid,
-	Text,
 	Utensils,
-	VStack,
 	Zap,
 } from '@/components';
 import { ChartLegend, DonutChart } from '@/components/charts';
@@ -132,13 +126,13 @@ function formatCurrency(amount: number): string {
 
 export default function BudgetPage() {
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader
 				title="Budget"
 				description="Suivez vos dépenses par catégorie"
 				actions={
-					<HStack gap="sm">
+					<div className="flex gap-3">
 						<Button
 							variant="outline"
 							iconLeft={<Settings style={{ height: '1rem', width: '1rem' }} />}
@@ -148,7 +142,7 @@ export default function BudgetPage() {
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 							Nouvelle catégorie
 						</Button>
-					</HStack>
+					</div>
 				}
 			/>
 
@@ -173,20 +167,20 @@ export default function BudgetPage() {
 
 			{/* Global Progress */}
 			<GlassCard padding="lg">
-				<HStack justify="between" align="center" style={{ marginBottom: '0.5rem' }}>
-					<Text weight="medium">Progression du mois</Text>
-					<Text size="sm" color="muted">
+				<div className="flex justify-between items-center mb-2">
+					<p className="font-medium">Progression du mois</p>
+					<p className="text-sm text-muted-foreground">
 						{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
-					</Text>
-				</HStack>
+					</p>
+				</div>
 				<Progress value={(totalSpent / totalBudget) * 100} style={{ height: '0.75rem' }} />
-				<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
+				<p className="text-xs text-muted-foreground" style={{ marginTop: '0.5rem' }}>
 					Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
-				</Text>
+				</p>
 			</GlassCard>
 
 			{/* Categories Grid */}
-			<Grid cols={3} gap="md">
+			<div className="grid grid-cols-3 gap-4">
 				{categories.map((category) => {
 					const percentage = (category.spent / category.budget) * 100;
 					const isOverBudget = category.spent > category.budget;
@@ -194,32 +188,25 @@ export default function BudgetPage() {
 
 					return (
 						<GlassCard key={category.id} padding="md">
-							<VStack gap="sm">
-								<HStack justify="between" align="start">
-									<HStack gap="sm" align="center">
-										<Box
-											display="flex"
-											rounded="xl"
+							<div className="flex flex-col gap-3">
+								<div className="flex justify-between items-start">
+									<div className="flex items-center gap-3">
+										<div
+											className="flex h-10 w-10 items-center justify-center rounded-xl"
 											style={{
-												height: '2.5rem',
-												width: '2.5rem',
-												alignItems: 'center',
-												justifyContent: 'center',
 												backgroundColor: `${category.color}20`,
 												color: category.color,
 											}}
 										>
 											<category.icon style={{ height: '1.25rem', width: '1.25rem' }} />
-										</Box>
-										<VStack gap="none">
-											<Text size="md" weight="medium">
-												{category.name}
-											</Text>
-											<Text size="xs" color="muted">
+										</div>
+										<div className="flex flex-col">
+											<p className="text-base font-medium">{category.name}</p>
+											<p className="text-xs text-muted-foreground">
 												{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
-											</Text>
-										</VStack>
-									</HStack>
+											</p>
+										</div>
+									</div>
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button variant="ghost" size="icon" style={{ height: '2rem', width: '2rem' }}>
@@ -235,8 +222,8 @@ export default function BudgetPage() {
 											</DropdownMenuItem>
 										</DropdownMenuContent>
 									</DropdownMenu>
-								</HStack>
-								<VStack gap="xs">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Progress
 										value={Math.min(percentage, 100)}
 										style={{
@@ -247,45 +234,37 @@ export default function BudgetPage() {
 												} as React.CSSProperties)),
 										}}
 									/>
-									<HStack justify="between">
-										<Text
-											size="xs"
-											weight={isOverBudget ? 'medium' : 'normal'}
+									<div className="flex justify-between">
+										<p
+											className={`text-xs ${isOverBudget ? 'font-medium' : 'text-muted-foreground'}`}
 											style={{ color: isOverBudget ? 'oklch(0.55 0.2 25)' : undefined }}
-											color={isOverBudget ? undefined : 'muted'}
 										>
 											{isOverBudget
 												? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
 												: `Reste ${formatCurrency(remainingBudget)}`}
-										</Text>
-										<Text size="xs" color="muted">
-											{Math.round(percentage)}%
-										</Text>
-									</HStack>
-								</VStack>
-							</VStack>
+										</p>
+										<p className="text-xs text-muted-foreground">{Math.round(percentage)}%</p>
+									</div>
+								</div>
+							</div>
 						</GlassCard>
 					);
 				})}
-			</Grid>
+			</div>
 
 			{/* Chart */}
 			<GlassCard padding="lg">
-				<VStack gap="md">
-					<VStack gap="xs">
-						<Heading level={3} size="md">
-							Répartition des dépenses
-						</Heading>
-						<Text size="sm" color="muted">
-							Vue graphique par catégorie
-						</Text>
-					</VStack>
-					<Grid cols={2} gap="xl" style={{ alignItems: 'center' }}>
+				<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-2">
+						<h3 className="text-base font-semibold tracking-tight">Répartition des dépenses</h3>
+						<p className="text-sm text-muted-foreground">Vue graphique par catégorie</p>
+					</div>
+					<div className="grid grid-cols-2 gap-8 items-center">
 						<DonutChart data={chartData} height="lg" />
 						<ChartLegend items={chartData} total={totalSpent} />
-					</Grid>
-				</VStack>
+					</div>
+				</div>
 			</GlassCard>
-		</VStack>
+		</div>
 	);
 }

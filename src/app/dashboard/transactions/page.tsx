@@ -10,15 +10,12 @@
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
-	Box,
 	Button,
 	Calendar,
 	CreditCard,
 	Download,
 	Filter,
 	GlassCard,
-	Heading,
-	HStack,
 	Input,
 	PageHeader,
 	Search,
@@ -29,8 +26,6 @@ import {
 	SelectValue,
 	StatCard,
 	StatCardGrid,
-	Text,
-	VStack,
 } from '@/components';
 import { MoneyDifference } from '@/components/common/MoneyDisplay';
 import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
@@ -141,7 +136,7 @@ function formatDate(dateStr: string): string {
 
 export default function TransactionsPage() {
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader
 				title="Transactions"
@@ -182,9 +177,9 @@ export default function TransactionsPage() {
 
 			{/* Filters */}
 			<GlassCard padding="md">
-				<Box display="flex" style={{ flexDirection: 'column', gap: '1rem' }}>
-					<HStack gap="md" style={{ flexWrap: 'wrap' }}>
-						<Box style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+				<div className="flex flex-col gap-4">
+					<div className="flex flex-wrap gap-4">
+						<div className="relative flex-1 min-w-[200px]">
 							<Search
 								style={{
 									position: 'absolute',
@@ -204,7 +199,7 @@ export default function TransactionsPage() {
 									borderRadius: '0.75rem',
 								}}
 							/>
-						</Box>
+						</div>
 						<Select defaultValue="all">
 							<SelectTrigger style={{ width: '180px', height: '2.75rem', borderRadius: '0.75rem' }}>
 								<SelectValue placeholder="Catégorie" />
@@ -242,49 +237,32 @@ export default function TransactionsPage() {
 						>
 							<Filter style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</HStack>
-				</Box>
+					</div>
+				</div>
 			</GlassCard>
 
 			{/* Transactions List */}
 			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
-				<HStack
-					justify="between"
-					align="center"
-					p="md"
+				<div
+					className="flex justify-between items-center p-4"
 					style={{ borderBottom: '1px solid hsl(var(--border))' }}
 				>
-					<Heading level={3} size="md">
-						Toutes les transactions
-					</Heading>
-					<Text size="sm" color="muted">
-						{transactions.length} opérations
-					</Text>
-				</HStack>
+					<h3 className="text-base font-semibold tracking-tight">Toutes les transactions</h3>
+					<p className="text-sm text-muted-foreground">{transactions.length} opérations</p>
+				</div>
 
 				{/* List */}
-				<VStack gap="xs" p="md">
+				<div className="flex flex-col gap-2 p-4">
 					{transactions.map((tx) => (
-						<HStack
+						<div
 							key={tx.id}
-							justify="between"
-							align="center"
-							p="md"
-							style={{
-								borderRadius: '0.75rem',
-								transition: 'background-color 0.2s',
-							}}
+							className="flex justify-between items-center p-4 rounded-xl transition-colors"
 						>
-							<HStack gap="md" align="center">
-								<Box
-									display="flex"
+							<div className="flex items-center gap-4">
+								<div
+									className="flex h-10 w-10 items-center justify-center rounded-xl"
 									style={{
-										borderRadius: '0.75rem',
-										height: '2.5rem',
-										width: '2.5rem',
-										alignItems: 'center',
-										justifyContent: 'center',
 										backgroundColor:
 											tx.amount > 0 ? 'oklch(0.55 0.15 145 / 0.1)' : 'hsl(var(--muted) / 0.3)',
 									}}
@@ -302,24 +280,24 @@ export default function TransactionsPage() {
 											}}
 										/>
 									)}
-								</Box>
-								<VStack gap="none">
-									<Text weight="medium">{tx.description}</Text>
-									<Text size="xs" color="muted">
+								</div>
+								<div className="flex flex-col">
+									<p className="font-medium">{tx.description}</p>
+									<p className="text-xs text-muted-foreground">
 										{tx.category} · {tx.account}
-									</Text>
-								</VStack>
-							</HStack>
-							<VStack gap="none" align="end">
+									</p>
+								</div>
+							</div>
+							<div className="flex flex-col items-end">
 								<MoneyDifference amount={tx.amount} size="md" />
-								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
+								<p className="text-xs text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{formatDate(tx.date)}
-								</Text>
-							</VStack>
-						</HStack>
+								</p>
+							</div>
+						</div>
 					))}
-				</VStack>
+				</div>
 			</GlassCard>
-		</VStack>
+		</div>
 	);
 }
