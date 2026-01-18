@@ -13,6 +13,7 @@ type FlexAlign = 'start' | 'center' | 'end' | 'stretch' | 'baseline';
 type FlexJustify = 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
 type FlexWrap = 'wrap' | 'nowrap' | 'wrap-reverse';
 type GapSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+type PaddingSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 interface FlexProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Flex direction */
@@ -33,6 +34,18 @@ interface FlexProps extends React.HTMLAttributes<HTMLDivElement> {
 	gap?: GapSize;
 	/** Enable inline-flex instead of flex */
 	inline?: boolean;
+	/** Padding (all sides) */
+	p?: PaddingSize;
+	/** Fill available height */
+	fullHeight?: boolean;
+	/** Fill available width */
+	fullWidth?: boolean;
+	/** Flex grow (take remaining space) */
+	grow?: boolean;
+	/** Flex shrink (allow shrinking) */
+	shrink?: boolean;
+	/** Minimum width 0 (allows shrinking below content size) */
+	minW0?: boolean;
 }
 
 const directionClasses: Record<FlexDirection, string> = {
@@ -96,6 +109,16 @@ const gapClasses: Record<GapSize, string> = {
 	'2xl': 'gap-12',
 };
 
+const paddingClasses: Record<PaddingSize, string> = {
+	none: 'p-0',
+	xs: 'p-1',
+	sm: 'p-2',
+	md: 'p-4',
+	lg: 'p-6',
+	xl: 'p-8',
+	'2xl': 'p-12',
+};
+
 const Flex = forwardRef<HTMLDivElement, FlexProps>(
 	(
 		{
@@ -109,6 +132,12 @@ const Flex = forwardRef<HTMLDivElement, FlexProps>(
 			wrap,
 			gap = 'md',
 			inline = false,
+			p,
+			fullHeight,
+			fullWidth,
+			grow,
+			shrink,
+			minW0,
 			...props
 		},
 		ref
@@ -126,6 +155,12 @@ const Flex = forwardRef<HTMLDivElement, FlexProps>(
 					justify && justifyClasses[justify],
 					wrap && wrapClasses[wrap],
 					gapClasses[gap],
+					p && paddingClasses[p],
+					fullHeight && 'h-full',
+					fullWidth && 'w-full',
+					grow && 'flex-1',
+					shrink === false && 'flex-shrink-0',
+					minW0 && 'min-w-0',
 					className
 				)}
 				{...props}
@@ -136,4 +171,4 @@ const Flex = forwardRef<HTMLDivElement, FlexProps>(
 Flex.displayName = 'Flex';
 
 export { Flex };
-export type { FlexProps, FlexDirection, FlexAlign, FlexJustify, FlexWrap, GapSize };
+export type { FlexProps, FlexDirection, FlexAlign, FlexJustify, FlexWrap, GapSize, PaddingSize };

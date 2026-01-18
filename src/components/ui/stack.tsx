@@ -4,10 +4,12 @@ import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 // =============================================================================
-// GAP SIZE TYPE (shared)
+// SHARED TYPES
 // =============================================================================
 
 type GapSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+type JustifyContent = 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
+type PaddingSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 const gapClasses: Record<GapSize, string> = {
 	none: 'gap-0',
@@ -19,18 +21,47 @@ const gapClasses: Record<GapSize, string> = {
 	'2xl': 'gap-12',
 };
 
+const justifyClasses: Record<JustifyContent, string> = {
+	start: 'justify-start',
+	center: 'justify-center',
+	end: 'justify-end',
+	between: 'justify-between',
+	around: 'justify-around',
+	evenly: 'justify-evenly',
+};
+
+const paddingClasses: Record<PaddingSize, string> = {
+	none: 'p-0',
+	xs: 'p-1',
+	sm: 'p-2',
+	md: 'p-4',
+	lg: 'p-6',
+	xl: 'p-8',
+	'2xl': 'p-12',
+};
+
 // =============================================================================
 // VSTACK COMPONENT
 // =============================================================================
-// Vertical stack with consistent gap and horizontal alignment
+// Vertical stack with consistent gap, horizontal alignment, and justify
 
 type VStackAlign = 'start' | 'center' | 'end' | 'stretch';
 
 interface VStackProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Gap size using design tokens */
 	gap?: GapSize;
-	/** Horizontal alignment of children */
+	/** Horizontal alignment of children (items-*) */
 	align?: VStackAlign;
+	/** Vertical distribution of children (justify-*) */
+	justify?: JustifyContent;
+	/** Padding (all sides) */
+	p?: PaddingSize;
+	/** Whether to allow wrapping */
+	wrap?: boolean;
+	/** Fill available height */
+	fullHeight?: boolean;
+	/** Fill available width */
+	fullWidth?: boolean;
 }
 
 const alignClasses: Record<VStackAlign, string> = {
@@ -41,7 +72,20 @@ const alignClasses: Record<VStackAlign, string> = {
 };
 
 const VStack = forwardRef<HTMLDivElement, VStackProps>(
-	({ className, gap = 'md', align, ...props }, ref) => {
+	(
+		{
+			className,
+			gap = 'md',
+			align,
+			justify,
+			p,
+			wrap,
+			fullHeight,
+			fullWidth,
+			...props
+		},
+		ref
+	) => {
 		return (
 			<div
 				ref={ref}
@@ -49,6 +93,11 @@ const VStack = forwardRef<HTMLDivElement, VStackProps>(
 					'flex flex-col',
 					gapClasses[gap],
 					align && alignClasses[align],
+					justify && justifyClasses[justify],
+					p && paddingClasses[p],
+					wrap && 'flex-wrap',
+					fullHeight && 'h-full',
+					fullWidth && 'w-full',
 					className
 				)}
 				{...props}
@@ -61,17 +110,25 @@ VStack.displayName = 'VStack';
 // =============================================================================
 // HSTACK COMPONENT
 // =============================================================================
-// Horizontal stack with consistent gap and vertical alignment
+// Horizontal stack with consistent gap, vertical alignment, and justify
 
 type HStackAlign = 'start' | 'center' | 'end' | 'stretch' | 'baseline';
 
 interface HStackProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Gap size using design tokens */
 	gap?: GapSize;
-	/** Vertical alignment of children */
+	/** Vertical alignment of children (items-*) */
 	align?: HStackAlign;
+	/** Horizontal distribution of children (justify-*) */
+	justify?: JustifyContent;
+	/** Padding (all sides) */
+	p?: PaddingSize;
 	/** Whether to wrap children */
 	wrap?: boolean;
+	/** Fill available height */
+	fullHeight?: boolean;
+	/** Fill available width */
+	fullWidth?: boolean;
 }
 
 const hstackAlignClasses: Record<HStackAlign, string> = {
@@ -83,7 +140,20 @@ const hstackAlignClasses: Record<HStackAlign, string> = {
 };
 
 const HStack = forwardRef<HTMLDivElement, HStackProps>(
-	({ className, gap = 'md', align = 'center', wrap = false, ...props }, ref) => {
+	(
+		{
+			className,
+			gap = 'md',
+			align = 'center',
+			justify,
+			p,
+			wrap = false,
+			fullHeight,
+			fullWidth,
+			...props
+		},
+		ref
+	) => {
 		return (
 			<div
 				ref={ref}
@@ -91,7 +161,11 @@ const HStack = forwardRef<HTMLDivElement, HStackProps>(
 					'flex flex-row',
 					gapClasses[gap],
 					hstackAlignClasses[align],
+					justify && justifyClasses[justify],
+					p && paddingClasses[p],
 					wrap && 'flex-wrap',
+					fullHeight && 'h-full',
+					fullWidth && 'w-full',
 					className
 				)}
 				{...props}
@@ -102,4 +176,12 @@ const HStack = forwardRef<HTMLDivElement, HStackProps>(
 HStack.displayName = 'HStack';
 
 export { VStack, HStack };
-export type { VStackProps, HStackProps, GapSize, VStackAlign, HStackAlign };
+export type {
+	VStackProps,
+	HStackProps,
+	GapSize,
+	VStackAlign,
+	HStackAlign,
+	JustifyContent,
+	PaddingSize,
+};

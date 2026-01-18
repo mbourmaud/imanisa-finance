@@ -7,7 +7,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading>Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-2xl md:text-3xl"
+			  class="tracking-tight text-2xl md:text-3xl text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -18,7 +18,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading level={1}>Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h1
-			  class="font-semibold tracking-tight text-3xl md:text-4xl"
+			  class="tracking-tight text-3xl md:text-4xl text-foreground font-semibold"
 			>
 			  Title
 			</h1>
@@ -29,7 +29,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading level={2}>Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-2xl md:text-3xl"
+			  class="tracking-tight text-2xl md:text-3xl text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -40,7 +40,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading level={3}>Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h3
-			  class="font-semibold tracking-tight text-xl md:text-2xl"
+			  class="tracking-tight text-xl md:text-2xl text-foreground font-semibold"
 			>
 			  Title
 			</h3>
@@ -51,7 +51,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading level={4}>Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h4
-			  class="font-semibold tracking-tight text-lg md:text-xl"
+			  class="tracking-tight text-lg md:text-xl text-foreground font-semibold"
 			>
 			  Title
 			</h4>
@@ -62,7 +62,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading level={5}>Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h5
-			  class="font-semibold tracking-tight text-base md:text-lg"
+			  class="tracking-tight text-base md:text-lg text-foreground font-semibold"
 			>
 			  Title
 			</h5>
@@ -73,7 +73,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading level={6}>Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h6
-			  class="font-semibold tracking-tight text-sm md:text-base"
+			  class="tracking-tight text-sm md:text-base text-foreground font-semibold"
 			>
 			  Title
 			</h6>
@@ -84,7 +84,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading size="xs">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-xs"
+			  class="tracking-tight text-xs text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -95,7 +95,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading size="sm">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-sm"
+			  class="tracking-tight text-sm text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -106,7 +106,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading size="lg">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-lg"
+			  class="tracking-tight text-lg text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -117,7 +117,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading size="xl">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-xl"
+			  class="tracking-tight text-xl text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -128,7 +128,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading size="2xl">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-2xl"
+			  class="tracking-tight text-2xl text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -139,7 +139,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading size="3xl">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-3xl"
+			  class="tracking-tight text-3xl text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -150,7 +150,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading size="4xl">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-4xl"
+			  class="tracking-tight text-4xl text-foreground font-semibold"
 			>
 			  Title
 			</h2>
@@ -161,7 +161,7 @@ describe('Heading', () => {
 		const { container } = render(<Heading className="custom-class">Title</Heading>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<h2
-			  class="font-semibold tracking-tight text-2xl md:text-3xl custom-class"
+			  class="tracking-tight text-2xl md:text-3xl text-foreground font-semibold custom-class"
 			>
 			  Title
 			</h2>
@@ -174,7 +174,7 @@ describe('Text', () => {
 		const { container } = render(<Text>Content</Text>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<p
-			  class="text-base"
+			  class=""
 			>
 			  Content
 			</p>
@@ -273,7 +273,7 @@ describe('Text', () => {
 		const { container } = render(<Text asSpan>Content</Text>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<span
-			  class="text-base"
+			  class=""
 			>
 			  Content
 			</span>
@@ -288,7 +288,7 @@ describe('Text', () => {
 		);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<p
-			  class="text-sm text-primary"
+			  class="text-base text-primary"
 			>
 			  Content
 			</p>
@@ -299,7 +299,7 @@ describe('Text', () => {
 		const { container } = render(<Text className="custom-class">Content</Text>);
 		expect(container.firstChild).toMatchInlineSnapshot(`
 			<p
-			  class="text-base custom-class"
+			  class="custom-class"
 			>
 			  Content
 			</p>

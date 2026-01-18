@@ -10,6 +10,9 @@ import { cn } from '@/lib/utils';
 
 type GridCols = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 type GapSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+type PaddingSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+type GridAlign = 'start' | 'center' | 'end' | 'stretch';
+type GridJustify = 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
 
 interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Number of columns (1-12) */
@@ -28,6 +31,16 @@ interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
 	gapX?: GapSize;
 	/** Vertical gap (overrides gap for row gaps) */
 	gapY?: GapSize;
+	/** Padding (all sides) */
+	p?: PaddingSize;
+	/** Align items vertically within cells */
+	alignItems?: GridAlign;
+	/** Justify items horizontally within cells */
+	justifyItems?: GridJustify;
+	/** Fill available height */
+	fullHeight?: boolean;
+	/** Fill available width */
+	fullWidth?: boolean;
 }
 
 const colsClasses: Record<GridCols, string> = {
@@ -135,6 +148,32 @@ const gapYClasses: Record<GapSize, string> = {
 	'2xl': 'gap-y-12',
 };
 
+const paddingClasses: Record<PaddingSize, string> = {
+	none: 'p-0',
+	xs: 'p-1',
+	sm: 'p-2',
+	md: 'p-4',
+	lg: 'p-6',
+	xl: 'p-8',
+	'2xl': 'p-12',
+};
+
+const alignItemsClasses: Record<GridAlign, string> = {
+	start: 'items-start',
+	center: 'items-center',
+	end: 'items-end',
+	stretch: 'items-stretch',
+};
+
+const justifyItemsClasses: Record<GridJustify, string> = {
+	start: 'justify-items-start',
+	center: 'justify-items-center',
+	end: 'justify-items-end',
+	between: 'justify-between',
+	around: 'justify-around',
+	evenly: 'justify-evenly',
+};
+
 const Grid = forwardRef<HTMLDivElement, GridProps>(
 	(
 		{
@@ -147,6 +186,11 @@ const Grid = forwardRef<HTMLDivElement, GridProps>(
 			gap = 'md',
 			gapX,
 			gapY,
+			p,
+			alignItems,
+			justifyItems,
+			fullHeight,
+			fullWidth,
 			...props
 		},
 		ref
@@ -164,6 +208,11 @@ const Grid = forwardRef<HTMLDivElement, GridProps>(
 					!gapX && !gapY && gapClasses[gap],
 					gapX && gapXClasses[gapX],
 					gapY && gapYClasses[gapY],
+					p && paddingClasses[p],
+					alignItems && alignItemsClasses[alignItems],
+					justifyItems && justifyItemsClasses[justifyItems],
+					fullHeight && 'h-full',
+					fullWidth && 'w-full',
 					className
 				)}
 				{...props}
@@ -174,4 +223,4 @@ const Grid = forwardRef<HTMLDivElement, GridProps>(
 Grid.displayName = 'Grid';
 
 export { Grid };
-export type { GridProps, GridCols, GapSize };
+export type { GridProps, GridCols, GapSize, PaddingSize, GridAlign, GridJustify };
