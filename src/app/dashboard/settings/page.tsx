@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Settings Page
+ *
+ * User settings including profile, members, appearance, and data management.
+ * Uses the new component library with glassmorphism styling.
+ */
+
 import { useEffect, useState } from 'react';
 import {
 	Bell,
@@ -20,7 +27,6 @@ import {
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -41,6 +47,9 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { PageHeader } from '@/components/ui/page-header';
+import { EmptyState } from '@/components/ui/empty-state';
+import { MemberAvatar } from '@/components/members/MemberAvatar';
 
 interface Member {
 	id: string;
@@ -196,126 +205,118 @@ export default function SettingsPage() {
 	return (
 		<div className="space-y-8">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Paramètres</h1>
-					<p className="mt-1 text-muted-foreground">Configurez votre application</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Paramètres"
+				description="Configurez votre application"
+			/>
 
 			<div className="grid gap-6 lg:grid-cols-3">
 				{/* Main Settings Column */}
 				<div className="space-y-6 lg:col-span-2">
 					{/* Profile */}
-					<Card className="border-border/60">
-						<CardHeader className="pb-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-									<User className="h-5 w-5" />
-								</div>
-								<div>
-									<CardTitle className="text-lg font-medium">Profil</CardTitle>
-									<p className="text-sm text-muted-foreground">Vos informations personnelles</p>
-								</div>
+					<div className="glass-card p-6 space-y-4">
+						<div className="flex items-center gap-3 pb-2">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+								<User className="h-5 w-5" />
 							</div>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid gap-4 sm:grid-cols-2">
-								<div className="space-y-2">
-									<Label htmlFor="name">Nom</Label>
-									<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
-								</div>
-								<div className="space-y-2">
-									<Label htmlFor="email">Email</Label>
-									<Input id="email" type="email" placeholder="votre@email.com" />
-								</div>
+							<div>
+								<h3 className="text-lg font-medium">Profil</h3>
+								<p className="text-sm text-muted-foreground">Vos informations personnelles</p>
+							</div>
+						</div>
+						<div className="grid gap-4 sm:grid-cols-2">
+							<div className="space-y-2">
+								<Label htmlFor="name">Nom</Label>
+								<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
 							</div>
 							<div className="space-y-2">
-								<Label htmlFor="currency">Devise par défaut</Label>
-								<Select defaultValue="eur">
-									<SelectTrigger id="currency" className="w-full sm:w-[200px]">
-										<SelectValue placeholder="Sélectionner" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="eur">EUR</SelectItem>
-										<SelectItem value="usd">USD ($)</SelectItem>
-										<SelectItem value="gbp">GBP</SelectItem>
-										<SelectItem value="chf">CHF</SelectItem>
-									</SelectContent>
-								</Select>
+								<Label htmlFor="email">Email</Label>
+								<Input id="email" type="email" placeholder="votre@email.com" />
 							</div>
-						</CardContent>
-					</Card>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="currency">Devise par défaut</Label>
+							<Select defaultValue="eur">
+								<SelectTrigger id="currency" className="w-full sm:w-[200px]">
+									<SelectValue placeholder="Sélectionner" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="eur">EUR</SelectItem>
+									<SelectItem value="usd">USD ($)</SelectItem>
+									<SelectItem value="gbp">GBP</SelectItem>
+									<SelectItem value="chf">CHF</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+					</div>
 
 					{/* Members (Household) */}
-					<Card className="border-border/60">
-						<CardHeader className="pb-4">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-										<Users className="h-5 w-5" />
-									</div>
-									<div>
-										<CardTitle className="text-lg font-medium">Membres du foyer</CardTitle>
-										<p className="text-sm text-muted-foreground">
-											Gérez les membres associés aux comptes
-										</p>
-									</div>
+					<div className="glass-card p-6 space-y-4">
+						<div className="flex items-center justify-between pb-2">
+							<div className="flex items-center gap-3">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+									<Users className="h-5 w-5" />
 								</div>
-								<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
-									<DialogTrigger asChild>
-										<Button variant="outline" size="sm" className="gap-2">
-											<Plus className="h-4 w-4" />
-											Ajouter
-										</Button>
-									</DialogTrigger>
-									<DialogContent>
-										<DialogHeader>
-											<DialogTitle>Ajouter un membre</DialogTitle>
-										</DialogHeader>
-										<div className="space-y-4 pt-4">
-											<div className="space-y-2">
-												<Label htmlFor="memberName">Nom</Label>
-												<Input
-													id="memberName"
-													placeholder="Prénom"
-													value={newMemberName}
-													onChange={(e) => setNewMemberName(e.target.value)}
-												/>
-											</div>
-											<div className="space-y-2">
-												<Label>Couleur</Label>
-												<div className="flex gap-2 flex-wrap">
-													{MEMBER_COLORS.map((color) => (
-														<button
-															key={color.value}
-															type="button"
-															onClick={() => setNewMemberColor(color.value)}
-															className={`h-8 w-8 rounded-full transition-all ${
-																newMemberColor === color.value
-																	? 'ring-2 ring-offset-2 ring-primary'
-																	: 'hover:scale-110'
-															}`}
-															style={{ backgroundColor: color.value }}
-															title={color.name}
-														/>
-													))}
-												</div>
-											</div>
-											<div className="flex justify-end gap-2 pt-4">
-												<Button variant="outline" onClick={() => setShowAddMember(false)}>
-													Annuler
-												</Button>
-												<Button onClick={handleAddMember} disabled={savingMember || !newMemberName.trim()}>
-													{savingMember ? 'Ajout...' : 'Ajouter'}
-												</Button>
+								<div>
+									<h3 className="text-lg font-medium">Membres du foyer</h3>
+									<p className="text-sm text-muted-foreground">
+										Gérez les membres associés aux comptes
+									</p>
+								</div>
+							</div>
+							<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
+								<DialogTrigger asChild>
+									<Button variant="outline" size="sm" className="gap-2">
+										<Plus className="h-4 w-4" />
+										Ajouter
+									</Button>
+								</DialogTrigger>
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>Ajouter un membre</DialogTitle>
+									</DialogHeader>
+									<div className="space-y-4 pt-4">
+										<div className="space-y-2">
+											<Label htmlFor="memberName">Nom</Label>
+											<Input
+												id="memberName"
+												placeholder="Prénom"
+												value={newMemberName}
+												onChange={(e) => setNewMemberName(e.target.value)}
+											/>
+										</div>
+										<div className="space-y-2">
+											<Label>Couleur</Label>
+											<div className="flex gap-2 flex-wrap">
+												{MEMBER_COLORS.map((color) => (
+													<button
+														key={color.value}
+														type="button"
+														onClick={() => setNewMemberColor(color.value)}
+														className={`h-8 w-8 rounded-full transition-all ${
+															newMemberColor === color.value
+																? 'ring-2 ring-offset-2 ring-primary'
+																: 'hover:scale-110'
+														}`}
+														style={{ backgroundColor: color.value }}
+														title={color.name}
+													/>
+												))}
 											</div>
 										</div>
-									</DialogContent>
-								</Dialog>
-							</div>
-						</CardHeader>
-						<CardContent className="space-y-2">
+										<div className="flex justify-end gap-2 pt-4">
+											<Button variant="outline" onClick={() => setShowAddMember(false)}>
+												Annuler
+											</Button>
+											<Button onClick={handleAddMember} disabled={savingMember || !newMemberName.trim()}>
+												{savingMember ? 'Ajout...' : 'Ajouter'}
+											</Button>
+										</div>
+									</div>
+								</DialogContent>
+							</Dialog>
+						</div>
+						<div className="space-y-2">
 							{loadingMembers ? (
 								<>
 									<MemberSkeleton />
@@ -323,22 +324,28 @@ export default function SettingsPage() {
 									<MemberSkeleton />
 								</>
 							) : members.length === 0 ? (
-								<p className="text-center text-muted-foreground py-8">
-									Aucun membre. Ajoutez votre premier membre pour commencer.
-								</p>
+								<EmptyState
+									icon={Users}
+									title="Aucun membre"
+									description="Ajoutez votre premier membre pour commencer"
+									size="sm"
+								/>
 							) : (
 								members.map((member) => (
 									<div
 										key={member.id}
-										className="flex items-center justify-between rounded-xl bg-muted/30 p-4 transition-colors hover:bg-muted/50"
+										className="flex items-center justify-between rounded-xl bg-white/50 dark:bg-white/5 p-4 transition-colors hover:bg-white/80 dark:hover:bg-white/10"
 									>
 										<div className="flex items-center gap-3">
-											<div
-												className="flex h-10 w-10 items-center justify-center rounded-lg text-white font-medium"
-												style={{ backgroundColor: member.color || '#6b7280' }}
-											>
-												{member.name[0].toUpperCase()}
-											</div>
+											<MemberAvatar
+												member={{
+													id: member.id,
+													name: member.name,
+													color: member.color,
+													avatarUrl: member.avatarUrl,
+												}}
+												size="md"
+											/>
 											<div>
 												<p className="font-medium">{member.name}</p>
 												<p className="text-xs text-muted-foreground">
@@ -419,208 +426,191 @@ export default function SettingsPage() {
 									</div>
 								))
 							)}
-						</CardContent>
-					</Card>
+						</div>
+					</div>
 
 					{/* Appearance */}
-					<Card className="border-border/60">
-						<CardHeader className="pb-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-									<Palette className="h-5 w-5" />
-								</div>
-								<div>
-									<CardTitle className="text-lg font-medium">Apparence</CardTitle>
-									<p className="text-sm text-muted-foreground">Personnalisez l&apos;interface</p>
-								</div>
+					<div className="glass-card p-6 space-y-6">
+						<div className="flex items-center gap-3 pb-2">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+								<Palette className="h-5 w-5" />
 							</div>
-						</CardHeader>
-						<CardContent className="space-y-6">
-							{/* Theme Selection */}
-							<div className="space-y-3">
-								<Label>Thème</Label>
-								<div className="grid grid-cols-3 gap-3">
-									<button
-										type="button"
-										onClick={() => setTheme('light')}
-										className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
-											mounted && theme === 'light'
-												? 'border-primary bg-primary/5'
-												: 'border-border/60 hover:border-border'
-										}`}
-									>
-										<Sun className="h-5 w-5" />
-										<span className="text-sm font-medium">Clair</span>
-									</button>
-									<button
-										type="button"
-										onClick={() => setTheme('dark')}
-										className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
-											mounted && theme === 'dark'
-												? 'border-primary bg-primary/5'
-												: 'border-border/60 hover:border-border'
-										}`}
-									>
-										<Moon className="h-5 w-5" />
-										<span className="text-sm font-medium">Sombre</span>
-									</button>
-									<button
-										type="button"
-										onClick={() => setTheme('system')}
-										className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
-											mounted && theme === 'system'
-												? 'border-primary bg-primary/5'
-												: 'border-border/60 hover:border-border'
-										}`}
-									>
-										<Globe className="h-5 w-5" />
-										<span className="text-sm font-medium">Système</span>
-									</button>
-								</div>
+							<div>
+								<h3 className="text-lg font-medium">Apparence</h3>
+								<p className="text-sm text-muted-foreground">Personnalisez l&apos;interface</p>
 							</div>
+						</div>
 
-							<Separator />
-
-							{/* Language */}
-							<div className="space-y-2">
-								<Label htmlFor="language">Langue</Label>
-								<Select defaultValue="fr">
-									<SelectTrigger id="language" className="w-full sm:w-[200px]">
-										<SelectValue placeholder="Sélectionner" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="fr">Français</SelectItem>
-										<SelectItem value="en">English</SelectItem>
-									</SelectContent>
-								</Select>
+						{/* Theme Selection */}
+						<div className="space-y-3">
+							<Label>Thème</Label>
+							<div className="grid grid-cols-3 gap-3">
+								<button
+									type="button"
+									onClick={() => setTheme('light')}
+									className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
+										mounted && theme === 'light'
+											? 'border-primary bg-primary/5'
+											: 'border-border/60 hover:border-border'
+									}`}
+								>
+									<Sun className="h-5 w-5" />
+									<span className="text-sm font-medium">Clair</span>
+								</button>
+								<button
+									type="button"
+									onClick={() => setTheme('dark')}
+									className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
+										mounted && theme === 'dark'
+											? 'border-primary bg-primary/5'
+											: 'border-border/60 hover:border-border'
+									}`}
+								>
+									<Moon className="h-5 w-5" />
+									<span className="text-sm font-medium">Sombre</span>
+								</button>
+								<button
+									type="button"
+									onClick={() => setTheme('system')}
+									className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors ${
+										mounted && theme === 'system'
+											? 'border-primary bg-primary/5'
+											: 'border-border/60 hover:border-border'
+									}`}
+								>
+									<Globe className="h-5 w-5" />
+									<span className="text-sm font-medium">Système</span>
+								</button>
 							</div>
-						</CardContent>
-					</Card>
+						</div>
+
+						<Separator />
+
+						{/* Language */}
+						<div className="space-y-2">
+							<Label htmlFor="language">Langue</Label>
+							<Select defaultValue="fr">
+								<SelectTrigger id="language" className="w-full sm:w-[200px]">
+									<SelectValue placeholder="Sélectionner" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="fr">Français</SelectItem>
+									<SelectItem value="en">English</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+					</div>
 
 					{/* Data & Privacy */}
-					<Card className="border-border/60">
-						<CardHeader className="pb-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-									<Database className="h-5 w-5" />
-								</div>
-								<div>
-									<CardTitle className="text-lg font-medium">Données</CardTitle>
-									<p className="text-sm text-muted-foreground">Export et sauvegarde</p>
-								</div>
+					<div className="glass-card p-6 space-y-4">
+						<div className="flex items-center gap-3 pb-2">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+								<Database className="h-5 w-5" />
 							</div>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="flex flex-col sm:flex-row gap-3">
-								<Button variant="outline" className="flex-1 gap-2">
-									<Download className="h-4 w-4" />
-									Exporter les données
-								</Button>
-								<Button variant="outline" className="flex-1 gap-2">
-									<Upload className="h-4 w-4" />
-									Importer une sauvegarde
-								</Button>
+							<div>
+								<h3 className="text-lg font-medium">Données</h3>
+								<p className="text-sm text-muted-foreground">Export et sauvegarde</p>
 							</div>
-							<p className="text-xs text-muted-foreground">
-								Vos données sont stockées localement sur votre serveur. Effectuez des sauvegardes
-								régulières pour éviter toute perte de données.
-							</p>
-						</CardContent>
-					</Card>
+						</div>
+						<div className="flex flex-col sm:flex-row gap-3">
+							<Button variant="outline" className="flex-1 gap-2">
+								<Download className="h-4 w-4" />
+								Exporter les données
+							</Button>
+							<Button variant="outline" className="flex-1 gap-2">
+								<Upload className="h-4 w-4" />
+								Importer une sauvegarde
+							</Button>
+						</div>
+						<p className="text-xs text-muted-foreground">
+							Vos données sont stockées localement sur votre serveur. Effectuez des sauvegardes
+							régulières pour éviter toute perte de données.
+						</p>
+					</div>
 				</div>
 
 				{/* Sidebar Settings */}
 				<div className="space-y-6">
 					{/* Notifications */}
-					<Card className="border-border/60">
-						<CardHeader className="pb-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-									<Bell className="h-5 w-5" />
-								</div>
-								<CardTitle className="text-lg font-medium">Notifications</CardTitle>
+					<div className="glass-card p-6 space-y-4">
+						<div className="flex items-center gap-3 pb-2">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+								<Bell className="h-5 w-5" />
 							</div>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="font-medium">Alertes budget</p>
-									<p className="text-xs text-muted-foreground">Dépassement de budget</p>
-								</div>
-								<Switch defaultChecked />
+							<h3 className="text-lg font-medium">Notifications</h3>
+						</div>
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="font-medium">Alertes budget</p>
+								<p className="text-xs text-muted-foreground">Dépassement de budget</p>
 							</div>
-							<Separator />
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="font-medium">Transactions</p>
-									<p className="text-xs text-muted-foreground">Nouvelles transactions</p>
-								</div>
-								<Switch />
+							<Switch defaultChecked />
+						</div>
+						<Separator />
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="font-medium">Transactions</p>
+								<p className="text-xs text-muted-foreground">Nouvelles transactions</p>
 							</div>
-							<Separator />
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="font-medium">Rappels</p>
-									<p className="text-xs text-muted-foreground">Échéances de prêts</p>
-								</div>
-								<Switch defaultChecked />
+							<Switch />
+						</div>
+						<Separator />
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="font-medium">Rappels</p>
+								<p className="text-xs text-muted-foreground">Échéances de prêts</p>
 							</div>
-						</CardContent>
-					</Card>
+							<Switch defaultChecked />
+						</div>
+					</div>
 
 					{/* Security */}
-					<Card className="border-border/60">
-						<CardHeader className="pb-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-									<Shield className="h-5 w-5" />
-								</div>
-								<CardTitle className="text-lg font-medium">Sécurité</CardTitle>
+					<div className="glass-card p-6 space-y-4">
+						<div className="flex items-center gap-3 pb-2">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+								<Shield className="h-5 w-5" />
 							</div>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<Button variant="outline" className="w-full justify-start gap-2">
-								<Key className="h-4 w-4" />
-								Changer le mot de passe
-							</Button>
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="font-medium">2FA</p>
-									<p className="text-xs text-muted-foreground">Authentification double facteur</p>
-								</div>
-								<Switch />
+							<h3 className="text-lg font-medium">Sécurité</h3>
+						</div>
+						<Button variant="outline" className="w-full justify-start gap-2">
+							<Key className="h-4 w-4" />
+							Changer le mot de passe
+						</Button>
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="font-medium">2FA</p>
+								<p className="text-xs text-muted-foreground">Authentification double facteur</p>
 							</div>
-							<Separator />
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="font-medium">Sessions</p>
-									<p className="text-xs text-muted-foreground">Déconnexion automatique</p>
-								</div>
-								<Switch defaultChecked />
+							<Switch />
+						</div>
+						<Separator />
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="font-medium">Sessions</p>
+								<p className="text-xs text-muted-foreground">Déconnexion automatique</p>
 							</div>
-						</CardContent>
-					</Card>
+							<Switch defaultChecked />
+						</div>
+					</div>
 
 					{/* App Info */}
-					<Card className="border-border/60 bg-muted/20">
-						<CardContent className="pt-6">
-							<div className="text-center">
-								<p className="font-medium">Imanisa Finance</p>
-								<p className="text-sm text-muted-foreground">Version 2.0.0</p>
-								<p className="mt-4 text-xs text-muted-foreground">
-									Application open source de gestion de patrimoine personnel
-								</p>
-								<a
-									href="https://github.com/mbourmaud/imanisa-finance"
-									target="_blank"
-									rel="noopener noreferrer"
-									className="mt-2 text-xs text-primary hover:underline inline-block"
-								>
-									Voir sur GitHub
-								</a>
-							</div>
-						</CardContent>
-					</Card>
+					<div className="glass-card p-6 bg-muted/20">
+						<div className="text-center">
+							<p className="font-medium">Imanisa Finance</p>
+							<p className="text-sm text-muted-foreground">Version 2.0.0</p>
+							<p className="mt-4 text-xs text-muted-foreground">
+								Application open source de gestion de patrimoine personnel
+							</p>
+							<a
+								href="https://github.com/mbourmaud/imanisa-finance"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="mt-2 text-xs text-primary hover:underline inline-block"
+							>
+								Voir sur GitHub
+							</a>
+						</div>
+					</div>
 				</div>
 			</div>
 
