@@ -2,7 +2,7 @@
 
 import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
-import { ArrowDownLeft, CreditCard, Row, Stack, Text, type LucideIcon } from '@/components'
+import { ArrowDownLeft, CreditCard, Flex, type LucideIcon } from '@/components'
 import { MoneyDifference } from '@/components/common/MoneyDisplay'
 
 // =============================================================================
@@ -59,7 +59,7 @@ const TransactionListItem = forwardRef<HTMLDivElement, TransactionListItemProps>
 				)}
 				{...props}
 			>
-				<Row gap="md" align="center">
+				<Flex direction="row" gap="md" align="center">
 					<div
 						className={cn(
 							'flex h-10 w-10 items-center justify-center rounded-xl',
@@ -73,19 +73,19 @@ const TransactionListItem = forwardRef<HTMLDivElement, TransactionListItemProps>
 							)}
 						/>
 					</div>
-					<Stack gap="none">
-						<Text weight="medium">{description}</Text>
-						<Text size="xs" color="muted">
+					<Flex direction="col" gap="none">
+						<span className="font-medium">{description}</span>
+						<span className="text-xs text-muted-foreground">
 							{category} · {account}
-						</Text>
-					</Stack>
-				</Row>
-				<Stack gap="none" align="end">
+						</span>
+					</Flex>
+				</Flex>
+				<Flex direction="col" gap="none" align="end">
 					<MoneyDifference amount={amount} size="md" />
-					<Text size="xs" color="muted">
+					<span className="text-xs text-muted-foreground">
 						{dateLabel}
-					</Text>
-				</Stack>
+					</span>
+				</Flex>
 			</div>
 		)
 	},

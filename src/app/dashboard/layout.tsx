@@ -5,7 +5,6 @@ import {
 	SidebarInset,
 	SidebarProvider,
 	SidebarTrigger,
-	Text,
 } from '@/components';
 import { AppSidebar } from '@/components/app-sidebar';
 
@@ -18,9 +17,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 				<DashboardHeader>
 					<DashboardHeaderMobile>
 						<SidebarTrigger />
-						<Text as="span" weight="semibold">
+						<span className="font-semibold">
 							Imanisa Finance
-						</Text>
+						</span>
 					</DashboardHeaderMobile>
 				</DashboardHeader>
 				<DashboardMain>{children}</DashboardMain>

@@ -12,19 +12,15 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	Flex,
 	GlassCard,
-	Grid,
-	Heading,
 	IconBox,
 	MoreHorizontal,
 	PageHeader,
 	Plus,
 	RefreshCw,
-	Row,
-	Stack,
 	StatCard,
 	StatCardGrid,
-	Text,
 	TrendingUp,
 	Wallet,
 } from '@/components';
@@ -151,13 +147,13 @@ function formatCurrency(amount: number): string {
 
 export default function InvestmentsPage() {
 	return (
-		<Stack gap="xl">
+		<Flex direction="col" gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Investissements"
 				description="PEA, CTO, Assurance-vie, Crypto"
 				actions={
-					<Row gap="sm">
+					<Flex direction="row" gap="sm">
 						<Button
 							variant="outline"
 							iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
@@ -167,7 +163,7 @@ export default function InvestmentsPage() {
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 							Nouvelle source
 						</Button>
-					</Row>
+					</Flex>
 				}
 			/>
 
@@ -203,7 +199,13 @@ export default function InvestmentsPage() {
 			</StatCardGrid>
 
 			{/* Sources Grid */}
-			<Grid cols={4} gap="md" responsive={{ sm: 2, lg: 4 }}>
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+					gap: '1rem',
+				}}
+			>
 				{sources.map((source) => {
 					const gain = source.value - source.invested;
 					const isPositive = gain >= 0;
@@ -214,7 +216,7 @@ export default function InvestmentsPage() {
 							padding="md"
 							style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
 						>
-							<Row justify="between">
+							<Flex direction="row" justify="between">
 								<IconBox
 									icon={source.icon}
 									size="md"
@@ -245,57 +247,56 @@ export default function InvestmentsPage() {
 										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
-							</Row>
-							<Stack gap="md">
-								<Stack gap="xs">
-									<Text weight="medium">{source.name}</Text>
-									<Text size="xs" color="muted">
+							</Flex>
+							<Flex direction="col" gap="md">
+								<Flex direction="col" gap="xs">
+									<span className="font-medium">{source.name}</span>
+									<span className="text-xs text-muted-foreground">
 										{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
-									</Text>
-								</Stack>
-								<Stack gap="xs">
-									<Text
-										size="2xl"
-										weight="semibold"
+									</span>
+								</Flex>
+								<Flex direction="col" gap="xs">
+									<span
+										className="text-2xl font-semibold"
 										style={{ fontVariantNumeric: 'tabular-nums' }}
 									>
 										{formatCurrency(source.value)}
-									</Text>
-									<Text
-										size="sm"
-										weight="medium"
+									</span>
+									<span
+										className="text-sm font-medium"
 										style={{ color: isPositive ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)' }}
 									>
 										{isPositive ? '+' : ''}
 										{formatCurrency(gain)} ({isPositive ? '+' : ''}
 										{source.performance.toFixed(2)}%)
-									</Text>
-								</Stack>
-							</Stack>
+									</span>
+								</Flex>
+							</Flex>
 						</GlassCard>
 					);
 				})}
-			</Grid>
+			</div>
 
 			{/* Positions Table */}
 			<GlassCard padding="lg">
-				<Row justify="between" style={{ marginBottom: '1rem' }}>
-					<Stack gap="xs">
-						<Heading level={3} size="lg" tracking="tight">
+				<Flex direction="row" justify="between" style={{ marginBottom: '1rem' }}>
+					<Flex direction="col" gap="xs">
+						<h3 className="text-lg font-bold tracking-tight">
 							Positions
-						</Heading>
-						<Text size="sm" color="muted">
+						</h3>
+						<span className="text-sm text-muted-foreground">
 							Toutes vos positions d&apos;investissement
-						</Text>
-					</Stack>
+						</span>
+					</Flex>
 					<Button variant="outline" size="sm">
 						Voir tout
 					</Button>
-				</Row>
-				<Stack gap="sm">
+				</Flex>
+				<Flex direction="col" gap="sm">
 					{positions.map((pos) => (
-						<Row
+						<Flex
 							key={pos.id}
+							direction="row"
 							justify="between"
 							style={{
 								padding: '1rem',
@@ -304,7 +305,7 @@ export default function InvestmentsPage() {
 								backgroundColor: 'hsl(var(--background) / 0.5)',
 							}}
 						>
-							<Row gap="md">
+							<Flex direction="row" gap="md">
 								<div
 									style={{
 										display: 'flex',
@@ -322,41 +323,41 @@ export default function InvestmentsPage() {
 								>
 									{pos.ticker.slice(0, 3)}
 								</div>
-								<Stack gap="xs">
-									<Text weight="medium">{pos.name}</Text>
-									<Text size="xs" color="muted">
+								<Flex direction="col" gap="xs">
+									<span className="font-medium">{pos.name}</span>
+									<span className="text-xs text-muted-foreground">
 										{pos.ticker} · {pos.source}
-									</Text>
-								</Stack>
-							</Row>
-							<Row gap="xl">
-								<Stack gap="xs" align="end" data-show-sm style={{ display: 'none' }}>
-									<Text size="xs" color="muted">
+									</span>
+								</Flex>
+							</Flex>
+							<Flex direction="row" gap="xl">
+								<Flex direction="col" gap="xs" align="end" data-show-sm style={{ display: 'none' }}>
+									<span className="text-xs text-muted-foreground">
 										Quantité
-									</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									</span>
+									<span className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{pos.quantity}
-									</Text>
-								</Stack>
-								<Stack gap="xs" align="end" data-show-md style={{ display: 'none' }}>
-									<Text size="xs" color="muted">
+									</span>
+								</Flex>
+								<Flex direction="col" gap="xs" align="end" data-show-md style={{ display: 'none' }}>
+									<span className="text-xs text-muted-foreground">
 										PRU
-									</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									</span>
+									<span className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.avgPrice)}
-									</Text>
-								</Stack>
-								<Stack gap="xs" align="end">
-									<Text size="xs" color="muted">
+									</span>
+								</Flex>
+								<Flex direction="col" gap="xs" align="end">
+									<span className="text-xs text-muted-foreground">
 										Valeur
-									</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									</span>
+									<span className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.value)}
-									</Text>
-								</Stack>
-								<Stack gap="xs" align="end" style={{ minWidth: '100px' }}>
-									<Text
-										weight="medium"
+									</span>
+								</Flex>
+								<Flex direction="col" gap="xs" align="end" style={{ minWidth: '100px' }}>
+									<span
+										className="font-medium"
 										style={{
 											fontVariantNumeric: 'tabular-nums',
 											color: pos.gain >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
@@ -364,36 +365,36 @@ export default function InvestmentsPage() {
 									>
 										{pos.gain >= 0 ? '+' : ''}
 										{formatCurrency(pos.gain)}
-									</Text>
-									<Text
-										size="xs"
+									</span>
+									<span
+										className="text-xs"
 										style={{
 											color: pos.gainPercent >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
 										}}
 									>
 										{pos.gainPercent >= 0 ? '+' : ''}
 										{pos.gainPercent.toFixed(2)}%
-									</Text>
-								</Stack>
-							</Row>
-						</Row>
+									</span>
+								</Flex>
+							</Flex>
+						</Flex>
 					))}
-				</Stack>
+				</Flex>
 			</GlassCard>
 
 			{/* Performance Chart */}
 			<GlassCard padding="lg">
-				<Row justify="between" style={{ marginBottom: '1rem' }}>
-					<Stack gap="xs">
-						<Heading level={3} size="lg" tracking="tight">
+				<Flex direction="row" justify="between" style={{ marginBottom: '1rem' }}>
+					<Flex direction="col" gap="xs">
+						<h3 className="text-lg font-bold tracking-tight">
 							Évolution du portefeuille
-						</Heading>
-						<Text size="sm" color="muted">
+						</h3>
+						<span className="text-sm text-muted-foreground">
 							Performance sur 12 mois
-						</Text>
-					</Stack>
-					<Row gap="md">
-						<Row gap="sm">
+						</span>
+					</Flex>
+					<Flex direction="row" gap="md">
+						<Flex direction="row" gap="sm">
 							<div
 								style={{
 									height: '0.5rem',
@@ -402,11 +403,11 @@ export default function InvestmentsPage() {
 									backgroundColor: 'oklch(0.55 0.18 270)',
 								}}
 							/>
-							<Text size="sm" color="muted">
+							<span className="text-sm text-muted-foreground">
 								Valeur
-							</Text>
-						</Row>
-						<Row gap="sm">
+							</span>
+						</Flex>
+						<Flex direction="row" gap="sm">
 							<div
 								style={{
 									height: '0',
@@ -414,14 +415,14 @@ export default function InvestmentsPage() {
 									borderTop: '2px dashed oklch(0.5 0.01 280)',
 								}}
 							/>
-							<Text size="sm" color="muted">
+							<span className="text-sm text-muted-foreground">
 								Investi
-							</Text>
-						</Row>
-					</Row>
-				</Row>
+							</span>
+						</Flex>
+					</Flex>
+				</Flex>
 				<InvestmentPerformanceChart data={demoInvestmentPerformance} height="lg" />
 			</GlassCard>
-		</Stack>
+		</Flex>
 	);
 }

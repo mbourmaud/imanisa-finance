@@ -9,12 +9,10 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	Flex,
 	GlassCard,
 	MoreHorizontal,
 	Progress,
-	Row,
-	Stack,
-	Text,
 	type LucideIcon,
 } from '@/components'
 
@@ -71,9 +69,9 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 
 		return (
 			<GlassCard ref={ref} padding="md">
-				<Stack gap="sm">
-					<Row justify="between" align="start">
-						<Row gap="sm" align="center">
+				<Flex direction="col" gap="sm">
+					<Flex direction="row" justify="between" align="start">
+						<Flex direction="row" gap="sm" align="center">
 							<div
 								className="flex h-10 w-10 items-center justify-center rounded-xl"
 								style={{
@@ -83,13 +81,13 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 							>
 								<Icon className="h-5 w-5" />
 							</div>
-							<Stack gap="none">
-								<Text weight="medium">{name}</Text>
-								<Text size="xs" color="muted">
+							<Flex direction="col" gap="none">
+								<span className="font-medium">{name}</span>
+								<span className="text-xs text-muted-foreground">
 									{formatCurrency(spent)} / {formatCurrency(budget)}
-								</Text>
-							</Stack>
-						</Row>
+								</span>
+							</Flex>
+						</Flex>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" size="icon" style={{ height: '2rem', width: '2rem' }}>
@@ -110,8 +108,8 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
-					</Row>
-					<Stack gap="xs">
+					</Flex>
+					<Flex direction="col" gap="xs">
 						<Progress
 							value={Math.min(percentage, 100)}
 							style={{
@@ -122,22 +120,23 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 									} as React.CSSProperties)),
 							}}
 						/>
-						<Row justify="between">
-							<Text
-								size="xs"
-								weight={isOverBudget ? 'medium' : 'normal'}
-								color={isOverBudget ? 'destructive' : 'muted'}
+						<Flex direction="row" justify="between">
+							<span
+								className={cn(
+									'text-xs',
+									isOverBudget ? 'font-medium text-destructive' : 'text-muted-foreground',
+								)}
 							>
 								{isOverBudget
 									? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
 									: `Reste ${formatCurrency(remainingBudget)}`}
-							</Text>
-							<Text size="xs" color="muted">
+							</span>
+							<span className="text-xs text-muted-foreground">
 								{Math.round(percentage)}%
-							</Text>
-						</Row>
-					</Stack>
-				</Stack>
+							</span>
+						</Flex>
+					</Flex>
+				</Flex>
 			</GlassCard>
 		)
 	},

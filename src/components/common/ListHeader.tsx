@@ -2,7 +2,7 @@
 
 import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
-import { Heading, Row, Text } from '@/components'
+import { Flex } from '@/components'
 
 // =============================================================================
 // LIST HEADER COMPONENT
@@ -32,16 +32,16 @@ const ListHeader = forwardRef<HTMLDivElement, ListHeaderProps>(
 				)}
 				{...props}
 			>
-				<Row gap="md" align="center">
-					<Heading level={3} size="md" weight="semibold">
+				<Flex direction="row" gap="md" align="center">
+					<h3 className="text-base font-semibold">
 						{title}
-					</Heading>
+					</h3>
 					{subtitle && (
-						<Text size="sm" color="muted">
+						<span className="text-sm text-muted-foreground">
 							{subtitle}
-						</Text>
+						</span>
 					)}
-				</Row>
+				</Flex>
 				{action}
 			</div>
 		)

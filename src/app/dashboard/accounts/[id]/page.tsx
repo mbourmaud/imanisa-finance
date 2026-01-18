@@ -23,11 +23,9 @@ import {
 	EmptyState,
 	ExternalLink,
 	FileSpreadsheet,
+	Flex,
 	// Cards
 	GlassCard,
-	Grid,
-	Heading,
-	IconBox,
 	IconWrapper,
 	Input,
 	Loader2,
@@ -35,7 +33,6 @@ import {
 	Plus,
 	RefreshCw,
 	RotateCcw,
-	Row,
 	Search,
 	Settings,
 	// Sheet
@@ -44,8 +41,6 @@ import {
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-	Stack,
-	Text,
 	Trash2,
 	Upload,
 	X,
@@ -578,7 +573,7 @@ export default function AccountDetailPage() {
 	}
 
 	return (
-		<Stack gap="lg">
+		<Flex direction="col" gap="lg">
 			{/* Back link */}
 			<Link
 				href="/dashboard/banks"
@@ -611,7 +606,7 @@ export default function AccountDetailPage() {
 					}}
 				/>
 
-				<Row gap="lg" align="start">
+				<Flex direction="row" gap="lg" align="start">
 					{/* Bank logo with glow */}
 					<div style={{ position: 'relative', flexShrink: 0 }}>
 						<div
@@ -646,14 +641,14 @@ export default function AccountDetailPage() {
 					</div>
 
 					{/* Content */}
-					<Stack gap="sm" style={{ flexGrow: 1, minWidth: 0 }}>
+					<Flex direction="col" gap="sm" style={{ flexGrow: 1, minWidth: 0 }}>
 						{/* Top row: Name + Balance + Actions */}
-						<Row justify="between" align="start" gap="md">
+						<Flex direction="row" justify="between" align="start" gap="md">
 							<div style={{ minWidth: 0 }}>
-								<Row gap="sm" align="center">
-									<Heading level={1} size="2xl" weight="bold" tracking="tight">
+								<Flex direction="row" gap="sm" align="center">
+									<h1 className="text-2xl font-bold tracking-tight">
 										{account.name}
-									</Heading>
+									</h1>
 									<Button
 										variant="ghost"
 										size="icon"
@@ -669,12 +664,12 @@ export default function AccountDetailPage() {
 									>
 										<Pencil style={{ height: '1rem', width: '1rem' }} />
 									</Button>
-								</Row>
+								</Flex>
 							</div>
 
 							{/* Balance + Actions */}
-							<Row gap="md" style={{ flexShrink: 0 }}>
-								<Stack gap="xs" align="end">
+							<Flex direction="row" gap="md" style={{ flexShrink: 0 }}>
+								<Flex direction="col" gap="xs" align="end">
 									<MoneyDisplay
 										amount={account.balance}
 										currency={account.currency as 'EUR'}
@@ -682,14 +677,14 @@ export default function AccountDetailPage() {
 										weight="bold"
 										style={{ letterSpacing: '-0.025em' }}
 									/>
-									<Text size="xs" color="muted" weight="medium">
+									<span className="text-xs text-muted-foreground font-medium">
 										{account._count.transactions} transaction
 										{account._count.transactions !== 1 ? 's' : ''}
-									</Text>
-								</Stack>
+									</span>
+								</Flex>
 
 								{/* Actions */}
-								<Row gap="sm">
+								<Flex direction="row" gap="sm">
 									<Button
 										variant="ghost"
 										size="icon"
@@ -723,15 +718,14 @@ export default function AccountDetailPage() {
 									>
 										<Trash2 style={{ height: '1rem', width: '1rem' }} />
 									</Button>
-								</Row>
-							</Row>
-						</Row>
+								</Flex>
+							</Flex>
+						</Flex>
 
 						{/* Bottom row: Bank info + Members */}
-						<Row gap="sm" style={{ flexWrap: 'wrap', marginTop: '0.75rem' }}>
-							<Text
-								size="xs"
-								weight="medium"
+						<Flex direction="row" gap="sm" style={{ flexWrap: 'wrap', marginTop: '0.75rem' }}>
+							<span
+								className="text-xs font-medium"
 								style={{
 									display: 'inline-flex',
 									alignItems: 'center',
@@ -743,7 +737,7 @@ export default function AccountDetailPage() {
 								}}
 							>
 								{account.bank.name}
-							</Text>
+							</span>
 							<AccountTypeBadge
 								type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
 								style={{
@@ -753,8 +747,8 @@ export default function AccountDetailPage() {
 								}}
 							/>
 							{account.accountNumber && (
-								<Text
-									size="xs"
+								<span
+									className="text-xs"
 									style={{
 										display: 'none',
 										padding: '0.25rem 0.75rem',
@@ -765,13 +759,13 @@ export default function AccountDetailPage() {
 									}}
 								>
 									{account.accountNumber}
-								</Text>
+								</span>
 							)}
 							{/* Members */}
 							{account.accountMembers.length > 0 && (
 								<>
 									<span style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>•</span>
-									<Row gap="sm" align="center">
+									<Flex direction="row" gap="sm" align="center">
 										<MemberAvatarGroup
 											members={account.accountMembers.map((am) => ({
 												id: am.memberId,
@@ -781,20 +775,20 @@ export default function AccountDetailPage() {
 											size="sm"
 											max={5}
 										/>
-										<Text size="xs" color="muted" weight="medium">
+										<span className="text-xs text-muted-foreground font-medium">
 											{account.accountMembers.map((am) => am.member.name).join(', ')}
-										</Text>
-									</Row>
+										</span>
+									</Flex>
 								</>
 							)}
-						</Row>
+						</Flex>
 						{account.description && (
-							<Text size="sm" color="muted" style={{ marginTop: '0.75rem' }}>
+							<p className="text-sm text-muted-foreground" style={{ marginTop: '0.75rem' }}>
 								{account.description}
-							</Text>
+							</p>
 						)}
-					</Stack>
-				</Row>
+					</Flex>
+				</Flex>
 			</GlassCard>
 
 			{/* Account Edit Drawer */}
@@ -817,7 +811,7 @@ export default function AccountDetailPage() {
 						<SheetDescription>Modifiez les informations du compte.</SheetDescription>
 					</SheetHeader>
 
-					<Stack gap="lg">
+					<Flex direction="col" gap="lg">
 						{/* Bank logo centered with glow */}
 						<div style={{ position: 'relative', marginLeft: 'auto', marginRight: 'auto', width: 'fit-content' }}>
 							<div
@@ -850,11 +844,11 @@ export default function AccountDetailPage() {
 							</div>
 						</div>
 
-						<Stack gap="md">
-							<Stack gap="sm">
+						<Flex direction="col" gap="md">
+							<Flex direction="col" gap="sm">
 								<label
 									htmlFor="edit-account-name"
-									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+									className="text-sm font-semibold"
 								>
 									Nom du compte
 								</label>
@@ -871,11 +865,11 @@ export default function AccountDetailPage() {
 										borderColor: 'hsl(var(--border) / 0.3)',
 									}}
 								/>
-							</Stack>
-							<Stack gap="sm">
+							</Flex>
+							<Flex direction="col" gap="sm">
 								<label
 									htmlFor="edit-account-number"
-									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+									className="text-sm font-semibold"
 								>
 									Numéro de compte
 									<span
@@ -902,11 +896,11 @@ export default function AccountDetailPage() {
 										borderColor: 'hsl(var(--border) / 0.3)',
 									}}
 								/>
-							</Stack>
-							<Stack gap="sm">
+							</Flex>
+							<Flex direction="col" gap="sm">
 								<label
 									htmlFor="edit-account-description"
-									style={{ fontSize: '0.875rem', fontWeight: 600 }}
+									className="text-sm font-semibold"
 								>
 									Description
 									<span
@@ -932,10 +926,10 @@ export default function AccountDetailPage() {
 										borderColor: 'hsl(var(--border) / 0.3)',
 									}}
 								/>
-							</Stack>
-						</Stack>
+							</Flex>
+						</Flex>
 
-						<Row gap="sm" style={{ paddingTop: '1rem' }}>
+						<Flex direction="row" gap="sm" style={{ paddingTop: '1rem' }}>
 							<Button
 								variant="outline"
 								onClick={cancelEditingAccount}
@@ -974,8 +968,8 @@ export default function AccountDetailPage() {
 								)}
 								Enregistrer
 							</Button>
-						</Row>
-					</Stack>
+						</Flex>
+					</Flex>
 				</SheetContent>
 			</Sheet>
 
@@ -1002,7 +996,7 @@ export default function AccountDetailPage() {
 							: '1px solid oklch(0.55 0.2 25 / 0.2)',
 					}}
 				>
-					<Row gap="sm" align="start">
+					<Flex direction="row" gap="sm" align="start">
 						<div
 							style={{
 								display: 'flex',
@@ -1027,10 +1021,9 @@ export default function AccountDetailPage() {
 								/>
 							)}
 						</div>
-						<Stack gap="xs" style={{ flexGrow: 1, minWidth: 0 }}>
-							<Text
-								size="sm"
-								weight="semibold"
+						<Flex direction="col" gap="xs" style={{ flexGrow: 1, minWidth: 0 }}>
+							<span
+								className="text-sm font-semibold"
 								style={{
 									color: error.includes('importées')
 										? 'oklch(0.55 0.15 145)'
@@ -1038,14 +1031,14 @@ export default function AccountDetailPage() {
 								}}
 							>
 								{error.includes('importées') ? 'Import réussi' : 'Erreur'}
-							</Text>
-							<Text
-								size="sm"
+							</span>
+							<span
+								className="text-sm"
 								style={{ color: 'hsl(var(--foreground) / 0.8)' }}
 							>
 								{error}
-							</Text>
-						</Stack>
+							</span>
+						</Flex>
 						<Button
 							variant="ghost"
 							size="icon"
@@ -1054,7 +1047,7 @@ export default function AccountDetailPage() {
 						>
 							<X style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</Row>
+					</Flex>
 				</div>
 			)}
 
@@ -1082,23 +1075,21 @@ export default function AccountDetailPage() {
 						</SheetHeader>
 					</div>
 
-					<Stack gap="none">
+					<Flex direction="col" gap="none">
 						{/* Section 1: Informations */}
-						<Stack gap="md" style={{ padding: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
-							<Text
-								size="xs"
-								weight="semibold"
-								color="muted"
+						<Flex direction="col" gap="md" style={{ padding: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
+							<span
+								className="text-xs font-semibold text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Informations
-							</Text>
+							</span>
 
 							{/* Account name */}
-							<Stack gap="sm">
+							<Flex direction="col" gap="sm">
 								<label
 									htmlFor="settings-account-name"
-									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+									className="text-sm text-muted-foreground"
 								>
 									Nom du compte
 								</label>
@@ -1117,13 +1108,13 @@ export default function AccountDetailPage() {
 									style={{ height: '2.5rem', fontSize: '0.875rem', fontWeight: 500 }}
 									placeholder="Nom du compte"
 								/>
-							</Stack>
+							</Flex>
 
 							{/* Description */}
-							<Stack gap="sm">
+							<Flex direction="col" gap="sm">
 								<label
 									htmlFor="settings-account-description"
-									style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+									className="text-sm text-muted-foreground"
 								>
 									Description
 								</label>
@@ -1142,12 +1133,13 @@ export default function AccountDetailPage() {
 									style={{ height: '2.5rem', fontSize: '0.875rem' }}
 									placeholder="Description (optionnel)"
 								/>
-							</Stack>
+							</Flex>
 
 							{/* Owners - Multi-select */}
-							<Stack gap="sm">
-								<Text size="sm" color="muted">Titulaires</Text>
-								<Row
+							<Flex direction="col" gap="sm">
+								<span className="text-sm text-muted-foreground">Titulaires</span>
+								<Flex
+									direction="row"
 									gap="sm"
 									style={{
 										flexWrap: 'wrap',
@@ -1159,8 +1151,9 @@ export default function AccountDetailPage() {
 									}}
 								>
 									{account.accountMembers.map((am) => (
-										<Row
+										<Flex
 											key={am.id}
+											direction="row"
 											gap="xs"
 											align="center"
 											style={{
@@ -1206,7 +1199,7 @@ export default function AccountDetailPage() {
 													am.member.name.charAt(0).toUpperCase()
 												)}
 											</div>
-											<Text weight="medium">{am.member.name}</Text>
+											<span className="font-medium">{am.member.name}</span>
 											<Button
 												variant="ghost"
 												size="icon"
@@ -1222,11 +1215,12 @@ export default function AccountDetailPage() {
 											>
 												<X style={{ height: '0.75rem', width: '0.75rem' }} />
 											</Button>
-										</Row>
+										</Flex>
 									))}
 									{/* Loading indicator when adding */}
 									{addMemberMutation.isPending && addMemberMutation.variables && (
-										<Row
+										<Flex
+											direction="row"
 											gap="xs"
 											align="center"
 											style={{
@@ -1264,13 +1258,13 @@ export default function AccountDetailPage() {
 													}}
 												/>
 											</div>
-											<Text weight="medium" color="muted">
+											<span className="font-medium text-muted-foreground">
 												{
 													allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
 														?.name
 												}
-											</Text>
-										</Row>
+											</span>
+										</Flex>
 									)}
 									{/* Add member button */}
 									<div style={{ position: 'relative' }}>
@@ -1347,26 +1341,25 @@ export default function AccountDetailPage() {
 													</Button>
 												))}
 												{availableMembers.length === 0 && (
-													<Text
-														size="sm"
-														color="muted"
+													<span
+														className="text-sm text-muted-foreground"
 														style={{ padding: '0.25rem 0.5rem' }}
 													>
 														Tous les membres sont ajoutés
-													</Text>
+													</span>
 												)}
 											</div>
 										)}
 									</div>
-								</Row>
-							</Stack>
+								</Flex>
+							</Flex>
 
 							{/* Export URL */}
-							<Stack gap="sm">
-								<Row justify="between" align="center">
+							<Flex direction="col" gap="sm">
+								<Flex direction="row" justify="between" align="center">
 									<label
 										htmlFor="settings-export-url"
-										style={{ fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' }}
+										className="text-sm text-muted-foreground"
 									>
 										Lien d&apos;export banque
 									</label>
@@ -1388,7 +1381,7 @@ export default function AccountDetailPage() {
 											<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 										</a>
 									)}
-								</Row>
+								</Flex>
 								<Input
 									id="settings-export-url"
 									type="url"
@@ -1407,12 +1400,12 @@ export default function AccountDetailPage() {
 									placeholder="https://www.banque.fr/espace-client"
 									style={{ height: '2.5rem', fontSize: '0.875rem' }}
 								/>
-							</Stack>
+							</Flex>
 
 							{/* Initial Balance */}
-							<Stack gap="sm">
-								<Text size="sm" color="muted">Solde initial</Text>
-								<Row gap="sm">
+							<Flex direction="col" gap="sm">
+								<span className="text-sm text-muted-foreground">Solde initial</span>
+								<Flex direction="row" gap="sm">
 									<div style={{ position: 'relative', flexGrow: 1 }}>
 										<Input
 											type="text"
@@ -1511,17 +1504,15 @@ export default function AccountDetailPage() {
 										}}
 										style={{ height: '2.5rem', fontSize: '0.875rem', flex: 1 }}
 									/>
-								</Row>
-							</Stack>
-						</Stack>
+								</Flex>
+							</Flex>
+						</Flex>
 
 						{/* Section 2: Imports */}
-						<Stack gap="sm" style={{ padding: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
-							<Row justify="between" align="center">
-								<Text
-									size="xs"
-									weight="semibold"
-									color="muted"
+						<Flex direction="col" gap="sm" style={{ padding: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
+							<Flex direction="row" justify="between" align="center">
+								<span
+									className="text-xs font-semibold text-muted-foreground"
 									style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 								>
 									Imports
@@ -1532,7 +1523,7 @@ export default function AccountDetailPage() {
 											({accountImports.length})
 										</span>
 									)}
-								</Text>
+								</span>
 								{accountImports.length > 5 && (
 									<Button
 										variant="ghost"
@@ -1543,10 +1534,11 @@ export default function AccountDetailPage() {
 										{showAllImports ? 'Réduire' : 'Tout voir'}
 									</Button>
 								)}
-							</Row>
+							</Flex>
 
 							{accountImports.length === 0 ? (
-								<Stack
+								<Flex
+									direction="col"
 									gap="sm"
 									align="center"
 									style={{
@@ -1563,13 +1555,14 @@ export default function AccountDetailPage() {
 											color: 'hsl(var(--muted-foreground) / 0.4)',
 										}}
 									/>
-									<Text size="xs" color="muted">Aucun import</Text>
-								</Stack>
+									<span className="text-xs text-muted-foreground">Aucun import</span>
+								</Flex>
 							) : (
-								<Stack gap="sm">
+								<Flex direction="col" gap="sm">
 									{(showAllImports ? accountImports : accountImports.slice(0, 5)).map((imp) => (
-										<Row
+										<Flex
 											key={imp.id}
+											direction="row"
 											gap="sm"
 											align="center"
 											style={{
@@ -1606,10 +1599,9 @@ export default function AccountDetailPage() {
 											>
 												{getStatusIcon(imp.status)}
 											</div>
-											<Stack gap="xs" style={{ flexGrow: 1, minWidth: 0 }}>
-												<Text
-													size="xs"
-													weight="medium"
+											<Flex direction="col" gap="xs" style={{ flexGrow: 1, minWidth: 0 }}>
+												<span
+													className="text-xs font-medium"
 													style={{
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
@@ -1617,8 +1609,8 @@ export default function AccountDetailPage() {
 													}}
 												>
 													{imp.filename}
-												</Text>
-												<Text style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))' }}>
+												</span>
+												<span style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))' }}>
 													{formatRelativeTime(imp.createdAt)}
 													{imp.recordsCount !== null && (
 														<span style={{ color: 'oklch(0.5 0.15 145)' }}>
@@ -1626,9 +1618,9 @@ export default function AccountDetailPage() {
 															• {imp.recordsCount} tx
 														</span>
 													)}
-												</Text>
-											</Stack>
-											<Row gap="xs" style={{ flexShrink: 0 }}>
+												</span>
+											</Flex>
+											<Flex direction="row" gap="xs" style={{ flexShrink: 0 }}>
 												{imp.status === 'PENDING' && (
 													<Button
 														variant="outline"
@@ -1720,23 +1712,21 @@ export default function AccountDetailPage() {
 														<Trash2 style={{ height: '0.75rem', width: '0.75rem' }} />
 													)}
 												</Button>
-											</Row>
-										</Row>
+											</Flex>
+										</Flex>
 									))}
-								</Stack>
+								</Flex>
 							)}
-						</Stack>
+						</Flex>
 
 						{/* Section 3: Gestion du compte */}
-						<Stack gap="sm" style={{ padding: '0.5rem 1rem' }}>
-							<Text
-								size="xs"
-								weight="semibold"
-								color="muted"
+						<Flex direction="col" gap="sm" style={{ padding: '0.5rem 1rem' }}>
+							<span
+								className="text-xs font-semibold text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Gestion du compte
-							</Text>
+							</span>
 							<Button
 								variant="outline"
 								size="sm"
@@ -1756,7 +1746,7 @@ export default function AccountDetailPage() {
 								Supprimer le compte
 							</Button>
 							{account._count.transactions > 0 && (
-								<Text
+								<span
 									style={{
 										fontSize: '11px',
 										color: 'hsl(var(--muted-foreground))',
@@ -1767,10 +1757,10 @@ export default function AccountDetailPage() {
 									{account._count.transactions > 1 ? 's' : ''} sera
 									{account._count.transactions > 1 ? 'ont' : ''} également supprimée
 									{account._count.transactions > 1 ? 's' : ''}
-								</Text>
+								</span>
 							)}
-						</Stack>
-					</Stack>
+						</Flex>
+					</Flex>
 				</SheetContent>
 			</Sheet>
 
@@ -1778,17 +1768,16 @@ export default function AccountDetailPage() {
 			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
 				<div style={{ padding: '1.5rem', paddingBottom: '1rem' }}>
-					<Stack gap="md">
+					<Flex direction="col" gap="md">
 						{/* Title row */}
-						<Row justify="between" align="center">
-							<Row gap="sm" align="center">
-								<Heading level={2} size="xl" weight="bold" tracking="tight">
+						<Flex direction="row" justify="between" align="center">
+							<Flex direction="row" gap="sm" align="center">
+								<h2 className="text-xl font-bold tracking-tight">
 									Transactions
-								</Heading>
+								</h2>
 								{totalTransactions > 0 && (
-									<Text
-										size="xs"
-										weight="semibold"
+									<span
+										className="text-xs font-semibold"
 										style={{
 											display: 'inline-flex',
 											alignItems: 'center',
@@ -1800,9 +1789,9 @@ export default function AccountDetailPage() {
 										}}
 									>
 										{totalTransactions}
-									</Text>
+									</span>
 								)}
-							</Row>
+							</Flex>
 							<label htmlFor="transaction-import-file" style={{ cursor: 'pointer' }}>
 								<input
 									id="transaction-import-file"
@@ -1838,7 +1827,7 @@ export default function AccountDetailPage() {
 									</span>
 								</Button>
 							</label>
-						</Row>
+						</Flex>
 						{/* Search row */}
 						<div style={{ position: 'relative' }}>
 							<Search
@@ -1869,7 +1858,7 @@ export default function AccountDetailPage() {
 								}}
 							/>
 						</div>
-					</Stack>
+					</Flex>
 				</div>
 
 				{/* Content */}
@@ -1887,7 +1876,8 @@ export default function AccountDetailPage() {
 				>
 					{/* Drag overlay */}
 					{dragActive && (
-						<Stack
+						<Flex
+							direction="col"
 							gap="sm"
 							align="center"
 							justify="center"
@@ -1914,13 +1904,13 @@ export default function AccountDetailPage() {
 							>
 								<Upload style={{ height: '2rem', width: '2rem', color: 'hsl(var(--primary))' }} />
 							</div>
-							<Text size="sm" weight="semibold" style={{ color: 'hsl(var(--primary))' }}>
+							<span className="text-sm font-semibold" style={{ color: 'hsl(var(--primary))' }}>
 								Déposez votre fichier ici
-							</Text>
-							<Text size="xs" style={{ color: 'hsl(var(--primary) / 0.7)' }}>
+							</span>
+							<span className="text-xs" style={{ color: 'hsl(var(--primary) / 0.7)' }}>
 								CSV, XLSX ou XLS
-							</Text>
-						</Stack>
+							</span>
+						</Flex>
 					)}
 
 					{allTransactions.length === 0 && !isLoadingTransactions ? (
@@ -1931,10 +1921,11 @@ export default function AccountDetailPage() {
 							size="md"
 						/>
 					) : (
-						<Stack gap="sm">
+						<Flex direction="col" gap="sm">
 							{allTransactions.map((tx, index) => (
-								<Row
+								<Flex
 									key={tx.id}
+									direction="row"
 									justify="between"
 									align="center"
 									style={{
@@ -1945,10 +1936,11 @@ export default function AccountDetailPage() {
 										animationDelay: `${Math.min(index, 10) * 20}ms`,
 									}}
 								>
-									<Row gap="md" align="center" style={{ minWidth: 0 }}>
+									<Flex direction="row" gap="md" align="center" style={{ minWidth: 0 }}>
 										{/* Date badge */}
 										<div style={{ width: '4rem', flexShrink: 0 }}>
-											<Stack
+											<Flex
+												direction="col"
 												gap="none"
 												align="center"
 												style={{
@@ -1959,7 +1951,7 @@ export default function AccountDetailPage() {
 													transition: 'background-color 0.2s',
 												}}
 											>
-												<Text
+												<span
 													style={{
 														fontSize: '10px',
 														fontWeight: 600,
@@ -1969,15 +1961,15 @@ export default function AccountDetailPage() {
 													}}
 												>
 													{formatDate(tx.date, 'MMM')}
-												</Text>
-												<Text size="sm" weight="bold" style={{ marginTop: '-0.125rem' }}>
+												</span>
+												<span className="text-sm font-bold" style={{ marginTop: '-0.125rem' }}>
 													{formatDate(tx.date, 'D')}
-												</Text>
-											</Stack>
+												</span>
+											</Flex>
 										</div>
-										<Stack gap="xs" style={{ minWidth: 0 }}>
-											<Text
-												weight="medium"
+										<Flex direction="col" gap="xs" style={{ minWidth: 0 }}>
+											<span
+												className="font-medium"
 												style={{
 													overflow: 'hidden',
 													textOverflow: 'ellipsis',
@@ -1986,19 +1978,19 @@ export default function AccountDetailPage() {
 												}}
 											>
 												{tx.description}
-											</Text>
+											</span>
 											{tx.transactionCategory?.category && (
-												<Row gap="xs" style={{ marginTop: '0.125rem' }}>
-													<Text size="xs" color="muted">
+												<Flex direction="row" gap="xs" style={{ marginTop: '0.125rem' }}>
+													<span className="text-xs text-muted-foreground">
 														{tx.transactionCategory.category.icon}
-													</Text>
-													<Text size="xs" color="muted">
+													</span>
+													<span className="text-xs text-muted-foreground">
 														{tx.transactionCategory.category.name}
-													</Text>
-												</Row>
+													</span>
+												</Flex>
 											)}
-										</Stack>
-									</Row>
+										</Flex>
+									</Flex>
 									<MoneyDisplay
 										amount={tx.type === 'INCOME' ? tx.amount : -tx.amount}
 										format="withSign"
@@ -2007,13 +1999,13 @@ export default function AccountDetailPage() {
 										variant={tx.type === 'INCOME' ? 'positive' : 'default'}
 										style={{ flexShrink: 0, marginLeft: '1rem' }}
 									/>
-								</Row>
+								</Flex>
 							))}
 
 							{/* Infinite scroll trigger & loading indicator */}
 							<div ref={loadMoreRef} style={{ padding: '2rem 0' }}>
 								{isLoadingMore ? (
-									<Row gap="sm" justify="center" align="center">
+									<Flex direction="row" gap="sm" justify="center" align="center">
 										<div style={{ position: 'relative' }}>
 											<div
 												style={{
@@ -2037,10 +2029,10 @@ export default function AccountDetailPage() {
 												}}
 											/>
 										</div>
-										<Text size="sm" color="muted" weight="medium">Chargement...</Text>
-									</Row>
+										<span className="text-sm text-muted-foreground font-medium">Chargement...</span>
+									</Flex>
 								) : hasMore ? (
-									<Stack gap="sm" align="center">
+									<Flex direction="col" gap="sm" align="center">
 										<Button
 											variant="ghost"
 											size="sm"
@@ -2053,9 +2045,10 @@ export default function AccountDetailPage() {
 										>
 											Charger plus de transactions
 										</Button>
-									</Stack>
+									</Flex>
 								) : allTransactions.length > 0 ? (
-									<Row
+									<Flex
+										direction="row"
 										gap="sm"
 										justify="center"
 										align="center"
@@ -2068,13 +2061,13 @@ export default function AccountDetailPage() {
 												color: 'hsl(var(--muted-foreground) / 0.5)',
 											}}
 										/>
-										<Text size="sm" color="muted">
+										<span className="text-sm text-muted-foreground">
 											{allTransactions.length} transactions affichées
-										</Text>
-									</Row>
+										</span>
+									</Flex>
 								) : null}
 							</div>
-						</Stack>
+						</Flex>
 					)}
 				</div>
 			</GlassCard>
@@ -2103,6 +2096,6 @@ export default function AccountDetailPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteImport}
 			/>
-		</Stack>
+		</Flex>
 	);
 }

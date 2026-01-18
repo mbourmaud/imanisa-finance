@@ -14,12 +14,12 @@ import {
 	Button,
 	CreditCard,
 	EmptyState,
+	Flex,
 	GlassCard,
 	LoadingSpinner,
 	PageHeader,
 	PiggyBank,
 	Plus,
-	Stack,
 	StatCard,
 	StatCardGrid,
 	TrendingUp,
@@ -145,7 +145,7 @@ export default function AccountsPage() {
 	}
 
 	return (
-		<Stack gap="xl">
+		<Flex direction="col" gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Comptes"
@@ -190,7 +190,7 @@ export default function AccountsPage() {
 			</StatCardGrid>
 
 			{/* Accounts by Type */}
-			<Stack gap="lg">
+			<Flex direction="col" gap="lg">
 				{accountGroups.map((group) => (
 					<GlassCard key={group.type} padding="lg">
 						{/* Group Header */}
@@ -201,7 +201,7 @@ export default function AccountsPage() {
 						/>
 
 						{/* Account List */}
-						<Stack gap="sm">
+						<Flex direction="col" gap="sm">
 							{group.accounts.map((account) => (
 								<AccountListItem
 									key={account.id}
@@ -213,7 +213,7 @@ export default function AccountsPage() {
 									currency={account.currency}
 								/>
 							))}
-						</Stack>
+						</Flex>
 					</GlassCard>
 				))}
 
@@ -232,7 +232,7 @@ export default function AccountsPage() {
 						}
 					/>
 				)}
-			</Stack>
-		</Stack>
+			</Flex>
+		</Flex>
 	);
 }
