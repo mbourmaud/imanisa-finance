@@ -27,6 +27,7 @@ export { SelectField } from './fields/SelectField';
 // Form components
 export { SubmitButton } from './components/SubmitButton';
 export { FormActions } from './components/FormActions';
+export { FieldError } from './components/FieldError';
 
 // Re-export types
 export type { FormApi, FieldApi } from './form-context';
