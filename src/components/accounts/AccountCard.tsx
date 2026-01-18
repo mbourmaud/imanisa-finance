@@ -146,6 +146,10 @@ export const AccountIcon = forwardRef<HTMLDivElement, AccountIconProps>(
 		const Icon = config.icon;
 		const bankColor = account.bank?.color;
 
+		const colorStyle = showBankColor && bankColor
+			? { '--account-color': bankColor } as React.CSSProperties
+			: undefined;
+
 		return (
 			<div
 				ref={ref}
@@ -153,18 +157,17 @@ export const AccountIcon = forwardRef<HTMLDivElement, AccountIconProps>(
 				className={cn(
 					'flex items-center justify-center rounded-xl transition-colors',
 					iconSizeClasses[size],
+					showBankColor && bankColor ? 'bg-[var(--account-color)]/10' : 'bg-muted/50',
 					className,
 				)}
-				style={{
-					backgroundColor: showBankColor && bankColor ? `${bankColor}20` : undefined,
-				}}
+				style={colorStyle}
 				{...props}
 			>
 				<Icon
-					className={cn(iconInnerSizeClasses[size])}
-					style={{
-						color: showBankColor && bankColor ? bankColor : undefined,
-					}}
+					className={cn(
+						iconInnerSizeClasses[size],
+						showBankColor && bankColor ? 'text-[var(--account-color)]' : 'text-muted-foreground',
+					)}
 				/>
 			</div>
 		);
@@ -218,19 +221,18 @@ export const MemberBadge = forwardRef<HTMLDivElement, MemberBadgeProps>(
 			.toUpperCase()
 			.slice(0, 2);
 
+		const memberColor = member.color || '#6366f1';
+		const colorStyle = { '--member-color': memberColor } as React.CSSProperties;
+
 		return (
 			<div
 				ref={ref}
 				data-slot="member-badge"
 				className={cn('inline-flex items-center gap-1.5 text-xs', className)}
+				style={colorStyle}
 				{...props}
 			>
-				<div
-					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white"
-					style={{
-						backgroundColor: member.color || '#6366f1',
-					}}
-				>
+				<div className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--member-color)] text-[10px] font-medium text-white">
 					{initials}
 				</div>
 				{showShare && member.ownerShare < 100 && (
