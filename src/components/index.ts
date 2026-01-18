@@ -430,3 +430,14 @@ export type {
 	ContentSkeletonSize,
 } from './common/ContentSkeleton';
 export { ContentSkeleton } from './common/ContentSkeleton';
+
+// =============================================================================
+// LANDING PAGE COMPONENTS
+// =============================================================================
+
+export { LandingBackground } from './landing/LandingBackground';
+export { LandingContainer } from './landing/LandingContainer';
+export { LandingFooter } from './landing/LandingFooter';
+export { LandingLogo } from './landing/LandingLogo';
+export { ProfileButton } from './landing/ProfileButton';
+export { ProfileSelector } from './landing/ProfileSelector';
