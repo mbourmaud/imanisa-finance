@@ -4,7 +4,6 @@ import {
 	ArrowDownRight,
 	ArrowUpRight,
 	Bitcoin,
-	Box,
 	Briefcase,
 	Building,
 	Button,
@@ -334,31 +333,31 @@ export default function InvestmentsPage() {
 								</VStack>
 							</HStack>
 							<HStack gap="xl" align="center">
-								<Box style={{ display: 'none', textAlign: 'right' }} data-show-sm>
+								<div className="hidden text-right sm:block" data-show-sm>
 									<Text size="xs" color="muted">
 										Quantité
 									</Text>
 									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{pos.quantity}
 									</Text>
-								</Box>
-								<Box style={{ display: 'none', textAlign: 'right' }} data-show-md>
+								</div>
+								<div className="hidden text-right md:block" data-show-md>
 									<Text size="xs" color="muted">
 										PRU
 									</Text>
 									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.avgPrice)}
 									</Text>
-								</Box>
-								<Box style={{ textAlign: 'right' }}>
+								</div>
+								<div className="text-right">
 									<Text size="xs" color="muted">
 										Valeur
 									</Text>
 									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.value)}
 									</Text>
-								</Box>
-								<Box style={{ textAlign: 'right', minWidth: '100px' }}>
+								</div>
+								<div className="min-w-[100px] text-right">
 									<Text
 										weight="medium"
 										style={{
@@ -378,7 +377,7 @@ export default function InvestmentsPage() {
 										{pos.gainPercent >= 0 ? '+' : ''}
 										{pos.gainPercent.toFixed(2)}%
 									</Text>
-								</Box>
+								</div>
 							</HStack>
 						</HStack>
 					))}
@@ -398,25 +397,18 @@ export default function InvestmentsPage() {
 					</VStack>
 					<HStack gap="md" align="center">
 						<HStack gap="sm" align="center">
-							<Box
-								style={{
-									height: '0.5rem',
-									width: '1rem',
-									borderRadius: '0.125rem',
-									backgroundColor: 'oklch(0.55 0.18 270)',
-								}}
+							<div
+								className="h-2 w-4 rounded-sm"
+								style={{ backgroundColor: 'oklch(0.55 0.18 270)' }}
 							/>
 							<Text size="sm" color="muted">
 								Valeur
 							</Text>
 						</HStack>
 						<HStack gap="sm" align="center">
-							<Box
-								style={{
-									height: '2px',
-									width: '1rem',
-									borderTop: '2px dashed oklch(0.5 0.01 280)',
-								}}
+							<div
+								className="h-0.5 w-4"
+								style={{ borderTop: '2px dashed oklch(0.5 0.01 280)' }}
 							/>
 							<Text size="sm" color="muted">
 								Investi

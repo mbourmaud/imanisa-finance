@@ -1,7 +1,6 @@
 'use client';
 
 import {
-	Box,
 	Button,
 	Car,
 	Coffee,
@@ -197,20 +196,15 @@ export default function BudgetPage() {
 							<VStack gap="sm">
 								<HStack justify="between" align="start">
 									<HStack gap="sm" align="center">
-										<Box
-											display="flex"
-											rounded="xl"
+										<div
+											className="flex h-10 w-10 items-center justify-center rounded-xl"
 											style={{
-												height: '2.5rem',
-												width: '2.5rem',
-												alignItems: 'center',
-												justifyContent: 'center',
 												backgroundColor: `${category.color}20`,
 												color: category.color,
 											}}
 										>
 											<category.icon style={{ height: '1.25rem', width: '1.25rem' }} />
-										</Box>
+										</div>
 										<VStack gap="none">
 											<Text size="md" weight="medium">
 												{category.name}

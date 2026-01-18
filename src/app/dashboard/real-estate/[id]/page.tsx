@@ -14,7 +14,6 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 	ArrowLeft,
-	Box,
 	Building2,
 	Button,
 	ChevronDown,
@@ -383,10 +382,10 @@ function LoanCard({
 		loan.loanInsurances?.reduce((sum, ins) => sum + ins.coveragePercent, 0) || 0;
 
 	return (
-		<Box rounded="xl" border="default" p="md" style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
+		<div className="rounded-xl border border-border p-4" style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
 			<VStack gap="md">
 				<HStack justify="between" align="start" gap="md">
-					<Box style={{ minWidth: 0 }}>
+					<div className="min-w-0">
 						<Text
 							weight="medium"
 							style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -398,15 +397,15 @@ function LoanCard({
 								{loan.lender}
 							</Text>
 						)}
-					</Box>
-					<Box style={{ textAlign: 'right', flexShrink: 0 }}>
+					</div>
+					<div className="text-right shrink-0">
 						<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.remainingAmount)}
 						</Text>
 						<Text size="xs" color="muted">
 							restant
 						</Text>
-					</Box>
+					</div>
 				</HStack>
 
 				<VStack gap="xs">
@@ -459,7 +458,7 @@ function LoanCard({
 				)}
 
 				{/* Insurance section */}
-				<Box style={{ paddingTop: '0.75rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}>
+				<div className="pt-3 border-t border-border/40">
 					<button
 						type="button"
 						onClick={() => setIsExpanded(!isExpanded)}
@@ -537,7 +536,7 @@ function LoanCard({
 											>
 												{insurance.member.name.charAt(0).toUpperCase()}
 											</Flex>
-											<Box style={{ flex: 1, minWidth: 0 }}>
+											<div className="flex-1 min-w-0">
 												<HStack gap="sm" align="center" style={{ flexWrap: 'wrap' }}>
 													<Text
 														size="sm"
@@ -573,16 +572,16 @@ function LoanCard({
 												>
 													{insurance.provider} · {formatCurrency(insurance.monthlyPremium)}/mois
 												</Text>
-											</Box>
+											</div>
 										</HStack>
 									))}
 								</VStack>
 							) : (
-								<Box style={{ textAlign: 'center', padding: '0.75rem 0' }}>
+								<div className="text-center py-3">
 									<Text size="sm" color="muted" style={{ marginBottom: '0.5rem' }}>
 										Aucune assurance emprunteur
 									</Text>
-								</Box>
+								</div>
 							)}
 							<Button
 								variant="outline"
@@ -595,9 +594,9 @@ function LoanCard({
 							</Button>
 						</VStack>
 					)}
-				</Box>
+				</div>
 			</VStack>
-		</Box>
+		</div>
 	);
 }
 
@@ -1438,7 +1437,7 @@ export default function PropertyDetailPage() {
 						>
 							<ArrowLeft style={{ height: '1rem', width: '1rem' }} />
 						</Link>
-						<Box style={{ minWidth: 0 }}>
+						<div className="min-w-0">
 							<HStack gap="sm" align="center" style={{ flexWrap: 'wrap' }}>
 								<Heading
 									level={1}
@@ -1488,7 +1487,7 @@ export default function PropertyDetailPage() {
 									{property.city}
 								</Text>
 							</HStack>
-						</Box>
+						</div>
 					</HStack>
 					<HStack gap="sm" align="center" style={{ flexShrink: 0 }}>
 						<Button variant="outline" style={{ gap: '0.5rem' }} onClick={openEditPropertyDialog}>
@@ -1625,13 +1624,7 @@ export default function PropertyDetailPage() {
 
 					{/* Notes */}
 					{property.notes && (
-						<Box
-							style={{
-								marginTop: '1.5rem',
-								paddingTop: '1.5rem',
-								borderTop: '1px solid hsl(var(--border) / 0.4)',
-							}}
-						>
+						<div className="mt-6 pt-6 border-t border-border/40">
 							<Text
 								size="xs"
 								weight="medium"
@@ -1647,7 +1640,7 @@ export default function PropertyDetailPage() {
 							<Text size="sm" color="muted">
 								{property.notes}
 							</Text>
-						</Box>
+						</div>
 					)}
 				</VStack>
 			</GlassCard>
@@ -1750,10 +1743,9 @@ export default function PropertyDetailPage() {
 								<VStack gap="md">
 									{/* Error message */}
 									{loanFormError && (
-										<Box
-											p="sm"
+										<div
+											className="p-3 rounded-lg"
 											style={{
-												borderRadius: '0.5rem',
 												backgroundColor: 'hsl(var(--destructive) / 0.1)',
 												border: '1px solid hsl(var(--destructive) / 0.2)',
 											}}
@@ -1761,7 +1753,7 @@ export default function PropertyDetailPage() {
 											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 												{loanFormError}
 											</Text>
-										</Box>
+										</div>
 									)}
 
 									{/* Basic info */}
@@ -1935,23 +1927,23 @@ export default function PropertyDetailPage() {
 							p="md"
 							style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 						>
-							<Box style={{ textAlign: 'center' }}>
+							<div className="text-center">
 								<Text size="xs" color="muted">
 									Capital restant
 								</Text>
 								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(totalLoansRemaining)}
 								</Text>
-							</Box>
-							<Box style={{ textAlign: 'center' }}>
+							</div>
+							<div className="text-center">
 								<Text size="xs" color="muted">
 									Mensualités
 								</Text>
 								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.loans.reduce((sum, l) => sum + l.monthlyPayment, 0))}
 								</Text>
-							</Box>
-							<Box style={{ textAlign: 'center' }}>
+							</div>
+							<div className="text-center">
 								<Text size="xs" color="muted">
 									Taux moyen
 								</Text>
@@ -1963,7 +1955,7 @@ export default function PropertyDetailPage() {
 										: 0}
 									%
 								</Text>
-							</Box>
+							</div>
 						</Grid>
 
 						{/* Loan cards */}
@@ -2110,7 +2102,7 @@ export default function PropertyDetailPage() {
 							gap="md"
 							style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 						>
-							<Box>
+							<div>
 								<Text size="xs" color="muted">
 									Prime mensuelle
 								</Text>
@@ -2120,20 +2112,20 @@ export default function PropertyDetailPage() {
 								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
 									{formatCurrency(property.insurance.monthlyPremium * 12)}/an
 								</Text>
-							</Box>
-							<Box>
+							</div>
+							<div>
 								<Text size="xs" color="muted">
 									Date de début
 								</Text>
 								<Text weight="medium">{formatDate(property.insurance.startDate.toString())}</Text>
-							</Box>
+							</div>
 							{property.insurance.endDate && (
-								<Box>
+								<div>
 									<Text size="xs" color="muted">
 										Date de fin
 									</Text>
 									<Text weight="medium">{formatDate(property.insurance.endDate.toString())}</Text>
-								</Box>
+								</div>
 							)}
 						</Grid>
 
@@ -2183,16 +2175,14 @@ export default function PropertyDetailPage() {
 						)}
 
 						{property.insurance.notes && (
-							<Box
-								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-							>
+							<div className="pt-2 border-t border-border/40">
 								<Text size="xs" color="muted">
 									Notes
 								</Text>
 								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
 									{property.insurance.notes}
 								</Text>
-							</Box>
+							</div>
 						)}
 					</VStack>
 				) : (
@@ -2381,9 +2371,7 @@ export default function PropertyDetailPage() {
 
 						{/* Additional info */}
 						{property.coOwnership.link && (
-							<Box
-								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-							>
+							<div className="pt-2 border-t border-border/40">
 								<a
 									href={property.coOwnership.link}
 									target="_blank"
@@ -2399,20 +2387,18 @@ export default function PropertyDetailPage() {
 									<ExternalLink style={{ height: '0.75rem', width: '0.75rem' }} />
 									Voir les documents
 								</a>
-							</Box>
+							</div>
 						)}
 
 						{property.coOwnership.notes && (
-							<Box
-								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
-							>
+							<div className="pt-2 border-t border-border/40">
 								<Text size="xs" color="muted">
 									Notes
 								</Text>
 								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
 									{property.coOwnership.notes}
 								</Text>
-							</Box>
+							</div>
 						)}
 					</VStack>
 				) : (
@@ -2547,11 +2533,9 @@ export default function PropertyDetailPage() {
 							{property.utilityContracts.map((contract) => {
 								const IconComponent = getUtilityTypeIcon(contract.type);
 								return (
-									<Box
+									<div
 										key={contract.id}
-										rounded="xl"
-										border="default"
-										p="md"
+										className="rounded-xl border border-border p-4"
 										style={{ borderColor: 'hsl(var(--border) / 0.6)' }}
 									>
 										<HStack justify="between" align="start" gap="md">
@@ -2578,8 +2562,8 @@ export default function PropertyDetailPage() {
 												<VStack gap="none">
 													<HStack gap="sm" align="center">
 														<Text weight="medium">{contract.provider}</Text>
-														<Box
-															rounded="full"
+														<span
+															className="rounded-full"
 															style={{
 																fontSize: '0.75rem',
 																padding: '0.125rem 0.5rem',
@@ -2588,7 +2572,7 @@ export default function PropertyDetailPage() {
 															}}
 														>
 															{getUtilityTypeLabel(contract.type)}
-														</Box>
+														</span>
 													</HStack>
 													<Text
 														size="sm"
@@ -2706,19 +2690,15 @@ export default function PropertyDetailPage() {
 										)}
 
 										{contract.notes && (
-											<Box
-												style={{
-													marginTop: '0.5rem',
-													paddingTop: '0.5rem',
-													borderTop: '1px solid hsl(var(--border) / 0.4)',
-												}}
+											<div
+												className="mt-2 pt-2 border-t border-border/40"
 											>
 												<Text size="xs" color="muted">
 													{contract.notes}
 												</Text>
-											</Box>
+											</div>
 										)}
-									</Box>
+									</div>
 								);
 							})}
 						</VStack>
@@ -2747,10 +2727,9 @@ export default function PropertyDetailPage() {
 					>
 						{/* Error message */}
 						{insuranceFormError && (
-							<Box
-								p="sm"
+							<div
+								className="p-3 rounded-lg"
 								style={{
-									borderRadius: '0.5rem',
 									backgroundColor: 'hsl(var(--destructive) / 0.1)',
 									border: '1px solid hsl(var(--destructive) / 0.2)',
 								}}
@@ -2758,7 +2737,7 @@ export default function PropertyDetailPage() {
 								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 									{insuranceFormError}
 								</Text>
-							</Box>
+							</div>
 						)}
 
 						{/* Member selection */}
@@ -2778,11 +2757,9 @@ export default function PropertyDetailPage() {
 										{members.map((member) => (
 											<SelectItem key={member.id} value={member.id}>
 												<HStack gap="sm" align="center">
-													<Box
-														rounded="full"
+													<div
+														className="rounded-full h-4 w-4"
 														style={{
-															height: '1rem',
-															width: '1rem',
 															backgroundColor: member.color || '#6b7280',
 														}}
 													/>
@@ -2934,10 +2911,9 @@ export default function PropertyDetailPage() {
 						<VStack gap="md">
 							{/* Error message */}
 							{propertyInsuranceFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
@@ -2945,7 +2921,7 @@ export default function PropertyDetailPage() {
 									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{propertyInsuranceFormError}
 									</Text>
-								</Box>
+								</div>
 							)}
 
 							{/* Type selection */}
@@ -3139,10 +3115,9 @@ export default function PropertyDetailPage() {
 						<VStack gap="md">
 							{/* Error message */}
 							{coOwnershipFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
@@ -3150,7 +3125,7 @@ export default function PropertyDetailPage() {
 									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{coOwnershipFormError}
 									</Text>
-								</Box>
+								</div>
 							)}
 
 							{/* Syndic name */}
@@ -3260,10 +3235,9 @@ export default function PropertyDetailPage() {
 						<VStack gap="md">
 							{/* Error message */}
 							{utilityContractFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
@@ -3271,7 +3245,7 @@ export default function PropertyDetailPage() {
 									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{utilityContractFormError}
 									</Text>
-								</Box>
+								</div>
 							)}
 
 							{/* Type selection */}
@@ -3440,10 +3414,9 @@ export default function PropertyDetailPage() {
 						<VStack gap="lg">
 							{/* Error message */}
 							{propertyFormError && (
-								<Box
-									p="sm"
+								<div
+									className="p-3 rounded-lg"
 									style={{
-										borderRadius: '0.5rem',
 										backgroundColor: 'hsl(var(--destructive) / 0.1)',
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
@@ -3451,7 +3424,7 @@ export default function PropertyDetailPage() {
 									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{propertyFormError}
 									</Text>
-								</Box>
+								</div>
 							)}
 
 							{/* Basic info */}

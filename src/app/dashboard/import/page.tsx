@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
 	AlertCircle,
-	Box,
 	Button,
 	CheckCircle2,
 	Clock,
@@ -350,10 +349,8 @@ export default function ImportPage() {
 
 			{/* Error message */}
 			{error && (
-				<Box
-					rounded="lg"
-					border="default"
-					p="md"
+				<div
+					className="rounded-lg border p-4"
 					style={{
 						borderColor: 'oklch(0.55 0.2 25 / 0.2)',
 						backgroundColor: 'oklch(0.55 0.2 25 / 0.05)',
@@ -371,7 +368,7 @@ export default function ImportPage() {
 							Fermer
 						</Button>
 					</HStack>
-				</Box>
+				</div>
 			)}
 
 			{/* Upload Section */}
@@ -454,15 +451,13 @@ export default function ImportPage() {
 						{/* Drop zone */}
 						<VStack gap="xs">
 							<Label htmlFor="import-file-input">3. Fichier</Label>
-							<Box
+							<div
 								role="presentation"
 								onDragEnter={handleDrag}
 								onDragLeave={handleDrag}
 								onDragOver={handleDrag}
 								onDrop={handleDrop}
-								display="flex"
-								rounded="xl"
-								p="xl"
+								className="flex rounded-xl p-8"
 								style={{
 									flexDirection: 'column',
 									alignItems: 'center',
@@ -482,9 +477,8 @@ export default function ImportPage() {
 									opacity: !canUpload ? 0.6 : 1,
 								}}
 							>
-								<Box
-									display="flex"
-									rounded="2xl"
+								<div
+									className="flex rounded-2xl"
 									style={{
 										height: '3.5rem',
 										width: '3.5rem',
@@ -505,7 +499,7 @@ export default function ImportPage() {
 									) : (
 										<FileSpreadsheet style={{ height: '1.75rem', width: '1.75rem' }} />
 									)}
-								</Box>
+								</div>
 								<Heading level={3} size="md" style={{ marginTop: '0.5rem' }}>
 									{isUploading ? 'Upload en cours...' : 'Import CSV / Excel'}
 								</Heading>
@@ -537,7 +531,7 @@ export default function ImportPage() {
 								<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
 									.csv, .xlsx · Max 10 MB
 								</Text>
-							</Box>
+							</div>
 						</VStack>
 					</VStack>
 				</GlassCard>
@@ -555,10 +549,8 @@ export default function ImportPage() {
 						</StatCardGrid>
 
 						{pendingCount > 0 && (
-							<Box
-								rounded="lg"
-								border="default"
-								p="sm"
+							<div
+								className="rounded-lg border p-3"
 								style={{
 									borderColor: 'oklch(0.7 0.15 75 / 0.2)',
 									backgroundColor: 'oklch(0.7 0.15 75 / 0.05)',
@@ -570,10 +562,10 @@ export default function ImportPage() {
 										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de traitement
 									</Text>
 								</HStack>
-							</Box>
+							</div>
 						)}
 
-						<Box
+						<div
 							style={{
 								borderRadius: '0.5rem',
 								padding: '1rem',
@@ -618,7 +610,7 @@ export default function ImportPage() {
 									</Text>
 								</li>
 							</ol>
-						</Box>
+						</div>
 					</VStack>
 				</GlassCard>
 			</Grid>
@@ -636,9 +628,8 @@ export default function ImportPage() {
 					</VStack>
 					<VStack gap="xs">
 						{isLoading ? (
-							<Box
-								display="flex"
-								py="xl"
+							<div
+								className="flex py-8"
 								style={{ alignItems: 'center', justifyContent: 'center' }}
 							>
 								<Loader2
@@ -649,7 +640,7 @@ export default function ImportPage() {
 										animation: 'spin 1s linear infinite',
 									}}
 								/>
-							</Box>
+							</div>
 						) : imports.length === 0 ? (
 							<EmptyState
 								icon={FileSpreadsheet}
@@ -674,9 +665,8 @@ export default function ImportPage() {
 									}}
 								>
 									<HStack gap="md" align="center">
-										<Box
-											display="flex"
-											rounded="lg"
+										<div
+											className="flex rounded-lg"
 											style={{
 												height: '2.5rem',
 												width: '2.5rem',
@@ -698,15 +688,12 @@ export default function ImportPage() {
 															: 'hsl(var(--muted-foreground))',
 												}}
 											/>
-										</Box>
+										</div>
 										<VStack gap="none">
 											<HStack gap="sm" align="center">
 												<Text weight="medium">{imp.filename}</Text>
-												<Box
-													display="flex"
-													rounded="full"
-													px="sm"
-													py="xs"
+												<div
+													className="flex rounded-full px-2 py-1"
 													style={{
 														alignItems: 'center',
 														gap: '0.25rem',
@@ -731,7 +718,7 @@ export default function ImportPage() {
 												>
 													{getStatusIcon(imp.status)}
 													<span>{getStatusLabel(imp.status)}</span>
-												</Box>
+												</div>
 											</HStack>
 											<Text size="xs" color="muted">
 												{getBankNameForImport(imp.bankKey)}

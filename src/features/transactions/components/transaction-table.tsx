@@ -15,7 +15,6 @@ import type {
 } from '@tanstack/react-table';
 import { useCallback, useMemo, useState } from 'react';
 import {
-	Box,
 	Button,
 	DataTable,
 	Flex,
@@ -152,7 +151,7 @@ export function TransactionTable({
 		<VStack gap="md">
 			{/* Filters */}
 			<Flex gap="md" style={{ flexDirection: 'column' }}>
-				<Box position="relative" style={{ flex: 1 }}>
+				<div className="relative flex-1">
 					<Search
 						style={{
 							position: 'absolute',
@@ -170,7 +169,7 @@ export function TransactionTable({
 						onChange={(e) => setSearch(e.target.value)}
 						style={{ paddingLeft: '2.5rem' }}
 					/>
-				</Box>
+				</div>
 				<HStack gap="md">
 					<Select
 						value={typeFilter}

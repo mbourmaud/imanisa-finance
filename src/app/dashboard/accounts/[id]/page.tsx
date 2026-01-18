@@ -14,8 +14,6 @@ import {
 	// Icons
 	AlertCircle,
 	ArrowLeft,
-	// Layout
-	Box,
 	// Form elements
 	Button,
 	Check,
@@ -533,12 +531,10 @@ export default function AccountDetailPage() {
 			<EmptyState
 				title="Chargement du compte..."
 				iconElement={
-					<Box style={{ position: 'relative' }}>
-						<Box
+					<div className="relative">
+						<div
+							className="h-12 w-12 rounded-full"
 							style={{
-								height: '3rem',
-								width: '3rem',
-								borderRadius: '9999px',
 								background:
 									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
 								animation: 'pulse 2s ease-in-out infinite',
@@ -556,7 +552,7 @@ export default function AccountDetailPage() {
 								transform: 'translate(-50%, -50%)',
 							}}
 						/>
-					</Box>
+					</div>
 				}
 				size="md"
 			/>
@@ -601,28 +597,22 @@ export default function AccountDetailPage() {
 			{/* Header - Glassmorphism card */}
 			<GlassCard padding="lg" style={{ position: 'relative' }}>
 				{/* Gradient accent bar */}
-				<Box
+				<div
+					className="absolute top-0 left-0 right-0 rounded-t-2xl"
 					style={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						right: 0,
 						height: '0.25rem',
-						borderRadius: '1rem 1rem 0 0',
 						background: `linear-gradient(90deg, ${account.bank.color}, ${account.bank.color}88, transparent)`,
 					}}
 				/>
 
 				<HStack gap="lg" align="start">
 					{/* Bank logo with glow */}
-					<Box style={{ position: 'relative', flexShrink: 0 }}>
-						<Box
+					<div className="relative shrink-0">
+						<div
+							className="absolute inset-0 rounded-2xl"
 							style={{
-								position: 'absolute',
-								inset: 0,
 								filter: 'blur(16px)',
 								opacity: 0.4,
-								borderRadius: '1rem',
 								backgroundColor: account.bank.color,
 							}}
 						/>
@@ -644,13 +634,13 @@ export default function AccountDetailPage() {
 						>
 							{getBankShortName(account.bank.name)}
 						</Flex>
-					</Box>
+					</div>
 
 					{/* Content */}
 					<Flex direction="col" grow minW0>
 						{/* Top row: Name + Balance + Actions */}
 						<HStack justify="between" align="start" gap="md">
-							<Box minW0>
+							<div className="min-w-0">
 								<HStack gap="sm" align="center">
 									<Heading level={1} size="2xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
 										{account.name}
@@ -671,7 +661,7 @@ export default function AccountDetailPage() {
 										<Pencil style={{ height: '1rem', width: '1rem' }} />
 									</Button>
 								</HStack>
-							</Box>
+							</div>
 
 							{/* Balance + Actions */}
 							<HStack gap="md" align="center" style={{ flexShrink: 0 }}>
@@ -824,21 +814,14 @@ export default function AccountDetailPage() {
 
 					<VStack gap="lg">
 						{/* Bank logo centered with glow */}
-						<Box
-							style={{
-								position: 'relative',
-								width: 'fit-content',
-								marginLeft: 'auto',
-								marginRight: 'auto',
-							}}
+						<div
+							className="relative mx-auto w-fit"
 						>
-							<Box
+							<div
+								className="absolute inset-0 rounded-2xl"
 								style={{
-									position: 'absolute',
-									inset: 0,
 									filter: 'blur(16px)',
 									opacity: 0.5,
-									borderRadius: '1rem',
 									backgroundColor: account.bank.color,
 								}}
 							/>
@@ -859,7 +842,7 @@ export default function AccountDetailPage() {
 							>
 								{getBankShortName(account.bank.name)}
 							</Flex>
-						</Box>
+						</div>
 
 						<VStack gap="md">
 							<VStack gap="sm">
@@ -992,16 +975,9 @@ export default function AccountDetailPage() {
 
 			{/* Error/Success message - floating toast style */}
 			{error && (
-				<Box
+				<div
+					className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl shadow-xl"
 					style={{
-						position: 'fixed',
-						bottom: '1.5rem',
-						right: '1.5rem',
-						zIndex: 50,
-						maxWidth: '28rem',
-						padding: '1rem',
-						borderRadius: '1rem',
-						boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
 						animation: 'fadeIn 0.3s ease-out',
 						backdropFilter: 'blur(16px)',
 						WebkitBackdropFilter: 'blur(16px)',
@@ -1065,7 +1041,7 @@ export default function AccountDetailPage() {
 							<X style={{ height: '1rem', width: '1rem' }} />
 						</Button>
 					</HStack>
-				</Box>
+				</div>
 			)}
 
 			{/* Settings Drawer - 33% width on desktop */}
@@ -1083,22 +1059,14 @@ export default function AccountDetailPage() {
 					}}
 				>
 					{/* Header */}
-					<Box
-						style={{
-							paddingLeft: '1rem',
-							paddingRight: '1rem',
-							paddingTop: '0.5rem',
-							paddingBottom: '0.5rem',
-							borderBottom: '1px solid hsl(var(--border))',
-						}}
-					>
+					<div className="px-4 py-2 border-b border-border">
 						<SheetHeader>
 							<SheetTitle style={{ fontSize: '1rem', fontWeight: 600 }}>Paramètres</SheetTitle>
 							<SheetDescription style={{ fontSize: '0.75rem' }}>
 								Informations et historique du compte
 							</SheetDescription>
 						</SheetHeader>
-					</Box>
+					</div>
 
 					<VStack gap="none">
 						{/* Section 1: Informations */}
@@ -1305,7 +1273,7 @@ export default function AccountDetailPage() {
 										</HStack>
 									)}
 									{/* Add member button */}
-									<Box style={{ position: 'relative' }}>
+									<div className="relative">
 										<Button
 											variant="ghost"
 											size="sm"
@@ -1326,19 +1294,10 @@ export default function AccountDetailPage() {
 											Ajouter
 										</Button>
 										{showMemberDropdown && (
-											<Box
+											<div
+												className="absolute top-full left-0 z-50 min-w-[180px] p-1 rounded-md border border-border shadow-md bg-popover"
 												style={{
-													position: 'absolute',
-													top: '100%',
-													left: 0,
 													marginTop: '0.25rem',
-													zIndex: 50,
-													minWidth: '180px',
-													padding: '0.25rem',
-													borderRadius: '0.375rem',
-													border: '1px solid hsl(var(--border))',
-													boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-													backgroundColor: 'hsl(var(--popover))',
 												}}
 											>
 												{availableMembers.map((member) => (
@@ -1382,9 +1341,9 @@ export default function AccountDetailPage() {
 														Tous les membres sont ajoutés
 													</Text>
 												)}
-											</Box>
+											</div>
 										)}
-									</Box>
+									</div>
 								</Flex>
 							</VStack>
 
@@ -1442,7 +1401,7 @@ export default function AccountDetailPage() {
 									Solde initial
 								</Text>
 								<HStack gap="sm">
-									<Box grow style={{ position: 'relative' }}>
+									<div className="relative grow">
 										<Input
 											type="text"
 											value={
@@ -1496,7 +1455,7 @@ export default function AccountDetailPage() {
 										>
 											EUR
 										</span>
-									</Box>
+									</div>
 									<Input
 										type="date"
 										value={
@@ -1584,15 +1543,8 @@ export default function AccountDetailPage() {
 							</HStack>
 
 							{accountImports.length === 0 ? (
-								<Box
-									style={{
-										textAlign: 'center',
-										paddingTop: '1.5rem',
-										paddingBottom: '1.5rem',
-										borderRadius: '0.5rem',
-										border: '1px dashed hsl(var(--border))',
-										backgroundColor: 'hsl(var(--muted) / 0.2)',
-									}}
+								<div
+									className="text-center py-6 rounded-lg border border-dashed border-border bg-muted/20"
 								>
 									<FileSpreadsheet
 										style={{
@@ -1607,7 +1559,7 @@ export default function AccountDetailPage() {
 									<Text size="xs" color="muted">
 										Aucun import
 									</Text>
-								</Box>
+								</div>
 							) : (
 								<VStack gap="sm">
 									{(showAllImports ? accountImports : accountImports.slice(0, 5)).map((imp) => (
@@ -1827,7 +1779,7 @@ export default function AccountDetailPage() {
 			{/* Transactions - Glassmorphism Section with Infinite Scroll */}
 			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
-				<Box p="lg" style={{ paddingBottom: '1rem' }}>
+				<div className="p-6 pb-4">
 					<VStack gap="md">
 						{/* Title row */}
 						<HStack justify="between" align="center">
@@ -1891,7 +1843,7 @@ export default function AccountDetailPage() {
 							</label>
 						</HStack>
 						{/* Search row */}
-						<Box style={{ position: 'relative' }}>
+						<div className="relative">
 							<Search
 								style={{
 									position: 'absolute',
@@ -1919,22 +1871,19 @@ export default function AccountDetailPage() {
 									boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
 								}}
 							/>
-						</Box>
+						</div>
 					</VStack>
-				</Box>
+				</div>
 
 				{/* Content */}
-				<Box
+				<div
 					role="presentation"
 					onDragEnter={handleDrag}
 					onDragLeave={handleDrag}
 					onDragOver={handleDrag}
 					onDrop={handleDrop}
+					className="relative px-6 pb-6"
 					style={{
-						position: 'relative',
-						paddingLeft: '1.5rem',
-						paddingRight: '1.5rem',
-						paddingBottom: '1.5rem',
 						backgroundColor: dragActive ? 'hsl(var(--primary) / 0.05)' : 'transparent',
 					}}
 				>
@@ -2004,7 +1953,7 @@ export default function AccountDetailPage() {
 								>
 									<HStack gap="md" align="center" minW0>
 										{/* Date badge */}
-										<Box style={{ width: '4rem', flexShrink: 0 }}>
+										<div className="w-16 shrink-0">
 											<VStack
 												gap="none"
 												align="center"
@@ -2034,7 +1983,7 @@ export default function AccountDetailPage() {
 													{formatDate(tx.date, 'D')}
 												</Text>
 											</VStack>
-										</Box>
+										</div>
 										<VStack gap="none" minW0>
 											<Text
 												weight="medium"
@@ -2071,15 +2020,13 @@ export default function AccountDetailPage() {
 							))}
 
 							{/* Infinite scroll trigger & loading indicator */}
-							<Box ref={loadMoreRef} py="xl">
+							<div ref={loadMoreRef} className="py-8">
 								{isLoadingMore ? (
 									<HStack gap="sm" justify="center" align="center">
-										<Box style={{ position: 'relative' }}>
-											<Box
+										<div className="relative">
+											<div
+												className="h-8 w-8 rounded-full"
 												style={{
-													height: '2rem',
-													width: '2rem',
-													borderRadius: '9999px',
 													backgroundColor: 'hsl(var(--primary) / 0.1)',
 													animation: 'pulse 2s ease-in-out infinite',
 												}}
@@ -2096,7 +2043,7 @@ export default function AccountDetailPage() {
 													transform: 'translate(-50%, -50%)',
 												}}
 											/>
-										</Box>
+										</div>
 										<Text size="sm" color="muted" weight="medium">
 											Chargement...
 										</Text>
@@ -2135,10 +2082,10 @@ export default function AccountDetailPage() {
 										</Text>
 									</HStack>
 								) : null}
-							</Box>
+							</div>
 						</VStack>
 					)}
-				</Box>
+				</div>
 			</GlassCard>
 
 			{/* Confirmation Dialogs */}

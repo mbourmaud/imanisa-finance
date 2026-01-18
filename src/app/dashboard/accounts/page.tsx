@@ -10,7 +10,6 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import {
-	Box,
 	Building,
 	Button,
 	ChevronRight,
@@ -135,12 +134,10 @@ export default function AccountsPage() {
 			<EmptyState
 				title="Chargement des comptes..."
 				iconElement={
-					<Box position="relative">
-						<Box
-							rounded="full"
+					<div className="relative">
+						<div
+							className="h-12 w-12 rounded-full"
 							style={{
-								height: '3rem',
-								width: '3rem',
 								background:
 									'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
 								animation: 'pulse 2s ease-in-out infinite',
@@ -158,7 +155,7 @@ export default function AccountsPage() {
 								transform: 'translate(-50%, -50%)',
 							}}
 						/>
-					</Box>
+					</div>
 				}
 				size="md"
 			/>

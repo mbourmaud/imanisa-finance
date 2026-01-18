@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import {
 	ArrowDown,
-	Box,
 	Building2,
 	Button,
 	Calendar,
@@ -109,10 +108,10 @@ function LoanCardSkeleton() {
 							<Skeleton style={{ height: '1rem', width: '8rem' }} />
 						</VStack>
 					</HStack>
-					<Box style={{ display: 'none', textAlign: 'right' }} data-show-sm>
+					<div className="hidden sm:block" style={{ textAlign: 'right' }}>
 						<Skeleton style={{ height: '2rem', width: '7rem', marginBottom: '0.25rem' }} />
 						<Skeleton style={{ height: '0.75rem', width: '5rem' }} />
-					</Box>
+					</div>
 				</HStack>
 			</CardHeader>
 			<CardContent>
@@ -127,26 +126,26 @@ function LoanCardSkeleton() {
 						gap="md"
 						style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 					>
-						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
 							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
 							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
 							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</Box>
-						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+						</div>
+						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
 							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
 							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
 							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</Box>
-						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+						</div>
+						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
 							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
 							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
 							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</Box>
-						<Box rounded="xl" p="sm" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
+						</div>
+						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
 							<Skeleton style={{ height: '0.75rem', width: '4rem', marginBottom: '0.5rem' }} />
 							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
 							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
-						</Box>
+						</div>
 					</Grid>
 				</VStack>
 			</CardContent>
@@ -319,7 +318,7 @@ export default function LoansPage() {
 													</VStack>
 												</HStack>
 												<HStack gap="md" align="center">
-													<Box style={{ display: 'none', textAlign: 'right' }} data-show-sm>
+													<div className="hidden sm:block" style={{ textAlign: 'right' }}>
 														<Text
 															size="2xl"
 															weight="semibold"
@@ -330,7 +329,7 @@ export default function LoansPage() {
 														<Text size="xs" color="muted">
 															Capital restant
 														</Text>
-													</Box>
+													</div>
 													<DropdownMenu>
 														<DropdownMenuTrigger asChild>
 															<Button
@@ -364,7 +363,7 @@ export default function LoansPage() {
 										<CardContent>
 											<VStack gap="md">
 												{/* Mobile: Show remaining amount */}
-												<Box display="block" data-hide-sm>
+												<div className="block sm:hidden">
 													<Text
 														size="2xl"
 														weight="semibold"
@@ -375,7 +374,7 @@ export default function LoansPage() {
 													<Text size="xs" color="muted">
 														Capital restant
 													</Text>
-												</Box>
+												</div>
 
 												{/* Progress Bar */}
 												<VStack gap="sm">
@@ -400,9 +399,8 @@ export default function LoansPage() {
 														borderTop: '1px solid hsl(var(--border) / 0.4)',
 													}}
 												>
-													<Box
-														rounded="xl"
-														p="sm"
+													<div
+														className="rounded-xl p-3"
 														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 													>
 														<HStack
@@ -424,10 +422,9 @@ export default function LoansPage() {
 																+ {formatCurrency(loanInsuranceTotal)} assurance
 															</Text>
 														)}
-													</Box>
-													<Box
-														rounded="xl"
-														p="sm"
+													</div>
+													<div
+														className="rounded-xl p-3"
 														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 													>
 														<HStack
@@ -445,10 +442,9 @@ export default function LoansPage() {
 														<Text size="xs" color="muted">
 															Taux nominal
 														</Text>
-													</Box>
-													<Box
-														rounded="xl"
-														p="sm"
+													</div>
+													<div
+														className="rounded-xl p-3"
 														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 													>
 														<HStack
@@ -468,10 +464,9 @@ export default function LoansPage() {
 																{remainingMonths} échéances
 															</Text>
 														)}
-													</Box>
-													<Box
-														rounded="xl"
-														p="sm"
+													</div>
+													<div
+														className="rounded-xl p-3"
 														style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 													>
 														<HStack
@@ -491,7 +486,7 @@ export default function LoansPage() {
 														<Text size="xs" color="muted">
 															Emprunté
 														</Text>
-													</Box>
+													</div>
 												</Grid>
 											</VStack>
 										</CardContent>
@@ -522,7 +517,7 @@ export default function LoansPage() {
 												Tous crédits confondus
 											</Text>
 										</VStack>
-										<Box style={{ textAlign: 'right' }}>
+										<div style={{ textAlign: 'right' }}>
 											<Text
 												size="3xl"
 												weight="semibold"
@@ -534,7 +529,7 @@ export default function LoansPage() {
 												{formatCurrency(summary.totalMonthlyPayment)} capital +{' '}
 												{formatCurrency(summary.totalInsurance)} assurance
 											</Text>
-										</Box>
+										</div>
 									</HStack>
 								</CardContent>
 							</Card>

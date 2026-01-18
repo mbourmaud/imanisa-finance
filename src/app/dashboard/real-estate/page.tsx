@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import {
-	Box,
 	Building2,
 	Button,
 	Dialog,
@@ -346,7 +345,7 @@ export default function RealEstatePage() {
 								<VStack gap="lg">
 									{/* Error message */}
 									{formError && (
-										<Box
+										<div
 											style={{
 												borderRadius: '0.5rem',
 												padding: '0.75rem',
@@ -357,7 +356,7 @@ export default function RealEstatePage() {
 											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
 												{formError}
 											</Text>
-										</Box>
+										</div>
 									)}
 
 									{/* Basic info */}
@@ -914,7 +913,7 @@ export default function RealEstatePage() {
 													<Building2 style={{ height: '1.5rem', width: '1.5rem' }} />
 												)}
 											</Flex>
-											<Box style={{ minWidth: 0 }}>
+											<div style={{ minWidth: 0 }}>
 												<Heading
 													level={3}
 													size="lg"
@@ -948,7 +947,7 @@ export default function RealEstatePage() {
 														{property.address}, {property.city}
 													</Text>
 												</HStack>
-											</Box>
+											</div>
 										</Link>
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
@@ -981,8 +980,7 @@ export default function RealEstatePage() {
 										</DropdownMenu>
 									</HStack>
 									<HStack gap="sm" style={{ flexWrap: 'wrap' }}>
-										<Box
-											as="span"
+										<span
 											style={{
 												borderRadius: '9999px',
 												fontSize: '0.625rem',
@@ -992,9 +990,8 @@ export default function RealEstatePage() {
 											}}
 										>
 											{getPropertyTypeLabel(property.type)}
-										</Box>
-										<Box
-											as="span"
+										</span>
+										<span
 											style={{
 												borderRadius: '9999px',
 												fontSize: '0.625rem',
@@ -1004,11 +1001,10 @@ export default function RealEstatePage() {
 											}}
 										>
 											{getPropertyUsageLabel(property.usage)}
-										</Box>
+										</span>
 										{property.propertyMembers.length > 0 && (
-											<Box
-												as="span"
-												rounded="full"
+											<span
+												className="rounded-full"
 												style={{
 													fontSize: '0.625rem',
 													padding: '0.125rem 0.5rem',
@@ -1017,15 +1013,14 @@ export default function RealEstatePage() {
 												}}
 											>
 												{property.propertyMembers.map((pm) => pm.member.name).join(', ')}
-											</Box>
+											</span>
 										)}
 									</HStack>
 									{/* Value & Equity */}
 									<Grid cols={2} gap="md">
-										<Box
+										<div
+											className="rounded-xl p-3"
 											style={{
-												borderRadius: '0.75rem',
-												padding: '0.75rem',
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
@@ -1050,11 +1045,10 @@ export default function RealEstatePage() {
 												{appreciation >= 0 ? '+' : ''}
 												{appreciation.toFixed(1)}% depuis l&apos;achat
 											</Text>
-										</Box>
-										<Box
+										</div>
+										<div
+											className="rounded-xl p-3"
 											style={{
-												borderRadius: '0.75rem',
-												padding: '0.75rem',
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
@@ -1077,7 +1071,7 @@ export default function RealEstatePage() {
 													? `${((equity / property.currentValue) * 100).toFixed(0)}% de la valeur`
 													: '-'}
 											</Text>
-										</Box>
+										</div>
 									</Grid>
 
 									{/* Loan Progress */}
@@ -1105,7 +1099,7 @@ export default function RealEstatePage() {
 											borderTop: '1px solid hsl(var(--border) / 0.4)',
 										}}
 									>
-										<Box style={{ textAlign: 'center' }}>
+										<div className="text-center">
 											<HStack
 												gap="xs"
 												align="center"
@@ -1118,8 +1112,8 @@ export default function RealEstatePage() {
 											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
 												{property.surface} m²
 											</Text>
-										</Box>
-										<Box style={{ textAlign: 'center' }}>
+										</div>
+										<div className="text-center">
 											<HStack
 												gap="xs"
 												align="center"
@@ -1132,8 +1126,8 @@ export default function RealEstatePage() {
 											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
 												{property.rooms || '-'}
 											</Text>
-										</Box>
-										<Box style={{ textAlign: 'center' }}>
+										</div>
+										<div className="text-center">
 											<HStack
 												gap="xs"
 												align="center"
@@ -1146,15 +1140,14 @@ export default function RealEstatePage() {
 											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
 												{property.bedrooms || '-'}
 											</Text>
-										</Box>
+										</div>
 									</Grid>
 
 									{/* Rent Info if rental */}
 									{isRentalProperty && property.rentAmount && (
-										<Box
+										<div
+											className="rounded-xl p-3"
 											style={{
-												borderRadius: '0.75rem',
-												padding: '0.75rem',
 												backgroundColor: 'oklch(0.55 0.15 145 / 0.1)',
 											}}
 										>
@@ -1175,17 +1168,17 @@ export default function RealEstatePage() {
 													</Text>
 												</VStack>
 												{property.rentCharges && (
-													<Box style={{ textAlign: 'right' }}>
+													<div className="text-right">
 														<Text size="xs" color="muted">
 															Net de charges
 														</Text>
 														<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 															{formatCurrency(property.rentAmount - property.rentCharges)}
 														</Text>
-													</Box>
+													</div>
 												)}
 											</HStack>
-										</Box>
+										</div>
 									)}
 								</VStack>
 							</GlassCard>

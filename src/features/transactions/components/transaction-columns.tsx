@@ -10,7 +10,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
-	Box,
 	Button,
 	Checkbox,
 	DropdownMenu,
@@ -186,7 +185,7 @@ export function createTransactionColumns(
 		// Amount column
 		{
 			accessorKey: 'amount',
-			header: () => <Box style={{ textAlign: 'right' }}>Montant</Box>,
+			header: () => <div className="text-right">Montant</div>,
 			cell: ({ row }) => {
 				const transaction = row.original;
 				const amount = transaction.amount;
@@ -328,7 +327,7 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 		// Amount column (compact)
 		{
 			accessorKey: 'amount',
-			header: () => <Box style={{ textAlign: 'right' }}>Montant</Box>,
+			header: () => <div className="text-right">Montant</div>,
 			cell: ({ row }) => {
 				const transaction = row.original;
 				const amount = transaction.amount;

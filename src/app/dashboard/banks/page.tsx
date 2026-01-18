@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
-	Box,
 	Button,
 	ChevronDown,
 	ChevronRight,
@@ -107,26 +106,22 @@ function BankRowSkeleton() {
 	return (
 		<GlassCard padding="sm">
 			<HStack gap="md" align="center">
-				<Box
-					rounded="xl"
-					bg="muted"
+				<div
+					className="rounded-xl bg-muted"
 					style={{ height: '3rem', width: '3rem', animation: 'pulse 2s ease-in-out infinite' }}
 				/>
 				<Flex direction="col" gap="xs" grow>
-					<Box
-						rounded="md"
-						bg="muted"
+					<div
+						className="rounded-md bg-muted"
 						style={{ height: '1.25rem', width: '8rem', animation: 'pulse 2s ease-in-out infinite' }}
 					/>
-					<Box
-						rounded="md"
-						bg="muted"
+					<div
+						className="rounded-md bg-muted"
 						style={{ height: '1rem', width: '5rem', animation: 'pulse 2s ease-in-out infinite' }}
 					/>
 				</Flex>
-				<Box
-					rounded="md"
-					bg="muted"
+				<div
+					className="rounded-md bg-muted"
 					style={{ height: '1.5rem', width: '6rem', animation: 'pulse 2s ease-in-out infinite' }}
 				/>
 			</HStack>
@@ -166,8 +161,8 @@ function SectionHeaderWithIcon({ icon, title, iconBgClass, action }: SectionHead
 				<Heading level={2} size="sm" weight="semibold">
 					{title}
 				</Heading>
-				<Box
-					grow
+				<div
+					className="flex-1"
 					style={{
 						marginLeft: '0.75rem',
 						height: '1px',
@@ -377,9 +372,9 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 						/>
 					</HStack>
 					{account.members.length > 0 && (
-						<Box style={{ marginTop: '0.375rem' }}>
+						<div style={{ marginTop: '0.375rem' }}>
 							<MemberAvatarGroup members={memberData} size="xs" max={4} spacing="normal" />
-						</Box>
+						</div>
 					)}
 				</VStack>
 			</HStack>
@@ -421,8 +416,8 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 				{banks.map((bank) => (
 					<DropdownMenuItem key={bank.id} onClick={() => onSelectBank(bank)}>
 						<HStack gap="sm" align="center">
-							<Box
-								rounded="full"
+							<div
+								className="rounded-full"
 								style={{ width: '0.5rem', height: '0.5rem', backgroundColor: bank.color }}
 							/>
 							<Text>{bank.name}</Text>
@@ -471,8 +466,8 @@ function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorC
 							borderColor: isSelected ? 'hsl(var(--primary) / 0.3)' : 'transparent',
 						}}
 					>
-						<Box
-							rounded="full"
+						<div
+							className="rounded-full"
 							style={{
 								width: '0.625rem',
 								height: '0.625rem',
@@ -601,7 +596,7 @@ export default function BanksPage() {
 	};
 
 	return (
-		<Box style={{ maxWidth: '56rem' }}>
+		<div style={{ maxWidth: '56rem' }}>
 			{/* Header */}
 			<PageHeader
 				title="Banques"
@@ -617,9 +612,9 @@ export default function BanksPage() {
 					<StatCardSkeleton variant="mint" />
 				</StatCardGrid>
 			) : error ? (
-				<Box py="lg">
+				<div className="py-6">
 					<Text color="danger">{error}</Text>
-				</Box>
+				</div>
 			) : (
 				<StatCardGrid columns={3}>
 					<StatCard
@@ -648,7 +643,7 @@ export default function BanksPage() {
 			)}
 
 			{/* Bank accounts section */}
-			<Box mt="xl">
+			<div className="mt-8">
 				<SectionHeaderWithIcon
 					icon={
 						<Landmark
@@ -684,10 +679,10 @@ export default function BanksPage() {
 						))}
 					</VStack>
 				)}
-			</Box>
+			</div>
 
 			{/* Investments section */}
-			<Box mt="xl">
+			<div className="mt-8">
 				<SectionHeaderWithIcon
 					icon={
 						<TrendingUp
@@ -725,7 +720,7 @@ export default function BanksPage() {
 						))}
 					</VStack>
 				)}
-			</Box>
+			</div>
 
 			{/* Add Account Dialog */}
 			<Dialog open={showAddAccount} onOpenChange={setShowAddAccount}>
@@ -738,9 +733,8 @@ export default function BanksPage() {
 					<VStack gap="lg">
 						{/* Error message */}
 						{formError && (
-							<Box
-								rounded="md"
-								p="sm"
+							<div
+								className="rounded-md p-3"
 								style={{
 									backgroundColor: 'hsl(var(--destructive) / 0.1)',
 									border: '1px solid hsl(var(--destructive) / 0.2)',
@@ -749,7 +743,7 @@ export default function BanksPage() {
 								<Text size="sm" color="danger">
 									{formError}
 								</Text>
-							</Box>
+							</div>
 						)}
 
 						{/* Account name */}
@@ -886,6 +880,6 @@ export default function BanksPage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-		</Box>
+		</div>
 	);
 }

@@ -10,7 +10,6 @@
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
-	Box,
 	Button,
 	Calendar,
 	CreditCard,
@@ -182,9 +181,9 @@ export default function TransactionsPage() {
 
 			{/* Filters */}
 			<GlassCard padding="md">
-				<Box display="flex" style={{ flexDirection: 'column', gap: '1rem' }}>
+				<div className="flex flex-col gap-4">
 					<HStack gap="md" style={{ flexWrap: 'wrap' }}>
-						<Box style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+						<div className="relative flex-1 min-w-[200px]">
 							<Search
 								style={{
 									position: 'absolute',
@@ -204,7 +203,7 @@ export default function TransactionsPage() {
 									borderRadius: '0.75rem',
 								}}
 							/>
-						</Box>
+						</div>
 						<Select defaultValue="all">
 							<SelectTrigger style={{ width: '180px', height: '2.75rem', borderRadius: '0.75rem' }}>
 								<SelectValue placeholder="Catégorie" />
@@ -243,7 +242,7 @@ export default function TransactionsPage() {
 							<Filter style={{ height: '1rem', width: '1rem' }} />
 						</Button>
 					</HStack>
-				</Box>
+				</div>
 			</GlassCard>
 
 			{/* Transactions List */}
@@ -277,14 +276,9 @@ export default function TransactionsPage() {
 							}}
 						>
 							<HStack gap="md" align="center">
-								<Box
-									display="flex"
+								<div
+									className="flex h-10 w-10 items-center justify-center rounded-xl"
 									style={{
-										borderRadius: '0.75rem',
-										height: '2.5rem',
-										width: '2.5rem',
-										alignItems: 'center',
-										justifyContent: 'center',
 										backgroundColor:
 											tx.amount > 0 ? 'oklch(0.55 0.15 145 / 0.1)' : 'hsl(var(--muted) / 0.3)',
 									}}
@@ -302,7 +296,7 @@ export default function TransactionsPage() {
 											}}
 										/>
 									)}
-								</Box>
+								</div>
 								<VStack gap="none">
 									<Text weight="medium">{tx.description}</Text>
 									<Text size="xs" color="muted">
