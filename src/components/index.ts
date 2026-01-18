@@ -375,29 +375,6 @@ export { Separator } from './ui/separator';
 export type { FlexProps, FlexItemProps, FlexDirection, FlexGap, FlexAlign, FlexJustify, FlexWrap } from './common/Flex';
 export { Flex, FlexItem } from './common/Flex';
 
-// Deprecated layout components (will be removed after migration to Flex)
-export type { StackProps, StackGap, StackAlign, StackJustify } from './common/Stack';
-export { Stack } from './common/Stack';
-export type { RowProps, RowGap, RowAlign, RowJustify, RowWrap } from './common/Row';
-export { Row } from './common/Row';
-export type { GridProps, GridCols, GridGap } from './common/Grid';
-export { Grid } from './common/Grid';
-
-// =============================================================================
-// TYPOGRAPHY COMPONENTS
-// =============================================================================
-
-export type { TextProps, TextSize, TextWeight, TextColor, TextAlign } from './common/Text';
-export { Text } from './common/Text';
-export type {
-	HeadingProps,
-	HeadingLevel,
-	HeadingSize,
-	HeadingColor,
-	HeadingWeight,
-} from './common/Heading';
-export { Heading } from './common/Heading';
-
 // =============================================================================
 // DASHBOARD LAYOUT COMPONENTS
 // =============================================================================
