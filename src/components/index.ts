@@ -469,3 +469,16 @@ export { AuthErrorCard } from './auth/AuthErrorCard';
 export { AuthErrorContainer } from './auth/AuthErrorContainer';
 export { AuthErrorFooter } from './auth/AuthErrorFooter';
 export { AuthErrorLogo } from './auth/AuthErrorLogo';
+
+// =============================================================================
+// INVESTMENT COMPONENTS
+// =============================================================================
+
+export { InvestmentActions } from './investments/InvestmentActions';
+export type { InvestmentSource } from './investments/InvestmentSourceCard';
+export { InvestmentSourceCard } from './investments/InvestmentSourceCard';
+export { InvestmentSourceGrid } from './investments/InvestmentSourceGrid';
+export type { Position } from './investments/PositionListItem';
+export { PositionListItem } from './investments/PositionListItem';
+export { PortfolioChartSection } from './investments/PortfolioChartSection';
+export { PositionsSection } from './investments/PositionsSection';
