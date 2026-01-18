@@ -22,7 +22,6 @@ import {
 	EmptyState,
 	GlassCard,
 	Globe,
-	Grid,
 	Heading,
 	Input,
 	Key,
@@ -210,7 +209,7 @@ export default function SettingsPage() {
 			{/* Header */}
 			<PageHeader title="Paramètres" description="Configurez votre application" />
 
-			<Grid cols={1} colsLg={3} gap="lg">
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				{/* Main Settings Column */}
 				<div className="flex flex-col gap-6" style={{ gridColumn: 'span 2' }}>
 					{/* Profile */}
@@ -235,7 +234,7 @@ export default function SettingsPage() {
 									</Text>
 								</div>
 							</div>
-							<Grid cols={1} colsSm={2} gap="md">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div className="flex flex-col gap-2">
 									<Label htmlFor="name">Nom</Label>
 									<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
@@ -244,7 +243,7 @@ export default function SettingsPage() {
 									<Label htmlFor="email">Email</Label>
 									<Input id="email" type="email" placeholder="votre@email.com" />
 								</div>
-							</Grid>
+							</div>
 							<div className="flex flex-col gap-2">
 								<Label htmlFor="currency">Devise par défaut</Label>
 								<Select defaultValue="eur">
@@ -511,7 +510,7 @@ export default function SettingsPage() {
 							{/* Theme Selection */}
 							<div className="flex flex-col gap-3">
 								<Label>Thème</Label>
-								<Grid cols={3} gap="sm">
+								<div className="grid grid-cols-3 gap-2">
 									<button
 										type="button"
 										onClick={() => setTheme('light')}
@@ -589,7 +588,7 @@ export default function SettingsPage() {
 											Système
 										</Text>
 									</button>
-								</Grid>
+								</div>
 							</div>
 
 							<Separator />
@@ -774,7 +773,7 @@ export default function SettingsPage() {
 						</div>
 					</GlassCard>
 				</div>
-			</Grid>
+			</div>
 
 			<ConfirmDialog
 				open={deleteMemberId !== null}

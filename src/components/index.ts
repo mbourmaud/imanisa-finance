@@ -26,14 +26,6 @@ export type {
 	SpacingSize,
 } from './ui/box';
 export { Box } from './ui/box';
-export type {
-	FlexAlign,
-	FlexDirection,
-	FlexJustify,
-	FlexProps,
-	FlexWrap,
-} from './ui/flex';
-export { Flex } from './ui/flex';
 export type { GridAlign, GridCols, GridJustify, GridProps } from './ui/grid';
 export { Grid } from './ui/grid';
 export type {
@@ -46,16 +38,6 @@ export type {
 export { Container, Page, Section } from './ui/layout';
 export type { SpacerProps } from './ui/spacer';
 export { Spacer } from './ui/spacer';
-export type {
-	GapSize,
-	HStackAlign,
-	HStackProps,
-	JustifyContent,
-	PaddingSize,
-	VStackAlign,
-	VStackProps,
-} from './ui/stack';
-export { HStack, VStack } from './ui/stack';
 
 // =============================================================================
 // TYPOGRAPHY

@@ -17,8 +17,6 @@ import { useCallback, useMemo, useState } from 'react';
 import {
 	Button,
 	DataTable,
-	Flex,
-	HStack,
 	Input,
 	Search,
 	Select,
@@ -26,8 +24,6 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	Text,
-	VStack,
 	X,
 } from '@/components';
 import { useTransactionsQuery } from '../hooks/use-transactions-query';
@@ -141,41 +137,33 @@ export function TransactionTable({
 
 	if (isError) {
 		return (
-			<Flex align="center" justify="center" style={{ height: '12rem' }}>
-				<Text color="muted">Erreur lors du chargement des transactions</Text>
-			</Flex>
+			<div className="flex items-center justify-center h-48">
+				<span className="text-muted-foreground">Erreur lors du chargement des transactions</span>
+			</div>
 		);
 	}
 
 	return (
-		<VStack gap="md">
+		<div className="flex flex-col gap-4">
 			{/* Filters */}
-			<Flex gap="md" style={{ flexDirection: 'column' }}>
+			<div className="flex flex-col gap-4">
 				<div className="relative flex-1">
 					<Search
-						style={{
-							position: 'absolute',
-							left: '0.75rem',
-							top: '50%',
-							height: '1rem',
-							width: '1rem',
-							transform: 'translateY(-50%)',
-							color: 'hsl(var(--muted-foreground))',
-						}}
+						className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
 					/>
 					<Input
 						placeholder="Rechercher une transaction..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						style={{ paddingLeft: '2.5rem' }}
+						className="pl-10"
 					/>
 				</div>
-				<HStack gap="md">
+				<div className="flex items-center gap-4">
 					<Select
 						value={typeFilter}
 						onValueChange={(v) => setTypeFilter(v as TransactionType | 'all')}
 					>
-						<SelectTrigger style={{ width: '150px' }}>
+						<SelectTrigger className="w-[150px]">
 							<SelectValue placeholder="Type" />
 						</SelectTrigger>
 						<SelectContent>
@@ -188,13 +176,13 @@ export function TransactionTable({
 						<Button
 							variant="ghost"
 							onClick={clearFilters}
-							iconLeft={<X style={{ height: '1rem', width: '1rem' }} />}
+							iconLeft={<X className="h-4 w-4" />}
 						>
 							Effacer
 						</Button>
 					)}
-				</HStack>
-			</Flex>
+				</div>
+			</div>
 
 			{/* Table */}
 			<DataTable
@@ -216,6 +204,6 @@ export function TransactionTable({
 				// Empty state
 				emptyMessage="Aucune transaction trouvée"
 			/>
-		</VStack>
+		</div>
 	);
 }

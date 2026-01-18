@@ -6,12 +6,10 @@ import {
 	AlertTriangle,
 	ArrowLeft,
 	Button,
-	Flex,
 	GlassCard,
 	Heading,
 	RefreshCw,
 	Text,
-	VStack,
 	Wallet,
 } from '@/components';
 
@@ -19,9 +17,7 @@ export default function AuthCodeErrorPage() {
 	const router = useRouter();
 
 	return (
-		<div
-			className="relative flex min-h-screen overflow-hidden bg-background p-6"
-		>
+		<div className="relative flex min-h-screen overflow-hidden bg-background p-6">
 			{/* Background gradient blobs */}
 			<div className="absolute inset-0 -z-10 overflow-hidden">
 				<div
@@ -42,9 +38,9 @@ export default function AuthCodeErrorPage() {
 			</div>
 
 			{/* Center content */}
-			<Flex direction="col" align="center" justify="center" fullWidth fullHeight>
+			<div className="flex flex-col items-center justify-center w-full h-full">
 				{/* Logo */}
-				<VStack gap="md" align="center" p="lg">
+				<div className="flex flex-col items-center gap-4 p-6">
 					<div
 						className="flex h-16 w-16 items-center justify-center rounded-2xl shadow-xl"
 						style={{
@@ -54,12 +50,12 @@ export default function AuthCodeErrorPage() {
 					>
 						<Wallet style={{ height: '2rem', width: '2rem', color: 'white' }} />
 					</div>
-				</VStack>
+				</div>
 
 				{/* Error card */}
 				<div className="w-full max-w-md">
 					<GlassCard padding="lg" variant="elevated">
-						<VStack gap="lg" align="center">
+						<div className="flex flex-col items-center gap-6">
 							{/* Error icon */}
 							<div
 								className="flex h-16 w-16 items-center justify-center rounded-full"
@@ -82,7 +78,7 @@ export default function AuthCodeErrorPage() {
 							</Text>
 
 							{/* Actions */}
-							<VStack gap="sm" fullWidth>
+							<div className="flex flex-col gap-3 w-full">
 								<Button
 									onClick={() => router.push('/login')}
 									iconLeft={<RefreshCw style={{ height: '1.25rem', width: '1.25rem' }} />}
@@ -99,8 +95,8 @@ export default function AuthCodeErrorPage() {
 								>
 									<Link href="/">Retour à l'accueil</Link>
 								</Button>
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 					</GlassCard>
 				</div>
 
@@ -110,7 +106,7 @@ export default function AuthCodeErrorPage() {
 						Besoin d'aide ? Contactez le support
 					</Text>
 				</div>
-			</Flex>
+			</div>
 		</div>
 	);
 }

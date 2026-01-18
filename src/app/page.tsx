@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button, ChevronRight, Heading, Text, User, VStack, Wallet } from '@/components';
+import { Button, ChevronRight, Heading, Text, User, Wallet } from '@/components';
 import { useEntityStore } from '@/shared/stores/entity-store';
 
 export default function HomePage() {
@@ -17,9 +17,7 @@ export default function HomePage() {
 	const individualEntities = entities.filter((e) => e.type === 'individual');
 
 	return (
-		<div
-			className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6"
-		>
+		<div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6">
 			{/* Background gradient blobs */}
 			<div className="absolute inset-0 -z-10 overflow-hidden">
 				<div
@@ -41,9 +39,8 @@ export default function HomePage() {
 			</div>
 
 			{/* Logo */}
-			<VStack
-				gap="lg"
-				align="center"
+			<div
+				className="flex flex-col items-center gap-6"
 				style={{ marginBottom: '4rem', animation: 'fadeIn 0.5s ease-out' }}
 			>
 				<div className="relative">
@@ -65,7 +62,7 @@ export default function HomePage() {
 						}}
 					/>
 				</div>
-				<VStack gap="xs" align="center">
+				<div className="flex flex-col items-center gap-2">
 					<Heading
 						level={1}
 						size="2xl"
@@ -83,8 +80,8 @@ export default function HomePage() {
 					<Text color="muted" size="lg">
 						Finance familiale
 					</Text>
-				</VStack>
-			</VStack>
+				</div>
+			</div>
 
 			{/* Profile selector */}
 			<div className="w-full max-w-sm">
@@ -92,7 +89,7 @@ export default function HomePage() {
 					Qui êtes-vous ?
 				</Text>
 
-				<VStack gap="md">
+				<div className="flex flex-col gap-4">
 					{individualEntities.map((entity, index) => (
 						<Button
 							key={entity.id}
@@ -130,16 +127,14 @@ export default function HomePage() {
 									Accéder à mon espace
 								</Text>
 							</div>
-							<div
-								className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10"
-							>
+							<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
 								<ChevronRight
 									style={{ height: '1.25rem', width: '1.25rem', color: 'hsl(var(--primary))' }}
 								/>
 							</div>
 						</Button>
 					))}
-				</VStack>
+				</div>
 			</div>
 
 			{/* Footer */}

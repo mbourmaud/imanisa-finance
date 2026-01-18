@@ -20,7 +20,6 @@ import {
 	Euro,
 	ExternalLink,
 	GlassCard,
-	Grid,
 	Loader2,
 	MoreHorizontal,
 	PageHeader,
@@ -117,10 +116,8 @@ function LoanCardSkeleton() {
 						<Skeleton style={{ height: '0.75rem', width: '100%' }} />
 						<Skeleton style={{ height: '0.5rem', width: '100%' }} />
 					</div>
-					<Grid
-						cols={2}
-						colsSm={4}
-						gap="md"
+					<div
+						className="grid grid-cols-2 sm:grid-cols-4 gap-4"
 						style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 					>
 						<div className="rounded-xl p-3" style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}>
@@ -143,7 +140,7 @@ function LoanCardSkeleton() {
 							<Skeleton style={{ height: '1.25rem', width: '5rem' }} />
 							<Skeleton style={{ height: '0.75rem', width: '3.5rem', marginTop: '0.25rem' }} />
 						</div>
-					</Grid>
+					</div>
 				</div>
 			</CardContent>
 		</Card>
@@ -383,10 +380,8 @@ export default function LoansPage() {
 												</div>
 
 												{/* Info Grid */}
-												<Grid
-													cols={2}
-													colsSm={4}
-													gap="md"
+												<div
+													className="grid grid-cols-2 sm:grid-cols-4 gap-4"
 													style={{
 														paddingTop: '0.5rem',
 														borderTop: '1px solid hsl(var(--border) / 0.4)',
@@ -464,7 +459,7 @@ export default function LoansPage() {
 															Emprunté
 														</Text>
 													</div>
-												</Grid>
+												</div>
 											</div>
 										</CardContent>
 									</Card>

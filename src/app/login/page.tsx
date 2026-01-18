@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, GlassCard, Heading, Text, VStack, Wallet } from '@/components';
+import { Button, GlassCard, Heading, Text, Wallet } from '@/components';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -28,9 +28,7 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div
-			className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6"
-		>
+		<div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6">
 			{/* Background gradient blobs */}
 			<div className="absolute inset-0 -z-10 overflow-hidden">
 				<div
@@ -52,9 +50,8 @@ export default function LoginPage() {
 			</div>
 
 			{/* Logo */}
-			<VStack
-				gap="lg"
-				align="center"
+			<div
+				className="flex flex-col items-center gap-6"
 				style={{ marginBottom: '1.5rem', animation: 'fadeIn 0.5s ease-out' }}
 			>
 				<div className="relative">
@@ -76,7 +73,7 @@ export default function LoginPage() {
 						}}
 					/>
 				</div>
-				<VStack gap="xs" align="center">
+				<div className="flex flex-col items-center gap-2">
 					<Heading
 						level={1}
 						size="2xl"
@@ -94,13 +91,13 @@ export default function LoginPage() {
 					<Text color="muted" size="lg">
 						Finance familiale
 					</Text>
-				</VStack>
-			</VStack>
+				</div>
+			</div>
 
 			{/* Login card */}
 			<div className="w-full max-w-sm">
 				<GlassCard padding="lg" variant="elevated">
-					<VStack gap="lg">
+					<div className="flex flex-col gap-6">
 						<Heading level={2} size="lg" align="center">
 							Connexion
 						</Heading>
@@ -148,7 +145,7 @@ export default function LoginPage() {
 						<Text color="muted" size="sm" align="center">
 							Vos donnees restent privees et securisees
 						</Text>
-					</VStack>
+					</div>
 				</GlassCard>
 			</div>
 

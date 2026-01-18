@@ -18,11 +18,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	Flex,
-	HStack,
 	MoreHorizontal,
-	Text,
-	VStack,
 } from '@/components';
 import type { Transaction } from '../types';
 
@@ -111,14 +107,14 @@ export function createTransactionColumns(
 			cell: ({ row }) => {
 				const date = row.getValue('date') as Date;
 				return (
-					<VStack gap="none">
-						<Text size="sm" weight="medium">
+					<div className="flex flex-col">
+						<span className="text-sm font-medium">
 							{formatRelativeDate(date)}
-						</Text>
-						<Text size="xs" color="muted">
+						</span>
+						<span className="text-xs text-muted-foreground">
 							{formatDate(date)}
-						</Text>
-					</VStack>
+						</span>
+					</div>
 				);
 			},
 			sortingFn: 'datetime',
@@ -132,40 +128,27 @@ export function createTransactionColumns(
 				const isIncome = transaction.type === 'income';
 
 				return (
-					<HStack gap="md" align="center">
-						<Flex
-							align="center"
-							justify="center"
-							style={{
-								borderRadius: '0.5rem',
-								height: '2.25rem',
-								width: '2.25rem',
-								flexShrink: 0,
-								backgroundColor: isIncome ? 'rgba(16, 185, 129, 0.1)' : 'hsl(var(--muted))',
-							}}
+					<div className="flex items-center gap-3">
+						<div
+							className={`flex items-center justify-center rounded-lg h-9 w-9 shrink-0 ${
+								isIncome ? 'bg-emerald-500/10' : 'bg-muted'
+							}`}
 						>
 							{isIncome ? (
-								<ArrowDownLeft
-									style={{ height: '1rem', width: '1rem', color: 'rgb(16, 185, 129)' }}
-								/>
+								<ArrowDownLeft className="h-4 w-4 text-emerald-500" />
 							) : (
-								<ArrowUpRight
-									style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
-								/>
+								<ArrowUpRight className="h-4 w-4 text-muted-foreground" />
 							)}
-						</Flex>
-						<VStack gap="none" style={{ minWidth: 0 }}>
-							<Text
-								weight="medium"
-								style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-							>
+						</div>
+						<div className="flex flex-col min-w-0">
+							<span className="font-medium truncate">
 								{transaction.description}
-							</Text>
-							<Text size="xs" color="muted">
+							</span>
+							<span className="text-xs text-muted-foreground">
 								{transaction.category || 'Non catégorisé'}
-							</Text>
-						</VStack>
-					</HStack>
+							</span>
+						</div>
+					</div>
 				);
 			},
 		},
@@ -176,9 +159,9 @@ export function createTransactionColumns(
 			cell: ({ row }) => {
 				const accountName = row.getValue('accountName') as string;
 				return (
-					<Text size="sm" color="muted">
+					<span className="text-sm text-muted-foreground">
 						{accountName}
-					</Text>
+					</span>
 				);
 			},
 		},
@@ -193,17 +176,14 @@ export function createTransactionColumns(
 				const displayAmount = isIncome ? amount : -amount;
 
 				return (
-					<Text
-						weight="medium"
-						style={{
-							textAlign: 'right',
-							fontVariantNumeric: 'tabular-nums',
-							color: isIncome ? 'rgb(5, 150, 105)' : undefined,
-						}}
+					<span
+						className={`font-medium text-right tabular-nums ${
+							isIncome ? 'text-emerald-600' : ''
+						}`}
 					>
 						{isIncome ? '+' : ''}
 						{formatCurrency(displayAmount)}
-					</Text>
+					</span>
 				);
 			},
 			sortingFn: (rowA, rowB) => {
@@ -292,9 +272,9 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			cell: ({ row }) => {
 				const date = row.getValue('date') as Date;
 				return (
-					<Text size="sm" color="muted">
+					<span className="text-sm text-muted-foreground">
 						{formatRelativeDate(date)}
-					</Text>
+					</span>
 				);
 			},
 			sortingFn: 'datetime',
@@ -307,20 +287,16 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			cell: ({ row }) => {
 				const transaction = row.original;
 				return (
-					<VStack gap="none" style={{ minWidth: 0 }}>
-						<Text
-							size="sm"
-							weight="medium"
-							style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-						>
+					<div className="flex flex-col min-w-0">
+						<span className="text-sm font-medium truncate">
 							{transaction.description}
-						</Text>
+						</span>
 						{transaction.category && (
-							<Text size="xs" color="muted">
+							<span className="text-xs text-muted-foreground">
 								{transaction.category}
-							</Text>
+							</span>
 						)}
-					</VStack>
+					</div>
 				);
 			},
 		},
@@ -335,18 +311,14 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 				const displayAmount = isIncome ? amount : -amount;
 
 				return (
-					<Text
-						size="sm"
-						weight="medium"
-						style={{
-							textAlign: 'right',
-							fontVariantNumeric: 'tabular-nums',
-							color: isIncome ? 'rgb(5, 150, 105)' : undefined,
-						}}
+					<span
+						className={`text-sm font-medium text-right tabular-nums ${
+							isIncome ? 'text-emerald-600' : ''
+						}`}
 					>
 						{isIncome ? '+' : ''}
 						{formatCurrency(displayAmount)}
-					</Text>
+					</span>
 				);
 			},
 			size: 120,

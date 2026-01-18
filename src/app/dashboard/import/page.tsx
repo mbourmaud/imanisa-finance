@@ -9,7 +9,6 @@ import {
 	EmptyState,
 	FileSpreadsheet,
 	GlassCard,
-	Grid,
 	Heading,
 	Label,
 	Loader2,
@@ -370,7 +369,7 @@ export default function ImportPage() {
 			)}
 
 			{/* Upload Section */}
-			<Grid cols={2} gap="lg">
+			<div className="grid grid-cols-2 gap-6">
 				{/* CSV Import */}
 				<GlassCard padding="lg">
 					<div className="flex flex-col gap-4">
@@ -611,7 +610,7 @@ export default function ImportPage() {
 						</div>
 					</div>
 				</GlassCard>
-			</Grid>
+			</div>
 
 			{/* Import History */}
 			<GlassCard padding="lg">

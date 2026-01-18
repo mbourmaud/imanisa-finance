@@ -13,7 +13,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	GlassCard,
-	Grid,
 	Heading,
 	MoreHorizontal,
 	PageHeader,
@@ -200,7 +199,7 @@ export default function InvestmentsPage() {
 			</StatCardGrid>
 
 			{/* Sources Grid */}
-			<Grid cols={1} colsSm={2} colsLg={4} gap="md">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 				{sources.map((source) => {
 					const gain = source.value - source.invested;
 					const isPositive = gain >= 0;
@@ -271,7 +270,7 @@ export default function InvestmentsPage() {
 						</GlassCard>
 					);
 				})}
-			</Grid>
+			</div>
 
 			{/* Positions Table */}
 			<GlassCard padding="lg">

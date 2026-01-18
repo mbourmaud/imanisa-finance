@@ -12,7 +12,6 @@ import {
 	DropdownMenuTrigger,
 	Film,
 	GlassCard,
-	Grid,
 	Heading,
 	Heart,
 	Home,
@@ -183,7 +182,7 @@ export default function BudgetPage() {
 			</GlassCard>
 
 			{/* Categories Grid */}
-			<Grid cols={3} gap="md">
+			<div className="grid grid-cols-3 gap-4">
 				{categories.map((category) => {
 					const percentage = (category.spent / category.budget) * 100;
 					const isOverBudget = category.spent > category.budget;
@@ -259,7 +258,7 @@ export default function BudgetPage() {
 						</GlassCard>
 					);
 				})}
-			</Grid>
+			</div>
 
 			{/* Chart */}
 			<GlassCard padding="lg">
@@ -272,10 +271,10 @@ export default function BudgetPage() {
 							Vue graphique par catégorie
 						</Text>
 					</div>
-					<Grid cols={2} gap="xl" style={{ alignItems: 'center' }}>
+					<div className="grid grid-cols-2 gap-8 items-center">
 						<DonutChart data={chartData} height="lg" />
 						<ChartLegend items={chartData} total={totalSpent} />
-					</Grid>
+					</div>
 				</div>
 			</GlassCard>
 		</div>
