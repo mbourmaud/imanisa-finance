@@ -27,14 +27,10 @@ function isValidBankKey(key: string): boolean {
 
 export async function POST(request: NextRequest) {
 	try {
-		console.log('[Upload] Starting upload request');
 		const user = await requireAuth();
-		console.log('[Upload] User authenticated:', { id: user.id, email: user.email });
 
 		// Ensure user exists in Prisma (sync from Supabase)
-		console.log('[Upload] Syncing user to Prisma')
 		await userRepository.syncFromAuth(user.id, user.email, user.name)
-		console.log('[Upload] User synced successfully')
 
 		const formData = await request.formData();
 		const file = formData.get('file') as File | null;
@@ -83,7 +79,6 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Create RawImport record in database
-		console.log('[Upload] Creating RawImport record');
 		const rawImport = await rawImportRepository.create({
 			userId: user.id,
 			bankKey,
@@ -93,7 +88,6 @@ export async function POST(request: NextRequest) {
 			mimeType,
 			accountId: accountId || undefined,
 		});
-		console.log('[Upload] RawImport created:', rawImport.id);
 
 		return NextResponse.json(
 			{
