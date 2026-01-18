@@ -352,27 +352,26 @@ export default function LoansPage() {
 											<div className="flex flex-col gap-4">
 												{/* Mobile: Show remaining amount */}
 												<div className="block sm:hidden">
-													<Text
-														size="2xl"
-														weight="semibold"
+													<p
+														className="text-2xl font-semibold"
 														style={{ fontVariantNumeric: 'tabular-nums' }}
 													>
 														{formatCurrency(loan.remainingAmount)}
-													</Text>
-													<Text size="xs" color="muted">
+													</p>
+													<p className="text-xs text-muted-foreground">
 														Capital restant
-													</Text>
+													</p>
 												</div>
 
 												{/* Progress Bar */}
 												<div className="flex flex-col gap-3">
 													<div className="flex justify-between">
-														<Text size="xs" color="muted">
+														<span className="text-xs text-muted-foreground">
 															Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
-														</Text>
-														<Text size="xs" weight="medium">
+														</span>
+														<span className="text-xs font-medium">
 															{progress.toFixed(1)}%
-														</Text>
+														</span>
 													</div>
 													<Progress value={progress} style={{ height: '0.5rem' }} />
 												</div>
@@ -394,15 +393,15 @@ export default function LoansPage() {
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<Euro style={{ height: '0.875rem', width: '0.875rem' }} />
-															<Text size="xs">Mensualité</Text>
+															<span className="text-xs">Mensualité</span>
 														</div>
-														<Text weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+														<p className="font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 															{formatCurrency(loan.monthlyPayment)}
-														</Text>
+														</p>
 														{loanInsuranceTotal > 0 && (
-															<Text size="xs" color="muted">
+															<p className="text-xs text-muted-foreground">
 																+ {formatCurrency(loanInsuranceTotal)} assurance
-															</Text>
+															</p>
 														)}
 													</div>
 													<div
@@ -414,12 +413,12 @@ export default function LoansPage() {
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<Percent style={{ height: '0.875rem', width: '0.875rem' }} />
-															<Text size="xs">Taux</Text>
+															<span className="text-xs">Taux</span>
 														</div>
-														<Text weight="semibold">{loan.rate}%</Text>
-														<Text size="xs" color="muted">
+														<p className="font-semibold">{loan.rate}%</p>
+														<p className="text-xs text-muted-foreground">
 															Taux nominal
-														</Text>
+														</p>
 													</div>
 													<div
 														className="rounded-xl p-3"
@@ -430,13 +429,13 @@ export default function LoansPage() {
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<Calendar style={{ height: '0.875rem', width: '0.875rem' }} />
-															<Text size="xs">Durée restante</Text>
+															<span className="text-xs">Durée restante</span>
 														</div>
-														<Text weight="semibold">{formatRemainingTime(loan.endDate)}</Text>
+														<p className="font-semibold">{formatRemainingTime(loan.endDate)}</p>
 														{loan.endDate && (
-															<Text size="xs" color="muted">
+															<p className="text-xs text-muted-foreground">
 																{remainingMonths} échéances
-															</Text>
+															</p>
 														)}
 													</div>
 													<div
@@ -448,14 +447,14 @@ export default function LoansPage() {
 															style={{ color: 'hsl(var(--muted-foreground))' }}
 														>
 															<ArrowDown style={{ height: '0.875rem', width: '0.875rem' }} />
-															<Text size="xs">Montant initial</Text>
+															<span className="text-xs">Montant initial</span>
 														</div>
-														<Text weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+														<p className="font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 															{formatCurrency(loan.initialAmount)}
-														</Text>
-														<Text size="xs" color="muted">
+														</p>
+														<p className="text-xs text-muted-foreground">
 															Emprunté
-														</Text>
+														</p>
 													</div>
 												</div>
 											</div>
@@ -476,23 +475,22 @@ export default function LoansPage() {
 								<CardContent style={{ paddingTop: '1.5rem' }}>
 									<div className="flex flex-col sm:flex-row justify-between items-center gap-4">
 										<div className="flex flex-col">
-											<Text weight="medium">Total mensuel</Text>
-											<Text size="sm" color="muted">
+											<p className="font-medium">Total mensuel</p>
+											<p className="text-sm text-muted-foreground">
 												Tous crédits confondus
-											</Text>
+											</p>
 										</div>
 										<div style={{ textAlign: 'right' }}>
-											<Text
-												size="3xl"
-												weight="semibold"
+											<p
+												className="text-3xl font-semibold"
 												style={{ fontVariantNumeric: 'tabular-nums' }}
 											>
 												{formatCurrency(totalMonthly)}
-											</Text>
-											<Text size="sm" color="muted">
+											</p>
+											<p className="text-sm text-muted-foreground">
 												{formatCurrency(summary.totalMonthlyPayment)} capital +{' '}
 												{formatCurrency(summary.totalInsurance)} assurance
-											</Text>
+											</p>
 										</div>
 									</div>
 								</CardContent>

@@ -10,24 +10,6 @@
  */
 
 // =============================================================================
-// LAYOUT COMPONENTS
-// =============================================================================
-
-export type {
-	BackgroundColor,
-	BorderStyle,
-	BoxProps,
-	DisplayType,
-	ElementType as BoxElementType,
-	OverflowType,
-	PositionType,
-	RoundedSize,
-	ShadowSize,
-	SpacingSize,
-} from './ui/box';
-export { Box } from './ui/box';
-
-// =============================================================================
 // TYPOGRAPHY
 // =============================================================================
 
