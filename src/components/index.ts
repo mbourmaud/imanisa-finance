@@ -482,3 +482,15 @@ export type { Position } from './investments/PositionListItem';
 export { PositionListItem } from './investments/PositionListItem';
 export { PortfolioChartSection } from './investments/PortfolioChartSection';
 export { PositionsSection } from './investments/PositionsSection';
+
+// =============================================================================
+// LOAN COMPONENTS
+// =============================================================================
+
+export type { LoanData } from './loans/LoanCard';
+export { LoanCard } from './loans/LoanCard';
+export { LoanCardSkeleton } from './loans/LoanCardSkeleton';
+export { LoanEmptyState } from './loans/LoanEmptyState';
+export { LoanErrorCard } from './loans/LoanErrorCard';
+export { LoanInfoBox } from './loans/LoanInfoBox';
+export { LoanSummaryCard } from './loans/LoanSummaryCard';
