@@ -376,3 +376,18 @@ export type { StackProps, StackGap, StackAlign, StackJustify } from './common/St
 export { Stack } from './common/Stack';
 export type { RowProps, RowGap, RowAlign, RowJustify, RowWrap } from './common/Row';
 export { Row } from './common/Row';
+
+// =============================================================================
+// TYPOGRAPHY COMPONENTS
+// =============================================================================
+
+export type { TextProps, TextSize, TextWeight, TextColor, TextAlign } from './common/Text';
+export { Text } from './common/Text';
+export type {
+	HeadingProps,
+	HeadingLevel,
+	HeadingSize,
+	HeadingColor,
+	HeadingWeight,
+} from './common/Heading';
+export { Heading } from './common/Heading';
