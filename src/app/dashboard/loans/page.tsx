@@ -12,7 +12,7 @@ import {
 	MoreHorizontal,
 	Percent,
 	TrendingDown,
-} from 'lucide-react'
+} from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageHeader } from '@/components/ui/page-header'

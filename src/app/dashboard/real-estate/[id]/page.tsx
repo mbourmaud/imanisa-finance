@@ -26,7 +26,7 @@ import {
 	Wifi,
 	X,
 	Zap,
-} from 'lucide-react'
+} from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,

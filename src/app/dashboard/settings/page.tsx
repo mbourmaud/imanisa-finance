@@ -24,7 +24,7 @@ import {
 	Users,
 	Pencil,
 	Trash2,
-} from 'lucide-react';
+} from '@/components/ui/icon';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

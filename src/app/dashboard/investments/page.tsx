@@ -11,7 +11,7 @@ import {
 	RefreshCw,
 	TrendingUp,
 	Wallet,
-} from 'lucide-react';
+} from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { InvestmentPerformanceChart } from '@/components/charts';
 import { PageHeader } from '@/components/ui/page-header';

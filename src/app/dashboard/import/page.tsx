@@ -11,7 +11,7 @@ import {
 	RotateCcw,
 	Trash2,
 	Upload,
-} from 'lucide-react';
+} from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import {
 	Select,

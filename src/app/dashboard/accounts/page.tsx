@@ -18,7 +18,7 @@ import {
 	Plus,
 	TrendingUp,
 	Wallet,
-} from 'lucide-react';
+} from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { useAccountsQuery } from '@/features/accounts';
 import { PageHeader } from '@/components/ui/page-header';

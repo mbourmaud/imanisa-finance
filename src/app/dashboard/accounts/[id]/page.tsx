@@ -18,6 +18,7 @@ import {
 	Clock,
 	ExternalLink,
 	FileSpreadsheet,
+	IconWrapper,
 	Loader2,
 	Pencil,
 	Plus,
@@ -127,13 +128,13 @@ interface RawImport {
 function getStatusIcon(status: RawImport['status']) {
 	switch (status) {
 		case 'PROCESSED':
-			return <CheckCircle2 className="h-4 w-4 text-[oklch(0.55_0.15_145)]" />;
+			return <IconWrapper icon={CheckCircle2} size="sm" color="success" />;
 		case 'PROCESSING':
-			return <Loader2 className="h-4 w-4 text-primary animate-spin" />;
+			return <IconWrapper icon={Loader2} size="sm" color="primary" className="animate-spin" />;
 		case 'FAILED':
-			return <AlertCircle className="h-4 w-4 text-[oklch(0.55_0.2_25)]" />;
+			return <IconWrapper icon={AlertCircle} size="sm" color="danger" />;
 		default:
-			return <Clock className="h-4 w-4 text-muted-foreground" />;
+			return <IconWrapper icon={Clock} size="sm" color="muted" />;
 	}
 }
 
@@ -521,9 +522,8 @@ export default function AccountDetailPage() {
 				description="Ce compte n'existe pas ou a été supprimé"
 				size="md"
 				action={
-					<Button variant="outline" className="gap-2" asChild>
+					<Button variant="outline" iconLeft={<IconWrapper icon={ArrowLeft} size="sm" />} asChild>
 						<Link href="/dashboard/accounts">
-							<ArrowLeft className="h-4 w-4" />
 							Retour aux comptes
 						</Link>
 					</Button>

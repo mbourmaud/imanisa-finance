@@ -11,7 +11,7 @@ import {
 	Plus,
 	TrendingUp,
 	X,
-} from 'lucide-react'
+} from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
 import { EmptyState } from '@/components/ui/empty-state'

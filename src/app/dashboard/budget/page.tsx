@@ -15,7 +15,7 @@ import {
 	ShoppingCart,
 	Utensils,
 	Zap,
-} from 'lucide-react';
+} from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { DonutChart, ChartLegend } from '@/components/charts';
 import { PageHeader } from '@/components/ui/page-header';
