@@ -9,12 +9,9 @@ import {
 	Landmark,
 	Plus,
 	TrendingUp,
-	Users,
 	Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import {
 	Dialog,
 	DialogContent,
@@ -39,9 +36,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { BankLogo } from '@/components/banks/BankLogo';
+import { PageHeader } from '@/components/ui/page-header';
+import { StatCard, StatCardGrid, StatCardSkeleton } from '@/components/ui/stat-card';
+import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
+import { AccountTypeBadge } from '@/components/accounts/AccountCard';
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
+import { cn } from '@/lib/utils';
+
+// =============================================================================
+// TYPES
+// =============================================================================
 
 interface AccountMember {
 	id: string;
@@ -92,63 +97,343 @@ interface BanksResponse {
 	summary: BanksSummary;
 }
 
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-	}).format(amount);
-}
+// =============================================================================
+// SKELETONS
+// =============================================================================
 
-// Skeleton for the stats cards
-function StatsCardsSkeleton() {
-	return (
-		<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-			{[1, 2, 3].map((i) => (
-				<Card key={i} className="py-4">
-					<CardContent className="flex items-center gap-4 px-4">
-						<Skeleton className="h-10 w-10 rounded-lg" />
-						<div className="flex-1">
-							<Skeleton className="h-3 w-16 mb-2" />
-							<Skeleton className="h-6 w-20" />
-						</div>
-					</CardContent>
-				</Card>
-			))}
-		</div>
-	);
-}
-
-// Skeleton for bank card
 function BankRowSkeleton() {
 	return (
-		<div className="bg-card rounded-lg border border-border/60 p-4 border-l-4 border-l-muted-foreground/20">
+		<div className="glass-card p-4 animate-pulse">
 			<div className="flex items-center gap-4">
-				<Skeleton className="h-10 w-10 rounded-lg" />
-				<div className="flex-1">
-					<Skeleton className="h-5 w-32 mb-1" />
-					<Skeleton className="h-4 w-20" />
+				<div className="h-12 w-12 rounded-xl bg-muted" />
+				<div className="flex-1 space-y-2">
+					<div className="h-5 w-32 rounded bg-muted" />
+					<div className="h-4 w-20 rounded bg-muted" />
 				</div>
-				<Skeleton className="h-6 w-24" />
-				<Skeleton className="h-9 w-24 rounded-md" />
+				<div className="h-6 w-24 rounded bg-muted" />
 			</div>
 		</div>
 	);
 }
 
-// Account type labels and colors
-const ACCOUNT_TYPE_LABELS: Record<string, string> = {
-	CHECKING: 'Compte courant',
-	SAVINGS: 'Épargne',
-	INVESTMENT: 'Investissement',
-	LOAN: 'Prêt',
-};
+// =============================================================================
+// SECTION HEADER WITH ICON
+// =============================================================================
 
-const ACCOUNT_TYPE_COLORS: Record<string, string> = {
-	CHECKING: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
-	SAVINGS: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
-	INVESTMENT: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
-	LOAN: 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
-};
+interface SectionHeaderWithIconProps {
+	icon: React.ReactNode;
+	title: string;
+	iconBgClass: string;
+	action?: React.ReactNode;
+}
+
+function SectionHeaderWithIcon({
+	icon,
+	title,
+	iconBgClass,
+	action,
+}: SectionHeaderWithIconProps) {
+	return (
+		<div className="flex items-center justify-between mb-4">
+			<div className="flex items-center gap-2">
+				<div
+					className={cn(
+						'flex h-6 w-6 items-center justify-center rounded-md',
+						iconBgClass
+					)}
+				>
+					{icon}
+				</div>
+				<h2 className="text-sm font-semibold text-foreground">{title}</h2>
+				<div className="flex-1 ml-3 h-px bg-border/50" />
+			</div>
+			{action}
+		</div>
+	);
+}
+
+// =============================================================================
+// BANK ROW COMPONENT
+// =============================================================================
+
+interface BankRowProps {
+	bank: Bank;
+	logo: string | null;
+	onAddAccount: () => void;
+	onLogoChange: (url: string) => void;
+	animationDelay?: number;
+}
+
+function BankRow({
+	bank,
+	logo,
+	onAddAccount,
+	onLogoChange,
+	animationDelay = 0,
+}: BankRowProps) {
+	const hasAccounts = bank.accountCount > 0;
+
+	const baseStyles = cn(
+		'glass-card border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2'
+	);
+
+	const animationStyles = {
+		borderLeftColor: bank.color,
+		animationDelay: `${animationDelay}ms`,
+		animationFillMode: 'backwards' as const,
+	};
+
+	const contentMarkup = (
+		<>
+			{/* Bank header */}
+			<div className="flex items-center gap-4 p-4">
+				<BankLogo
+					bankId={bank.id}
+					bankName={bank.name}
+					bankColor={bank.color}
+					logo={logo}
+					size="lg"
+					onLogoChange={onLogoChange}
+				/>
+				<div className="flex-1 min-w-0">
+					<div className="flex items-center gap-2">
+						<h3
+							className={cn(
+								'text-lg font-semibold',
+								!hasAccounts && 'text-muted-foreground'
+							)}
+						>
+							{bank.name}
+						</h3>
+						{hasAccounts ? (
+							<span className="badge-fun badge-default text-xs">
+								{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
+							</span>
+						) : (
+							<span className="text-xs text-muted-foreground italic">
+								Aucun compte
+							</span>
+						)}
+					</div>
+					{bank.description && (
+						<p className="text-sm text-muted-foreground mt-0.5">
+							{bank.description}
+						</p>
+					)}
+				</div>
+				{hasAccounts ? (
+					<>
+						<MoneyDisplay
+							amount={bank.totalBalance}
+							size="lg"
+							weight="semibold"
+						/>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="gap-1 text-muted-foreground hover:text-foreground"
+							onClick={(e) => {
+								e.stopPropagation();
+								onAddAccount();
+							}}
+						>
+							<Plus className="h-4 w-4" />
+							<span className="hidden sm:inline">Ajouter</span>
+						</Button>
+					</>
+				) : (
+					<Button
+						variant="default"
+						size="sm"
+						className="gap-1"
+						onClick={(e) => {
+							e.stopPropagation();
+							onAddAccount();
+						}}
+					>
+						<Plus className="h-4 w-4" />
+						Ajouter un compte
+					</Button>
+				)}
+			</div>
+
+			{/* Accounts list */}
+			{bank.accounts.length > 0 && (
+				<div className="px-4 pb-4 ml-16 space-y-2">
+					{bank.accounts.map((account) => (
+						<AccountRowLink key={account.id} account={account} />
+					))}
+				</div>
+			)}
+		</>
+	);
+
+	// Return different markup based on whether bank row is clickable
+	if (!hasAccounts) {
+		return (
+			<button
+				type="button"
+				className={cn(
+					baseStyles,
+					'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer text-left w-full'
+				)}
+				style={animationStyles}
+				onClick={onAddAccount}
+			>
+				{contentMarkup}
+			</button>
+		);
+	}
+
+	return (
+		<div
+			className={cn(baseStyles, 'hover:shadow-sm')}
+			style={animationStyles}
+		>
+			{contentMarkup}
+		</div>
+	);
+}
+
+// =============================================================================
+// ACCOUNT ROW LINK COMPONENT
+// =============================================================================
+
+interface AccountRowLinkProps {
+	account: Account;
+}
+
+function AccountRowLink({ account }: AccountRowLinkProps) {
+	// Map member data for MemberAvatarGroup
+	const memberData = account.members.map((m) => ({
+		id: m.id,
+		name: m.name,
+		color: m.color || undefined,
+	}));
+
+	return (
+		<Link
+			href={`/dashboard/accounts/${account.id}`}
+			className="glass-card p-3 flex items-center justify-between group hover:bg-muted/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+		>
+			<div className="flex items-center gap-3">
+				<div>
+					<div className="flex items-center gap-2">
+						<p className="font-medium text-sm group-hover:text-foreground">
+							{account.name}
+						</p>
+						<AccountTypeBadge
+							type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
+							variant="subtle"
+							className="text-[10px]"
+						/>
+					</div>
+					{account.members.length > 0 && (
+						<div className="mt-1.5">
+							<MemberAvatarGroup
+								members={memberData}
+								size="xs"
+								max={4}
+								spacing="normal"
+							/>
+						</div>
+					)}
+				</div>
+			</div>
+			<div className="flex items-center gap-3">
+				<MoneyDisplay
+					amount={account.balance}
+					size="sm"
+					weight="semibold"
+					autoColor
+				/>
+				<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
+			</div>
+		</Link>
+	);
+}
+
+// =============================================================================
+// ADD BANK DROPDOWN
+// =============================================================================
+
+interface AddBankDropdownProps {
+	banks: Bank[];
+	onSelectBank: (bank: Bank) => void;
+}
+
+function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="outline" size="sm" className="gap-1 text-xs">
+					<Plus className="h-3.5 w-3.5" />
+					Ajouter
+					<ChevronDown className="h-3 w-3 opacity-50" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="w-48">
+				{banks.map((bank) => (
+					<DropdownMenuItem
+						key={bank.id}
+						onClick={() => onSelectBank(bank)}
+						className="gap-2"
+					>
+						<span
+							className="w-2 h-2 rounded-full"
+							style={{ backgroundColor: bank.color }}
+						/>
+						{bank.name}
+					</DropdownMenuItem>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
+// =============================================================================
+// MEMBER SELECTOR FOR DIALOG
+// =============================================================================
+
+interface MemberSelectorChipsProps {
+	members: Member[];
+	selectedIds: string[];
+	onToggle: (id: string) => void;
+}
+
+function MemberSelectorChips({
+	members,
+	selectedIds,
+	onToggle,
+}: MemberSelectorChipsProps) {
+	return (
+		<div className="flex flex-wrap gap-2">
+			{members.map((member) => (
+				<button
+					key={member.id}
+					type="button"
+					onClick={() => onToggle(member.id)}
+					className={cn(
+						'flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150 cursor-pointer border',
+						selectedIds.includes(member.id)
+							? 'bg-primary/10 text-primary border-primary/30'
+							: 'bg-muted/50 text-muted-foreground border-transparent hover:bg-muted hover:text-foreground'
+					)}
+				>
+					<span
+						className="w-2.5 h-2.5 rounded-full"
+						style={{ backgroundColor: member.color || '#6b7280' }}
+					/>
+					{member.name}
+				</button>
+			))}
+		</div>
+	);
+}
+
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
 
 export default function BanksPage() {
 	const [data, setData] = useState<BanksResponse | null>(null);
@@ -255,120 +540,72 @@ export default function BanksPage() {
 	// Toggle member selection
 	const toggleMember = (memberId: string) => {
 		setNewAccountMembers((prev) =>
-			prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId],
+			prev.includes(memberId)
+				? prev.filter((id) => id !== memberId)
+				: [...prev, memberId]
 		);
 	};
 
 	return (
 		<div className="max-w-4xl">
 			{/* Header */}
-			<div className="mb-8">
-				<h1 className="text-2xl font-semibold text-foreground">Banques</h1>
-				<p className="text-muted-foreground mt-1">
-					Gérez vos établissements et importez vos données
-				</p>
-			</div>
+			<PageHeader
+				title="Banques"
+				description="Gérez vos établissements et importez vos données"
+				size="sm"
+			/>
 
 			{/* Stats Cards */}
 			{loading ? (
-				<StatsCardsSkeleton />
+				<StatCardGrid columns={3}>
+					<StatCardSkeleton variant="gold" />
+					<StatCardSkeleton variant="teal" />
+					<StatCardSkeleton variant="mint" />
+				</StatCardGrid>
 			) : error ? (
 				<div className="py-6 text-destructive">{error}</div>
 			) : (
-				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-					{/* Banks Card */}
-					<Card className="py-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-						<CardContent className="flex items-center gap-4 px-4">
-							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/50">
-								<Landmark className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-							</div>
-							<div>
-								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-									Banques
-								</p>
-								<p className="text-2xl font-semibold tabular-nums">
-									{data?.summary.totalBanksUsed ?? 0}
-									<span className="text-sm font-normal text-muted-foreground ml-1">
-										/ {data?.summary.totalBanksAvailable ?? 0}
-									</span>
-								</p>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Accounts Card */}
-					<Card className="py-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50 dark:border-blue-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '50ms', animationFillMode: 'backwards' }}>
-						<CardContent className="flex items-center gap-4 px-4">
-							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
-								<CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-							</div>
-							<div>
-								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-									Comptes actifs
-								</p>
-								<p className="text-2xl font-semibold tabular-nums">
-									{data?.summary.totalAccounts ?? 0}
-								</p>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Balance Card */}
-					<Card className="py-4 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-800/30 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
-						<CardContent className="flex items-center gap-4 px-4">
-							<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-								<Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-							</div>
-							<div>
-								<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-									Solde total
-								</p>
-								<p className="text-2xl font-semibold tabular-nums">
-									{formatCurrency(data?.summary.totalBalance ?? 0)}
-								</p>
-							</div>
-						</CardContent>
-					</Card>
-				</div>
+				<StatCardGrid columns={3}>
+					<StatCard
+						variant="gold"
+						icon={Landmark}
+						label="Banques"
+						value={data?.summary.totalBanksUsed ?? 0}
+						description={`/ ${data?.summary.totalBanksAvailable ?? 0}`}
+					/>
+					<StatCard
+						variant="teal"
+						icon={CreditCard}
+						label="Comptes actifs"
+						value={data?.summary.totalAccounts ?? 0}
+					/>
+					<StatCard
+						variant="mint"
+						icon={Wallet}
+						label="Solde total"
+						value={new Intl.NumberFormat('fr-FR', {
+							style: 'currency',
+							currency: 'EUR',
+						}).format(data?.summary.totalBalance ?? 0)}
+					/>
+				</StatCardGrid>
 			)}
 
 			{/* Bank accounts section */}
 			<div className="mt-8">
-				<div className="flex items-center justify-between mb-4">
-					<div className="flex items-center gap-2">
-						<div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/50">
-							<Landmark className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-						</div>
-						<h2 className="text-sm font-semibold text-foreground">
-							Comptes bancaires
-						</h2>
-						<div className="flex-1 ml-3 h-px bg-border/50" />
-					</div>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="outline" size="sm" className="gap-1 text-xs">
-								<Plus className="h-3.5 w-3.5" />
-								Ajouter
-								<ChevronDown className="h-3 w-3 opacity-50" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-48">
-							{data?.bankAccounts.map((bank) => (
-								<DropdownMenuItem
-									key={bank.id}
-									onClick={() => handleAddAccountClick(bank)}
-									className="gap-2"
-								>
-									<span
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: bank.color }}
-									/>
-									{bank.name}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
+				<SectionHeaderWithIcon
+					icon={<Landmark className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />}
+					iconBgClass="bg-blue-100 dark:bg-blue-900/50"
+					title="Comptes bancaires"
+					action={
+						data?.bankAccounts && (
+							<AddBankDropdown
+								banks={data.bankAccounts}
+								onSelectBank={handleAddAccountClick}
+							/>
+						)
+					}
+				/>
 
 				{loading ? (
 					<div className="space-y-3">
@@ -378,178 +615,35 @@ export default function BanksPage() {
 					</div>
 				) : (
 					<div className="space-y-3">
-						{data?.bankAccounts.map((bank, index) => {
-							const hasAccounts = bank.accountCount > 0;
-
-							return (
-								<div
-									key={bank.id}
-									className={`rounded-lg p-4 border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 ${
-										hasAccounts
-											? 'bg-card border border-border/60 hover:shadow-sm'
-											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
-									}`}
-									style={{
-										borderLeftColor: bank.color,
-										animationDelay: `${index * 50}ms`,
-										animationFillMode: 'backwards',
-									}}
-									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
-								>
-									{/* Bank header */}
-									<div className="flex items-center gap-4">
-										<BankLogo
-											bankId={bank.id}
-											bankName={bank.name}
-											bankColor={bank.color}
-											logo={bankLogos[bank.id] ?? bank.logo}
-											size="lg"
-											onLogoChange={(url) => handleLogoChange(bank.id, url)}
-										/>
-										<div className="flex-1 min-w-0">
-											<div className="flex items-center gap-2">
-												<h3 className={`text-lg font-semibold ${!hasAccounts && 'text-muted-foreground'}`}>{bank.name}</h3>
-												{hasAccounts ? (
-													<Badge variant="secondary" className="text-xs">
-														{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-													</Badge>
-												) : (
-													<span className="text-xs text-muted-foreground italic">
-														Aucun compte
-													</span>
-												)}
-											</div>
-											{bank.description && (
-												<p className="text-sm text-muted-foreground mt-0.5">
-													{bank.description}
-												</p>
-											)}
-										</div>
-										{hasAccounts ? (
-											<>
-												<p className="text-lg font-semibold tabular-nums">
-													{formatCurrency(bank.totalBalance)}
-												</p>
-												<Button
-													variant="ghost"
-													size="sm"
-													className="gap-1 text-muted-foreground hover:text-foreground"
-													onClick={() => handleAddAccountClick(bank)}
-												>
-													<Plus className="h-4 w-4" />
-													<span className="hidden sm:inline">Ajouter</span>
-												</Button>
-											</>
-										) : (
-											<Button
-												variant="default"
-												size="sm"
-												className="gap-1"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleAddAccountClick(bank);
-												}}
-											>
-												<Plus className="h-4 w-4" />
-												Ajouter un compte
-											</Button>
-										)}
-									</div>
-
-									{/* Accounts list */}
-									{bank.accounts.length > 0 && (
-									<div className="mt-4 ml-16 space-y-2">
-										{bank.accounts.map((account) => (
-											<Link
-												key={account.id}
-												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-md hover:border-border/60 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-											>
-												<div className="flex items-center gap-3">
-													<div>
-														<div className="flex items-center gap-2">
-															<p className="font-medium text-sm group-hover:text-foreground">{account.name}</p>
-															<span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ACCOUNT_TYPE_COLORS[account.type] || 'bg-muted text-muted-foreground'}`}>
-																{ACCOUNT_TYPE_LABELS[account.type] || account.type}
-															</span>
-														</div>
-														{account.members.length > 0 && (
-															<div className="flex items-center gap-1 mt-1">
-																<div className="flex -space-x-1">
-																	{account.members.map((member) => (
-																		<Tooltip key={member.id}>
-																			<TooltipTrigger asChild>
-																				<span
-																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
-																					style={{ backgroundColor: member.color || '#6b7280' }}
-																				>
-																					{member.name.charAt(0).toUpperCase()}
-																				</span>
-																			</TooltipTrigger>
-																			<TooltipContent>
-																				<p>{member.name}</p>
-																			</TooltipContent>
-																		</Tooltip>
-																	))}
-																</div>
-															</div>
-														)}
-													</div>
-												</div>
-												<div className="flex items-center gap-3">
-													<p className="font-semibold tabular-nums text-sm">
-														{formatCurrency(account.balance)}
-													</p>
-													<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
-												</div>
-											</Link>
-										))}
-									</div>
-								)}
-								</div>
-							);
-						})}
+						{data?.bankAccounts.map((bank, index) => (
+							<BankRow
+								key={bank.id}
+								bank={bank}
+								logo={bankLogos[bank.id] ?? bank.logo}
+								onAddAccount={() => handleAddAccountClick(bank)}
+								onLogoChange={(url) => handleLogoChange(bank.id, url)}
+								animationDelay={index * 50}
+							/>
+						))}
 					</div>
 				)}
 			</div>
 
 			{/* Investments section */}
 			<div className="mt-8">
-				<div className="flex items-center justify-between mb-4">
-					<div className="flex items-center gap-2">
-						<div className="flex h-6 w-6 items-center justify-center rounded-md bg-purple-100 dark:bg-purple-900/50">
-							<TrendingUp className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
-						</div>
-						<h2 className="text-sm font-semibold text-foreground">
-							Investissements
-						</h2>
-						<div className="flex-1 ml-3 h-px bg-border/50" />
-					</div>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="outline" size="sm" className="gap-1 text-xs">
-								<Plus className="h-3.5 w-3.5" />
-								Ajouter
-								<ChevronDown className="h-3 w-3 opacity-50" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-48">
-							{data?.investmentAccounts.map((bank) => (
-								<DropdownMenuItem
-									key={bank.id}
-									onClick={() => handleAddAccountClick(bank)}
-									className="gap-2"
-								>
-									<span
-										className="w-2 h-2 rounded-full"
-										style={{ backgroundColor: bank.color }}
-									/>
-									{bank.name}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
+				<SectionHeaderWithIcon
+					icon={<TrendingUp className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />}
+					iconBgClass="bg-purple-100 dark:bg-purple-900/50"
+					title="Investissements"
+					action={
+						data?.investmentAccounts && (
+							<AddBankDropdown
+								banks={data.investmentAccounts}
+								onSelectBank={handleAddAccountClick}
+							/>
+						)
+					}
+				/>
 
 				{loading ? (
 					<div className="space-y-3">
@@ -558,137 +652,16 @@ export default function BanksPage() {
 					</div>
 				) : (
 					<div className="space-y-3">
-						{data?.investmentAccounts.map((bank, index) => {
-							const hasAccounts = bank.accountCount > 0;
-
-							return (
-								<div
-									key={bank.id}
-									className={`rounded-lg p-4 border-l-4 transition-all duration-200 animate-in fade-in-0 slide-in-from-bottom-2 ${
-										hasAccounts
-											? 'bg-card border border-border/60 hover:shadow-sm'
-											: 'bg-muted/20 border-2 border-dashed border-border/40 hover:border-border/60 hover:bg-muted/30 cursor-pointer'
-									}`}
-									style={{
-										borderLeftColor: bank.color,
-										animationDelay: `${index * 50}ms`,
-										animationFillMode: 'backwards',
-									}}
-									onClick={hasAccounts ? undefined : () => handleAddAccountClick(bank)}
-								>
-									{/* Bank header */}
-									<div className="flex items-center gap-4">
-										<BankLogo
-											bankId={bank.id}
-											bankName={bank.name}
-											bankColor={bank.color}
-											logo={bankLogos[bank.id] ?? bank.logo}
-											size="lg"
-											onLogoChange={(url) => handleLogoChange(bank.id, url)}
-										/>
-										<div className="flex-1 min-w-0">
-											<div className="flex items-center gap-2">
-												<h3 className={`text-lg font-semibold ${!hasAccounts && 'text-muted-foreground'}`}>{bank.name}</h3>
-												{hasAccounts ? (
-													<Badge variant="secondary" className="text-xs">
-														{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-													</Badge>
-												) : (
-													<span className="text-xs text-muted-foreground italic">
-														Aucun compte
-													</span>
-												)}
-											</div>
-											{bank.description && (
-												<p className="text-sm text-muted-foreground mt-0.5">
-													{bank.description}
-												</p>
-											)}
-										</div>
-										{hasAccounts ? (
-											<>
-												<p className="text-lg font-semibold tabular-nums">
-													{formatCurrency(bank.totalBalance)}
-												</p>
-												<Button
-													variant="ghost"
-													size="sm"
-													className="gap-1 text-muted-foreground hover:text-foreground"
-													onClick={() => handleAddAccountClick(bank)}
-												>
-													<Plus className="h-4 w-4" />
-													<span className="hidden sm:inline">Ajouter</span>
-												</Button>
-											</>
-										) : (
-											<Button
-												variant="default"
-												size="sm"
-												className="gap-1"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleAddAccountClick(bank);
-												}}
-											>
-												<Plus className="h-4 w-4" />
-												Ajouter un compte
-											</Button>
-										)}
-									</div>
-
-									{/* Accounts list */}
-									{bank.accounts.length > 0 && (
-									<div className="mt-4 ml-16 space-y-2">
-										{bank.accounts.map((account) => (
-											<Link
-												key={account.id}
-												href={`/dashboard/accounts/${account.id}`}
-												className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background hover:bg-muted/30 hover:shadow-md hover:border-border/60 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-											>
-												<div className="flex items-center gap-3">
-													<div>
-														<div className="flex items-center gap-2">
-															<p className="font-medium text-sm group-hover:text-foreground">{account.name}</p>
-															<span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ACCOUNT_TYPE_COLORS[account.type] || 'bg-muted text-muted-foreground'}`}>
-																{ACCOUNT_TYPE_LABELS[account.type] || account.type}
-															</span>
-														</div>
-														{account.members.length > 0 && (
-															<div className="flex items-center gap-1 mt-1">
-																<div className="flex -space-x-1">
-																	{account.members.map((member) => (
-																		<Tooltip key={member.id}>
-																			<TooltipTrigger asChild>
-																				<span
-																					className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium text-white ring-2 ring-background cursor-default"
-																					style={{ backgroundColor: member.color || '#6b7280' }}
-																				>
-																					{member.name.charAt(0).toUpperCase()}
-																				</span>
-																			</TooltipTrigger>
-																			<TooltipContent>
-																				<p>{member.name}</p>
-																			</TooltipContent>
-																		</Tooltip>
-																	))}
-																</div>
-															</div>
-														)}
-													</div>
-												</div>
-												<div className="flex items-center gap-3">
-													<p className="font-semibold tabular-nums text-sm">
-														{formatCurrency(account.balance)}
-													</p>
-													<ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200" />
-												</div>
-											</Link>
-										))}
-									</div>
-								)}
-								</div>
-							);
-						})}
+						{data?.investmentAccounts.map((bank, index) => (
+							<BankRow
+								key={bank.id}
+								bank={bank}
+								logo={bankLogos[bank.id] ?? bank.logo}
+								onAddAccount={() => handleAddAccountClick(bank)}
+								onLogoChange={(url) => handleLogoChange(bank.id, url)}
+								animationDelay={index * 50}
+							/>
+						))}
 					</div>
 				)}
 			</div>
@@ -698,9 +671,7 @@ export default function BanksPage() {
 				<DialogContent className="sm:max-w-md">
 					<DialogHeader>
 						<DialogTitle>Nouveau compte</DialogTitle>
-						<DialogDescription>
-							{selectedBank?.name}
-						</DialogDescription>
+						<DialogDescription>{selectedBank?.name}</DialogDescription>
 					</DialogHeader>
 
 					<div className="space-y-5">
@@ -713,7 +684,10 @@ export default function BanksPage() {
 
 						{/* Account name */}
 						<div className="space-y-2">
-							<Label htmlFor="accountName" className="text-sm font-medium text-muted-foreground">
+							<Label
+								htmlFor="accountName"
+								className="text-sm font-medium text-muted-foreground"
+							>
 								Nom du compte
 							</Label>
 							<Input
@@ -727,7 +701,10 @@ export default function BanksPage() {
 
 						{/* Description (optional) */}
 						<div className="space-y-2">
-							<Label htmlFor="accountDescription" className="text-sm font-medium text-muted-foreground">
+							<Label
+								htmlFor="accountDescription"
+								className="text-sm font-medium text-muted-foreground"
+							>
 								Description
 								<span className="ml-1 text-xs font-normal">(optionnel)</span>
 							</Label>
@@ -742,7 +719,10 @@ export default function BanksPage() {
 
 						{/* Account type */}
 						<div className="space-y-2">
-							<Label htmlFor="accountType" className="text-sm font-medium text-muted-foreground">
+							<Label
+								htmlFor="accountType"
+								className="text-sm font-medium text-muted-foreground"
+							>
 								Type de compte
 							</Label>
 							<Select value={newAccountType} onValueChange={setNewAccountType}>
@@ -760,7 +740,10 @@ export default function BanksPage() {
 
 						{/* Export URL (optional) */}
 						<div className="space-y-2">
-							<Label htmlFor="accountExportUrl" className="text-sm font-medium text-muted-foreground">
+							<Label
+								htmlFor="accountExportUrl"
+								className="text-sm font-medium text-muted-foreground"
+							>
 								Lien d'export
 								<span className="ml-1 text-xs font-normal">(optionnel)</span>
 							</Label>
@@ -782,26 +765,11 @@ export default function BanksPage() {
 							<Label className="text-sm font-medium text-muted-foreground">
 								Titulaires
 							</Label>
-							<div className="flex flex-wrap gap-2">
-								{members.map((member) => (
-									<button
-										key={member.id}
-										type="button"
-										onClick={() => toggleMember(member.id)}
-										className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150 cursor-pointer border ${
-											newAccountMembers.includes(member.id)
-												? 'bg-primary/10 text-primary border-primary/30'
-												: 'bg-muted/50 text-muted-foreground border-transparent hover:bg-muted hover:text-foreground'
-										}`}
-									>
-										<span
-											className="w-2.5 h-2.5 rounded-full"
-											style={{ backgroundColor: member.color || '#6b7280' }}
-										/>
-										{member.name}
-									</button>
-								))}
-							</div>
+							<MemberSelectorChips
+								members={members}
+								selectedIds={newAccountMembers}
+								onToggle={toggleMember}
+							/>
 						</div>
 					</div>
 
