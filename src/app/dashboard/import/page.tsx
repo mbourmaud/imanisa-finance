@@ -11,19 +11,19 @@ import {
 	RotateCcw,
 	Trash2,
 	Upload,
-} from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
+} from '@/components';
+import { Button } from '@/components';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
+} from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { PageHeader } from '@/components/ui/page-header';
-import { EmptyState } from '@/components/ui/empty-state';
-import { StatCard, StatCardGrid } from '@/components/ui/stat-card';
+import { PageHeader } from '@/components';
+import { EmptyState } from '@/components';
+import { StatCard, StatCardGrid } from '@/components';
 
 interface RawImport {
 	id: string;

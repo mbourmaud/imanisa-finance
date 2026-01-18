@@ -12,20 +12,20 @@ import {
 	MoreHorizontal,
 	Percent,
 	TrendingDown,
-} from '@/components/ui/icon'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PageHeader } from '@/components/ui/page-header'
-import { EmptyState as EmptyStateComponent } from '@/components/ui/empty-state'
+} from '@/components'
+import { Button } from '@/components'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components'
+import { PageHeader } from '@/components'
+import { EmptyState as EmptyStateComponent } from '@/components'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Progress } from '@/components/ui/progress'
-import { Skeleton } from '@/components/ui/skeleton'
+} from '@/components'
+import { Progress } from '@/components'
+import { Skeleton } from '@/components'
 import { useLoansQuery } from '@/features/loans'
 import type { PropertyType } from '@/lib/prisma'
 

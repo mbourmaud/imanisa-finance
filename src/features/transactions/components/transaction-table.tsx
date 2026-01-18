@@ -10,16 +10,16 @@
 import { useMemo, useState, useCallback } from 'react';
 import type { PaginationState, RowSelectionState, SortingState, Updater } from '@tanstack/react-table';
 import { Search, X } from 'lucide-react';
-import { DataTable } from '@/components/ui/data-table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { DataTable } from '@/components';
+import { Input } from '@/components';
+import { Button } from '@/components';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
+} from '@/components';
 import { useTransactionsQuery } from '../hooks/use-transactions-query';
 import { createTransactionColumns } from './transaction-columns';
 import type { Transaction, TransactionFilters, TransactionType } from '../types';

@@ -15,18 +15,18 @@ import {
 	ShoppingCart,
 	Utensils,
 	Zap,
-} from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
+} from '@/components';
+import { Button } from '@/components';
 import { DonutChart, ChartLegend } from '@/components/charts';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Progress } from '@/components/ui/progress';
+} from '@/components';
+import { Progress } from '@/components';
 
 const categories = [
 	{

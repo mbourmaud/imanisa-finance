@@ -18,13 +18,13 @@ import {
 	Plus,
 	TrendingUp,
 	Wallet,
-} from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
+} from '@/components';
+import { Button } from '@/components';
 import { useAccountsQuery } from '@/features/accounts';
-import { PageHeader } from '@/components/ui/page-header';
-import { StatCard, StatCardGrid } from '@/components/ui/stat-card';
+import { PageHeader } from '@/components';
+import { StatCard, StatCardGrid } from '@/components';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
-import { EmptyState } from '@/components/ui/empty-state';
+import { EmptyState } from '@/components';
 import { formatMoneyCompact } from '@/shared/utils';
 
 // Account type returned by API

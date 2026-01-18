@@ -15,18 +15,18 @@ import {
 	Download,
 	Filter,
 	Search,
-} from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from '@/components';
+import { Button } from '@/components';
+import { Input } from '@/components';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
-import { PageHeader } from '@/components/ui/page-header';
-import { StatCard, StatCardGrid } from '@/components/ui/stat-card';
+} from '@/components';
+import { PageHeader } from '@/components';
+import { StatCard, StatCardGrid } from '@/components';
 import { MoneyDifference } from '@/components/common/MoneyDisplay';
 import { formatMoney, formatDate as formatDateUtil } from '@/shared/utils';
 

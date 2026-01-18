@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
+	// Icons
 	AlertCircle,
 	ArrowLeft,
 	Check,
@@ -29,27 +30,33 @@ import {
 	Trash2,
 	Upload,
 	X,
-} from '@/components/ui/icon';
-import { Box } from '@/components/ui/box';
-import { VStack, HStack } from '@/components/ui/stack';
-import { Flex } from '@/components/ui/flex';
-import { Text, Heading } from '@/components/ui/typography';
-import { GlassCard } from '@/components/ui/glass-card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
+	// Layout
+	Box,
+	VStack,
+	HStack,
+	Flex,
+	// Typography
+	Text,
+	Heading,
+	// Cards
+	GlassCard,
+	// Form elements
+	Button,
+	Input,
+	// Sheet
 	Sheet,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
 	SheetDescription,
-} from '@/components/ui/sheet';
+	// Feedback
+	EmptyState,
+} from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { formatDate, formatRelativeTime } from '@/shared/utils';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
 import { AccountTypeBadge } from '@/components/accounts/AccountCard';
-import { EmptyState } from '@/components/ui/empty-state';
 
 // TanStack Query hooks
 import {

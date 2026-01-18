@@ -11,10 +11,10 @@ import {
 	RefreshCw,
 	TrendingUp,
 	Wallet,
-} from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
+} from '@/components';
+import { Button } from '@/components';
 import { InvestmentPerformanceChart } from '@/components/charts';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components';
 import { demoInvestmentPerformance } from '@/lib/demo';
 import {
 	DropdownMenu,
@@ -22,7 +22,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components';
 
 const sources = [
 	{

@@ -10,8 +10,8 @@ import {
 	Plus,
 	TrendingUp,
 	Wallet,
-} from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
+} from '@/components';
+import { Button } from '@/components';
 import {
 	Dialog,
 	DialogContent,
@@ -19,34 +19,34 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/components';
+import { Input } from '@/components';
+import { Label } from '@/components';
+import { Textarea } from '@/components';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
+} from '@/components';
 import { BankLogo } from '@/components/banks/BankLogo';
-import { PageHeader } from '@/components/ui/page-header';
-import { StatCard, StatCardGrid, StatCardSkeleton } from '@/components/ui/stat-card';
+import { PageHeader } from '@/components';
+import { StatCard, StatCardGrid, StatCardSkeleton } from '@/components';
 import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
 import { AccountTypeBadge } from '@/components/accounts/AccountCard';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
-import { Box } from '@/components/ui/box';
-import { VStack, HStack } from '@/components/ui/stack';
-import { Flex } from '@/components/ui/flex';
-import { Text, Heading } from '@/components/ui/typography';
-import { GlassCard } from '@/components/ui/glass-card';
+import { Box } from '@/components';
+import { VStack, HStack } from '@/components';
+import { Flex } from '@/components';
+import { Text, Heading } from '@/components';
+import { GlassCard } from '@/components';
 
 // =============================================================================
 // TYPES

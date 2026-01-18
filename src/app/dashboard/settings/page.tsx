@@ -24,31 +24,31 @@ import {
 	Users,
 	Pencil,
 	Trash2,
-} from '@/components/ui/icon';
+} from '@/components';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components';
+import { Input } from '@/components';
+import { Label } from '@/components';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
+} from '@/components';
+import { Separator } from '@/components';
+import { Switch } from '@/components';
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '@/components/ui/dialog';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@/components';
+import { Skeleton } from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { PageHeader } from '@/components/ui/page-header';
-import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components';
+import { EmptyState } from '@/components';
 import { MemberAvatar } from '@/components/members/MemberAvatar';
 
 interface Member {

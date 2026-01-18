@@ -8,8 +8,8 @@
 
 import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowDownLeft, ArrowUpRight, MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components';
+import { Checkbox } from '@/components';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -17,7 +17,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components';
 import type { Transaction } from '../types';
 
 /**
