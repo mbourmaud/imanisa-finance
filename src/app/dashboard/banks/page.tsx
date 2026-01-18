@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import {
 	Button,
 	ChevronDown,
@@ -47,6 +48,7 @@ import { AccountTypeBadge } from '@/components/accounts/AccountCard';
 import { BankLogo } from '@/components/banks/BankLogo';
 import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 import { MemberAvatarGroup } from '@/components/members/MemberAvatar';
+import { useCreateAccountMutation } from '@/features/accounts';
 
 // =============================================================================
 // TYPES
@@ -438,15 +440,24 @@ export default function BanksPage() {
 	const [newAccountExportUrl, setNewAccountExportUrl] = useState('');
 	const [newAccountType, setNewAccountType] = useState('CHECKING');
 	const [newAccountMembers, setNewAccountMembers] = useState<string[]>([]);
-	const [savingAccount, setSavingAccount] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
 
 	// Track bank logos separately so we can update them after upload
 	const [bankLogos, setBankLogos] = useState<Record<string, string | null>>({});
 
+	// Create account mutation
+	const createAccountMutation = useCreateAccountMutation();
+
 	// Handler for when a bank logo is updated
 	const handleLogoChange = (bankId: string, newLogoUrl: string) => {
 		setBankLogos((prev) => ({ ...prev, [bankId]: newLogoUrl }));
+	};
+
+	// Refresh data function
+	const refreshData = async () => {
+		const banksRes = await fetch('/api/banks');
+		if (banksRes.ok) {
+			setData(await banksRes.json());
+		}
 	};
 
 	useEffect(() => {
@@ -483,46 +494,30 @@ export default function BanksPage() {
 		setNewAccountExportUrl('');
 		setNewAccountType('CHECKING');
 		setNewAccountMembers([]);
-		setFormError(null);
+		createAccountMutation.reset();
 		setShowAddAccount(true);
 	};
 
-	// Create new account
+	// Create new account using mutation
 	const handleCreateAccount = async () => {
 		if (!selectedBank || !newAccountName.trim()) return;
 
-		setFormError(null);
-		setSavingAccount(true);
 		try {
-			const response = await fetch('/api/accounts', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					name: newAccountName.trim(),
-					description: newAccountDescription.trim() || undefined,
-					exportUrl: newAccountExportUrl.trim() || undefined,
-					bankId: selectedBank.id,
-					type: newAccountType,
-					memberIds: newAccountMembers.length > 0 ? newAccountMembers : undefined,
-				}),
+			await createAccountMutation.mutateAsync({
+				name: newAccountName.trim(),
+				description: newAccountDescription.trim() || undefined,
+				exportUrl: newAccountExportUrl.trim() || undefined,
+				bankId: selectedBank.id,
+				type: newAccountType as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN',
+				memberIds: newAccountMembers.length > 0 ? newAccountMembers : undefined,
 			});
 
-			if (response.ok) {
-				// Refresh data
-				const banksRes = await fetch('/api/banks');
-				if (banksRes.ok) {
-					setData(await banksRes.json());
-				}
-				setShowAddAccount(false);
-			} else {
-				const errData = await response.json();
-				setFormError(errData.error || 'Erreur lors de la création du compte');
-			}
+			// Refresh data to show new account
+			await refreshData();
+			setShowAddAccount(false);
+			toast.success('Compte créé avec succès');
 		} catch (err) {
-			console.error('Error creating account:', err);
-			setFormError('Une erreur est survenue. Veuillez réessayer.');
-		} finally {
-			setSavingAccount(false);
+			toast.error(err instanceof Error ? err.message : 'Erreur lors de la création du compte');
 		}
 	};
 
@@ -680,7 +675,7 @@ export default function BanksPage() {
 
 					<Stack gap="lg">
 						{/* Error message */}
-						{formError && (
+						{createAccountMutation.error && (
 							<div
 								style={{
 									borderRadius: '0.375rem',
@@ -689,8 +684,8 @@ export default function BanksPage() {
 									border: '1px solid hsl(var(--destructive) / 0.2)',
 								}}
 							>
-								<Text size="sm" color="destructive">
-									{formError}
+<Text size="sm" color="destructive">
+									{createAccountMutation.error.message}
 								</Text>
 							</div>
 						)}
@@ -816,15 +811,15 @@ export default function BanksPage() {
 						<Button
 							variant="outline"
 							onClick={() => setShowAddAccount(false)}
-							disabled={savingAccount}
+							disabled={createAccountMutation.isPending}
 						>
 							Annuler
 						</Button>
 						<Button
 							onClick={handleCreateAccount}
-							disabled={savingAccount || !newAccountName.trim()}
+							disabled={createAccountMutation.isPending || !newAccountName.trim()}
 						>
-							{savingAccount ? 'Création...' : 'Créer le compte'}
+							{createAccountMutation.isPending ? 'Création...' : 'Créer le compte'}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

@@ -735,6 +735,272 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 }
 ```
 
+### Standard Form Pattern
+
+This project uses a standardized pattern for all forms: **useAppForm + Valibot schema + TanStack Query mutation**.
+
+#### Creating a New Form - Checklist
+
+When creating a new form, follow this checklist:
+
+- [ ] **1. Create Valibot Schema** - `src/features/[feature]/forms/[feature]-form-schema.ts`
+  - Define all fields with proper validation
+  - Use French error messages for user-facing validation
+  - Export the schema and the inferred type (`FormValues`)
+
+- [ ] **2. Create Mutation Hook** - `src/features/[feature]/hooks/use-[feature]-query.ts`
+  - Define query key factory with `all`, `lists()`, `detail()` pattern
+  - Create mutation hook with proper cache invalidation in `onSuccess`
+  - Use `mutateAsync` for form submissions (allows try/catch)
+
+- [ ] **3. Create Form Component** - `src/features/[feature]/components/[Feature]Form.tsx`
+  - Use `useAppForm` (not `useForm` directly)
+  - Pass Valibot schema to `validators.onChange`
+  - Use mutation hook for submission
+  - Use `toast.success()` / `toast.error()` for feedback
+  - Handle loading states (`isLoading`, `isPending`)
+
+- [ ] **4. Export from Barrel** - `src/features/[feature]/index.ts`
+  - Export schema, types, hooks, and components
+  - Use barrel exports in pages (never direct imports)
+
+- [ ] **5. Integrate in Page** - `src/app/dashboard/[feature]/page.tsx`
+  - Import from barrel (`@/features/[feature]`)
+  - Handle loading/error states before rendering form
+
+#### Architecture Overview
+
+```
+src/features/[feature]/
+├── forms/
+│   └── [feature]-form-schema.ts    # Valibot validation schema
+├── hooks/
+│   └── use-[feature]-query.ts      # TanStack Query hooks (queries + mutations)
+├── components/
+│   └── [Feature]Form.tsx           # Form component
+└── index.ts                        # Barrel exports
+```
+
+#### Step 1: Create Valibot Schema
+
+```typescript
+// src/features/profile/forms/profile-form-schema.ts
+import * as v from 'valibot';
+
+export const profileFormSchema = v.object({
+  name: v.pipe(
+    v.string(),
+    v.minLength(1, 'Le nom est requis'),
+    v.maxLength(100, 'Le nom ne peut pas dépasser 100 caractères')
+  ),
+  email: v.pipe(v.string(), v.email('Veuillez entrer un email valide')),
+});
+
+export type ProfileFormValues = v.InferOutput<typeof profileFormSchema>;
+```
+
+#### Step 2: Create Mutation Hook
+
+```typescript
+// src/features/profile/hooks/use-profile-query.ts
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+// Query key factory
+export const profileKeys = {
+  all: ['profile'] as const,
+  detail: () => [...profileKeys.all, 'detail'] as const,
+};
+
+// Query hook
+export function useProfileQuery() {
+  return useQuery({
+    queryKey: profileKeys.detail(),
+    queryFn: async () => {
+      const response = await fetch('/api/profile');
+      if (!response.ok) throw new Error('Failed to fetch profile');
+      return response.json();
+    },
+  });
+}
+
+// Mutation hook
+export function useUpdateProfileMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: UpdateProfileInput) => {
+      const response = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+      if (!response.ok) throw new Error('Failed to update profile');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.all });
+    },
+  });
+}
+```
+
+#### Step 3: Create Form Component
+
+```tsx
+// src/features/profile/components/ProfileForm.tsx
+'use client';
+
+import { useEffect } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components';
+import { TextField, useAppForm } from '@/lib/forms';
+import { profileFormSchema } from '../forms/profile-form-schema';
+import { useProfileQuery, useUpdateProfileMutation } from '../hooks/use-profile-query';
+
+export function ProfileForm() {
+  const { data: profile, isLoading } = useProfileQuery();
+  const updateMutation = useUpdateProfileMutation();
+
+  const form = useAppForm({
+    defaultValues: {
+      name: '',
+      email: '',
+    },
+    validators: {
+      onChange: profileFormSchema,  // Valibot schema, no adapter needed
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        await updateMutation.mutateAsync(value);
+        toast.success('Profil mis à jour');
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Erreur');
+      }
+    },
+  });
+
+  // Populate form with fetched data
+  useEffect(() => {
+    if (profile) {
+      form.setFieldValue('name', profile.name || '');
+      form.setFieldValue('email', profile.email);
+    }
+  }, [profile, form]);
+
+  if (isLoading) return <LoadingSpinner />;
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}>
+      <form.AppField name="name">
+        {() => <TextField label="Nom" placeholder="Votre nom" />}
+      </form.AppField>
+
+      <form.AppField name="email">
+        {() => <TextField label="Email" type="email" />}
+      </form.AppField>
+
+      <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+        {([canSubmit, isSubmitting]) => (
+          <Button type="submit" disabled={!canSubmit || updateMutation.isPending}>
+            {isSubmitting || updateMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
+          </Button>
+        )}
+      </form.Subscribe>
+    </form>
+  );
+}
+```
+
+#### Step 4: Export from Barrel
+
+```typescript
+// src/features/profile/index.ts
+export { ProfileForm } from './components/ProfileForm';
+export { profileKeys, useProfileQuery, useUpdateProfileMutation } from './hooks/use-profile-query';
+export { profileFormSchema, type ProfileFormValues } from './forms/profile-form-schema';
+```
+
+#### Available Field Components
+
+The `@/lib/forms` module provides pre-built field components:
+
+| Component | Usage |
+|-----------|-------|
+| `TextField` | Text input, email, password |
+| `NumberField` | Numeric input with step/min/max |
+| `SelectField` | Dropdown select |
+| `TextAreaField` | Multi-line text input |
+| `SubmitButton` | Submit button with loading state |
+| `FormActions` | Form action buttons container |
+| `FieldError` | Field error display |
+
+#### Key Rules
+
+1. **Always use `useAppForm`** - Not `useForm` from TanStack directly
+2. **Always use Valibot** - Not Zod for schemas
+3. **Always use mutation hooks** - No direct `fetch()` calls in forms
+4. **Always use toast for feedback** - `toast.success()` / `toast.error()`
+5. **Handle loading states** - Check `isLoading` and `isPending`
+6. **Populate forms with `useEffect`** - When editing existing data
+
+#### Common Mistakes to Avoid
+
+| Mistake | Why It's Wrong | Correct Approach |
+|---------|----------------|------------------|
+| Using `fetch()` directly in `onSubmit` | No cache invalidation, no loading state, no error handling | Use mutation hook with `mutateAsync()` |
+| Using `useForm` from TanStack | Missing our app-specific configuration | Use `useAppForm` from `@/lib/forms` |
+| Using Zod for validation | Larger bundle, not our standard | Use Valibot with `v.object()`, `v.pipe()` |
+| `useState` for form field values | No validation, no form state management | Use `form.Field` with `field.state.value` |
+| Direct imports from feature internals | Breaks encapsulation, harder to refactor | Import from barrel (`@/features/[feature]`) |
+| Missing `onSuccess` invalidation | Stale data after mutation | Always invalidate related queries |
+| Using `mutate()` instead of `mutateAsync()` | Cannot use try/catch for error handling | Use `mutateAsync()` in form `onSubmit` |
+| Forgetting loading states | Poor UX, double submissions | Check `mutation.isPending` on submit button |
+| No toast feedback | User doesn't know if action succeeded | Always show `toast.success()` or `toast.error()` |
+| Inline error messages without `isTouched` | Shows errors before user interacts | Check `field.state.meta.isTouched` first |
+
+**Anti-pattern examples:**
+
+```tsx
+// ❌ BAD: Direct fetch in form
+const handleSubmit = async (data) => {
+  const response = await fetch('/api/users', { method: 'POST', body: JSON.stringify(data) });
+  if (response.ok) alert('Success!');
+};
+
+// ✅ GOOD: Mutation hook
+const mutation = useCreateUserMutation();
+const handleSubmit = async (data) => {
+  try {
+    await mutation.mutateAsync(data);
+    toast.success('Utilisateur créé');
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Erreur');
+  }
+};
+```
+
+```tsx
+// ❌ BAD: useState for form fields
+const [name, setName] = useState('');
+const [email, setEmail] = useState('');
+
+// ✅ GOOD: useAppForm
+const form = useAppForm({
+  defaultValues: { name: '', email: '' },
+  validators: { onChange: userFormSchema },
+});
+```
+
+```tsx
+// ❌ BAD: Zod schema
+import { z } from 'zod';
+const schema = z.object({ name: z.string().min(1) });
+
+// ✅ GOOD: Valibot schema
+import * as v from 'valibot';
+const schema = v.object({ name: v.pipe(v.string(), v.minLength(1, 'Le nom est requis')) });
+```
+
 ## Tests
 
 Playwright test account: `fr100828` / `1L0v31000niuM*`
