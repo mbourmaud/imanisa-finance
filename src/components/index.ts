@@ -494,3 +494,15 @@ export { LoanEmptyState } from './loans/LoanEmptyState';
 export { LoanErrorCard } from './loans/LoanErrorCard';
 export { LoanInfoBox } from './loans/LoanInfoBox';
 export { LoanSummaryCard } from './loans/LoanSummaryCard';
+
+// =============================================================================
+// IMPORT COMPONENTS
+// =============================================================================
+
+export { ImportDropZone } from './import/ImportDropZone';
+export { ImportErrorBanner } from './import/ImportErrorBanner';
+export { ImportHistorySection } from './import/ImportHistorySection';
+export { ImportRefreshButton } from './import/ImportRefreshButton';
+export type { ImportData } from './import/ImportRow';
+export { ImportRow } from './import/ImportRow';
+export { ImportStatsCard } from './import/ImportStatsCard';
