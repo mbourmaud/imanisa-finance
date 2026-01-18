@@ -389,27 +389,19 @@ function LoanCard({
 						>
 							{loan.name}
 						</p>
-						{loan.lender && (
-							<p className="text-sm text-muted-foreground">
-								{loan.lender}
-							</p>
-						)}
+						{loan.lender && <p className="text-sm text-muted-foreground">{loan.lender}</p>}
 					</div>
 					<div className="text-right shrink-0">
 						<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.remainingAmount)}
 						</p>
-						<p className="text-xs text-muted-foreground">
-							restant
-						</p>
+						<p className="text-xs text-muted-foreground">restant</p>
 					</div>
 				</div>
 
 				<div className="flex flex-col gap-2">
 					<div className="flex justify-between">
-						<p className="text-xs text-muted-foreground">
-							Progression du remboursement
-						</p>
+						<p className="text-xs text-muted-foreground">Progression du remboursement</p>
 						<p className="text-xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{paidPercent.toFixed(0)}%
 						</p>
@@ -419,25 +411,19 @@ function LoanCard({
 
 				<div className="grid grid-cols-3 gap-4 pt-2 text-sm">
 					<div className="flex flex-col">
-						<p className="text-xs text-muted-foreground">
-							Mensualité
-						</p>
+						<p className="text-xs text-muted-foreground">Mensualité</p>
 						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.monthlyPayment)}
 						</p>
 					</div>
 					<div className="flex flex-col">
-						<p className="text-xs text-muted-foreground">
-							Taux
-						</p>
+						<p className="text-xs text-muted-foreground">Taux</p>
 						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{loan.rate}%
 						</p>
 					</div>
 					<div className="flex flex-col">
-						<p className="text-xs text-muted-foreground">
-							Montant initial
-						</p>
+						<p className="text-xs text-muted-foreground">Montant initial</p>
 						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.initialAmount)}
 						</p>
@@ -485,9 +471,9 @@ function LoanCard({
 						</div>
 						<div className="flex items-center gap-3">
 							{hasInsurances && (
-								<Text size="xs" color="muted">
+								<p className="text-xs text-muted-foreground">
 									{formatCurrency(totalInsurancePremium)}/mois · {totalCoverage}%
-								</Text>
+								</p>
 							)}
 							{isExpanded ? (
 								<ChevronUp
@@ -519,9 +505,8 @@ function LoanCard({
 											</div>
 											<div className="flex-1 min-w-0">
 												<div className="flex items-center gap-3 flex-wrap">
-													<Text
-														size="sm"
-														weight="medium"
+													<p
+														className="text-sm font-medium"
 														style={{
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
@@ -529,9 +514,9 @@ function LoanCard({
 														}}
 													>
 														{insurance.member.name}
-													</Text>
-													<Text
-														size="xs"
+													</p>
+													<span
+														className="text-xs"
 														style={{
 															padding: '0.125rem 0.375rem',
 															borderRadius: '9999px',
@@ -540,11 +525,10 @@ function LoanCard({
 														}}
 													>
 														{insurance.coveragePercent}%
-													</Text>
+													</span>
 												</div>
-												<Text
-													size="xs"
-													color="muted"
+												<p
+													className="text-xs text-muted-foreground"
 													style={{
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
@@ -552,16 +536,16 @@ function LoanCard({
 													}}
 												>
 													{insurance.provider} · {formatCurrency(insurance.monthlyPremium)}/mois
-												</Text>
+												</p>
 											</div>
 										</div>
 									))}
 								</div>
 							) : (
 								<div className="text-center py-3">
-									<Text size="sm" color="muted" style={{ marginBottom: '0.5rem' }}>
+									<p className="text-sm text-muted-foreground" style={{ marginBottom: '0.5rem' }}>
 										Aucune assurance emprunteur
-									</Text>
+									</p>
 								</div>
 							)}
 							<Button
@@ -592,12 +576,12 @@ function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
 					style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 				/>
 			</div>
-			<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+			<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 				Aucun prêt
-			</Text>
-			<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+			</p>
+			<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 				Ajoutez les crédits immobiliers associés à ce bien.
-			</Text>
+			</p>
 			<Button variant="outline" size="sm" style={{ gap: '0.5rem' }} onClick={onAddClick}>
 				<Plus style={{ height: '1rem', width: '1rem' }} />
 				Ajouter un prêt
@@ -616,12 +600,10 @@ function DetailItem({
 	if (value === null || value === undefined) return null;
 	return (
 		<div className="flex flex-col">
-			<Text size="xs" color="muted">
-				{label}
-			</Text>
-			<Text weight="medium">
+			<p className="text-xs text-muted-foreground">{label}</p>
+			<p className="font-medium">
 				{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
-			</Text>
+			</p>
 		</div>
 	);
 }
@@ -630,12 +612,10 @@ function CurrencyItem({ label, value }: { label: string; value: number | null | 
 	if (value === null || value === undefined) return null;
 	return (
 		<div className="flex flex-col">
-			<Text size="xs" color="muted">
-				{label}
-			</Text>
-			<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+			<p className="text-xs text-muted-foreground">{label}</p>
+			<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 				{formatCurrency(value)}
-			</Text>
+			</p>
 		</div>
 	);
 }
@@ -1359,9 +1339,9 @@ export default function PropertyDetailPage() {
 						backgroundColor: 'hsl(var(--destructive) / 0.05)',
 					}}
 				>
-					<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+					<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 						{error || 'Bien non trouvé'}
-					</Text>
+					</p>
 					<Button
 						variant="outline"
 						size="sm"
@@ -1408,17 +1388,15 @@ export default function PropertyDetailPage() {
 						</Link>
 						<div className="min-w-0">
 							<div className="flex items-center gap-3 flex-wrap">
-								<Heading
-									level={1}
-									size="2xl"
-									weight="semibold"
+								<h1
+									className="text-2xl font-semibold tracking-tight"
 									style={{ letterSpacing: '-0.025em' }}
 								>
 									{property.name}
-								</Heading>
+								</h1>
 								<div className="flex gap-1">
-									<Text
-										size="xs"
+									<span
+										className="text-xs"
 										style={{
 											padding: '0.125rem 0.5rem',
 											borderRadius: '9999px',
@@ -1427,9 +1405,9 @@ export default function PropertyDetailPage() {
 										}}
 									>
 										{getPropertyTypeLabel(property.type)}
-									</Text>
-									<Text
-										size="xs"
+									</span>
+									<span
+										className="text-xs"
 										style={{
 											padding: '0.125rem 0.5rem',
 											borderRadius: '9999px',
@@ -1438,7 +1416,7 @@ export default function PropertyDetailPage() {
 										}}
 									>
 										{getPropertyUsageLabel(property.usage)}
-									</Text>
+									</span>
 								</div>
 							</div>
 							<div className="flex items-center gap-1 mt-1">
@@ -1450,11 +1428,11 @@ export default function PropertyDetailPage() {
 										color: 'hsl(var(--muted-foreground))',
 									}}
 								/>
-								<Text size="sm" color="muted">
+								<p className="text-sm text-muted-foreground">
 									{property.address}
 									{property.address2 && `, ${property.address2}`}, {property.postalCode}{' '}
 									{property.city}
-								</Text>
+								</p>
 							</div>
 						</div>
 					</div>
@@ -1529,21 +1507,17 @@ export default function PropertyDetailPage() {
 						<Home
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
-						<Heading level={3} size="md" weight="medium">
-							Informations
-						</Heading>
+						<h3 className="text-base font-semibold tracking-tight">Informations</h3>
 					</div>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 						{/* Caractéristiques */}
 						<div className="flex flex-col gap-3">
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Caractéristiques
-							</Text>
+							</p>
 							<div className="flex flex-col gap-3">
 								<DetailItem label="Surface" value={`${property.surface} m²`} />
 								<DetailItem label="Pièces" value={property.rooms} />
@@ -1553,14 +1527,12 @@ export default function PropertyDetailPage() {
 
 						{/* Achat */}
 						<div className="flex flex-col gap-3">
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Achat
-							</Text>
+							</p>
 							<div className="flex flex-col gap-3">
 								<CurrencyItem label="Prix d'achat" value={property.purchasePrice} />
 								<CurrencyItem label="Frais de notaire" value={property.notaryFees} />
@@ -1571,14 +1543,12 @@ export default function PropertyDetailPage() {
 
 						{/* Valeur & Rentabilité */}
 						<div className="flex flex-col gap-3">
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								{isRental ? 'Valeur & Revenus' : 'Valeur'}
-							</Text>
+							</p>
 							<div className="flex flex-col gap-3">
 								<CurrencyItem label="Valeur actuelle" value={property.currentValue} />
 								{isRental && (
@@ -1594,10 +1564,8 @@ export default function PropertyDetailPage() {
 					{/* Notes */}
 					{property.notes && (
 						<div className="mt-6 pt-6 border-t border-border/40">
-							<Text
-								size="xs"
-								weight="medium"
-								color="muted"
+							<p
+								className="text-xs font-medium text-muted-foreground"
 								style={{
 									textTransform: 'uppercase',
 									letterSpacing: '0.05em',
@@ -1605,10 +1573,8 @@ export default function PropertyDetailPage() {
 								}}
 							>
 								Notes
-							</Text>
-							<Text size="sm" color="muted">
-								{property.notes}
-							</Text>
+							</p>
+							<p className="text-sm text-muted-foreground">{property.notes}</p>
 						</div>
 					)}
 				</div>
@@ -1621,14 +1587,10 @@ export default function PropertyDetailPage() {
 						<Users
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
-						<Heading level={3} size="md" weight="medium">
-							Propriétaires
-						</Heading>
+						<h3 className="text-base font-semibold tracking-tight">Propriétaires</h3>
 					</div>
 					{property.propertyMembers.length === 0 ? (
-						<Text size="sm" color="muted">
-							Aucun propriétaire renseigné
-						</Text>
+						<p className="text-sm text-muted-foreground">Aucun propriétaire renseigné</p>
 					) : (
 						<div className="flex flex-wrap gap-3">
 							{property.propertyMembers.map((pm) => (
@@ -1656,10 +1618,8 @@ export default function PropertyDetailPage() {
 										{pm.member.name.charAt(0).toUpperCase()}
 									</div>
 									<div className="flex flex-col">
-										<Text weight="medium">{pm.member.name}</Text>
-										<Text size="sm" color="muted">
-											{pm.ownershipShare}%
-										</Text>
+										<p className="font-medium">{pm.member.name}</p>
+										<p className="text-sm text-muted-foreground">{pm.ownershipShare}%</p>
 									</div>
 								</div>
 							))}
@@ -1671,17 +1631,15 @@ export default function PropertyDetailPage() {
 			{/* Prêts Section */}
 			<GlassCard padding="lg">
 				<div className="flex justify-between items-center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<CreditCard
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
 						Prêts
-					</Heading>
+					</h3>
 					<Dialog
 						open={isLoanDialogOpen}
 						onOpenChange={(open) => {
@@ -1716,9 +1674,9 @@ export default function PropertyDetailPage() {
 												border: '1px solid hsl(var(--destructive) / 0.2)',
 											}}
 										>
-											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+											<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 												{loanFormError}
-											</Text>
+											</p>
 										</div>
 									)}
 
@@ -1758,9 +1716,7 @@ export default function PropertyDetailPage() {
 
 									{/* Amounts */}
 									<div className="flex flex-col gap-4">
-										<Text size="sm" weight="medium" color="muted">
-											Montants
-										</Text>
+										<p className="text-sm font-medium text-muted-foreground">Montants</p>
 										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 											<div className="flex flex-col gap-2">
 												<Label htmlFor="loan-initial">Montant initial (€) *</Label>
@@ -1892,33 +1848,27 @@ export default function PropertyDetailPage() {
 							style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 						>
 							<div className="text-center">
-								<Text size="xs" color="muted">
-									Capital restant
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<p className="text-xs text-muted-foreground">Capital restant</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(totalLoansRemaining)}
-								</Text>
+								</p>
 							</div>
 							<div className="text-center">
-								<Text size="xs" color="muted">
-									Mensualités
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<p className="text-xs text-muted-foreground">Mensualités</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.loans.reduce((sum, l) => sum + l.monthlyPayment, 0))}
-								</Text>
+								</p>
 							</div>
 							<div className="text-center">
-								<Text size="xs" color="muted">
-									Taux moyen
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<p className="text-xs text-muted-foreground">Taux moyen</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{property.loans.length > 0
 										? (
 												property.loans.reduce((sum, l) => sum + l.rate, 0) / property.loans.length
 											).toFixed(2)
 										: 0}
 									%
-								</Text>
+								</p>
 							</div>
 						</div>
 
@@ -1935,17 +1885,15 @@ export default function PropertyDetailPage() {
 			{/* Assurance Section */}
 			<GlassCard padding="lg">
 				<div className="flex justify-between items-center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<Shield
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
 						Assurance habitation
-					</Heading>
+					</h3>
 					{!property.insurance && (
 						<Button
 							variant="outline"
@@ -1980,9 +1928,9 @@ export default function PropertyDetailPage() {
 								</div>
 								<div className="flex flex-col">
 									<div className="flex items-center gap-3">
-										<Text weight="medium">{property.insurance.provider}</Text>
-										<Text
-											size="xs"
+										<p className="font-medium">{property.insurance.provider}</p>
+										<span
+											className="text-xs"
 											style={{
 												padding: '0.125rem 0.5rem',
 												borderRadius: '9999px',
@@ -1991,11 +1939,11 @@ export default function PropertyDetailPage() {
 											}}
 										>
 											{getInsuranceTypeBadge(property.insurance.type)}
-										</Text>
+										</span>
 									</div>
-									<Text size="sm" color="muted">
+									<p className="text-sm text-muted-foreground">
 										{getInsuranceTypeLabel(property.insurance.type)}
-									</Text>
+									</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-3 shrink-0">
@@ -2059,28 +2007,22 @@ export default function PropertyDetailPage() {
 						{/* Insurance details */}
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
 							<div>
-								<Text size="xs" color="muted">
-									Prime mensuelle
-								</Text>
-								<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<p className="text-xs text-muted-foreground">Prime mensuelle</p>
+								<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.insurance.monthlyPremium)}
-								</Text>
-								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
+								</p>
+								<p className="text-xs text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{formatCurrency(property.insurance.monthlyPremium * 12)}/an
-								</Text>
+								</p>
 							</div>
 							<div>
-								<Text size="xs" color="muted">
-									Date de début
-								</Text>
-								<Text weight="medium">{formatDate(property.insurance.startDate.toString())}</Text>
+								<p className="text-xs text-muted-foreground">Date de début</p>
+								<p className="font-medium">{formatDate(property.insurance.startDate.toString())}</p>
 							</div>
 							{property.insurance.endDate && (
 								<div>
-									<Text size="xs" color="muted">
-										Date de fin
-									</Text>
-									<Text weight="medium">{formatDate(property.insurance.endDate.toString())}</Text>
+									<p className="text-xs text-muted-foreground">Date de fin</p>
+									<p className="font-medium">{formatDate(property.insurance.endDate.toString())}</p>
 								</div>
 							)}
 						</div>
@@ -2094,20 +2036,20 @@ export default function PropertyDetailPage() {
 								style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 							>
 								{property.insurance.contractNumber && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										N° contrat:{' '}
-										<Text as="span" style={{ color: 'hsl(var(--foreground))' }}>
+										<span style={{ color: 'hsl(var(--foreground))' }}>
 											{property.insurance.contractNumber}
-										</Text>
-									</Text>
+										</span>
+									</p>
 								)}
 								{property.insurance.coverage && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Couverture:{' '}
-										<Text as="span" style={{ color: 'hsl(var(--foreground))' }}>
+										<span style={{ color: 'hsl(var(--foreground))' }}>
 											{property.insurance.coverage}
-										</Text>
-									</Text>
+										</span>
+									</p>
 								)}
 								{property.insurance.link && (
 									<a
@@ -2132,12 +2074,10 @@ export default function PropertyDetailPage() {
 
 						{property.insurance.notes && (
 							<div className="pt-2 border-t border-border/40">
-								<Text size="xs" color="muted">
-									Notes
-								</Text>
-								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+								<p className="text-xs text-muted-foreground">Notes</p>
+								<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{property.insurance.notes}
-								</Text>
+								</p>
 							</div>
 						)}
 					</div>
@@ -2160,12 +2100,12 @@ export default function PropertyDetailPage() {
 								style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
 						</div>
-						<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+						<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 							Aucune assurance
-						</Text>
-						<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+						</p>
+						<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 							Ajoutez l'assurance habitation de ce bien (MRH ou PNO).
-						</Text>
+						</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -2181,17 +2121,15 @@ export default function PropertyDetailPage() {
 			{/* Copropriété Section */}
 			<GlassCard padding="lg">
 				<div className="flex justify-between items-center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<Building2
 							style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 						/>
 						Copropriété
-					</Heading>
+					</h3>
 					{!property.coOwnership && (
 						<Button
 							variant="outline"
@@ -2229,10 +2167,8 @@ export default function PropertyDetailPage() {
 									/>
 								</div>
 								<div className="flex flex-col">
-									<Text weight="medium">{property.coOwnership.name}</Text>
-									<Text size="sm" color="muted">
-										Syndic de copropriété
-									</Text>
+									<p className="font-medium">{property.coOwnership.name}</p>
+									<p className="text-sm text-muted-foreground">Syndic de copropriété</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-3 shrink-0">
@@ -2297,20 +2233,16 @@ export default function PropertyDetailPage() {
 						{/* Amounts */}
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/40">
 							<div className="flex flex-col">
-								<Text size="xs" color="muted">
-									Charges trimestrielles
-								</Text>
-								<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<p className="text-xs text-muted-foreground">Charges trimestrielles</p>
+								<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.coOwnership.quarterlyAmount)}
-								</Text>
+								</p>
 							</div>
 							<div className="flex flex-col">
-								<Text size="xs" color="muted">
-									Charges annuelles
-								</Text>
-								<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<p className="text-xs text-muted-foreground">Charges annuelles</p>
+								<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(property.coOwnership.quarterlyAmount * 4)}
-								</Text>
+								</p>
 							</div>
 						</div>
 
@@ -2337,12 +2269,10 @@ export default function PropertyDetailPage() {
 
 						{property.coOwnership.notes && (
 							<div className="pt-2 border-t border-border/40">
-								<Text size="xs" color="muted">
-									Notes
-								</Text>
-								<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
+								<p className="text-xs text-muted-foreground">Notes</p>
+								<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{property.coOwnership.notes}
-								</Text>
+								</p>
 							</div>
 						)}
 					</div>
@@ -2365,12 +2295,12 @@ export default function PropertyDetailPage() {
 								style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
 						</div>
-						<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+						<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 							Aucune copropriété
-						</Text>
-						<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+						</p>
+						<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 							Ajoutez les informations du syndic et des charges de copropriété.
-						</Text>
+						</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -2386,15 +2316,13 @@ export default function PropertyDetailPage() {
 			{/* Contrats Section */}
 			<GlassCard padding="lg">
 				<div className="flex justify-between items-center">
-					<Heading
-						level={3}
-						size="md"
-						weight="medium"
+					<h3
+						className="text-base font-semibold tracking-tight"
 						style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
 					>
 						<Zap style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }} />
 						Contrats & Abonnements
-					</Heading>
+					</h3>
 					<Button
 						variant="outline"
 						size="sm"
@@ -2423,12 +2351,12 @@ export default function PropertyDetailPage() {
 								style={{ height: '1.5rem', width: '1.5rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
 						</div>
-						<Text weight="medium" style={{ marginBottom: '0.25rem' }}>
+						<p className="font-medium" style={{ marginBottom: '0.25rem' }}>
 							Aucun contrat
-						</Text>
-						<Text size="sm" color="muted" style={{ marginBottom: '1rem' }}>
+						</p>
+						<p className="text-sm text-muted-foreground" style={{ marginBottom: '1rem' }}>
 							Ajoutez les contrats d'énergie et abonnements liés à ce bien.
-						</Text>
+						</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -2446,22 +2374,16 @@ export default function PropertyDetailPage() {
 							style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 						>
 							<div className="flex flex-col items-center">
-								<Text size="xs" color="muted">
-									Nombre de contrats
-								</Text>
-								<Text size="lg" weight="semibold">
-									{property.utilityContracts.length}
-								</Text>
+								<p className="text-xs text-muted-foreground">Nombre de contrats</p>
+								<p className="text-lg font-semibold">{property.utilityContracts.length}</p>
 							</div>
 							<div className="flex flex-col items-center">
-								<Text size="xs" color="muted">
-									Total mensuel
-								</Text>
-								<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+								<p className="text-xs text-muted-foreground">Total mensuel</p>
+								<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 									{formatCurrency(
 										property.utilityContracts.reduce((sum, c) => sum + c.monthlyAmount, 0),
 									)}
-								</Text>
+								</p>
 							</div>
 						</div>
 
@@ -2496,7 +2418,7 @@ export default function PropertyDetailPage() {
 												</div>
 												<div className="flex flex-col">
 													<div className="flex items-center gap-3">
-														<Text weight="medium">{contract.provider}</Text>
+														<p className="font-medium">{contract.provider}</p>
 														<span
 															className="rounded-full"
 															style={{
@@ -2509,16 +2431,15 @@ export default function PropertyDetailPage() {
 															{getUtilityTypeLabel(contract.type)}
 														</span>
 													</div>
-													<Text
-														size="sm"
-														color="muted"
+													<p
+														className="text-sm text-muted-foreground"
 														style={{ fontVariantNumeric: 'tabular-nums' }}
 													>
 														{formatCurrency(contract.monthlyAmount)}/mois
 														<span style={{ fontSize: '0.75rem', marginLeft: '0.25rem' }}>
 															({formatCurrency(contract.monthlyAmount * 12)}/an)
 														</span>
-													</Text>
+													</p>
 												</div>
 											</div>
 											<div className="flex items-center gap-3 shrink-0">
@@ -2595,12 +2516,12 @@ export default function PropertyDetailPage() {
 												}}
 											>
 												{contract.contractNumber && (
-													<Text size="xs" color="muted">
+													<p className="text-xs text-muted-foreground">
 														N° contrat:{' '}
 														<span style={{ color: 'hsl(var(--foreground))' }}>
 															{contract.contractNumber}
 														</span>
-													</Text>
+													</p>
 												)}
 												{contract.link && (
 													<a
@@ -2624,9 +2545,7 @@ export default function PropertyDetailPage() {
 
 										{contract.notes && (
 											<div className="mt-2 pt-2 border-t border-border/40">
-												<Text size="xs" color="muted">
-													{contract.notes}
-												</Text>
+												<p className="text-xs text-muted-foreground">{contract.notes}</p>
 											</div>
 										)}
 									</div>
@@ -2665,9 +2584,9 @@ export default function PropertyDetailPage() {
 									border: '1px solid hsl(var(--destructive) / 0.2)',
 								}}
 							>
-								<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+								<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 									{insuranceFormError}
-								</Text>
+								</p>
 							</div>
 						)}
 
@@ -2739,9 +2658,7 @@ export default function PropertyDetailPage() {
 									value={insuranceFormData.coveragePercent}
 									onChange={(e) => handleInsuranceInputChange('coveragePercent', e.target.value)}
 								/>
-								<Text size="xs" color="muted">
-									Pourcentage du capital couvert
-								</Text>
+								<p className="text-xs text-muted-foreground">Pourcentage du capital couvert</p>
 							</div>
 							<div className="flex flex-col gap-2">
 								<Label htmlFor="insurance-premium">Prime mensuelle (€) *</Label>
@@ -2849,9 +2766,9 @@ export default function PropertyDetailPage() {
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{propertyInsuranceFormError}
-									</Text>
+									</p>
 								</div>
 							)}
 
@@ -2869,17 +2786,13 @@ export default function PropertyDetailPage() {
 										<SelectItem value="MRH">
 											<div className="flex flex-col">
 												<span>MRH - Multirisque Habitation</span>
-												<Text size="xs" color="muted">
-													Pour les occupants du bien
-												</Text>
+												<p className="text-xs text-muted-foreground">Pour les occupants du bien</p>
 											</div>
 										</SelectItem>
 										<SelectItem value="PNO">
 											<div className="flex flex-col">
 												<span>PNO - Propriétaire Non-Occupant</span>
-												<Text size="xs" color="muted">
-													Pour les biens locatifs
-												</Text>
+												<p className="text-xs text-muted-foreground">Pour les biens locatifs</p>
 											</div>
 										</SelectItem>
 									</SelectContent>
@@ -2925,13 +2838,13 @@ export default function PropertyDetailPage() {
 									}
 								/>
 								{propertyInsuranceFormData.monthlyPremium && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Soit{' '}
 										{formatCurrency(
 											Number.parseFloat(propertyInsuranceFormData.monthlyPremium) * 12,
 										)}
 										/an
-									</Text>
+									</p>
 								)}
 							</div>
 
@@ -3053,9 +2966,9 @@ export default function PropertyDetailPage() {
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{coOwnershipFormError}
-									</Text>
+									</p>
 								</div>
 							)}
 
@@ -3083,10 +2996,10 @@ export default function PropertyDetailPage() {
 									onChange={(e) => handleCoOwnershipInputChange('quarterlyAmount', e.target.value)}
 								/>
 								{coOwnershipFormData.quarterlyAmount && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Soit{' '}
 										{formatCurrency(Number.parseFloat(coOwnershipFormData.quarterlyAmount) * 4)}/an
-									</Text>
+									</p>
 								)}
 							</div>
 
@@ -3173,9 +3086,9 @@ export default function PropertyDetailPage() {
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{utilityContractFormError}
-									</Text>
+									</p>
 								</div>
 							)}
 
@@ -3263,11 +3176,11 @@ export default function PropertyDetailPage() {
 									}
 								/>
 								{utilityContractFormData.monthlyAmount && (
-									<Text size="xs" color="muted">
+									<p className="text-xs text-muted-foreground">
 										Soit{' '}
 										{formatCurrency(Number.parseFloat(utilityContractFormData.monthlyAmount) * 12)}
 										/an
-									</Text>
+									</p>
 								)}
 							</div>
 
@@ -3352,17 +3265,15 @@ export default function PropertyDetailPage() {
 										border: '1px solid hsl(var(--destructive) / 0.2)',
 									}}
 								>
-									<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+									<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 										{propertyFormError}
-									</Text>
+									</p>
 								</div>
 							)}
 
 							{/* Basic info */}
 							<div className="flex flex-col gap-4">
-								<Text size="sm" weight="medium" color="muted">
-									Informations générales
-								</Text>
+								<p className="text-sm font-medium text-muted-foreground">Informations générales</p>
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-name">Nom du bien *</Label>
@@ -3443,9 +3354,7 @@ export default function PropertyDetailPage() {
 
 							{/* Address */}
 							<div className="flex flex-col gap-4">
-								<Text size="sm" weight="medium" color="muted">
-									Adresse
-								</Text>
+								<p className="text-sm font-medium text-muted-foreground">Adresse</p>
 								<div className="flex flex-col gap-4">
 									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-address">Adresse *</Label>
@@ -3490,9 +3399,7 @@ export default function PropertyDetailPage() {
 
 							{/* Purchase info */}
 							<div className="flex flex-col gap-4">
-								<Text size="sm" weight="medium" color="muted">
-									Achat
-								</Text>
+								<p className="text-sm font-medium text-muted-foreground">Achat</p>
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-purchasePrice">Prix d&apos;achat (€) *</Label>
@@ -3544,9 +3451,7 @@ export default function PropertyDetailPage() {
 
 							{/* Current value */}
 							<div className="flex flex-col gap-4">
-								<Text size="sm" weight="medium" color="muted">
-									Valeur actuelle
-								</Text>
+								<p className="text-sm font-medium text-muted-foreground">Valeur actuelle</p>
 								<div className="flex flex-col gap-2">
 									<Label htmlFor="edit-currentValue">Valeur estimée (€) *</Label>
 									<Input
@@ -3564,9 +3469,9 @@ export default function PropertyDetailPage() {
 							{/* Rental info - only shown for RENTAL usage */}
 							{isEditFormRental && (
 								<div className="flex flex-col gap-4">
-									<Text size="sm" weight="medium" color="muted">
+									<p className="text-sm font-medium text-muted-foreground">
 										Informations locatives
-									</Text>
+									</p>
 									<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 										<div className="flex flex-col gap-2">
 											<Label htmlFor="edit-rentAmount">Loyer mensuel (€)</Label>
@@ -3599,9 +3504,7 @@ export default function PropertyDetailPage() {
 							{/* Members/Owners */}
 							<div className="flex flex-col gap-4">
 								<div className="flex justify-between items-center">
-									<Text size="sm" weight="medium" color="muted">
-										Propriétaires
-									</Text>
+									<p className="text-sm font-medium text-muted-foreground">Propriétaires</p>
 									{members.length > editMemberShares.length && (
 										<Button
 											type="button"
@@ -3617,10 +3520,10 @@ export default function PropertyDetailPage() {
 								{loadingMembers ? (
 									<Skeleton style={{ height: '2.5rem', width: '100%' }} />
 								) : editMemberShares.length === 0 ? (
-									<Text size="sm" color="muted">
+									<p className="text-sm text-muted-foreground">
 										Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des
 										propriétaires.
-									</Text>
+									</p>
 								) : (
 									<div className="flex flex-col gap-3">
 										{editMemberShares.map((ms, index) => {
@@ -3679,9 +3582,7 @@ export default function PropertyDetailPage() {
 																handleShareChange(index, Number.parseInt(e.target.value, 10) || 0)
 															}
 														/>
-														<Text size="sm" color="muted">
-															%
-														</Text>
+														<p className="text-sm text-muted-foreground">%</p>
 													</div>
 													<Button
 														type="button"
@@ -3696,18 +3597,15 @@ export default function PropertyDetailPage() {
 											);
 										})}
 										{editMemberShares.length > 0 && (
-											<Text size="xs" color="muted" style={{ textAlign: 'right' }}>
+											<p className="text-xs text-muted-foreground" style={{ textAlign: 'right' }}>
 												Total: {editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
 												{editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !==
 													100 && (
-													<Text
-														as="span"
-														style={{ marginLeft: '0.25rem', color: 'hsl(var(--destructive))' }}
-													>
+													<span style={{ marginLeft: '0.25rem', color: 'hsl(var(--destructive))' }}>
 														(doit être 100%)
-													</Text>
+													</span>
 												)}
-											</Text>
+											</p>
 										)}
 									</div>
 								)}

@@ -347,17 +347,17 @@ export default function RealEstatePage() {
 												border: '1px solid hsl(var(--destructive) / 0.2)',
 											}}
 										>
-											<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+											<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 												{formError}
-											</Text>
+											</p>
 										</div>
 									)}
 
 									{/* Basic info */}
 									<div className="flex flex-col gap-4">
-										<Text size="sm" weight="medium" color="muted">
+										<p className="text-sm font-medium text-muted-foreground">
 											Informations générales
-										</Text>
+										</p>
 										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 											<div className="flex flex-col gap-3">
 												<Label htmlFor="name">Nom du bien *</Label>
@@ -438,9 +438,7 @@ export default function RealEstatePage() {
 
 									{/* Address */}
 									<div className="flex flex-col gap-4">
-										<Text size="sm" weight="medium" color="muted">
-											Adresse
-										</Text>
+										<p className="text-sm font-medium text-muted-foreground">Adresse</p>
 										<div className="flex flex-col gap-4">
 											<div className="flex flex-col gap-3">
 												<Label htmlFor="address">Adresse *</Label>
@@ -485,9 +483,7 @@ export default function RealEstatePage() {
 
 									{/* Purchase info */}
 									<div className="flex flex-col gap-4">
-										<Text size="sm" weight="medium" color="muted">
-											Achat
-										</Text>
+										<p className="text-sm font-medium text-muted-foreground">Achat</p>
 										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 											<div className="flex flex-col gap-3">
 												<Label htmlFor="purchasePrice">Prix d&apos;achat (€) *</Label>
@@ -539,9 +535,7 @@ export default function RealEstatePage() {
 
 									{/* Current value */}
 									<div className="flex flex-col gap-4">
-										<Text size="sm" weight="medium" color="muted">
-											Valeur actuelle
-										</Text>
+										<p className="text-sm font-medium text-muted-foreground">Valeur actuelle</p>
 										<div className="flex flex-col gap-3">
 											<Label htmlFor="currentValue">Valeur estimée (€) *</Label>
 											<Input
@@ -559,9 +553,9 @@ export default function RealEstatePage() {
 									{/* Rental info - only shown for RENTAL usage */}
 									{isRental && (
 										<div className="flex flex-col gap-4">
-											<Text size="sm" weight="medium" color="muted">
+											<p className="text-sm font-medium text-muted-foreground">
 												Informations locatives
-											</Text>
+											</p>
 											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 												<div className="flex flex-col gap-3">
 													<Label htmlFor="rentAmount">Loyer mensuel (€)</Label>
@@ -594,9 +588,7 @@ export default function RealEstatePage() {
 									{/* Members/Owners */}
 									<div className="flex flex-col gap-4">
 										<div className="flex justify-between items-center">
-											<Text size="sm" weight="medium" color="muted">
-												Propriétaires
-											</Text>
+											<p className="text-sm font-medium text-muted-foreground">Propriétaires</p>
 											{members.length > memberShares.length && (
 												<Button
 													type="button"
@@ -610,10 +602,10 @@ export default function RealEstatePage() {
 											)}
 										</div>
 										{memberShares.length === 0 ? (
-											<Text size="sm" color="muted">
+											<p className="text-sm text-muted-foreground">
 												Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter
 												des propriétaires.
-											</Text>
+											</p>
 										) : (
 											<div className="flex flex-col gap-4">
 												{memberShares.map((ms, index) => {
@@ -671,9 +663,7 @@ export default function RealEstatePage() {
 																		)
 																	}
 																/>
-																<Text size="sm" color="muted">
-																	%
-																</Text>
+																<span className="text-sm text-muted-foreground">%</span>
 															</div>
 															<Button
 																type="button"
@@ -688,7 +678,10 @@ export default function RealEstatePage() {
 													);
 												})}
 												{memberShares.length > 0 && (
-													<p className="text-xs text-muted-foreground" style={{ textAlign: 'right' }}>
+													<p
+														className="text-xs text-muted-foreground"
+														style={{ textAlign: 'right' }}
+													>
 														Total: {memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
 														{memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !==
 															100 && (
@@ -758,9 +751,9 @@ export default function RealEstatePage() {
 						backgroundColor: 'hsl(var(--destructive) / 0.05)',
 					}}
 				>
-					<Text size="sm" style={{ color: 'hsl(var(--destructive))' }}>
+					<p className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
 						{error instanceof Error ? error.message : 'Une erreur est survenue'}
-					</Text>
+					</p>
 				</GlassCard>
 			)}
 
@@ -837,10 +830,10 @@ export default function RealEstatePage() {
 						value={(summary.totalLoansRemaining / summary.totalValue) * 100}
 						style={{ height: '0.75rem' }}
 					/>
-					<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
+					<p className="text-xs text-muted-foreground" style={{ marginTop: '0.5rem' }}>
 						Équité: {formatCurrency(summary.totalEquity)} (
 						{((summary.totalEquity / summary.totalValue) * 100).toFixed(1)}%)
-					</Text>
+					</p>
 				</GlassCard>
 			)}
 
@@ -914,9 +907,8 @@ export default function RealEstatePage() {
 															color: 'hsl(var(--muted-foreground))',
 														}}
 													/>
-													<Text
-														size="xs"
-														color="muted"
+													<span
+														className="text-xs text-muted-foreground"
 														style={{
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
@@ -924,7 +916,7 @@ export default function RealEstatePage() {
 														}}
 													>
 														{property.address}, {property.city}
-													</Text>
+													</span>
 												</div>
 											</div>
 										</Link>
@@ -1003,9 +995,7 @@ export default function RealEstatePage() {
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
-											<p className="text-xs text-muted-foreground">
-												Valeur actuelle
-											</p>
+											<p className="text-xs text-muted-foreground">Valeur actuelle</p>
 											<p
 												className="text-xl font-semibold"
 												style={{ fontVariantNumeric: 'tabular-nums', marginTop: '0.25rem' }}
@@ -1029,9 +1019,7 @@ export default function RealEstatePage() {
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
-											<p className="text-xs text-muted-foreground">
-												Équité
-											</p>
+											<p className="text-xs text-muted-foreground">Équité</p>
 											<p
 												className="text-xl font-semibold"
 												style={{
@@ -1042,7 +1030,10 @@ export default function RealEstatePage() {
 											>
 												{formatCurrency(equity)}
 											</p>
-											<p className="text-xs text-muted-foreground" style={{ marginTop: '0.125rem' }}>
+											<p
+												className="text-xs text-muted-foreground"
+												style={{ marginTop: '0.125rem' }}
+											>
 												{property.currentValue > 0
 													? `${((equity / property.currentValue) * 100).toFixed(0)}% de la valeur`
 													: '-'}
@@ -1131,10 +1122,11 @@ export default function RealEstatePage() {
 												</div>
 												{property.rentCharges && (
 													<div className="text-right">
-														<span className="text-xs text-muted-foreground">
-															Net de charges
-														</span>
-														<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+														<span className="text-xs text-muted-foreground">Net de charges</span>
+														<p
+															className="font-medium"
+															style={{ fontVariantNumeric: 'tabular-nums' }}
+														>
 															{formatCurrency(property.rentAmount - property.rentCharges)}
 														</p>
 													</div>
