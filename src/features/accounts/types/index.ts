@@ -28,10 +28,15 @@ export interface AccountSummary {
 
 export interface CreateAccountInput {
 	name: string;
-	type: AccountType;
+	type?: 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN';
 	bankId: string;
-	initialBalance?: number;
+	description?: string;
+	accountNumber?: string;
+	balance?: number;
 	currency?: string;
+	exportUrl?: string;
+	memberIds?: string[];
+	memberShares?: Array<{ memberId: string; ownerShare: number }>;
 }
 
 export interface UpdateAccountInput {
