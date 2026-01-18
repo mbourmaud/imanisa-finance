@@ -48,13 +48,9 @@ const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
 			>
 				<div
 					className={cn(
-						'rounded-full animate-pulse',
+						'rounded-full animate-pulse bg-gradient-to-br from-primary/20 to-primary/5',
 						containerSizeClasses[size],
 					)}
-					style={{
-						background:
-							'linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))',
-					}}
 				/>
 				<Loader2
 					className={cn(
