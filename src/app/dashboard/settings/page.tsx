@@ -20,12 +20,10 @@ import {
 	DialogTrigger,
 	Download,
 	EmptyState,
-	Flex,
 	GlassCard,
 	Globe,
 	Grid,
 	Heading,
-	HStack,
 	Input,
 	Key,
 	Label,
@@ -49,7 +47,6 @@ import {
 	Upload,
 	User,
 	Users,
-	VStack,
 } from '@/components';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { MemberAvatar } from '@/components/members/MemberAvatar';
@@ -82,21 +79,19 @@ const MEMBER_COLORS = [
 
 function MemberSkeleton() {
 	return (
-		<HStack
-			justify="between"
-			align="center"
-			p="md"
-			style={{ borderRadius: '0.75rem', backgroundColor: 'hsl(var(--muted) / 0.3)' }}
+		<div
+			className="flex justify-between items-center p-4 rounded-xl"
+			style={{ backgroundColor: 'hsl(var(--muted) / 0.3)' }}
 		>
-			<HStack gap="md" align="center">
+			<div className="flex items-center gap-4">
 				<Skeleton style={{ height: '2.5rem', width: '2.5rem', borderRadius: '0.5rem' }} />
-				<VStack gap="xs">
+				<div className="flex flex-col gap-2">
 					<Skeleton style={{ height: '1.25rem', width: '6rem' }} />
 					<Skeleton style={{ height: '1rem', width: '4rem' }} />
-				</VStack>
-			</HStack>
+				</div>
+			</div>
 			<Skeleton style={{ height: '2rem', width: '2rem' }} />
-		</HStack>
+		</div>
 	);
 }
 
@@ -211,50 +206,46 @@ export default function SettingsPage() {
 	const memberToDelete = members.find((m) => m.id === deleteMemberId);
 
 	return (
-		<VStack gap="xl">
+		<div className="flex flex-col gap-8">
 			{/* Header */}
 			<PageHeader title="Paramètres" description="Configurez votre application" />
 
 			<Grid cols={1} colsLg={3} gap="lg">
 				{/* Main Settings Column */}
-				<VStack gap="lg" style={{ gridColumn: 'span 2' }}>
+				<div className="flex flex-col gap-6" style={{ gridColumn: 'span 2' }}>
 					{/* Profile */}
 					<GlassCard padding="lg">
-						<VStack gap="md">
-							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex
-									align="center"
-									justify="center"
+						<div className="flex flex-col gap-4">
+							<div className="flex items-center gap-4 pb-2">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-xl"
 									style={{
-										borderRadius: '0.75rem',
-										height: '2.5rem',
-										width: '2.5rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
 										color: 'hsl(var(--primary))',
 									}}
 								>
 									<User style={{ height: '1.25rem', width: '1.25rem' }} />
-								</Flex>
-								<VStack gap="none">
+								</div>
+								<div className="flex flex-col">
 									<Heading level={3} size="lg" weight="medium">
 										Profil
 									</Heading>
 									<Text size="sm" color="muted">
 										Vos informations personnelles
 									</Text>
-								</VStack>
-							</HStack>
+								</div>
+							</div>
 							<Grid cols={1} colsSm={2} gap="md">
-								<VStack gap="xs">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="name">Nom</Label>
 									<Input id="name" placeholder="Votre nom" defaultValue="Utilisateur" />
-								</VStack>
-								<VStack gap="xs">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="email">Email</Label>
 									<Input id="email" type="email" placeholder="votre@email.com" />
-								</VStack>
+								</div>
 							</Grid>
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="currency">Devise par défaut</Label>
 								<Select defaultValue="eur">
 									<SelectTrigger id="currency" style={{ width: '100%', maxWidth: '200px' }}>
@@ -267,37 +258,33 @@ export default function SettingsPage() {
 										<SelectItem value="chf">CHF</SelectItem>
 									</SelectContent>
 								</Select>
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 					</GlassCard>
 
 					{/* Members (Household) */}
 					<GlassCard padding="lg">
-						<VStack gap="md">
-							<HStack justify="between" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<HStack gap="md" align="center">
-									<Flex
-										align="center"
-										justify="center"
+						<div className="flex flex-col gap-4">
+							<div className="flex justify-between items-center pb-2">
+								<div className="flex items-center gap-4">
+									<div
+										className="flex items-center justify-center h-10 w-10 rounded-xl"
 										style={{
-											borderRadius: '0.75rem',
-											height: '2.5rem',
-											width: '2.5rem',
 											backgroundColor: 'hsl(var(--primary) / 0.1)',
 											color: 'hsl(var(--primary))',
 										}}
 									>
 										<Users style={{ height: '1.25rem', width: '1.25rem' }} />
-									</Flex>
-									<VStack gap="none">
+									</div>
+									<div className="flex flex-col">
 										<Heading level={3} size="lg" weight="medium">
 											Membres du foyer
 										</Heading>
 										<Text size="sm" color="muted">
 											Gérez les membres associés aux comptes
 										</Text>
-									</VStack>
-								</HStack>
+									</div>
+								</div>
 								<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
 									<DialogTrigger asChild>
 										<Button
@@ -312,8 +299,8 @@ export default function SettingsPage() {
 										<DialogHeader>
 											<DialogTitle>Ajouter un membre</DialogTitle>
 										</DialogHeader>
-										<VStack gap="md" style={{ paddingTop: '1rem' }}>
-											<VStack gap="xs">
+										<div className="flex flex-col gap-4 pt-4">
+											<div className="flex flex-col gap-2">
 												<Label htmlFor="memberName">Nom</Label>
 												<Input
 													id="memberName"
@@ -321,10 +308,10 @@ export default function SettingsPage() {
 													value={newMemberName}
 													onChange={(e) => setNewMemberName(e.target.value)}
 												/>
-											</VStack>
-											<VStack gap="xs">
+											</div>
+											<div className="flex flex-col gap-2">
 												<Label>Couleur</Label>
-												<HStack gap="sm" style={{ flexWrap: 'wrap' }}>
+												<div className="flex flex-wrap gap-3">
 													{MEMBER_COLORS.map((color) => (
 														<button
 															key={color.value}
@@ -347,9 +334,9 @@ export default function SettingsPage() {
 															title={color.name}
 														/>
 													))}
-												</HStack>
-											</VStack>
-											<HStack justify="end" gap="sm" style={{ paddingTop: '1rem' }}>
+												</div>
+											</div>
+											<div className="flex justify-end gap-3 pt-4">
 												<Button variant="outline" onClick={() => setShowAddMember(false)}>
 													Annuler
 												</Button>
@@ -359,12 +346,12 @@ export default function SettingsPage() {
 												>
 													{savingMember ? 'Ajout...' : 'Ajouter'}
 												</Button>
-											</HStack>
-										</VStack>
+											</div>
+										</div>
 									</DialogContent>
 								</Dialog>
-							</HStack>
-							<VStack gap="xs">
+							</div>
+							<div className="flex flex-col gap-2">
 								{loadingMembers ? (
 									<>
 										<MemberSkeleton />
@@ -380,18 +367,15 @@ export default function SettingsPage() {
 									/>
 								) : (
 									members.map((member) => (
-										<HStack
+										<div
 											key={member.id}
-											justify="between"
-											align="center"
-											p="md"
+											className="flex justify-between items-center p-4 rounded-xl"
 											style={{
-												borderRadius: '0.75rem',
 												backgroundColor: 'hsl(var(--background) / 0.5)',
 												transition: 'background-color 0.2s',
 											}}
 										>
-											<HStack gap="md" align="center">
+											<div className="flex items-center gap-4">
 												<MemberAvatar
 													member={{
 														id: member.id,
@@ -401,15 +385,15 @@ export default function SettingsPage() {
 													}}
 													size="md"
 												/>
-												<VStack gap="none">
+												<div className="flex flex-col">
 													<Text weight="medium">{member.name}</Text>
 													<Text size="xs" color="muted">
 														{member.accountMembers.length} compte
 														{member.accountMembers.length !== 1 ? 's' : ''}
 													</Text>
-												</VStack>
-											</HStack>
-											<HStack gap="sm" align="center">
+												</div>
+											</div>
+											<div className="flex items-center gap-3">
 												<Dialog
 													open={editingMember?.id === member.id}
 													onOpenChange={(open) => !open && setEditingMember(null)}
@@ -429,8 +413,8 @@ export default function SettingsPage() {
 															<DialogTitle>Modifier le membre</DialogTitle>
 														</DialogHeader>
 														{editingMember && (
-															<VStack gap="md" style={{ paddingTop: '1rem' }}>
-																<VStack gap="xs">
+															<div className="flex flex-col gap-4 pt-4">
+																<div className="flex flex-col gap-2">
 																	<Label htmlFor="editMemberName">Nom</Label>
 																	<Input
 																		id="editMemberName"
@@ -439,10 +423,10 @@ export default function SettingsPage() {
 																			setEditingMember({ ...editingMember, name: e.target.value })
 																		}
 																	/>
-																</VStack>
-																<VStack gap="xs">
+																</div>
+																<div className="flex flex-col gap-2">
 																	<Label>Couleur</Label>
-																	<HStack gap="sm" style={{ flexWrap: 'wrap' }}>
+																	<div className="flex flex-wrap gap-3">
 																		{MEMBER_COLORS.map((color) => (
 																			<button
 																				key={color.value}
@@ -467,17 +451,17 @@ export default function SettingsPage() {
 																				title={color.name}
 																			/>
 																		))}
-																	</HStack>
-																</VStack>
-																<HStack justify="end" gap="sm" style={{ paddingTop: '1rem' }}>
+																	</div>
+																</div>
+																<div className="flex justify-end gap-3 pt-4">
 																	<Button variant="outline" onClick={() => setEditingMember(null)}>
 																		Annuler
 																	</Button>
 																	<Button onClick={handleUpdateMember} disabled={savingMember}>
 																		{savingMember ? 'Sauvegarde...' : 'Sauvegarder'}
 																	</Button>
-																</HStack>
-															</VStack>
+																</div>
+															</div>
 														)}
 													</DialogContent>
 												</Dialog>
@@ -493,43 +477,39 @@ export default function SettingsPage() {
 												>
 													<Trash2 style={{ height: '1rem', width: '1rem' }} />
 												</Button>
-											</HStack>
-										</HStack>
+											</div>
+										</div>
 									))
 								)}
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 					</GlassCard>
 
 					{/* Appearance */}
 					<GlassCard padding="lg">
-						<VStack gap="lg">
-							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex
-									align="center"
-									justify="center"
+						<div className="flex flex-col gap-6">
+							<div className="flex items-center gap-4 pb-2">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-xl"
 									style={{
-										borderRadius: '0.75rem',
-										height: '2.5rem',
-										width: '2.5rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
 										color: 'hsl(var(--primary))',
 									}}
 								>
 									<Palette style={{ height: '1.25rem', width: '1.25rem' }} />
-								</Flex>
-								<VStack gap="none">
+								</div>
+								<div className="flex flex-col">
 									<Heading level={3} size="lg" weight="medium">
 										Apparence
 									</Heading>
 									<Text size="sm" color="muted">
 										Personnalisez l&apos;interface
 									</Text>
-								</VStack>
-							</HStack>
+								</div>
+							</div>
 
 							{/* Theme Selection */}
-							<VStack gap="sm">
+							<div className="flex flex-col gap-3">
 								<Label>Thème</Label>
 								<Grid cols={3} gap="sm">
 									<button
@@ -610,12 +590,12 @@ export default function SettingsPage() {
 										</Text>
 									</button>
 								</Grid>
-							</VStack>
+							</div>
 
 							<Separator />
 
 							{/* Language */}
-							<VStack gap="xs">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="language">Langue</Label>
 								<Select defaultValue="fr">
 									<SelectTrigger id="language" style={{ width: '100%', maxWidth: '200px' }}>
@@ -626,37 +606,33 @@ export default function SettingsPage() {
 										<SelectItem value="en">English</SelectItem>
 									</SelectContent>
 								</Select>
-							</VStack>
-						</VStack>
+							</div>
+						</div>
 					</GlassCard>
 
 					{/* Data & Privacy */}
 					<GlassCard padding="lg">
-						<VStack gap="md">
-							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex
-									align="center"
-									justify="center"
+						<div className="flex flex-col gap-4">
+							<div className="flex items-center gap-4 pb-2">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-xl"
 									style={{
-										borderRadius: '0.75rem',
-										height: '2.5rem',
-										width: '2.5rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
 										color: 'hsl(var(--primary))',
 									}}
 								>
 									<Database style={{ height: '1.25rem', width: '1.25rem' }} />
-								</Flex>
-								<VStack gap="none">
+								</div>
+								<div className="flex flex-col">
 									<Heading level={3} size="lg" weight="medium">
 										Données
 									</Heading>
 									<Text size="sm" color="muted">
 										Export et sauvegarde
 									</Text>
-								</VStack>
-							</HStack>
-							<Flex gap="sm" style={{ flexDirection: 'column' }}>
+								</div>
+							</div>
+							<div className="flex flex-col gap-3">
 								<Button
 									variant="outline"
 									style={{ flex: 1 }}
@@ -671,91 +647,83 @@ export default function SettingsPage() {
 								>
 									Importer une sauvegarde
 								</Button>
-							</Flex>
+							</div>
 							<Text size="xs" color="muted">
 								Vos données sont stockées localement sur votre serveur. Effectuez des sauvegardes
 								régulières pour éviter toute perte de données.
 							</Text>
-						</VStack>
+						</div>
 					</GlassCard>
-				</VStack>
+				</div>
 
 				{/* Sidebar Settings */}
-				<VStack gap="lg">
+				<div className="flex flex-col gap-6">
 					{/* Notifications */}
 					<GlassCard padding="lg">
-						<VStack gap="md">
-							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex
-									align="center"
-									justify="center"
+						<div className="flex flex-col gap-4">
+							<div className="flex items-center gap-4 pb-2">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-xl"
 									style={{
-										borderRadius: '0.75rem',
-										height: '2.5rem',
-										width: '2.5rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
 										color: 'hsl(var(--primary))',
 									}}
 								>
 									<Bell style={{ height: '1.25rem', width: '1.25rem' }} />
-								</Flex>
+								</div>
 								<Heading level={3} size="lg" weight="medium">
 									Notifications
 								</Heading>
-							</HStack>
-							<HStack justify="between" align="center">
-								<VStack gap="none">
+							</div>
+							<div className="flex justify-between items-center">
+								<div className="flex flex-col">
 									<Text weight="medium">Alertes budget</Text>
 									<Text size="xs" color="muted">
 										Dépassement de budget
 									</Text>
-								</VStack>
+								</div>
 								<Switch defaultChecked />
-							</HStack>
+							</div>
 							<Separator />
-							<HStack justify="between" align="center">
-								<VStack gap="none">
+							<div className="flex justify-between items-center">
+								<div className="flex flex-col">
 									<Text weight="medium">Transactions</Text>
 									<Text size="xs" color="muted">
 										Nouvelles transactions
 									</Text>
-								</VStack>
+								</div>
 								<Switch />
-							</HStack>
+							</div>
 							<Separator />
-							<HStack justify="between" align="center">
-								<VStack gap="none">
+							<div className="flex justify-between items-center">
+								<div className="flex flex-col">
 									<Text weight="medium">Rappels</Text>
 									<Text size="xs" color="muted">
 										Échéances de prêts
 									</Text>
-								</VStack>
+								</div>
 								<Switch defaultChecked />
-							</HStack>
-						</VStack>
+							</div>
+						</div>
 					</GlassCard>
 
 					{/* Security */}
 					<GlassCard padding="lg">
-						<VStack gap="md">
-							<HStack gap="md" align="center" style={{ paddingBottom: '0.5rem' }}>
-								<Flex
-									align="center"
-									justify="center"
+						<div className="flex flex-col gap-4">
+							<div className="flex items-center gap-4 pb-2">
+								<div
+									className="flex items-center justify-center h-10 w-10 rounded-xl"
 									style={{
-										borderRadius: '0.75rem',
-										height: '2.5rem',
-										width: '2.5rem',
 										backgroundColor: 'hsl(var(--primary) / 0.1)',
 										color: 'hsl(var(--primary))',
 									}}
 								>
 									<Shield style={{ height: '1.25rem', width: '1.25rem' }} />
-								</Flex>
+								</div>
 								<Heading level={3} size="lg" weight="medium">
 									Sécurité
 								</Heading>
-							</HStack>
+							</div>
 							<Button
 								variant="outline"
 								style={{ width: '100%', justifyContent: 'flex-start' }}
@@ -763,31 +731,31 @@ export default function SettingsPage() {
 							>
 								Changer le mot de passe
 							</Button>
-							<HStack justify="between" align="center">
-								<VStack gap="none">
+							<div className="flex justify-between items-center">
+								<div className="flex flex-col">
 									<Text weight="medium">2FA</Text>
 									<Text size="xs" color="muted">
 										Authentification double facteur
 									</Text>
-								</VStack>
+								</div>
 								<Switch />
-							</HStack>
+							</div>
 							<Separator />
-							<HStack justify="between" align="center">
-								<VStack gap="none">
+							<div className="flex justify-between items-center">
+								<div className="flex flex-col">
 									<Text weight="medium">Sessions</Text>
 									<Text size="xs" color="muted">
 										Déconnexion automatique
 									</Text>
-								</VStack>
+								</div>
 								<Switch defaultChecked />
-							</HStack>
-						</VStack>
+							</div>
+						</div>
 					</GlassCard>
 
 					{/* App Info */}
 					<GlassCard padding="lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.2)' }}>
-						<Flex direction="col" align="center" style={{ textAlign: 'center' }}>
+						<div className="flex flex-col items-center text-center">
 							<Text weight="medium">Imanisa Finance</Text>
 							<Text size="sm" color="muted">
 								Version 2.0.0
@@ -803,9 +771,9 @@ export default function SettingsPage() {
 							>
 								Voir sur GitHub
 							</a>
-						</Flex>
+						</div>
 					</GlassCard>
-				</VStack>
+				</div>
 			</Grid>
 
 			<ConfirmDialog
@@ -821,6 +789,6 @@ export default function SettingsPage() {
 				variant="destructive"
 				onConfirm={confirmDeleteMember}
 			/>
-		</VStack>
+		</div>
 	);
 }

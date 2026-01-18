@@ -17,10 +17,8 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-	Flex,
 	GlassCard,
 	Heading,
-	HStack,
 	Input,
 	Label,
 	Landmark,
@@ -37,7 +35,6 @@ import {
 	Text,
 	Textarea,
 	TrendingUp,
-	VStack,
 	Wallet,
 } from '@/components';
 import { AccountTypeBadge } from '@/components/accounts/AccountCard';
@@ -105,12 +102,12 @@ interface BanksResponse {
 function BankRowSkeleton() {
 	return (
 		<GlassCard padding="sm">
-			<HStack gap="md" align="center">
+			<div className="flex items-center gap-4">
 				<div
 					className="rounded-xl bg-muted"
 					style={{ height: '3rem', width: '3rem', animation: 'pulse 2s ease-in-out infinite' }}
 				/>
-				<Flex direction="col" gap="xs" grow>
+				<div className="flex flex-col gap-2 flex-grow">
 					<div
 						className="rounded-md bg-muted"
 						style={{ height: '1.25rem', width: '8rem', animation: 'pulse 2s ease-in-out infinite' }}
@@ -119,12 +116,12 @@ function BankRowSkeleton() {
 						className="rounded-md bg-muted"
 						style={{ height: '1rem', width: '5rem', animation: 'pulse 2s ease-in-out infinite' }}
 					/>
-				</Flex>
+				</div>
 				<div
 					className="rounded-md bg-muted"
 					style={{ height: '1.5rem', width: '6rem', animation: 'pulse 2s ease-in-out infinite' }}
 				/>
-			</HStack>
+			</div>
 		</GlassCard>
 	);
 }
@@ -142,22 +139,18 @@ interface SectionHeaderWithIconProps {
 
 function SectionHeaderWithIcon({ icon, title, iconBgClass, action }: SectionHeaderWithIconProps) {
 	return (
-		<HStack justify="between" align="center" style={{ marginBottom: '1rem' }}>
-			<HStack gap="sm" align="center">
-				<Flex
-					align="center"
-					justify="center"
+		<div className="flex justify-between items-center mb-4">
+			<div className="flex items-center gap-3">
+				<div
+					className="flex items-center justify-center h-6 w-6 rounded-md"
 					style={{
-						height: '1.5rem',
-						width: '1.5rem',
-						borderRadius: '0.375rem',
 						backgroundColor: iconBgClass.includes('blue')
 							? 'hsl(var(--primary) / 0.1)'
 							: 'hsl(270 60% 95%)',
 					}}
 				>
 					{icon}
-				</Flex>
+				</div>
 				<Heading level={2} size="sm" weight="semibold">
 					{title}
 				</Heading>
@@ -169,9 +162,9 @@ function SectionHeaderWithIcon({ icon, title, iconBgClass, action }: SectionHead
 						backgroundColor: 'hsl(var(--border) / 0.5)',
 					}}
 				/>
-			</HStack>
+			</div>
 			{action}
-		</HStack>
+		</div>
 	);
 }
 
@@ -199,7 +192,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 	const contentMarkup = (
 		<>
 			{/* Bank header */}
-			<HStack gap="md" align="center" p="sm">
+			<div className="flex items-center gap-4 p-3">
 				<BankLogo
 					bankId={bank.id}
 					bankName={bank.name}
@@ -208,8 +201,8 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 					size="lg"
 					onLogoChange={onLogoChange}
 				/>
-				<Flex direction="col" grow minW0>
-					<HStack gap="sm" align="center">
+				<div className="flex flex-col flex-grow min-w-0">
+					<div className="flex items-center gap-3">
 						<Heading
 							level={3}
 							size="lg"
@@ -235,13 +228,13 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 								Aucun compte
 							</Text>
 						)}
-					</HStack>
+					</div>
 					{bank.description && (
 						<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
 							{bank.description}
 						</Text>
 					)}
-				</Flex>
+				</div>
 				{hasAccounts ? (
 					<>
 						<MoneyDisplay amount={bank.totalBalance} size="lg" weight="semibold" />
@@ -270,12 +263,12 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 						Ajouter un compte
 					</Button>
 				)}
-			</HStack>
+			</div>
 
 			{/* Accounts list */}
 			{bank.accounts.length > 0 && (
-				<VStack
-					gap="sm"
+				<div
+					className="flex flex-col gap-3"
 					style={{
 						paddingLeft: '1rem',
 						paddingRight: '1rem',
@@ -286,7 +279,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 					{bank.accounts.map((account) => (
 						<AccountRowLink key={account.id} account={account} />
 					))}
-				</VStack>
+				</div>
 			)}
 		</>
 	);
@@ -359,9 +352,9 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 				backdropFilter: 'blur(8px)',
 			}}
 		>
-			<HStack gap="sm" align="center">
-				<VStack gap="none">
-					<HStack gap="sm" align="center">
+			<div className="flex items-center gap-3">
+				<div className="flex flex-col">
+					<div className="flex items-center gap-3">
 						<Text size="sm" weight="medium">
 							{account.name}
 						</Text>
@@ -370,15 +363,15 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 							variant="subtle"
 							style={{ fontSize: '10px' }}
 						/>
-					</HStack>
+					</div>
 					{account.members.length > 0 && (
 						<div style={{ marginTop: '0.375rem' }}>
 							<MemberAvatarGroup members={memberData} size="xs" max={4} spacing="normal" />
 						</div>
 					)}
-				</VStack>
-			</HStack>
-			<HStack gap="sm" align="center">
+				</div>
+			</div>
+			<div className="flex items-center gap-3">
 				<MoneyDisplay amount={account.balance} size="sm" weight="semibold" autoColor />
 				<ChevronRight
 					style={{
@@ -388,7 +381,7 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 						transition: 'all 0.2s',
 					}}
 				/>
-			</HStack>
+			</div>
 		</Link>
 	);
 }
@@ -415,13 +408,13 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 			<DropdownMenuContent align="end" style={{ width: '12rem' }}>
 				{banks.map((bank) => (
 					<DropdownMenuItem key={bank.id} onClick={() => onSelectBank(bank)}>
-						<HStack gap="sm" align="center">
+						<div className="flex items-center gap-3">
 							<div
 								className="rounded-full"
 								style={{ width: '0.5rem', height: '0.5rem', backgroundColor: bank.color }}
 							/>
 							<Text>{bank.name}</Text>
-						</HStack>
+						</div>
 					</DropdownMenuItem>
 				))}
 			</DropdownMenuContent>
@@ -441,7 +434,7 @@ interface MemberSelectorChipsProps {
 
 function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorChipsProps) {
 	return (
-		<Flex wrap="wrap" gap="sm">
+		<div className="flex flex-wrap gap-3">
 			{members.map((member) => {
 				const isSelected = selectedIds.includes(member.id);
 				return (
@@ -478,7 +471,7 @@ function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorC
 					</Button>
 				);
 			})}
-		</Flex>
+		</div>
 	);
 }
 
@@ -660,13 +653,13 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<VStack gap="sm">
+					<div className="flex flex-col gap-3">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</VStack>
+					</div>
 				) : (
-					<VStack gap="sm">
+					<div className="flex flex-col gap-3">
 						{data?.bankAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -677,7 +670,7 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</VStack>
+					</div>
 				)}
 			</div>
 
@@ -702,12 +695,12 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<VStack gap="sm">
+					<div className="flex flex-col gap-3">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</VStack>
+					</div>
 				) : (
-					<VStack gap="sm">
+					<div className="flex flex-col gap-3">
 						{data?.investmentAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -718,7 +711,7 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</VStack>
+					</div>
 				)}
 			</div>
 
@@ -730,7 +723,7 @@ export default function BanksPage() {
 						<DialogDescription>{selectedBank?.name}</DialogDescription>
 					</DialogHeader>
 
-					<VStack gap="lg">
+					<div className="flex flex-col gap-6">
 						{/* Error message */}
 						{formError && (
 							<div
@@ -747,7 +740,7 @@ export default function BanksPage() {
 						)}
 
 						{/* Account name */}
-						<VStack gap="sm">
+						<div className="flex flex-col gap-3">
 							<Label
 								htmlFor="accountName"
 								style={{
@@ -765,10 +758,10 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountName(e.target.value)}
 								style={{ height: '2.5rem' }}
 							/>
-						</VStack>
+						</div>
 
 						{/* Description (optional) */}
-						<VStack gap="sm">
+						<div className="flex flex-col gap-3">
 							<Label
 								htmlFor="accountDescription"
 								style={{
@@ -789,10 +782,10 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountDescription(e.target.value)}
 								style={{ minHeight: '80px', resize: 'none' }}
 							/>
-						</VStack>
+						</div>
 
 						{/* Account type */}
-						<VStack gap="sm">
+						<div className="flex flex-col gap-3">
 							<Label
 								htmlFor="accountType"
 								style={{
@@ -814,10 +807,10 @@ export default function BanksPage() {
 									<SelectItem value="LOAN">Prêt</SelectItem>
 								</SelectContent>
 							</Select>
-						</VStack>
+						</div>
 
 						{/* Export URL (optional) */}
-						<VStack gap="sm">
+						<div className="flex flex-col gap-3">
 							<Label
 								htmlFor="accountExportUrl"
 								style={{
@@ -842,10 +835,10 @@ export default function BanksPage() {
 							<Text size="xs" color="muted">
 								URL vers l'espace client pour exporter les relevés
 							</Text>
-						</VStack>
+						</div>
 
 						{/* Member selection */}
-						<VStack gap="sm">
+						<div className="flex flex-col gap-3">
 							<Label
 								style={{
 									fontSize: '0.875rem',
@@ -860,8 +853,8 @@ export default function BanksPage() {
 								selectedIds={newAccountMembers}
 								onToggle={toggleMember}
 							/>
-						</VStack>
-					</VStack>
+						</div>
+					</div>
 
 					<DialogFooter style={{ paddingTop: '1rem' }}>
 						<Button
