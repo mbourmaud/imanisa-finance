@@ -13,8 +13,8 @@ import {
 	Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InvestmentPerformanceChart } from '@/components/charts';
+import { PageHeader } from '@/components/ui/page-header';
 import { demoInvestmentPerformance } from '@/lib/demo';
 import {
 	DropdownMenu,
@@ -146,22 +146,22 @@ export default function InvestmentsPage() {
 	return (
 		<div className="space-y-8">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Investissements</h1>
-					<p className="mt-1 text-muted-foreground">PEA, CTO, Assurance-vie, Crypto</p>
-				</div>
-				<div className="flex gap-2">
-					<Button variant="outline" className="gap-2">
-						<RefreshCw className="h-4 w-4" />
-						Actualiser
-					</Button>
-					<Button className="gap-2">
-						<Plus className="h-4 w-4" />
-						Nouvelle source
-					</Button>
-				</div>
-			</div>
+			<PageHeader
+				title="Investissements"
+				description="PEA, CTO, Assurance-vie, Crypto"
+				actions={
+					<div className="flex gap-2">
+						<Button variant="outline" className="gap-2">
+							<RefreshCw className="h-4 w-4" />
+							Actualiser
+						</Button>
+						<Button className="gap-2">
+							<Plus className="h-4 w-4" />
+							Nouvelle source
+						</Button>
+					</div>
+				}
+			/>
 
 			{/* Stats Overview */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
@@ -237,155 +237,143 @@ export default function InvestmentsPage() {
 					const isPositive = gain >= 0;
 
 					return (
-						<Card key={source.id} className="border-border/60 group">
-							<CardHeader className="pb-3">
-								<div className="flex items-start justify-between">
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-										<source.icon className="h-5 w-5" />
-									</div>
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-											>
-												<MoreHorizontal className="h-4 w-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuItem>Voir les positions</DropdownMenuItem>
-											<DropdownMenuItem>Ajouter une transaction</DropdownMenuItem>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
+						<div key={source.id} className="glass-card p-4 space-y-3 group">
+							<div className="flex items-start justify-between">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+									<source.icon className="h-5 w-5" />
 								</div>
-							</CardHeader>
-							<CardContent>
-								<div className="space-y-3">
-									<div>
-										<p className="font-medium">{source.name}</p>
-										<p className="text-xs text-muted-foreground">
-											{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
-										</p>
-									</div>
-									<div>
-										<p className="text-2xl font-semibold number-display">
-											{formatCurrency(source.value)}
-										</p>
-										<p
-											className={`text-sm font-medium ${
-												isPositive ? 'value-positive' : 'value-negative'
-											}`}
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
 										>
-											{isPositive ? '+' : ''}
-											{formatCurrency(gain)} ({isPositive ? '+' : ''}
-											{source.performance.toFixed(2)}%)
-										</p>
-									</div>
+											<MoreHorizontal className="h-4 w-4" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										<DropdownMenuItem>Voir les positions</DropdownMenuItem>
+										<DropdownMenuItem>Ajouter une transaction</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</div>
+							<div className="space-y-3">
+								<div>
+									<p className="font-medium">{source.name}</p>
+									<p className="text-xs text-muted-foreground">
+										{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
+									</p>
 								</div>
-							</CardContent>
-						</Card>
+								<div>
+									<p className="text-2xl font-semibold number-display">
+										{formatCurrency(source.value)}
+									</p>
+									<p
+										className={`text-sm font-medium ${
+											isPositive ? 'value-positive' : 'value-negative'
+										}`}
+									>
+										{isPositive ? '+' : ''}
+										{formatCurrency(gain)} ({isPositive ? '+' : ''}
+										{source.performance.toFixed(2)}%)
+									</p>
+								</div>
+							</div>
+						</div>
 					);
 				})}
 			</div>
 
 			{/* Positions Table */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-medium">Positions</CardTitle>
-							<p className="mt-1 text-sm text-muted-foreground">
-								Toutes vos positions d&apos;investissement
-							</p>
-						</div>
-						<Button variant="outline" size="sm" className="text-sm">
-							Voir tout
-						</Button>
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between pb-2">
+					<div>
+						<h3 className="text-lg font-medium">Positions</h3>
+						<p className="text-sm text-muted-foreground">
+							Toutes vos positions d&apos;investissement
+						</p>
 					</div>
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-2">
-						{positions.map((pos) => (
-							<div
-								key={pos.id}
-								className="flex items-center justify-between rounded-xl bg-muted/30 p-4 transition-colors hover:bg-muted/50"
-							>
-								<div className="flex items-center gap-4">
-									<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background font-mono text-sm font-semibold text-muted-foreground">
-										{pos.ticker.slice(0, 3)}
-									</div>
-									<div>
-										<p className="font-medium">{pos.name}</p>
-										<p className="text-xs text-muted-foreground">
-											{pos.ticker} · {pos.source}
-										</p>
-									</div>
+					<Button variant="outline" size="sm" className="text-sm">
+						Voir tout
+					</Button>
+				</div>
+				<div className="space-y-2">
+					{positions.map((pos) => (
+						<div
+							key={pos.id}
+							className="flex items-center justify-between rounded-xl bg-white/50 dark:bg-white/5 p-4 transition-colors hover:bg-white/80 dark:hover:bg-white/10"
+						>
+							<div className="flex items-center gap-4">
+								<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background font-mono text-sm font-semibold text-muted-foreground">
+									{pos.ticker.slice(0, 3)}
 								</div>
-								<div className="flex items-center gap-8">
-									<div className="text-right hidden sm:block">
-										<p className="text-xs text-muted-foreground">Quantité</p>
-										<p className="font-medium number-display">{pos.quantity}</p>
-									</div>
-									<div className="text-right hidden md:block">
-										<p className="text-xs text-muted-foreground">PRU</p>
-										<p className="font-medium number-display">{formatCurrency(pos.avgPrice)}</p>
-									</div>
-									<div className="text-right">
-										<p className="text-xs text-muted-foreground">Valeur</p>
-										<p className="font-medium number-display">{formatCurrency(pos.value)}</p>
-									</div>
-									<div className="text-right min-w-[100px]">
-										<p
-											className={`font-medium number-display ${
-												pos.gain >= 0 ? 'value-positive' : 'value-negative'
-											}`}
-										>
-											{pos.gain >= 0 ? '+' : ''}
-											{formatCurrency(pos.gain)}
-										</p>
-										<p
-											className={`text-xs ${
-												pos.gainPercent >= 0 ? 'value-positive' : 'value-negative'
-											}`}
-										>
-											{pos.gainPercent >= 0 ? '+' : ''}
-											{pos.gainPercent.toFixed(2)}%
-										</p>
-									</div>
+								<div>
+									<p className="font-medium">{pos.name}</p>
+									<p className="text-xs text-muted-foreground">
+										{pos.ticker} · {pos.source}
+									</p>
 								</div>
 							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
+							<div className="flex items-center gap-8">
+								<div className="text-right hidden sm:block">
+									<p className="text-xs text-muted-foreground">Quantité</p>
+									<p className="font-medium number-display">{pos.quantity}</p>
+								</div>
+								<div className="text-right hidden md:block">
+									<p className="text-xs text-muted-foreground">PRU</p>
+									<p className="font-medium number-display">{formatCurrency(pos.avgPrice)}</p>
+								</div>
+								<div className="text-right">
+									<p className="text-xs text-muted-foreground">Valeur</p>
+									<p className="font-medium number-display">{formatCurrency(pos.value)}</p>
+								</div>
+								<div className="text-right min-w-[100px]">
+									<p
+										className={`font-medium number-display ${
+											pos.gain >= 0 ? 'value-positive' : 'value-negative'
+										}`}
+									>
+										{pos.gain >= 0 ? '+' : ''}
+										{formatCurrency(pos.gain)}
+									</p>
+									<p
+										className={`text-xs ${
+											pos.gainPercent >= 0 ? 'value-positive' : 'value-negative'
+										}`}
+									>
+										{pos.gainPercent >= 0 ? '+' : ''}
+										{pos.gainPercent.toFixed(2)}%
+									</p>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
 
 			{/* Performance Chart */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-medium">Évolution du portefeuille</CardTitle>
-							<p className="mt-1 text-sm text-muted-foreground">Performance sur 12 mois</p>
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between pb-2">
+					<div>
+						<h3 className="text-lg font-medium">Évolution du portefeuille</h3>
+						<p className="text-sm text-muted-foreground">Performance sur 12 mois</p>
+					</div>
+					<div className="flex items-center gap-4">
+						<div className="flex items-center gap-2 text-sm text-muted-foreground">
+							<div className="h-2 w-4 rounded-sm bg-[oklch(0.55_0.18_270)]" />
+							<span>Valeur</span>
 						</div>
-						<div className="flex items-center gap-4">
-							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<div className="h-2 w-4 rounded-sm bg-[oklch(0.55_0.18_270)]" />
-								<span>Valeur</span>
-							</div>
-							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<div className="h-0.5 w-4 border-t-2 border-dashed border-[oklch(0.5_0.01_280)]" />
-								<span>Investi</span>
-							</div>
+						<div className="flex items-center gap-2 text-sm text-muted-foreground">
+							<div className="h-0.5 w-4 border-t-2 border-dashed border-[oklch(0.5_0.01_280)]" />
+							<span>Investi</span>
 						</div>
 					</div>
-				</CardHeader>
-				<CardContent>
-					<InvestmentPerformanceChart data={demoInvestmentPerformance} className="h-72" />
-				</CardContent>
-			</Card>
+				</div>
+				<InvestmentPerformanceChart data={demoInvestmentPerformance} className="h-72" />
+			</div>
 		</div>
 	);
 }

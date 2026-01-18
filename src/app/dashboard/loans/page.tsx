@@ -15,6 +15,8 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageHeader } from '@/components/ui/page-header'
+import { EmptyState as EmptyStateComponent } from '@/components/ui/empty-state'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -138,25 +140,19 @@ function LoanCardSkeleton() {
 // Empty state component
 function EmptyState() {
 	return (
-		<Card className="border-border/60 border-dashed">
-			<CardContent className="py-16">
-				<div className="flex flex-col items-center justify-center text-center">
-					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50 mb-4">
-						<CreditCard className="h-7 w-7 text-muted-foreground" />
-					</div>
-					<h3 className="text-lg font-medium mb-1">Aucun crédit</h3>
-					<p className="text-sm text-muted-foreground mb-4 max-w-sm">
-						Vos crédits apparaîtront ici. Commencez par ajouter un bien immobilier avec son crédit associé.
-					</p>
-					<Button asChild variant="outline" size="sm">
-						<Link href="/dashboard/real-estate">
-							<Building2 className="h-4 w-4 mr-2" />
-							Voir les biens
-						</Link>
-					</Button>
-				</div>
-			</CardContent>
-		</Card>
+		<EmptyStateComponent
+			icon={CreditCard}
+			title="Aucun crédit"
+			description="Vos crédits apparaîtront ici. Commencez par ajouter un bien immobilier avec son crédit associé."
+			action={
+				<Button asChild variant="outline" size="sm">
+					<Link href="/dashboard/real-estate">
+						<Building2 className="h-4 w-4 mr-2" />
+						Voir les biens
+					</Link>
+				</Button>
+			}
+		/>
 	)
 }
 
@@ -172,12 +168,10 @@ export default function LoansPage() {
 	return (
 		<div className="space-y-8">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Crédits</h1>
-					<p className="mt-1 text-muted-foreground">Suivez vos emprunts et échéanciers</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Crédits"
+				description="Suivez vos emprunts et échéanciers"
+			/>
 
 			{/* Loading State */}
 			{isLoading && (
