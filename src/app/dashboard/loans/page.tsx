@@ -28,7 +28,6 @@ import {
 	Skeleton,
 	StatCard,
 	StatCardGrid,
-	Text,
 	TrendingDown,
 } from '@/components';
 import { useLoansQuery } from '@/features/loans';
@@ -202,9 +201,9 @@ export default function LoansPage() {
 				<Card style={{ borderColor: 'hsl(var(--destructive) / 0.5)' }}>
 					<CardContent style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
 						<div className="flex flex-col items-center gap-4 text-center">
-							<Text style={{ color: 'hsl(var(--destructive))' }}>
+							<p className="text-destructive">
 								{error instanceof Error ? error.message : 'Une erreur est survenue'}
-							</Text>
+							</p>
 							<Button onClick={() => refetch()} variant="outline" size="sm">
 								<Loader2 style={{ height: '1rem', width: '1rem', marginRight: '0.5rem' }} />
 								Réessayer
@@ -288,9 +287,9 @@ export default function LoansPage() {
 														<CardTitle style={{ fontSize: '1.125rem', fontWeight: 500 }}>
 															{loan.name}
 														</CardTitle>
-														<Text size="sm" color="muted">
+														<p className="text-sm text-muted-foreground">
 															{loan.lender || 'Prêt familial'} · {loan.rate}%
-														</Text>
+														</p>
 														<Link
 															href={`/dashboard/real-estate/${loan.propertyId}`}
 															style={{
@@ -309,16 +308,15 @@ export default function LoansPage() {
 												</div>
 												<div className="flex items-center gap-4">
 													<div className="hidden sm:block" style={{ textAlign: 'right' }}>
-														<Text
-															size="2xl"
-															weight="semibold"
+														<p
+															className="text-2xl font-semibold"
 															style={{ fontVariantNumeric: 'tabular-nums' }}
 														>
 															{formatCurrency(loan.remainingAmount)}
-														</Text>
-														<Text size="xs" color="muted">
+														</p>
+														<p className="text-xs text-muted-foreground">
 															Capital restant
-														</Text>
+														</p>
 													</div>
 													<DropdownMenu>
 														<DropdownMenuTrigger asChild>

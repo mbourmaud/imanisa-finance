@@ -26,16 +26,6 @@ export type {
 	SpacingSize,
 } from './ui/box';
 export { Box } from './ui/box';
-export type {
-	ContainerMaxWidth,
-	ContainerProps,
-	PageProps,
-	SectionProps,
-	SectionSpacing,
-} from './ui/layout';
-export { Container, Page, Section } from './ui/layout';
-export type { SpacerProps } from './ui/spacer';
-export { Spacer } from './ui/spacer';
 
 // =============================================================================
 // TYPOGRAPHY
@@ -237,11 +227,6 @@ export { StatCard, StatCardGrid, StatCardSkeleton } from './ui/stat-card';
 
 // =============================================================================
 // GLASS EFFECTS
-// =============================================================================
-
-export type { GlassPadding, GlassProps, GlassRadius, GlassVariant } from './ui/glass';
-export { Glass } from './ui/glass';
-
 // =============================================================================
 // NAVIGATION & LAYOUT
 // =============================================================================

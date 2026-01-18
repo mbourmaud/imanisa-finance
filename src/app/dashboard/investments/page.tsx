@@ -245,24 +245,26 @@ export default function InvestmentsPage() {
 							</div>
 							<div className="flex flex-col gap-4">
 								<div className="flex flex-col">
-									<Text weight="medium">{source.name}</Text>
-									<Text size="xs" color="muted">
+									<p className="font-medium">{source.name}</p>
+									<p className="text-xs text-muted-foreground">
 										{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
-									</Text>
+									</p>
 								</div>
 								<div className="flex flex-col">
-									<Text size="2xl" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<p
+										className="text-2xl font-semibold"
+										style={{ fontVariantNumeric: 'tabular-nums' }}
+									>
 										{formatCurrency(source.value)}
-									</Text>
-									<Text
-										size="sm"
-										weight="medium"
+									</p>
+									<p
+										className="text-sm font-medium"
 										style={{ color: isPositive ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)' }}
 									>
 										{isPositive ? '+' : ''}
 										{formatCurrency(gain)} ({isPositive ? '+' : ''}
 										{source.performance.toFixed(2)}%)
-									</Text>
+									</p>
 								</div>
 							</div>
 						</GlassCard>
@@ -274,12 +276,10 @@ export default function InvestmentsPage() {
 			<GlassCard padding="lg">
 				<div className="flex justify-between items-center mb-4">
 					<div className="flex flex-col">
-						<Heading level={3} size="lg" weight="medium">
-							Positions
-						</Heading>
-						<Text size="sm" color="muted">
+						<h3 className="text-lg font-medium tracking-tight">Positions</h3>
+						<p className="text-sm text-muted-foreground">
 							Toutes vos positions d&apos;investissement
-						</Text>
+						</p>
 					</div>
 					<Button variant="outline" size="sm">
 						Voir tout
@@ -305,40 +305,34 @@ export default function InvestmentsPage() {
 									{pos.ticker.slice(0, 3)}
 								</div>
 								<div className="flex flex-col">
-									<Text weight="medium">{pos.name}</Text>
-									<Text size="xs" color="muted">
+									<p className="font-medium">{pos.name}</p>
+									<p className="text-xs text-muted-foreground">
 										{pos.ticker} · {pos.source}
-									</Text>
+									</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-8">
 								<div className="hidden text-right sm:block" data-show-sm>
-									<Text size="xs" color="muted">
-										Quantité
-									</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<p className="text-xs text-muted-foreground">Quantité</p>
+									<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{pos.quantity}
-									</Text>
+									</p>
 								</div>
 								<div className="hidden text-right md:block" data-show-md>
-									<Text size="xs" color="muted">
-										PRU
-									</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<p className="text-xs text-muted-foreground">PRU</p>
+									<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.avgPrice)}
-									</Text>
+									</p>
 								</div>
 								<div className="text-right">
-									<Text size="xs" color="muted">
-										Valeur
-									</Text>
-									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<p className="text-xs text-muted-foreground">Valeur</p>
+									<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.value)}
-									</Text>
+									</p>
 								</div>
 								<div className="min-w-[100px] text-right">
-									<Text
-										weight="medium"
+									<p
+										className="font-medium"
 										style={{
 											fontVariantNumeric: 'tabular-nums',
 											color: pos.gain >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
@@ -346,16 +340,16 @@ export default function InvestmentsPage() {
 									>
 										{pos.gain >= 0 ? '+' : ''}
 										{formatCurrency(pos.gain)}
-									</Text>
-									<Text
-										size="xs"
+									</p>
+									<p
+										className="text-xs"
 										style={{
 											color: pos.gainPercent >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
 										}}
 									>
 										{pos.gainPercent >= 0 ? '+' : ''}
 										{pos.gainPercent.toFixed(2)}%
-									</Text>
+									</p>
 								</div>
 							</div>
 						</div>
@@ -367,12 +361,8 @@ export default function InvestmentsPage() {
 			<GlassCard padding="lg">
 				<div className="flex justify-between items-center mb-4">
 					<div className="flex flex-col">
-						<Heading level={3} size="lg" weight="medium">
-							Évolution du portefeuille
-						</Heading>
-						<Text size="sm" color="muted">
-							Performance sur 12 mois
-						</Text>
+						<h3 className="text-lg font-medium tracking-tight">Évolution du portefeuille</h3>
+						<p className="text-sm text-muted-foreground">Performance sur 12 mois</p>
 					</div>
 					<div className="flex items-center gap-4">
 						<div className="flex items-center gap-3">
@@ -380,18 +370,11 @@ export default function InvestmentsPage() {
 								className="h-2 w-4 rounded-sm"
 								style={{ backgroundColor: 'oklch(0.55 0.18 270)' }}
 							/>
-							<Text size="sm" color="muted">
-								Valeur
-							</Text>
+							<span className="text-sm text-muted-foreground">Valeur</span>
 						</div>
 						<div className="flex items-center gap-3">
-							<div
-								className="h-0.5 w-4"
-								style={{ borderTop: '2px dashed oklch(0.5 0.01 280)' }}
-							/>
-							<Text size="sm" color="muted">
-								Investi
-							</Text>
+							<div className="h-0.5 w-4" style={{ borderTop: '2px dashed oklch(0.5 0.01 280)' }} />
+							<span className="text-sm text-muted-foreground">Investi</span>
 						</div>
 					</div>
 				</div>
