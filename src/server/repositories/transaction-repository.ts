@@ -366,7 +366,49 @@ export const transactionRepository = {
 	async delete(id: string): Promise<void> {
 		await prisma.transaction.delete({
 			where: { id },
-		});
+		})
+	},
+
+	/**
+	 * Delete transactions for an account within a date range
+	 * Used for reprocessing imports
+	 */
+	async deleteByAccountInDateRange(
+		accountId: string,
+		minDate: Date,
+		maxDate: Date,
+	): Promise<{ count: number }> {
+		return prisma.transaction.deleteMany({
+			where: {
+				accountId,
+				date: {
+					gte: minDate,
+					lte: maxDate,
+				},
+			},
+		})
+	},
+
+	/**
+	 * Create many transactions without deduplication
+	 * Used for reprocessing imports where existing transactions are deleted first
+	 */
+	async createManySimple(
+		accountId: string,
+		transactions: ParsedTransaction[],
+	): Promise<{ count: number }> {
+		return prisma.transaction.createMany({
+			data: transactions.map((tx) => ({
+				accountId,
+				type: tx.type,
+				amount: tx.amount,
+				currency: 'EUR',
+				description: tx.description,
+				date: tx.date,
+				bankCategory: tx.bankCategory,
+				isInternal: false,
+			})),
+		})
 	},
 
 	/**
