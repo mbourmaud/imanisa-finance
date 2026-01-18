@@ -391,3 +391,10 @@ export type {
 	HeadingWeight,
 } from './common/Heading';
 export { Heading } from './common/Heading';
+
+// =============================================================================
+// DASHBOARD LAYOUT COMPONENTS
+// =============================================================================
+
+export type { DashboardHeaderProps, DashboardMainProps } from './common/DashboardHeader';
+export { DashboardHeader, DashboardHeaderMobile, DashboardMain } from './common/DashboardHeader';
