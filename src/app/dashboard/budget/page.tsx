@@ -17,8 +17,8 @@ import {
 	Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DonutChart, ChartLegend } from '@/components/charts';
+import { PageHeader } from '@/components/ui/page-header';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -127,22 +127,22 @@ export default function BudgetPage() {
 	return (
 		<div className="space-y-8">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Budget</h1>
-					<p className="mt-1 text-muted-foreground">Suivez vos dépenses par catégorie</p>
-				</div>
-				<div className="flex gap-2">
-					<Button variant="outline" className="gap-2">
-						<Settings className="h-4 w-4" />
-						Règles
-					</Button>
-					<Button className="gap-2">
-						<Plus className="h-4 w-4" />
-						Nouvelle catégorie
-					</Button>
-				</div>
-			</div>
+			<PageHeader
+				title="Budget"
+				description="Suivez vos dépenses par catégorie"
+				actions={
+					<div className="flex gap-2">
+						<Button variant="outline" className="gap-2">
+							<Settings className="h-4 w-4" />
+							Règles
+						</Button>
+						<Button className="gap-2">
+							<Plus className="h-4 w-4" />
+							Nouvelle catégorie
+						</Button>
+					</div>
+				}
+			/>
 
 			{/* Stats Overview */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-2 sm:grid-cols-3 stagger-children">
@@ -190,20 +190,18 @@ export default function BudgetPage() {
 			</div>
 
 			{/* Global Progress */}
-			<Card className="border-border/60">
-				<CardContent className="pt-6">
-					<div className="flex items-center justify-between mb-3">
-						<p className="font-medium">Progression du mois</p>
-						<p className="text-sm text-muted-foreground">
-							{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
-						</p>
-					</div>
-					<Progress value={(totalSpent / totalBudget) * 100} className="h-3" />
-					<p className="mt-2 text-xs text-muted-foreground">
-						Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
+			<div className="glass-card p-6">
+				<div className="flex items-center justify-between mb-3">
+					<p className="font-medium">Progression du mois</p>
+					<p className="text-sm text-muted-foreground">
+						{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
 					</p>
-				</CardContent>
-			</Card>
+				</div>
+				<Progress value={(totalSpent / totalBudget) * 100} className="h-3" />
+				<p className="mt-2 text-xs text-muted-foreground">
+					Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
+				</p>
+			</div>
 
 			{/* Categories Grid */}
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -213,84 +211,76 @@ export default function BudgetPage() {
 					const remainingBudget = category.budget - category.spent;
 
 					return (
-						<Card key={category.id} className="border-border/60 group">
-							<CardHeader className="pb-3">
-								<div className="flex items-start justify-between">
-									<div className="flex items-center gap-3">
-										<div
-											className="flex h-10 w-10 items-center justify-center rounded-xl"
-											style={{ backgroundColor: `${category.color}20`, color: category.color }}
-										>
-											<category.icon className="h-5 w-5" />
-										</div>
-										<div>
-											<CardTitle className="text-base font-medium">{category.name}</CardTitle>
-											<p className="text-xs text-muted-foreground">
-												{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
-											</p>
-										</div>
+						<div key={category.id} className="glass-card p-4 space-y-3 group">
+							<div className="flex items-start justify-between">
+								<div className="flex items-center gap-3">
+									<div
+										className="flex h-10 w-10 items-center justify-center rounded-xl"
+										style={{ backgroundColor: `${category.color}20`, color: category.color }}
+									>
+										<category.icon className="h-5 w-5" />
 									</div>
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-											>
-												<MoreHorizontal className="h-4 w-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuItem>Voir les transactions</DropdownMenuItem>
-											<DropdownMenuItem>Modifier le budget</DropdownMenuItem>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</div>
-							</CardHeader>
-							<CardContent>
-								<div className="space-y-2">
-									<Progress
-										value={Math.min(percentage, 100)}
-										className={`h-2 ${isOverBudget ? '[&>div]:bg-destructive' : ''}`}
-									/>
-									<div className="flex justify-between text-xs">
-										<span
-											className={
-												isOverBudget ? 'value-negative font-medium' : 'text-muted-foreground'
-											}
-										>
-											{isOverBudget
-												? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
-												: `Reste ${formatCurrency(remainingBudget)}`}
-										</span>
-										<span className="text-muted-foreground">{Math.round(percentage)}%</span>
+									<div>
+										<h4 className="text-base font-medium">{category.name}</h4>
+										<p className="text-xs text-muted-foreground">
+											{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
+										</p>
 									</div>
 								</div>
-							</CardContent>
-						</Card>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+										>
+											<MoreHorizontal className="h-4 w-4" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										<DropdownMenuItem>Voir les transactions</DropdownMenuItem>
+										<DropdownMenuItem>Modifier le budget</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</div>
+							<div className="space-y-2">
+								<Progress
+									value={Math.min(percentage, 100)}
+									className={`h-2 ${isOverBudget ? '[&>div]:bg-destructive' : ''}`}
+								/>
+								<div className="flex justify-between text-xs">
+									<span
+										className={
+											isOverBudget ? 'value-negative font-medium' : 'text-muted-foreground'
+										}
+									>
+										{isOverBudget
+											? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
+											: `Reste ${formatCurrency(remainingBudget)}`}
+									</span>
+									<span className="text-muted-foreground">{Math.round(percentage)}%</span>
+								</div>
+							</div>
+						</div>
 					);
 				})}
 			</div>
 
 			{/* Chart */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-medium">Répartition des dépenses</CardTitle>
-							<p className="mt-1 text-sm text-muted-foreground">Vue graphique par catégorie</p>
-						</div>
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between pb-2">
+					<div>
+						<h3 className="text-lg font-medium">Répartition des dépenses</h3>
+						<p className="text-sm text-muted-foreground">Vue graphique par catégorie</p>
 					</div>
-				</CardHeader>
-				<CardContent>
-					<div className="grid gap-8 md:grid-cols-2 items-center">
-						<DonutChart data={chartData} className="h-72" />
-						<ChartLegend items={chartData} total={totalSpent} />
-					</div>
-				</CardContent>
-			</Card>
+				</div>
+				<div className="grid gap-8 md:grid-cols-2 items-center">
+					<DonutChart data={chartData} className="h-72" />
+					<ChartLegend items={chartData} total={totalSpent} />
+				</div>
+			</div>
 		</div>
 	);
 }

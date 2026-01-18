@@ -13,7 +13,6 @@ import {
 	Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
 	Select,
 	SelectContent,
@@ -22,6 +21,9 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { PageHeader } from '@/components/ui/page-header';
+import { EmptyState } from '@/components/ui/empty-state';
+import { StatCard, StatCardGrid } from '@/components/ui/stat-card';
 
 interface RawImport {
 	id: string;
@@ -312,18 +314,16 @@ export default function ImportPage() {
 	return (
 		<div className="space-y-8">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Import</h1>
-					<p className="mt-1 text-muted-foreground">
-						Importez vos relevés bancaires et conservez les fichiers bruts
-					</p>
-				</div>
-				<Button variant="outline" className="gap-2" onClick={fetchData}>
-					<RefreshCw className="h-4 w-4" />
-					Actualiser
-				</Button>
-			</div>
+			<PageHeader
+				title="Import"
+				description="Importez vos relevés bancaires et conservez les fichiers bruts"
+				actions={
+					<Button variant="outline" className="gap-2" onClick={fetchData}>
+						<RefreshCw className="h-4 w-4" />
+						Actualiser
+					</Button>
+				}
+			/>
 
 			{/* Error message */}
 			{error && (
@@ -346,201 +346,194 @@ export default function ImportPage() {
 			{/* Upload Section */}
 			<div className="grid gap-6 md:grid-cols-2">
 				{/* CSV Import */}
-				<Card className="border-border/60 overflow-hidden">
-					<CardContent className="pt-6">
-						<div className="space-y-4">
-							{/* Bank selector */}
-							<div className="space-y-2">
-								<label htmlFor="import-bank-select" className="text-sm font-medium">
-									1. Banque <span className="text-muted-foreground">*</span>
-								</label>
-								<Select value={selectedBankId} onValueChange={setSelectedBankId}>
-									<SelectTrigger id="import-bank-select" className="w-full">
-										<SelectValue placeholder="Sélectionner une banque..." />
-									</SelectTrigger>
-									<SelectContent>
-										{banks.map((bank) => (
-											<SelectItem key={bank.id} value={bank.id}>
-												{bank.name}
-												{bank.template && (
-													<span className="text-muted-foreground ml-2">
-														({bank.template})
-													</span>
-												)}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								{banks.length === 0 && !isLoading && (
-									<p className="text-xs text-muted-foreground">
-										Aucune banque configurée. Ajoutez d&apos;abord une banque dans les
-										paramètres.
-									</p>
-								)}
-							</div>
-
-							{/* Account selector */}
-							<div className="space-y-2">
-								<label htmlFor="import-account-select" className="text-sm font-medium">
-									2. Compte <span className="text-muted-foreground">*</span>
-								</label>
-								<Select
-									value={selectedAccountId}
-									onValueChange={setSelectedAccountId}
-									disabled={!selectedBankId}
-								>
-									<SelectTrigger id="import-account-select" className="w-full">
-										<SelectValue
-											placeholder={
-												selectedBankId
-													? 'Sélectionner un compte...'
-													: 'Sélectionnez d\'abord une banque'
-											}
-										/>
-									</SelectTrigger>
-									<SelectContent>
-										{filteredAccounts.map((account) => (
-											<SelectItem key={account.id} value={account.id}>
-												{account.name}
-												<span className="text-muted-foreground ml-2">
-													({account.type})
-												</span>
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								{selectedBankId && filteredAccounts.length === 0 && (
-									<p className="text-xs text-muted-foreground">
-										Aucun compte pour cette banque. Ajoutez d&apos;abord un compte.
-									</p>
-								)}
-							</div>
-
-							{/* Drop zone */}
-							<div className="space-y-2">
-								<label htmlFor="import-file-input" className="text-sm font-medium">3. Fichier</label>
-								<div
-									role="presentation"
-									onDragEnter={handleDrag}
-									onDragLeave={handleDrag}
-									onDragOver={handleDrag}
-									onDrop={handleDrop}
-									className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors ${
-										!canUpload
-											? 'border-border/40 bg-muted/10 opacity-60'
-											: dragActive
-												? 'border-primary bg-primary/5'
-												: 'border-border/60 bg-muted/20 hover:border-primary/50 hover:bg-muted/30'
-									}`}
-								>
-									<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-										{isUploading ? (
-											<Loader2 className="h-7 w-7 animate-spin" />
-										) : (
-											<FileSpreadsheet className="h-7 w-7" />
-										)}
-									</div>
-									<h3 className="mt-3 text-base font-medium">
-										{isUploading ? 'Upload en cours...' : 'Import CSV / Excel'}
-									</h3>
-									<p className="mt-1 text-center text-sm text-muted-foreground max-w-xs">
-										Glissez votre fichier ici ou cliquez pour sélectionner
-									</p>
-									<label htmlFor="import-file-input" className="mt-4">
-										<input
-											id="import-file-input"
-											type="file"
-											accept=".csv,.xlsx,.xls"
-											onChange={handleFileSelect}
-											className="hidden"
-											disabled={!canUpload}
-										/>
-										<Button className="gap-2" disabled={!canUpload} asChild>
-											<span>
-												<Upload className="h-4 w-4" />
-												Sélectionner un fichier
+				<div className="glass-card p-6 space-y-4">
+					{/* Bank selector */}
+					<div className="space-y-2">
+						<label htmlFor="import-bank-select" className="text-sm font-medium">
+							1. Banque <span className="text-muted-foreground">*</span>
+						</label>
+						<Select value={selectedBankId} onValueChange={setSelectedBankId}>
+							<SelectTrigger id="import-bank-select" className="w-full">
+								<SelectValue placeholder="Sélectionner une banque..." />
+							</SelectTrigger>
+							<SelectContent>
+								{banks.map((bank) => (
+									<SelectItem key={bank.id} value={bank.id}>
+										{bank.name}
+										{bank.template && (
+											<span className="text-muted-foreground ml-2">
+												({bank.template})
 											</span>
-										</Button>
-									</label>
-									<p className="mt-2 text-xs text-muted-foreground">
-										.csv, .xlsx · Max 10 MB
-									</p>
-								</div>
-							</div>
-						</div>
-					</CardContent>
-				</Card>
-
-				{/* Stats */}
-				<Card className="border-border/60">
-					<CardHeader className="pb-3">
-						<CardTitle className="text-lg font-medium">Statistiques d&apos;import</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="grid grid-cols-3 gap-3">
-							<div className="text-center rounded-lg bg-muted/30 p-3">
-								<p className="text-2xl font-semibold">{imports.length}</p>
-								<p className="text-xs text-muted-foreground">Fichiers</p>
-							</div>
-							<div className="text-center rounded-lg bg-muted/30 p-3">
-								<p className="text-2xl font-semibold">{processedCount}</p>
-								<p className="text-xs text-muted-foreground">Traités</p>
-							</div>
-							<div className="text-center rounded-lg bg-muted/30 p-3">
-								<p className="text-2xl font-semibold">{totalRecords}</p>
-								<p className="text-xs text-muted-foreground">Transactions</p>
-							</div>
-						</div>
-
-						{pendingCount > 0 && (
-							<div className="rounded-lg border border-[oklch(0.7_0.15_75)]/20 bg-[oklch(0.7_0.15_75)]/5 p-3">
-								<div className="flex items-center gap-2 text-[oklch(0.7_0.15_75)]">
-									<Clock className="h-4 w-4" />
-									<span className="text-sm font-medium">
-										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de
-										traitement
-									</span>
-								</div>
-							</div>
+										)}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						{banks.length === 0 && !isLoading && (
+							<p className="text-xs text-muted-foreground">
+								Aucune banque configurée. Ajoutez d&apos;abord une banque dans les
+								paramètres.
+							</p>
 						)}
+					</div>
 
-						<div className="rounded-lg bg-muted/30 p-4">
-							<h4 className="font-medium mb-2">Comment ça marche ?</h4>
-							<ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-								<li>Sélectionnez la banque source</li>
-								<li>Choisissez le compte cible</li>
-								<li>Uploadez votre fichier CSV/Excel</li>
-								<li>Le fichier brut est stocké dans le cloud</li>
-								<li>Les transactions sont importées automatiquement</li>
-							</ol>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
+					{/* Account selector */}
+					<div className="space-y-2">
+						<label htmlFor="import-account-select" className="text-sm font-medium">
+							2. Compte <span className="text-muted-foreground">*</span>
+						</label>
+						<Select
+							value={selectedAccountId}
+							onValueChange={setSelectedAccountId}
+							disabled={!selectedBankId}
+						>
+							<SelectTrigger id="import-account-select" className="w-full">
+								<SelectValue
+									placeholder={
+										selectedBankId
+											? 'Sélectionner un compte...'
+											: 'Sélectionnez d\'abord une banque'
+									}
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								{filteredAccounts.map((account) => (
+									<SelectItem key={account.id} value={account.id}>
+										{account.name}
+										<span className="text-muted-foreground ml-2">
+											({account.type})
+										</span>
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						{selectedBankId && filteredAccounts.length === 0 && (
+							<p className="text-xs text-muted-foreground">
+								Aucun compte pour cette banque. Ajoutez d&apos;abord un compte.
+							</p>
+						)}
+					</div>
 
-			{/* Import History */}
-			<Card className="border-border/60">
-				<CardHeader className="pb-4">
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-medium">Historique des imports</CardTitle>
-							<p className="mt-1 text-sm text-muted-foreground">
-								Fichiers bruts stockés et leur statut de traitement
+					{/* Drop zone */}
+					<div className="space-y-2">
+						<label htmlFor="import-file-input" className="text-sm font-medium">3. Fichier</label>
+						<div
+							role="presentation"
+							onDragEnter={handleDrag}
+							onDragLeave={handleDrag}
+							onDragOver={handleDrag}
+							onDrop={handleDrop}
+							className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors ${
+								!canUpload
+									? 'border-border/40 bg-muted/10 opacity-60'
+									: dragActive
+										? 'border-primary bg-primary/5'
+										: 'border-border/60 bg-white/50 dark:bg-white/5 hover:border-primary/50 hover:bg-white/80 dark:hover:bg-white/10'
+							}`}
+						>
+							<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+								{isUploading ? (
+									<Loader2 className="h-7 w-7 animate-spin" />
+								) : (
+									<FileSpreadsheet className="h-7 w-7" />
+								)}
+							</div>
+							<h3 className="mt-3 text-base font-medium">
+								{isUploading ? 'Upload en cours...' : 'Import CSV / Excel'}
+							</h3>
+							<p className="mt-1 text-center text-sm text-muted-foreground max-w-xs">
+								Glissez votre fichier ici ou cliquez pour sélectionner
+							</p>
+							<label htmlFor="import-file-input" className="mt-4">
+								<input
+									id="import-file-input"
+									type="file"
+									accept=".csv,.xlsx,.xls"
+									onChange={handleFileSelect}
+									className="hidden"
+									disabled={!canUpload}
+								/>
+								<Button className="gap-2" disabled={!canUpload} asChild>
+									<span>
+										<Upload className="h-4 w-4" />
+										Sélectionner un fichier
+									</span>
+								</Button>
+							</label>
+							<p className="mt-2 text-xs text-muted-foreground">
+								.csv, .xlsx · Max 10 MB
 							</p>
 						</div>
 					</div>
-				</CardHeader>
-				<CardContent className="space-y-2">
+				</div>
+
+				{/* Stats */}
+				<div className="glass-card p-6 space-y-4">
+					<h3 className="text-lg font-medium">Statistiques d&apos;import</h3>
+					<StatCardGrid columns={3}>
+						<StatCard
+							label="Fichiers"
+							value={String(imports.length)}
+							icon={FileSpreadsheet}
+						/>
+						<StatCard
+							label="Traités"
+							value={String(processedCount)}
+							icon={CheckCircle2}
+						/>
+						<StatCard
+							label="Transactions"
+							value={String(totalRecords)}
+							icon={RefreshCw}
+						/>
+					</StatCardGrid>
+
+					{pendingCount > 0 && (
+						<div className="rounded-lg border border-[oklch(0.7_0.15_75)]/20 bg-[oklch(0.7_0.15_75)]/5 p-3">
+							<div className="flex items-center gap-2 text-[oklch(0.7_0.15_75)]">
+								<Clock className="h-4 w-4" />
+								<span className="text-sm font-medium">
+									{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de
+									traitement
+								</span>
+							</div>
+						</div>
+					)}
+
+					<div className="rounded-lg bg-white/50 dark:bg-white/5 p-4">
+						<h4 className="font-medium mb-2">Comment ça marche ?</h4>
+						<ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+							<li>Sélectionnez la banque source</li>
+							<li>Choisissez le compte cible</li>
+							<li>Uploadez votre fichier CSV/Excel</li>
+							<li>Le fichier brut est stocké dans le cloud</li>
+							<li>Les transactions sont importées automatiquement</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+
+			{/* Import History */}
+			<div className="glass-card p-6 space-y-4">
+				<div className="flex items-center justify-between pb-2">
+					<div>
+						<h3 className="text-lg font-medium">Historique des imports</h3>
+						<p className="text-sm text-muted-foreground">
+							Fichiers bruts stockés et leur statut de traitement
+						</p>
+					</div>
+				</div>
+				<div className="space-y-2">
 					{isLoading ? (
 						<div className="flex items-center justify-center py-8">
 							<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 						</div>
 					) : imports.length === 0 ? (
-						<div className="text-center py-8 text-muted-foreground">
-							<FileSpreadsheet className="h-12 w-12 mx-auto mb-3 opacity-50" />
-							<p>Aucun import pour le moment</p>
-							<p className="text-sm">Uploadez votre premier fichier ci-dessus</p>
-						</div>
+						<EmptyState
+							icon={FileSpreadsheet}
+							title="Aucun import"
+							description="Uploadez votre premier fichier ci-dessus"
+						/>
 					) : (
 						imports.map((imp) => (
 							<div
@@ -548,7 +541,7 @@ export default function ImportPage() {
 								className={`flex items-center justify-between rounded-xl p-4 transition-colors ${
 									imp.status === 'FAILED'
 										? 'bg-[oklch(0.55_0.2_25)]/5 border border-[oklch(0.55_0.2_25)]/20'
-										: 'bg-muted/30 hover:bg-muted/50'
+										: 'bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10'
 								}`}
 							>
 								<div className="flex items-center gap-4">
@@ -650,8 +643,8 @@ export default function ImportPage() {
 							</div>
 						))
 					)}
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			<ConfirmDialog
 				open={deleteImportId !== null}
