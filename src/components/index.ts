@@ -506,3 +506,15 @@ export { ImportRefreshButton } from './import/ImportRefreshButton';
 export type { ImportData } from './import/ImportRow';
 export { ImportRow } from './import/ImportRow';
 export { ImportStatsCard } from './import/ImportStatsCard';
+
+// =============================================================================
+// SETTINGS COMPONENTS
+// =============================================================================
+
+export { SettingsAppInfo } from './settings/SettingsAppInfo';
+export { SettingsColorPicker } from './settings/SettingsColorPicker';
+export { SettingsMemberRow } from './settings/SettingsMemberRow';
+export { SettingsMemberSkeleton } from './settings/SettingsMemberSkeleton';
+export { SettingsNotificationRow } from './settings/SettingsNotificationRow';
+export { SettingsSectionCard } from './settings/SettingsSectionCard';
+export { SettingsThemeSelector } from './settings/SettingsThemeSelector';
