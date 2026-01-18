@@ -19,7 +19,6 @@ import {
 	DropdownMenuTrigger,
 	EmptyState,
 	GlassCard,
-	Heading,
 	Home,
 	Input,
 	Label,
@@ -37,7 +36,6 @@ import {
 	Skeleton,
 	StatCard,
 	StatCardGrid,
-	Text,
 	TrendingUp,
 	X,
 } from '@/components';
@@ -690,7 +688,7 @@ export default function RealEstatePage() {
 													);
 												})}
 												{memberShares.length > 0 && (
-													<Text size="xs" color="muted" style={{ textAlign: 'right' }}>
+													<p className="text-xs text-muted-foreground" style={{ textAlign: 'right' }}>
 														Total: {memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)}%
 														{memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0) !==
 															100 && (
@@ -700,7 +698,7 @@ export default function RealEstatePage() {
 																(doit être 100%)
 															</span>
 														)}
-													</Text>
+													</p>
 												)}
 											</div>
 										)}
@@ -825,15 +823,15 @@ export default function RealEstatePage() {
 				<GlassCard padding="lg">
 					<div className="flex justify-between items-center mb-4">
 						<div className="flex flex-col">
-							<Text weight="medium">Capital restant dû</Text>
-							<Text size="sm" color="muted">
+							<p className="font-medium">Capital restant dû</p>
+							<p className="text-sm text-muted-foreground">
 								{formatCurrency(summary.totalLoansRemaining)} sur{' '}
 								{formatCurrency(summary.totalValue)}
-							</Text>
+							</p>
 						</div>
-						<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{((summary.totalLoansRemaining / summary.totalValue) * 100).toFixed(1)}%
-						</Text>
+						</p>
 					</div>
 					<Progress
 						value={(summary.totalLoansRemaining / summary.totalValue) * 100}
@@ -897,10 +895,8 @@ export default function RealEstatePage() {
 												)}
 											</div>
 											<div style={{ minWidth: 0 }}>
-												<Heading
-													level={3}
-													size="lg"
-													weight="medium"
+												<h3
+													className="text-lg font-medium tracking-tight"
 													style={{
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
@@ -908,7 +904,7 @@ export default function RealEstatePage() {
 													}}
 												>
 													{property.name}
-												</Heading>
+												</h3>
 												<div className="flex items-center gap-1 mt-0.5">
 													<MapPin
 														style={{
@@ -1007,19 +1003,17 @@ export default function RealEstatePage() {
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
-											<Text size="xs" color="muted">
+											<p className="text-xs text-muted-foreground">
 												Valeur actuelle
-											</Text>
-											<Text
-												size="xl"
-												weight="semibold"
+											</p>
+											<p
+												className="text-xl font-semibold"
 												style={{ fontVariantNumeric: 'tabular-nums', marginTop: '0.25rem' }}
 											>
 												{formatCurrency(property.currentValue)}
-											</Text>
-											<Text
-												size="xs"
-												weight="medium"
+											</p>
+											<p
+												className="text-xs font-medium"
 												style={{
 													marginTop: '0.125rem',
 													color: appreciation >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
@@ -1027,7 +1021,7 @@ export default function RealEstatePage() {
 											>
 												{appreciation >= 0 ? '+' : ''}
 												{appreciation.toFixed(1)}% depuis l&apos;achat
-											</Text>
+											</p>
 										</div>
 										<div
 											className="rounded-xl p-3"
@@ -1035,12 +1029,11 @@ export default function RealEstatePage() {
 												backgroundColor: 'hsl(var(--muted) / 0.3)',
 											}}
 										>
-											<Text size="xs" color="muted">
+											<p className="text-xs text-muted-foreground">
 												Équité
-											</Text>
-											<Text
-												size="xl"
-												weight="semibold"
+											</p>
+											<p
+												className="text-xl font-semibold"
 												style={{
 													fontVariantNumeric: 'tabular-nums',
 													marginTop: '0.25rem',
@@ -1048,12 +1041,12 @@ export default function RealEstatePage() {
 												}}
 											>
 												{formatCurrency(equity)}
-											</Text>
-											<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
+											</p>
+											<p className="text-xs text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 												{property.currentValue > 0
 													? `${((equity / property.currentValue) * 100).toFixed(0)}% de la valeur`
 													: '-'}
-											</Text>
+											</p>
 										</div>
 									</div>
 
@@ -1061,13 +1054,13 @@ export default function RealEstatePage() {
 									{totalLoansRemaining > 0 && (
 										<div className="flex flex-col gap-2">
 											<div className="flex justify-between">
-												<Text size="xs" color="muted">
+												<span className="text-xs text-muted-foreground">
 													Crédit restant ({property._count.loans} prêt
 													{property._count.loans > 1 ? 's' : ''})
-												</Text>
-												<Text size="xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
+												</span>
+												<span className="text-xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
 													{formatCurrency(totalLoansRemaining)}
-												</Text>
+												</span>
 											</div>
 											<Progress value={100 - loanProgress} style={{ height: '0.5rem' }} />
 										</div>
@@ -1081,11 +1074,11 @@ export default function RealEstatePage() {
 												style={{ color: 'hsl(var(--muted-foreground))' }}
 											>
 												<Home style={{ height: '0.875rem', width: '0.875rem' }} />
-												<Text size="xs">Surface</Text>
+												<span className="text-xs">Surface</span>
 											</div>
-											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
+											<p className="font-medium" style={{ marginTop: '0.25rem' }}>
 												{property.surface} m²
-											</Text>
+											</p>
 										</div>
 										<div className="text-center">
 											<div
@@ -1093,11 +1086,11 @@ export default function RealEstatePage() {
 												style={{ color: 'hsl(var(--muted-foreground))' }}
 											>
 												<Building2 style={{ height: '0.875rem', width: '0.875rem' }} />
-												<Text size="xs">Pièces</Text>
+												<span className="text-xs">Pièces</span>
 											</div>
-											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
+											<p className="font-medium" style={{ marginTop: '0.25rem' }}>
 												{property.rooms || '-'}
-											</Text>
+											</p>
 										</div>
 										<div className="text-center">
 											<div
@@ -1105,11 +1098,11 @@ export default function RealEstatePage() {
 												style={{ color: 'hsl(var(--muted-foreground))' }}
 											>
 												<Building2 style={{ height: '0.875rem', width: '0.875rem' }} />
-												<Text size="xs">Chambres</Text>
+												<span className="text-xs">Chambres</span>
 											</div>
-											<Text weight="medium" style={{ marginTop: '0.25rem' }}>
+											<p className="font-medium" style={{ marginTop: '0.25rem' }}>
 												{property.bedrooms || '-'}
-											</Text>
+											</p>
 										</div>
 									</div>
 
@@ -1123,28 +1116,27 @@ export default function RealEstatePage() {
 										>
 											<div className="flex justify-between items-center">
 												<div className="flex flex-col">
-													<Text size="xs" style={{ color: 'oklch(0.55 0.15 145)' }}>
+													<span className="text-xs" style={{ color: 'oklch(0.55 0.15 145)' }}>
 														Loyer mensuel
-													</Text>
-													<Text
-														size="lg"
-														weight="semibold"
+													</span>
+													<p
+														className="text-lg font-semibold"
 														style={{
 															fontVariantNumeric: 'tabular-nums',
 															color: 'oklch(0.55 0.15 145)',
 														}}
 													>
 														{formatCurrency(property.rentAmount)}
-													</Text>
+													</p>
 												</div>
 												{property.rentCharges && (
 													<div className="text-right">
-														<Text size="xs" color="muted">
+														<span className="text-xs text-muted-foreground">
 															Net de charges
-														</Text>
-														<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+														</span>
+														<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 															{formatCurrency(property.rentAmount - property.rentCharges)}
-														</Text>
+														</p>
 													</div>
 												)}
 											</div>

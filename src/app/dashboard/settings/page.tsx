@@ -22,7 +22,6 @@ import {
 	EmptyState,
 	GlassCard,
 	Globe,
-	Heading,
 	Input,
 	Key,
 	Label,
@@ -41,7 +40,6 @@ import {
 	Skeleton,
 	Sun,
 	Switch,
-	Text,
 	Trash2,
 	Upload,
 	User,
@@ -226,12 +224,8 @@ export default function SettingsPage() {
 									<User style={{ height: '1.25rem', width: '1.25rem' }} />
 								</div>
 								<div className="flex flex-col">
-									<Heading level={3} size="lg" weight="medium">
-										Profil
-									</Heading>
-									<Text size="sm" color="muted">
-										Vos informations personnelles
-									</Text>
+									<h3 className="text-lg font-medium tracking-tight">Profil</h3>
+									<p className="text-sm text-muted-foreground">Vos informations personnelles</p>
 								</div>
 							</div>
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -276,12 +270,10 @@ export default function SettingsPage() {
 										<Users style={{ height: '1.25rem', width: '1.25rem' }} />
 									</div>
 									<div className="flex flex-col">
-										<Heading level={3} size="lg" weight="medium">
-											Membres du foyer
-										</Heading>
-										<Text size="sm" color="muted">
+										<h3 className="text-lg font-medium tracking-tight">Membres du foyer</h3>
+										<p className="text-sm text-muted-foreground">
 											Gérez les membres associés aux comptes
-										</Text>
+										</p>
 									</div>
 								</div>
 								<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
@@ -385,11 +377,11 @@ export default function SettingsPage() {
 													size="md"
 												/>
 												<div className="flex flex-col">
-													<Text weight="medium">{member.name}</Text>
-													<Text size="xs" color="muted">
+													<p className="font-medium">{member.name}</p>
+													<p className="text-xs text-muted-foreground">
 														{member.accountMembers.length} compte
 														{member.accountMembers.length !== 1 ? 's' : ''}
-													</Text>
+													</p>
 												</div>
 											</div>
 											<div className="flex items-center gap-3">
@@ -498,12 +490,8 @@ export default function SettingsPage() {
 									<Palette style={{ height: '1.25rem', width: '1.25rem' }} />
 								</div>
 								<div className="flex flex-col">
-									<Heading level={3} size="lg" weight="medium">
-										Apparence
-									</Heading>
-									<Text size="sm" color="muted">
-										Personnalisez l&apos;interface
-									</Text>
+									<h3 className="text-lg font-medium tracking-tight">Apparence</h3>
+									<p className="text-sm text-muted-foreground">Personnalisez l&apos;interface</p>
 								</div>
 							</div>
 
@@ -532,9 +520,7 @@ export default function SettingsPage() {
 										}}
 									>
 										<Sun style={{ height: '1.25rem', width: '1.25rem' }} />
-										<Text size="sm" weight="medium">
-											Clair
-										</Text>
+										<span className="text-sm font-medium">Clair</span>
 									</button>
 									<button
 										type="button"
@@ -557,9 +543,7 @@ export default function SettingsPage() {
 										}}
 									>
 										<Moon style={{ height: '1.25rem', width: '1.25rem' }} />
-										<Text size="sm" weight="medium">
-											Sombre
-										</Text>
+										<span className="text-sm font-medium">Sombre</span>
 									</button>
 									<button
 										type="button"
@@ -584,9 +568,7 @@ export default function SettingsPage() {
 										}}
 									>
 										<Globe style={{ height: '1.25rem', width: '1.25rem' }} />
-										<Text size="sm" weight="medium">
-											Système
-										</Text>
+										<span className="text-sm font-medium">Système</span>
 									</button>
 								</div>
 							</div>
@@ -623,12 +605,8 @@ export default function SettingsPage() {
 									<Database style={{ height: '1.25rem', width: '1.25rem' }} />
 								</div>
 								<div className="flex flex-col">
-									<Heading level={3} size="lg" weight="medium">
-										Données
-									</Heading>
-									<Text size="sm" color="muted">
-										Export et sauvegarde
-									</Text>
+									<h3 className="text-lg font-medium tracking-tight">Données</h3>
+									<p className="text-sm text-muted-foreground">Export et sauvegarde</p>
 								</div>
 							</div>
 							<div className="flex flex-col gap-3">
@@ -647,10 +625,10 @@ export default function SettingsPage() {
 									Importer une sauvegarde
 								</Button>
 							</div>
-							<Text size="xs" color="muted">
+							<p className="text-xs text-muted-foreground">
 								Vos données sont stockées localement sur votre serveur. Effectuez des sauvegardes
 								régulières pour éviter toute perte de données.
-							</Text>
+							</p>
 						</div>
 					</GlassCard>
 				</div>
@@ -670,36 +648,28 @@ export default function SettingsPage() {
 								>
 									<Bell style={{ height: '1.25rem', width: '1.25rem' }} />
 								</div>
-								<Heading level={3} size="lg" weight="medium">
-									Notifications
-								</Heading>
+								<h3 className="text-lg font-medium tracking-tight">Notifications</h3>
 							</div>
 							<div className="flex justify-between items-center">
 								<div className="flex flex-col">
-									<Text weight="medium">Alertes budget</Text>
-									<Text size="xs" color="muted">
-										Dépassement de budget
-									</Text>
+									<p className="font-medium">Alertes budget</p>
+									<p className="text-xs text-muted-foreground">Dépassement de budget</p>
 								</div>
 								<Switch defaultChecked />
 							</div>
 							<Separator />
 							<div className="flex justify-between items-center">
 								<div className="flex flex-col">
-									<Text weight="medium">Transactions</Text>
-									<Text size="xs" color="muted">
-										Nouvelles transactions
-									</Text>
+									<p className="font-medium">Transactions</p>
+									<p className="text-xs text-muted-foreground">Nouvelles transactions</p>
 								</div>
 								<Switch />
 							</div>
 							<Separator />
 							<div className="flex justify-between items-center">
 								<div className="flex flex-col">
-									<Text weight="medium">Rappels</Text>
-									<Text size="xs" color="muted">
-										Échéances de prêts
-									</Text>
+									<p className="font-medium">Rappels</p>
+									<p className="text-xs text-muted-foreground">Échéances de prêts</p>
 								</div>
 								<Switch defaultChecked />
 							</div>
@@ -719,9 +689,7 @@ export default function SettingsPage() {
 								>
 									<Shield style={{ height: '1.25rem', width: '1.25rem' }} />
 								</div>
-								<Heading level={3} size="lg" weight="medium">
-									Sécurité
-								</Heading>
+								<h3 className="text-lg font-medium tracking-tight">Sécurité</h3>
 							</div>
 							<Button
 								variant="outline"
@@ -732,20 +700,16 @@ export default function SettingsPage() {
 							</Button>
 							<div className="flex justify-between items-center">
 								<div className="flex flex-col">
-									<Text weight="medium">2FA</Text>
-									<Text size="xs" color="muted">
-										Authentification double facteur
-									</Text>
+									<p className="font-medium">2FA</p>
+									<p className="text-xs text-muted-foreground">Authentification double facteur</p>
 								</div>
 								<Switch />
 							</div>
 							<Separator />
 							<div className="flex justify-between items-center">
 								<div className="flex flex-col">
-									<Text weight="medium">Sessions</Text>
-									<Text size="xs" color="muted">
-										Déconnexion automatique
-									</Text>
+									<p className="font-medium">Sessions</p>
+									<p className="text-xs text-muted-foreground">Déconnexion automatique</p>
 								</div>
 								<Switch defaultChecked />
 							</div>
@@ -755,13 +719,11 @@ export default function SettingsPage() {
 					{/* App Info */}
 					<GlassCard padding="lg" style={{ backgroundColor: 'hsl(var(--muted) / 0.2)' }}>
 						<div className="flex flex-col items-center text-center">
-							<Text weight="medium">Imanisa Finance</Text>
-							<Text size="sm" color="muted">
-								Version 2.0.0
-							</Text>
-							<Text size="xs" color="muted" style={{ marginTop: '1rem' }}>
+							<p className="font-medium">Imanisa Finance</p>
+							<p className="text-sm text-muted-foreground">Version 2.0.0</p>
+							<p className="text-xs text-muted-foreground" style={{ marginTop: '1rem' }}>
 								Application open source de gestion de patrimoine personnel
-							</Text>
+							</p>
 							<a
 								href="https://github.com/mbourmaud/imanisa-finance"
 								target="_blank"

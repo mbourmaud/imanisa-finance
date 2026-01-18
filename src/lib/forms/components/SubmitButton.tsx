@@ -17,6 +17,7 @@
  * ```
  */
 
+import { useStore } from '@tanstack/react-store';
 import { useFormContext } from '../form-context';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { Loader2 } from '@/components/ui/icon';
@@ -38,10 +39,10 @@ export function SubmitButton({
 }: SubmitButtonProps) {
 	const form = useFormContext();
 
-	// Subscribe to form state
-	const canSubmit = form.useStore((state) => state.canSubmit);
-	const isSubmitting = form.useStore((state) => state.isSubmitting);
-	const isValidating = form.useStore((state) => state.isValidating);
+	// Subscribe to form state using the store
+	const canSubmit = useStore(form.store, (state) => state.canSubmit);
+	const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
+	const isValidating = useStore(form.store, (state) => state.isValidating);
 
 	const isDisabled = forceDisabled || !canSubmit || isSubmitting || isValidating;
 	const showLoader = isSubmitting || isValidating;

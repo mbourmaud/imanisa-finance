@@ -9,7 +9,6 @@ import {
 	EmptyState,
 	FileSpreadsheet,
 	GlassCard,
-	Heading,
 	Label,
 	Loader2,
 	PageHeader,
@@ -22,7 +21,6 @@ import {
 	SelectValue,
 	StatCard,
 	StatCardGrid,
-	Text,
 	Trash2,
 	Upload,
 } from '@/components';
@@ -355,7 +353,7 @@ export default function ImportPage() {
 				>
 					<div className="flex items-center gap-3" style={{ color: 'oklch(0.55 0.2 25)' }}>
 						<AlertCircle style={{ height: '1rem', width: '1rem' }} />
-						<Text weight="medium">{error}</Text>
+						<span className="font-medium">{error}</span>
 						<Button
 							variant="ghost"
 							size="sm"
@@ -376,10 +374,7 @@ export default function ImportPage() {
 						{/* Bank selector */}
 						<div className="flex flex-col gap-2">
 							<Label htmlFor="import-bank-select">
-								1. Banque{' '}
-								<Text as="span" color="muted">
-									*
-								</Text>
+								1. Banque <span className="text-muted-foreground">*</span>
 							</Label>
 							<Select value={selectedBankId} onValueChange={setSelectedBankId}>
 								<SelectTrigger id="import-bank-select" style={{ width: '100%' }}>
@@ -390,28 +385,25 @@ export default function ImportPage() {
 										<SelectItem key={bank.id} value={bank.id}>
 											{bank.name}
 											{bank.template && (
-												<Text as="span" color="muted" style={{ marginLeft: '0.5rem' }}>
+												<span className="text-muted-foreground" style={{ marginLeft: '0.5rem' }}>
 													({bank.template})
-												</Text>
+												</span>
 											)}
 										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
 							{banks.length === 0 && !isLoading && (
-								<Text size="xs" color="muted">
+								<p className="text-xs text-muted-foreground">
 									Aucune banque configurée. Ajoutez d&apos;abord une banque dans les paramètres.
-								</Text>
+								</p>
 							)}
 						</div>
 
 						{/* Account selector */}
 						<div className="flex flex-col gap-2">
 							<Label htmlFor="import-account-select">
-								2. Compte{' '}
-								<Text as="span" color="muted">
-									*
-								</Text>
+								2. Compte <span className="text-muted-foreground">*</span>
 							</Label>
 							<Select
 								value={selectedAccountId}
@@ -431,17 +423,17 @@ export default function ImportPage() {
 									{filteredAccounts.map((account) => (
 										<SelectItem key={account.id} value={account.id}>
 											{account.name}
-											<Text as="span" color="muted" style={{ marginLeft: '0.5rem' }}>
+											<span className="text-muted-foreground" style={{ marginLeft: '0.5rem' }}>
 												({account.type})
-											</Text>
+											</span>
 										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
 							{selectedBankId && filteredAccounts.length === 0 && (
-								<Text size="xs" color="muted">
+								<p className="text-xs text-muted-foreground">
 									Aucun compte pour cette banque. Ajoutez d&apos;abord un compte.
-								</Text>
+								</p>
 							)}
 						</div>
 
@@ -497,17 +489,18 @@ export default function ImportPage() {
 										<FileSpreadsheet style={{ height: '1.75rem', width: '1.75rem' }} />
 									)}
 								</div>
-								<Heading level={3} size="md" style={{ marginTop: '0.5rem' }}>
+								<h3
+									className="text-base font-semibold tracking-tight"
+									style={{ marginTop: '0.5rem' }}
+								>
 									{isUploading ? 'Upload en cours...' : 'Import CSV / Excel'}
-								</Heading>
-								<Text
-									size="sm"
-									color="muted"
-									align="center"
+								</h3>
+								<p
+									className="text-sm text-muted-foreground text-center"
 									style={{ marginTop: '0.25rem', maxWidth: '20rem' }}
 								>
 									Glissez votre fichier ici ou cliquez pour sélectionner
-								</Text>
+								</p>
 								<label htmlFor="import-file-input" style={{ marginTop: '1rem' }}>
 									<input
 										id="import-file-input"
@@ -525,9 +518,9 @@ export default function ImportPage() {
 										<span>Sélectionner un fichier</span>
 									</Button>
 								</label>
-								<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
+								<p className="text-xs text-muted-foreground" style={{ marginTop: '0.5rem' }}>
 									.csv, .xlsx · Max 10 MB
-								</Text>
+								</p>
 							</div>
 						</div>
 					</div>
@@ -536,9 +529,7 @@ export default function ImportPage() {
 				{/* Stats */}
 				<GlassCard padding="lg">
 					<div className="flex flex-col gap-4">
-						<Heading level={3} size="md">
-							Statistiques d&apos;import
-						</Heading>
+						<h3 className="text-base font-semibold tracking-tight">Statistiques d&apos;import</h3>
 						<StatCardGrid columns={3}>
 							<StatCard label="Fichiers" value={String(imports.length)} icon={FileSpreadsheet} />
 							<StatCard label="Traités" value={String(processedCount)} icon={CheckCircle2} />
@@ -555,9 +546,9 @@ export default function ImportPage() {
 							>
 								<div className="flex items-center gap-3" style={{ color: 'oklch(0.7 0.15 75)' }}>
 									<Clock style={{ height: '1rem', width: '1rem' }} />
-									<Text size="sm" weight="medium">
+									<span className="text-sm font-medium">
 										{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de traitement
-									</Text>
+									</span>
 								</div>
 							</div>
 						)}
@@ -569,10 +560,11 @@ export default function ImportPage() {
 								backgroundColor: 'hsl(0 0% 100% / 0.5)',
 							}}
 						>
-							<Text weight="medium" style={{ marginBottom: '0.5rem' }}>
+							<p className="font-medium" style={{ marginBottom: '0.5rem' }}>
 								Comment ça marche ?
-							</Text>
+							</p>
 							<ol
+								className="text-sm text-muted-foreground"
 								style={{
 									listStyleType: 'decimal',
 									paddingLeft: '1.25rem',
@@ -581,31 +573,11 @@ export default function ImportPage() {
 									gap: '0.25rem',
 								}}
 							>
-								<li>
-									<Text size="sm" color="muted">
-										Sélectionnez la banque source
-									</Text>
-								</li>
-								<li>
-									<Text size="sm" color="muted">
-										Choisissez le compte cible
-									</Text>
-								</li>
-								<li>
-									<Text size="sm" color="muted">
-										Uploadez votre fichier CSV/Excel
-									</Text>
-								</li>
-								<li>
-									<Text size="sm" color="muted">
-										Le fichier brut est stocké dans le cloud
-									</Text>
-								</li>
-								<li>
-									<Text size="sm" color="muted">
-										Les transactions sont importées automatiquement
-									</Text>
-								</li>
+								<li>Sélectionnez la banque source</li>
+								<li>Choisissez le compte cible</li>
+								<li>Uploadez votre fichier CSV/Excel</li>
+								<li>Le fichier brut est stocké dans le cloud</li>
+								<li>Les transactions sont importées automatiquement</li>
 							</ol>
 						</div>
 					</div>
@@ -616,19 +588,14 @@ export default function ImportPage() {
 			<GlassCard padding="lg">
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
-						<Heading level={3} size="md">
-							Historique des imports
-						</Heading>
-						<Text size="sm" color="muted">
+						<h3 className="text-base font-semibold tracking-tight">Historique des imports</h3>
+						<p className="text-sm text-muted-foreground">
 							Fichiers bruts stockés et leur statut de traitement
-						</Text>
+						</p>
 					</div>
 					<div className="flex flex-col gap-2">
 						{isLoading ? (
-							<div
-								className="flex py-8"
-								style={{ alignItems: 'center', justifyContent: 'center' }}
-							>
+							<div className="flex py-8" style={{ alignItems: 'center', justifyContent: 'center' }}>
 								<Loader2
 									style={{
 										height: '1.5rem',
@@ -684,7 +651,7 @@ export default function ImportPage() {
 										</div>
 										<div className="flex flex-col">
 											<div className="flex items-center gap-3">
-												<Text weight="medium">{imp.filename}</Text>
+												<span className="font-medium">{imp.filename}</span>
 												<div
 													className="flex rounded-full px-2 py-1"
 													style={{
@@ -713,23 +680,20 @@ export default function ImportPage() {
 													<span>{getStatusLabel(imp.status)}</span>
 												</div>
 											</div>
-											<Text size="xs" color="muted">
+											<p className="text-xs text-muted-foreground">
 												{getBankNameForImport(imp.bankKey)}
 												{imp.account && ` → ${imp.account.name}`} · {formatFileSize(imp.fileSize)} ·{' '}
 												{formatDate(imp.createdAt)}
 												{imp.recordsCount !== null && (
-													<Text as="span" style={{ color: 'oklch(0.55 0.15 145)' }}>
+													<span style={{ color: 'oklch(0.55 0.15 145)' }}>
 														{' '}
 														· {imp.recordsCount} transactions
-													</Text>
+													</span>
 												)}
 												{imp.errorMessage && (
-													<Text as="span" style={{ color: 'oklch(0.55 0.2 25)' }}>
-														{' '}
-														· {imp.errorMessage}
-													</Text>
+													<span style={{ color: 'oklch(0.55 0.2 25)' }}> · {imp.errorMessage}</span>
 												)}
-											</Text>
+											</p>
 										</div>
 									</div>
 									<div className="flex items-center gap-3">

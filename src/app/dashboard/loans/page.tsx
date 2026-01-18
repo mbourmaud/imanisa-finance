@@ -314,9 +314,7 @@ export default function LoansPage() {
 														>
 															{formatCurrency(loan.remainingAmount)}
 														</p>
-														<p className="text-xs text-muted-foreground">
-															Capital restant
-														</p>
+														<p className="text-xs text-muted-foreground">Capital restant</p>
 													</div>
 													<DropdownMenu>
 														<DropdownMenuTrigger asChild>
@@ -358,9 +356,7 @@ export default function LoansPage() {
 													>
 														{formatCurrency(loan.remainingAmount)}
 													</p>
-													<p className="text-xs text-muted-foreground">
-														Capital restant
-													</p>
+													<p className="text-xs text-muted-foreground">Capital restant</p>
 												</div>
 
 												{/* Progress Bar */}
@@ -369,9 +365,7 @@ export default function LoansPage() {
 														<span className="text-xs text-muted-foreground">
 															Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
 														</span>
-														<span className="text-xs font-medium">
-															{progress.toFixed(1)}%
-														</span>
+														<span className="text-xs font-medium">{progress.toFixed(1)}%</span>
 													</div>
 													<Progress value={progress} style={{ height: '0.5rem' }} />
 												</div>
@@ -395,7 +389,10 @@ export default function LoansPage() {
 															<Euro style={{ height: '0.875rem', width: '0.875rem' }} />
 															<span className="text-xs">Mensualité</span>
 														</div>
-														<p className="font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+														<p
+															className="font-semibold"
+															style={{ fontVariantNumeric: 'tabular-nums' }}
+														>
 															{formatCurrency(loan.monthlyPayment)}
 														</p>
 														{loanInsuranceTotal > 0 && (
@@ -416,9 +413,7 @@ export default function LoansPage() {
 															<span className="text-xs">Taux</span>
 														</div>
 														<p className="font-semibold">{loan.rate}%</p>
-														<p className="text-xs text-muted-foreground">
-															Taux nominal
-														</p>
+														<p className="text-xs text-muted-foreground">Taux nominal</p>
 													</div>
 													<div
 														className="rounded-xl p-3"
@@ -449,12 +444,13 @@ export default function LoansPage() {
 															<ArrowDown style={{ height: '0.875rem', width: '0.875rem' }} />
 															<span className="text-xs">Montant initial</span>
 														</div>
-														<p className="font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+														<p
+															className="font-semibold"
+															style={{ fontVariantNumeric: 'tabular-nums' }}
+														>
 															{formatCurrency(loan.initialAmount)}
 														</p>
-														<p className="text-xs text-muted-foreground">
-															Emprunté
-														</p>
+														<p className="text-xs text-muted-foreground">Emprunté</p>
 													</div>
 												</div>
 											</div>
@@ -476,9 +472,7 @@ export default function LoansPage() {
 									<div className="flex flex-col sm:flex-row justify-between items-center gap-4">
 										<div className="flex flex-col">
 											<p className="font-medium">Total mensuel</p>
-											<p className="text-sm text-muted-foreground">
-												Tous crédits confondus
-											</p>
+											<p className="text-sm text-muted-foreground">Tous crédits confondus</p>
 										</div>
 										<div style={{ textAlign: 'right' }}>
 											<p

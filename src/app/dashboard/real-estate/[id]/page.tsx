@@ -35,7 +35,6 @@ import {
 	ExternalLink,
 	Flame,
 	GlassCard,
-	Heading,
 	Home,
 	Input,
 	Label,
@@ -55,7 +54,6 @@ import {
 	Skeleton,
 	StatCard,
 	StatCardGrid,
-	Text,
 	Trash2,
 	Users,
 	Wallet,
@@ -385,75 +383,74 @@ function LoanCard({
 			<div className="flex flex-col gap-4">
 				<div className="flex justify-between items-start gap-4">
 					<div className="min-w-0">
-						<Text
-							weight="medium"
+						<p
+							className="font-medium"
 							style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
 						>
 							{loan.name}
-						</Text>
+						</p>
 						{loan.lender && (
-							<Text size="sm" color="muted">
+							<p className="text-sm text-muted-foreground">
 								{loan.lender}
-							</Text>
+							</p>
 						)}
 					</div>
 					<div className="text-right shrink-0">
-						<Text size="lg" weight="semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						<p className="text-lg font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.remainingAmount)}
-						</Text>
-						<Text size="xs" color="muted">
+						</p>
+						<p className="text-xs text-muted-foreground">
 							restant
-						</Text>
+						</p>
 					</div>
 				</div>
 
 				<div className="flex flex-col gap-2">
 					<div className="flex justify-between">
-						<Text size="xs" color="muted">
+						<p className="text-xs text-muted-foreground">
 							Progression du remboursement
-						</Text>
-						<Text size="xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						</p>
+						<p className="text-xs" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{paidPercent.toFixed(0)}%
-						</Text>
+						</p>
 					</div>
 					<Progress value={paidPercent} style={{ height: '0.5rem' }} />
 				</div>
 
 				<div className="grid grid-cols-3 gap-4 pt-2 text-sm">
 					<div className="flex flex-col">
-						<Text size="xs" color="muted">
+						<p className="text-xs text-muted-foreground">
 							Mensualité
-						</Text>
-						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						</p>
+						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.monthlyPayment)}
-						</Text>
+						</p>
 					</div>
 					<div className="flex flex-col">
-						<Text size="xs" color="muted">
+						<p className="text-xs text-muted-foreground">
 							Taux
-						</Text>
-						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						</p>
+						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{loan.rate}%
-						</Text>
+						</p>
 					</div>
 					<div className="flex flex-col">
-						<Text size="xs" color="muted">
+						<p className="text-xs text-muted-foreground">
 							Montant initial
-						</Text>
-						<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+						</p>
+						<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 							{formatCurrency(loan.initialAmount)}
-						</Text>
+						</p>
 					</div>
 				</div>
 
 				{loan.loanNumber && (
-					<Text
-						size="xs"
-						color="muted"
+					<p
+						className="text-xs text-muted-foreground"
 						style={{ paddingTop: '0.5rem', borderTop: '1px solid hsl(var(--border) / 0.4)' }}
 					>
 						N° contrat: {loan.loanNumber}
-					</Text>
+					</p>
 				)}
 
 				{/* Insurance section */}
@@ -473,21 +470,18 @@ function LoanCard({
 							<Shield
 								style={{ height: '1rem', width: '1rem', color: 'hsl(var(--muted-foreground))' }}
 							/>
-							<Text size="sm" weight="medium">
+							<p className="text-sm font-medium">
 								Assurance emprunteur
 								{hasInsurances && (
-									<Text
-										as="span"
-										size="xs"
-										color="muted"
-										weight="normal"
+									<span
+										className="text-xs text-muted-foreground font-normal"
 										style={{ marginLeft: '0.5rem' }}
 									>
 										({loan.loanInsurances?.length} contrat
 										{loan.loanInsurances && loan.loanInsurances.length > 1 ? 's' : ''})
-									</Text>
+									</span>
 								)}
-							</Text>
+							</p>
 						</div>
 						<div className="flex items-center gap-3">
 							{hasInsurances && (

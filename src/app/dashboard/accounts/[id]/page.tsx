@@ -25,7 +25,6 @@ import {
 	FileSpreadsheet,
 	// Cards
 	GlassCard,
-	Heading,
 	IconWrapper,
 	Input,
 	Loader2,
@@ -41,8 +40,6 @@ import {
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-	// Typography
-	Text,
 	Trash2,
 	Upload,
 	X,
@@ -634,9 +631,9 @@ export default function AccountDetailPage() {
 						<div className="flex justify-between items-start gap-4">
 							<div className="min-w-0">
 								<div className="flex items-center gap-3">
-									<Heading level={1} size="2xl" weight="bold" style={{ letterSpacing: '-0.025em' }}>
+									<h1 className="text-2xl font-bold tracking-tight">
 										{account.name}
-									</Heading>
+									</h1>
 									<Button
 										variant="ghost"
 										size="icon"
@@ -665,10 +662,10 @@ export default function AccountDetailPage() {
 										weight="bold"
 										style={{ letterSpacing: '-0.025em' }}
 									/>
-									<Text size="xs" color="muted" weight="medium" style={{ marginTop: '0.25rem' }}>
+									<p className="text-xs text-muted-foreground font-medium" style={{ marginTop: '0.25rem' }}>
 										{account._count.transactions} transaction
 										{account._count.transactions !== 1 ? 's' : ''}
-									</Text>
+									</p>
 								</div>
 
 								{/* Actions */}
@@ -712,10 +709,8 @@ export default function AccountDetailPage() {
 
 						{/* Bottom row: Bank info + Members */}
 						<div className="flex flex-wrap items-center gap-3 mt-3">
-							<Text
-								as="span"
-								size="xs"
-								weight="medium"
+							<span
+								className="text-xs font-medium"
 								style={{
 									display: 'inline-flex',
 									alignItems: 'center',
@@ -727,7 +722,7 @@ export default function AccountDetailPage() {
 								}}
 							>
 								{account.bank.name}
-							</Text>
+							</span>
 							<AccountTypeBadge
 								type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
 								style={{
@@ -737,9 +732,8 @@ export default function AccountDetailPage() {
 								}}
 							/>
 							{account.accountNumber && (
-								<Text
-									as="span"
-									size="xs"
+								<span
+									className="text-xs"
 									style={{
 										display: 'none',
 										padding: '0.25rem 0.75rem',
@@ -750,14 +744,14 @@ export default function AccountDetailPage() {
 									}}
 								>
 									{account.accountNumber}
-								</Text>
+								</span>
 							)}
 							{/* Members */}
 							{account.accountMembers.length > 0 && (
 								<>
-									<Text as="span" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>
+									<span style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>
 										•
-									</Text>
+									</span>
 									<div className="flex items-center gap-3">
 										<MemberAvatarGroup
 											members={account.accountMembers.map((am) => ({
@@ -768,17 +762,17 @@ export default function AccountDetailPage() {
 											size="sm"
 											max={5}
 										/>
-										<Text size="xs" color="muted" weight="medium">
+										<p className="text-xs text-muted-foreground font-medium">
 											{account.accountMembers.map((am) => am.member.name).join(', ')}
-										</Text>
+										</p>
 									</div>
 								</>
 							)}
 						</div>
 						{account.description && (
-							<Text size="sm" color="muted" style={{ marginTop: '0.75rem' }}>
+							<p className="text-sm text-muted-foreground" style={{ marginTop: '0.75rem' }}>
 								{account.description}
-							</Text>
+							</p>
 						)}
 					</div>
 				</div>
@@ -996,9 +990,8 @@ export default function AccountDetailPage() {
 							)}
 						</div>
 						<div className="flex flex-col grow min-w-0">
-							<Text
-								size="sm"
-								weight="semibold"
+							<p
+								className="text-sm font-semibold"
 								style={{
 									color: error.includes('importées')
 										? 'oklch(0.55 0.15 145)'
@@ -1006,13 +999,13 @@ export default function AccountDetailPage() {
 								}}
 							>
 								{error.includes('importées') ? 'Import réussi' : 'Erreur'}
-							</Text>
-							<Text
-								size="sm"
+							</p>
+							<p
+								className="text-sm"
 								style={{ color: 'hsl(var(--foreground) / 0.8)', marginTop: '0.125rem' }}
 							>
 								{error}
-							</Text>
+							</p>
 						</div>
 						<Button
 							variant="ghost"
@@ -1056,14 +1049,12 @@ export default function AccountDetailPage() {
 							className="flex flex-col gap-4 px-4 py-4"
 							style={{ borderBottom: '1px solid hsl(var(--border))' }}
 						>
-							<Text
-								size="xs"
-								weight="semibold"
-								color="muted"
+							<p
+								className="text-xs font-semibold text-muted-foreground"
 								style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
 							>
 								Informations
-							</Text>
+							</p>
 
 							{/* Account name */}
 							<div className="flex flex-col gap-2">
@@ -1117,9 +1108,9 @@ export default function AccountDetailPage() {
 
 							{/* Owners - Multi-select */}
 							<div className="flex flex-col gap-2">
-								<Text size="sm" color="muted">
+								<p className="text-sm text-muted-foreground">
 									Titulaires
-								</Text>
+								</p>
 								<div
 									className="flex flex-wrap items-center gap-3 p-2 rounded-md border"
 									style={{
@@ -1165,9 +1156,9 @@ export default function AccountDetailPage() {
 													am.member.name.charAt(0).toUpperCase()
 												)}
 											</div>
-											<Text as="span" weight="medium">
+											<span className="font-medium">
 												{am.member.name}
-											</Text>
+											</span>
 											<Button
 												variant="ghost"
 												size="icon"
@@ -1216,12 +1207,12 @@ export default function AccountDetailPage() {
 													}}
 												/>
 											</div>
-											<Text as="span" weight="medium" color="muted">
+											<span className="font-medium text-muted-foreground">
 												{
 													allMembers?.find((m) => m.id === addMemberMutation.variables?.memberId)
 														?.name
 												}
-											</Text>
+											</span>
 										</div>
 									)}
 									{/* Add member button */}
@@ -1280,9 +1271,9 @@ export default function AccountDetailPage() {
 													</Button>
 												))}
 												{availableMembers.length === 0 && (
-													<Text size="sm" color="muted" style={{ padding: '0.25rem 0.5rem' }}>
+													<p className="text-sm text-muted-foreground" style={{ padding: '0.25rem 0.5rem' }}>
 														Tous les membres sont ajoutés
-													</Text>
+													</p>
 												)}
 											</div>
 										)}
@@ -1340,9 +1331,9 @@ export default function AccountDetailPage() {
 
 							{/* Initial Balance */}
 							<div className="flex flex-col gap-2">
-								<Text size="sm" color="muted">
+								<p className="text-sm text-muted-foreground">
 									Solde initial
-								</Text>
+								</p>
 								<div className="flex gap-3">
 									<div className="relative grow">
 										<Input
