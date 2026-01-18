@@ -367,3 +367,12 @@ export { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 export { ScrollArea, ScrollBar } from './ui/scroll-area';
 
 export { Separator } from './ui/separator';
+
+// =============================================================================
+// LAYOUT COMPONENTS
+// =============================================================================
+
+export type { StackProps, StackGap, StackAlign, StackJustify } from './common/Stack';
+export { Stack } from './common/Stack';
+export type { RowProps, RowGap, RowAlign, RowJustify, RowWrap } from './common/Row';
+export { Row } from './common/Row';
