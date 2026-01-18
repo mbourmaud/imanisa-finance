@@ -7,6 +7,8 @@ import {
 	Button,
 	ChevronDown,
 	ChevronRight,
+	ColorDot,
+	ContentSkeleton,
 	CreditCard,
 	Dialog,
 	DialogContent,
@@ -19,19 +21,25 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	GlassCard,
+	Heading,
+	IconBox,
 	Input,
 	Label,
 	Landmark,
 	PageHeader,
 	Plus,
+	Row,
+	SectionHeader,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+	Stack,
 	StatCard,
 	StatCardGrid,
 	StatCardSkeleton,
+	Text,
 	Textarea,
 	TrendingUp,
 	Wallet,
@@ -102,67 +110,15 @@ interface BanksResponse {
 function BankRowSkeleton() {
 	return (
 		<GlassCard padding="sm">
-			<div className="flex items-center gap-4">
-				<div
-					className="rounded-xl bg-muted"
-					style={{ height: '3rem', width: '3rem', animation: 'pulse 2s ease-in-out infinite' }}
-				/>
-				<div className="flex flex-col gap-2 flex-grow">
-					<div
-						className="rounded-md bg-muted"
-						style={{ height: '1.25rem', width: '8rem', animation: 'pulse 2s ease-in-out infinite' }}
-					/>
-					<div
-						className="rounded-md bg-muted"
-						style={{ height: '1rem', width: '5rem', animation: 'pulse 2s ease-in-out infinite' }}
-					/>
-				</div>
-				<div
-					className="rounded-md bg-muted"
-					style={{ height: '1.5rem', width: '6rem', animation: 'pulse 2s ease-in-out infinite' }}
-				/>
-			</div>
+			<Row gap="md">
+				<ContentSkeleton variant="icon" size="md" />
+				<Stack gap="sm" style={{ flex: 1 }}>
+					<ContentSkeleton variant="title" size="sm" />
+					<ContentSkeleton variant="text" size="sm" />
+				</Stack>
+				<ContentSkeleton variant="text" size="lg" />
+			</Row>
 		</GlassCard>
-	);
-}
-
-// =============================================================================
-// SECTION HEADER WITH ICON
-// =============================================================================
-
-interface SectionHeaderWithIconProps {
-	icon: React.ReactNode;
-	title: string;
-	iconBgClass: string;
-	action?: React.ReactNode;
-}
-
-function SectionHeaderWithIcon({ icon, title, iconBgClass, action }: SectionHeaderWithIconProps) {
-	return (
-		<div className="flex justify-between items-center mb-4">
-			<div className="flex items-center gap-3">
-				<div
-					className="flex items-center justify-center h-6 w-6 rounded-md"
-					style={{
-						backgroundColor: iconBgClass.includes('blue')
-							? 'hsl(var(--primary) / 0.1)'
-							: 'hsl(270 60% 95%)',
-					}}
-				>
-					{icon}
-				</div>
-				<h2 className="text-sm font-semibold tracking-tight">{title}</h2>
-				<div
-					className="flex-1"
-					style={{
-						marginLeft: '0.75rem',
-						height: '1px',
-						backgroundColor: 'hsl(var(--border) / 0.5)',
-					}}
-				/>
-			</div>
-			{action}
-		</div>
 	);
 }
 
@@ -190,7 +146,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 	const contentMarkup = (
 		<>
 			{/* Bank header */}
-			<div className="flex items-center gap-4 p-3">
+			<Row gap="md" style={{ padding: '0.75rem' }}>
 				<BankLogo
 					bankId={bank.id}
 					bankName={bank.name}
@@ -199,16 +155,20 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 					size="lg"
 					onLogoChange={onLogoChange}
 				/>
-				<div className="flex flex-col flex-grow min-w-0">
-					<div className="flex items-center gap-3">
-						<h3
-							className={`text-lg font-semibold tracking-tight ${!hasAccounts ? 'text-muted-foreground' : ''}`}
+				<Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
+					<Row gap="sm">
+						<Heading
+							level={3}
+							size="lg"
+							tracking="tight"
+							color={!hasAccounts ? 'muted' : 'default'}
 						>
 							{bank.name}
-						</h3>
+						</Heading>
 						{hasAccounts ? (
-							<span
-								className="text-xs"
+							<Text
+								as="span"
+								size="xs"
 								style={{
 									padding: '0.125rem 0.5rem',
 									borderRadius: '9999px',
@@ -217,17 +177,19 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 								}}
 							>
 								{bank.accountCount} compte{bank.accountCount > 1 ? 's' : ''}
-							</span>
+							</Text>
 						) : (
-							<span className="text-xs text-muted-foreground italic">Aucun compte</span>
+							<Text as="span" size="xs" color="muted" style={{ fontStyle: 'italic' }}>
+								Aucun compte
+							</Text>
 						)}
-					</div>
+					</Row>
 					{bank.description && (
-						<p className="text-sm text-muted-foreground" style={{ marginTop: '0.125rem' }}>
+						<Text size="sm" color="muted" style={{ marginTop: '0.125rem' }}>
 							{bank.description}
-						</p>
+						</Text>
 					)}
-				</div>
+				</Stack>
 				{hasAccounts ? (
 					<>
 						<MoneyDisplay amount={bank.totalBalance} size="lg" weight="semibold" />
@@ -256,12 +218,12 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 						Ajouter un compte
 					</Button>
 				)}
-			</div>
+			</Row>
 
 			{/* Accounts list */}
 			{bank.accounts.length > 0 && (
-				<div
-					className="flex flex-col gap-3"
+				<Stack
+					gap="sm"
 					style={{
 						paddingLeft: '1rem',
 						paddingRight: '1rem',
@@ -272,7 +234,7 @@ function BankRow({ bank, logo, onAddAccount, onLogoChange, animationDelay = 0 }:
 					{bank.accounts.map((account) => (
 						<AccountRowLink key={account.id} account={account} />
 					))}
-				</div>
+				</Stack>
 			)}
 		</>
 	);
@@ -345,24 +307,26 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 				backdropFilter: 'blur(8px)',
 			}}
 		>
-			<div className="flex items-center gap-3">
-				<div className="flex flex-col">
-					<div className="flex items-center gap-3">
-						<span className="text-sm font-medium">{account.name}</span>
+			<Row gap="sm">
+				<Stack gap="xs">
+					<Row gap="sm">
+						<Text as="span" size="sm" weight="medium">
+							{account.name}
+						</Text>
 						<AccountTypeBadge
 							type={account.type as 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN'}
 							variant="subtle"
 							style={{ fontSize: '10px' }}
 						/>
-					</div>
+					</Row>
 					{account.members.length > 0 && (
 						<div style={{ marginTop: '0.375rem' }}>
 							<MemberAvatarGroup members={memberData} size="xs" max={4} spacing="normal" />
 						</div>
 					)}
-				</div>
-			</div>
-			<div className="flex items-center gap-3">
+				</Stack>
+			</Row>
+			<Row gap="sm">
 				<MoneyDisplay amount={account.balance} size="sm" weight="semibold" autoColor />
 				<ChevronRight
 					style={{
@@ -372,7 +336,7 @@ function AccountRowLink({ account }: AccountRowLinkProps) {
 						transition: 'all 0.2s',
 					}}
 				/>
-			</div>
+			</Row>
 		</Link>
 	);
 }
@@ -392,20 +356,19 @@ function AddBankDropdown({ banks, onSelectBank }: AddBankDropdownProps) {
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" size="sm">
 					<Plus style={{ height: '0.875rem', width: '0.875rem' }} />
-					<span className="text-xs">Ajouter</span>
+					<Text as="span" size="xs">
+						Ajouter
+					</Text>
 					<ChevronDown style={{ height: '0.75rem', width: '0.75rem', opacity: 0.5 }} />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" style={{ width: '12rem' }}>
 				{banks.map((bank) => (
 					<DropdownMenuItem key={bank.id} onClick={() => onSelectBank(bank)}>
-						<div className="flex items-center gap-3">
-							<div
-								className="rounded-full"
-								style={{ width: '0.5rem', height: '0.5rem', backgroundColor: bank.color }}
-							/>
-							<span>{bank.name}</span>
-						</div>
+						<Row gap="sm">
+							<ColorDot color={bank.color} size="sm" />
+							<Text as="span">{bank.name}</Text>
+						</Row>
 					</DropdownMenuItem>
 				))}
 			</DropdownMenuContent>
@@ -425,7 +388,7 @@ interface MemberSelectorChipsProps {
 
 function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorChipsProps) {
 	return (
-		<div className="flex flex-wrap gap-3">
+		<Row gap="sm" wrap="wrap">
 			{members.map((member) => {
 				const isSelected = selectedIds.includes(member.id);
 				return (
@@ -450,19 +413,12 @@ function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorC
 							borderColor: isSelected ? 'hsl(var(--primary) / 0.3)' : 'transparent',
 						}}
 					>
-						<div
-							className="rounded-full"
-							style={{
-								width: '0.625rem',
-								height: '0.625rem',
-								backgroundColor: member.color || '#6b7280',
-							}}
-						/>
-						<span>{member.name}</span>
+						<ColorDot color={member.color || '#6b7280'} size="md" />
+						<Text as="span">{member.name}</Text>
 					</Button>
 				);
 			})}
-		</div>
+		</Row>
 	);
 }
 
@@ -589,9 +545,9 @@ export default function BanksPage() {
 					<StatCardSkeleton variant="mint" />
 				</StatCardGrid>
 			) : error ? (
-				<div className="py-6">
-					<p className="text-destructive">{error}</p>
-				</div>
+				<Stack gap="lg" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
+					<Text color="destructive">{error}</Text>
+				</Stack>
 			) : (
 				<StatCardGrid columns={3}>
 					<StatCard
@@ -620,15 +576,19 @@ export default function BanksPage() {
 			)}
 
 			{/* Bank accounts section */}
-			<div className="mt-8">
-				<SectionHeaderWithIcon
+			<Stack gap="sm" style={{ marginTop: '2rem' }}>
+				<SectionHeader
+					title="Comptes bancaires"
+					size="sm"
 					icon={
-						<Landmark
-							style={{ height: '0.875rem', width: '0.875rem', color: 'hsl(var(--primary))' }}
+						<IconBox
+							icon={Landmark}
+							size="sm"
+							variant="primary"
+							rounded="md"
 						/>
 					}
-					iconBgClass="bg-blue-100"
-					title="Comptes bancaires"
+					showLine
 					action={
 						data?.bankAccounts && (
 							<AddBankDropdown banks={data.bankAccounts} onSelectBank={handleAddAccountClick} />
@@ -637,13 +597,13 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<div className="flex flex-col gap-3">
+					<Stack gap="sm">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</div>
+					</Stack>
 				) : (
-					<div className="flex flex-col gap-3">
+					<Stack gap="sm">
 						{data?.bankAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -654,20 +614,26 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</div>
+					</Stack>
 				)}
-			</div>
+			</Stack>
 
 			{/* Investments section */}
-			<div className="mt-8">
-				<SectionHeaderWithIcon
+			<Stack gap="sm" style={{ marginTop: '2rem' }}>
+				<SectionHeader
+					title="Investissements"
+					size="sm"
 					icon={
-						<TrendingUp
-							style={{ height: '0.875rem', width: '0.875rem', color: 'hsl(270 60% 50%)' }}
+						<IconBox
+							icon={TrendingUp}
+							size="sm"
+							variant="custom"
+							bgColor="hsl(270 60% 95%)"
+							iconColor="hsl(270 60% 50%)"
+							rounded="md"
 						/>
 					}
-					iconBgClass="bg-purple-100"
-					title="Investissements"
+					showLine
 					action={
 						data?.investmentAccounts && (
 							<AddBankDropdown
@@ -679,12 +645,12 @@ export default function BanksPage() {
 				/>
 
 				{loading ? (
-					<div className="flex flex-col gap-3">
+					<Stack gap="sm">
 						<BankRowSkeleton />
 						<BankRowSkeleton />
-					</div>
+					</Stack>
 				) : (
-					<div className="flex flex-col gap-3">
+					<Stack gap="sm">
 						{data?.investmentAccounts.map((bank, index) => (
 							<BankRow
 								key={bank.id}
@@ -695,9 +661,9 @@ export default function BanksPage() {
 								animationDelay={index * 50}
 							/>
 						))}
-					</div>
+					</Stack>
 				)}
-			</div>
+			</Stack>
 
 			{/* Add Account Dialog */}
 			<Dialog open={showAddAccount} onOpenChange={setShowAddAccount}>
@@ -707,22 +673,25 @@ export default function BanksPage() {
 						<DialogDescription>{selectedBank?.name}</DialogDescription>
 					</DialogHeader>
 
-					<div className="flex flex-col gap-6">
+					<Stack gap="lg">
 						{/* Error message */}
 						{createAccountMutation.error && (
 							<div
-								className="rounded-md p-3"
 								style={{
+									borderRadius: '0.375rem',
+									padding: '0.75rem',
 									backgroundColor: 'hsl(var(--destructive) / 0.1)',
 									border: '1px solid hsl(var(--destructive) / 0.2)',
 								}}
 							>
-								<p className="text-sm text-destructive">{createAccountMutation.error.message}</p>
+<Text size="sm" color="destructive">
+									{createAccountMutation.error.message}
+								</Text>
 							</div>
 						)}
 
 						{/* Account name */}
-						<div className="flex flex-col gap-3">
+						<Stack gap="sm">
 							<Label
 								htmlFor="accountName"
 								style={{
@@ -740,10 +709,10 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountName(e.target.value)}
 								style={{ height: '2.5rem' }}
 							/>
-						</div>
+						</Stack>
 
 						{/* Description (optional) */}
-						<div className="flex flex-col gap-3">
+						<Stack gap="sm">
 							<Label
 								htmlFor="accountDescription"
 								style={{
@@ -753,9 +722,9 @@ export default function BanksPage() {
 								}}
 							>
 								Description
-								<span className="text-xs font-normal" style={{ marginLeft: '0.25rem' }}>
+								<Text as="span" size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
 									(optionnel)
-								</span>
+								</Text>
 							</Label>
 							<Textarea
 								id="accountDescription"
@@ -764,10 +733,10 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountDescription(e.target.value)}
 								style={{ minHeight: '80px', resize: 'none' }}
 							/>
-						</div>
+						</Stack>
 
 						{/* Account type */}
-						<div className="flex flex-col gap-3">
+						<Stack gap="sm">
 							<Label
 								htmlFor="accountType"
 								style={{
@@ -789,10 +758,10 @@ export default function BanksPage() {
 									<SelectItem value="LOAN">Prêt</SelectItem>
 								</SelectContent>
 							</Select>
-						</div>
+						</Stack>
 
 						{/* Export URL (optional) */}
-						<div className="flex flex-col gap-3">
+						<Stack gap="sm">
 							<Label
 								htmlFor="accountExportUrl"
 								style={{
@@ -802,9 +771,9 @@ export default function BanksPage() {
 								}}
 							>
 								Lien d'export
-								<span className="text-xs font-normal" style={{ marginLeft: '0.25rem' }}>
+								<Text as="span" size="xs" weight="normal" style={{ marginLeft: '0.25rem' }}>
 									(optionnel)
-								</span>
+								</Text>
 							</Label>
 							<Input
 								id="accountExportUrl"
@@ -814,13 +783,13 @@ export default function BanksPage() {
 								onChange={(e) => setNewAccountExportUrl(e.target.value)}
 								style={{ height: '2.5rem' }}
 							/>
-							<p className="text-xs text-muted-foreground">
+							<Text size="xs" color="muted">
 								URL vers l'espace client pour exporter les relevés
-							</p>
-						</div>
+							</Text>
+						</Stack>
 
 						{/* Member selection */}
-						<div className="flex flex-col gap-3">
+						<Stack gap="sm">
 							<Label
 								style={{
 									fontSize: '0.875rem',
@@ -835,8 +804,8 @@ export default function BanksPage() {
 								selectedIds={newAccountMembers}
 								onToggle={toggleMember}
 							/>
-						</div>
-					</div>
+						</Stack>
+					</Stack>
 
 					<DialogFooter style={{ paddingTop: '1rem' }}>
 						<Button

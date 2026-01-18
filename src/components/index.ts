@@ -367,3 +367,85 @@ export { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 export { ScrollArea, ScrollBar } from './ui/scroll-area';
 
 export { Separator } from './ui/separator';
+
+// =============================================================================
+// LAYOUT COMPONENTS
+// =============================================================================
+
+export type { StackProps, StackGap, StackAlign, StackJustify } from './common/Stack';
+export { Stack } from './common/Stack';
+export type { RowProps, RowGap, RowAlign, RowJustify, RowWrap } from './common/Row';
+export { Row } from './common/Row';
+
+// =============================================================================
+// TYPOGRAPHY COMPONENTS
+// =============================================================================
+
+export type { TextProps, TextSize, TextWeight, TextColor, TextAlign } from './common/Text';
+export { Text } from './common/Text';
+export type {
+	HeadingProps,
+	HeadingLevel,
+	HeadingSize,
+	HeadingColor,
+	HeadingWeight,
+} from './common/Heading';
+export { Heading } from './common/Heading';
+
+// =============================================================================
+// DASHBOARD LAYOUT COMPONENTS
+// =============================================================================
+
+export type { DashboardHeaderProps, DashboardMainProps } from './common/DashboardHeader';
+export { DashboardHeader, DashboardHeaderMobile, DashboardMain } from './common/DashboardHeader';
+export type { LoadingSpinnerProps, LoadingSpinnerSize } from './common/LoadingSpinner';
+export { LoadingSpinner } from './common/LoadingSpinner';
+export type { IconBoxProps, IconBoxSize, IconBoxVariant, IconBoxRounded } from './common/IconBox';
+export { IconBox } from './common/IconBox';
+
+// =============================================================================
+// ACCOUNT COMPONENTS
+// =============================================================================
+
+export type { AccountListItemProps } from './accounts/AccountListItem';
+export { AccountListItem } from './accounts/AccountListItem';
+export type { AccountTypeHeaderProps } from './accounts/AccountTypeHeader';
+export { AccountTypeHeader } from './accounts/AccountTypeHeader';
+export type { SearchInputProps, SearchInputSize } from './common/SearchInput';
+export { SearchInput } from './common/SearchInput';
+export type { ListHeaderProps } from './common/ListHeader';
+export { ListHeader } from './common/ListHeader';
+
+// =============================================================================
+// TRANSACTION COMPONENTS
+// =============================================================================
+
+export type { TransactionListItemProps } from './transactions/TransactionListItem';
+export { TransactionListItem } from './transactions/TransactionListItem';
+export type { GridProps, GridCols, GridGap } from './common/Grid';
+export { Grid } from './common/Grid';
+
+// =============================================================================
+// BUDGET COMPONENTS
+// =============================================================================
+
+export type { BudgetCategoryCardProps } from './budget/BudgetCategoryCard';
+export { BudgetCategoryCard } from './budget/BudgetCategoryCard';
+
+// =============================================================================
+// INDICATOR COMPONENTS
+// =============================================================================
+
+export type { ColorDotProps, ColorDotSize } from './common/ColorDot';
+export { ColorDot } from './common/ColorDot';
+
+// =============================================================================
+// SKELETON COMPONENTS
+// =============================================================================
+
+export type {
+	ContentSkeletonProps,
+	ContentSkeletonVariant,
+	ContentSkeletonSize,
+} from './common/ContentSkeleton';
+export { ContentSkeleton } from './common/ContentSkeleton';

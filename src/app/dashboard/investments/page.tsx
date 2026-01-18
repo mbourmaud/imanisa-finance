@@ -13,12 +13,18 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	GlassCard,
+	Grid,
+	Heading,
+	IconBox,
 	MoreHorizontal,
 	PageHeader,
 	Plus,
 	RefreshCw,
+	Row,
+	Stack,
 	StatCard,
 	StatCardGrid,
+	Text,
 	TrendingUp,
 	Wallet,
 } from '@/components';
@@ -145,13 +151,13 @@ function formatCurrency(amount: number): string {
 
 export default function InvestmentsPage() {
 	return (
-		<div className="flex flex-col gap-8">
+		<Stack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Investissements"
 				description="PEA, CTO, Assurance-vie, Crypto"
 				actions={
-					<div className="flex gap-3">
+					<Row gap="sm">
 						<Button
 							variant="outline"
 							iconLeft={<RefreshCw style={{ height: '1rem', width: '1rem' }} />}
@@ -161,7 +167,7 @@ export default function InvestmentsPage() {
 						<Button iconLeft={<Plus style={{ height: '1rem', width: '1rem' }} />}>
 							Nouvelle source
 						</Button>
-					</div>
+					</Row>
 				}
 			/>
 
@@ -197,7 +203,7 @@ export default function InvestmentsPage() {
 			</StatCardGrid>
 
 			{/* Sources Grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+			<Grid cols={4} gap="md" responsive={{ sm: 2, lg: 4 }}>
 				{sources.map((source) => {
 					const gain = source.value - source.invested;
 					const isPositive = gain >= 0;
@@ -208,16 +214,13 @@ export default function InvestmentsPage() {
 							padding="md"
 							style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
 						>
-							<div className="flex justify-between items-start">
-								<div
-									className="flex items-center justify-center h-10 w-10 rounded-xl"
-									style={{
-										backgroundColor: 'hsl(var(--primary) / 0.1)',
-										color: 'hsl(var(--primary))',
-									}}
-								>
-									<source.icon style={{ height: '1.25rem', width: '1.25rem' }} />
-								</div>
+							<Row justify="between">
+								<IconBox
+									icon={source.icon}
+									size="md"
+									variant="primary"
+									rounded="xl"
+								/>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
@@ -242,97 +245,118 @@ export default function InvestmentsPage() {
 										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
-							</div>
-							<div className="flex flex-col gap-4">
-								<div className="flex flex-col">
-									<p className="font-medium">{source.name}</p>
-									<p className="text-xs text-muted-foreground">
+							</Row>
+							<Stack gap="md">
+								<Stack gap="xs">
+									<Text weight="medium">{source.name}</Text>
+									<Text size="xs" color="muted">
 										{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
-									</p>
-								</div>
-								<div className="flex flex-col">
-									<p
-										className="text-2xl font-semibold"
+									</Text>
+								</Stack>
+								<Stack gap="xs">
+									<Text
+										size="2xl"
+										weight="semibold"
 										style={{ fontVariantNumeric: 'tabular-nums' }}
 									>
 										{formatCurrency(source.value)}
-									</p>
-									<p
-										className="text-sm font-medium"
+									</Text>
+									<Text
+										size="sm"
+										weight="medium"
 										style={{ color: isPositive ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)' }}
 									>
 										{isPositive ? '+' : ''}
 										{formatCurrency(gain)} ({isPositive ? '+' : ''}
 										{source.performance.toFixed(2)}%)
-									</p>
-								</div>
-							</div>
+									</Text>
+								</Stack>
+							</Stack>
 						</GlassCard>
 					);
 				})}
-			</div>
+			</Grid>
 
 			{/* Positions Table */}
 			<GlassCard padding="lg">
-				<div className="flex justify-between items-center mb-4">
-					<div className="flex flex-col">
-						<h3 className="text-lg font-medium tracking-tight">Positions</h3>
-						<p className="text-sm text-muted-foreground">
+				<Row justify="between" style={{ marginBottom: '1rem' }}>
+					<Stack gap="xs">
+						<Heading level={3} size="lg" tracking="tight">
+							Positions
+						</Heading>
+						<Text size="sm" color="muted">
 							Toutes vos positions d&apos;investissement
-						</p>
-					</div>
+						</Text>
+					</Stack>
 					<Button variant="outline" size="sm">
 						Voir tout
 					</Button>
-				</div>
-				<div className="flex flex-col gap-3">
+				</Row>
+				<Stack gap="sm">
 					{positions.map((pos) => (
-						<div
+						<Row
 							key={pos.id}
-							className="flex justify-between items-center p-4 rounded-xl transition-colors"
+							justify="between"
 							style={{
+								padding: '1rem',
+								borderRadius: '0.75rem',
+								transition: 'background-color 0.2s',
 								backgroundColor: 'hsl(var(--background) / 0.5)',
 							}}
 						>
-							<div className="flex items-center gap-4">
+							<Row gap="md">
 								<div
-									className="flex items-center justify-center h-10 w-10 rounded-lg font-mono text-sm font-semibold"
 									style={{
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										height: '2.5rem',
+										width: '2.5rem',
+										borderRadius: '0.5rem',
+										fontFamily: 'monospace',
+										fontSize: '0.875rem',
+										fontWeight: 600,
 										backgroundColor: 'hsl(var(--background))',
 										color: 'hsl(var(--muted-foreground))',
 									}}
 								>
 									{pos.ticker.slice(0, 3)}
 								</div>
-								<div className="flex flex-col">
-									<p className="font-medium">{pos.name}</p>
-									<p className="text-xs text-muted-foreground">
+								<Stack gap="xs">
+									<Text weight="medium">{pos.name}</Text>
+									<Text size="xs" color="muted">
 										{pos.ticker} · {pos.source}
-									</p>
-								</div>
-							</div>
-							<div className="flex items-center gap-8">
-								<div className="hidden text-right sm:block" data-show-sm>
-									<p className="text-xs text-muted-foreground">Quantité</p>
-									<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									</Text>
+								</Stack>
+							</Row>
+							<Row gap="xl">
+								<Stack gap="xs" align="end" data-show-sm style={{ display: 'none' }}>
+									<Text size="xs" color="muted">
+										Quantité
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{pos.quantity}
-									</p>
-								</div>
-								<div className="hidden text-right md:block" data-show-md>
-									<p className="text-xs text-muted-foreground">PRU</p>
-									<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									</Text>
+								</Stack>
+								<Stack gap="xs" align="end" data-show-md style={{ display: 'none' }}>
+									<Text size="xs" color="muted">
+										PRU
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.avgPrice)}
-									</p>
-								</div>
-								<div className="text-right">
-									<p className="text-xs text-muted-foreground">Valeur</p>
-									<p className="font-medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
+									</Text>
+								</Stack>
+								<Stack gap="xs" align="end">
+									<Text size="xs" color="muted">
+										Valeur
+									</Text>
+									<Text weight="medium" style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{formatCurrency(pos.value)}
-									</p>
-								</div>
-								<div className="min-w-[100px] text-right">
-									<p
-										className="font-medium"
+									</Text>
+								</Stack>
+								<Stack gap="xs" align="end" style={{ minWidth: '100px' }}>
+									<Text
+										weight="medium"
 										style={{
 											fontVariantNumeric: 'tabular-nums',
 											color: pos.gain >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
@@ -340,46 +364,64 @@ export default function InvestmentsPage() {
 									>
 										{pos.gain >= 0 ? '+' : ''}
 										{formatCurrency(pos.gain)}
-									</p>
-									<p
-										className="text-xs"
+									</Text>
+									<Text
+										size="xs"
 										style={{
 											color: pos.gainPercent >= 0 ? 'oklch(0.55 0.15 145)' : 'oklch(0.55 0.2 25)',
 										}}
 									>
 										{pos.gainPercent >= 0 ? '+' : ''}
 										{pos.gainPercent.toFixed(2)}%
-									</p>
-								</div>
-							</div>
-						</div>
+									</Text>
+								</Stack>
+							</Row>
+						</Row>
 					))}
-				</div>
+				</Stack>
 			</GlassCard>
 
 			{/* Performance Chart */}
 			<GlassCard padding="lg">
-				<div className="flex justify-between items-center mb-4">
-					<div className="flex flex-col">
-						<h3 className="text-lg font-medium tracking-tight">Évolution du portefeuille</h3>
-						<p className="text-sm text-muted-foreground">Performance sur 12 mois</p>
-					</div>
-					<div className="flex items-center gap-4">
-						<div className="flex items-center gap-3">
+				<Row justify="between" style={{ marginBottom: '1rem' }}>
+					<Stack gap="xs">
+						<Heading level={3} size="lg" tracking="tight">
+							Évolution du portefeuille
+						</Heading>
+						<Text size="sm" color="muted">
+							Performance sur 12 mois
+						</Text>
+					</Stack>
+					<Row gap="md">
+						<Row gap="sm">
 							<div
-								className="h-2 w-4 rounded-sm"
-								style={{ backgroundColor: 'oklch(0.55 0.18 270)' }}
+								style={{
+									height: '0.5rem',
+									width: '1rem',
+									borderRadius: '0.125rem',
+									backgroundColor: 'oklch(0.55 0.18 270)',
+								}}
 							/>
-							<span className="text-sm text-muted-foreground">Valeur</span>
-						</div>
-						<div className="flex items-center gap-3">
-							<div className="h-0.5 w-4" style={{ borderTop: '2px dashed oklch(0.5 0.01 280)' }} />
-							<span className="text-sm text-muted-foreground">Investi</span>
-						</div>
-					</div>
-				</div>
+							<Text size="sm" color="muted">
+								Valeur
+							</Text>
+						</Row>
+						<Row gap="sm">
+							<div
+								style={{
+									height: '0',
+									width: '1rem',
+									borderTop: '2px dashed oklch(0.5 0.01 280)',
+								}}
+							/>
+							<Text size="sm" color="muted">
+								Investi
+							</Text>
+						</Row>
+					</Row>
+				</Row>
 				<InvestmentPerformanceChart data={demoInvestmentPerformance} height="lg" />
 			</GlassCard>
-		</div>
+		</Stack>
 	);
 }
