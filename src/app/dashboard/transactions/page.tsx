@@ -248,12 +248,8 @@ export default function TransactionsPage() {
 					className="flex justify-between items-center p-4"
 					style={{ borderBottom: '1px solid hsl(var(--border))' }}
 				>
-					<h3 className="text-base font-semibold tracking-tight">
-						Toutes les transactions
-					</h3>
-					<p className="text-sm text-muted-foreground">
-						{transactions.length} opérations
-					</p>
+					<h3 className="text-base font-semibold tracking-tight">Toutes les transactions</h3>
+					<p className="text-sm text-muted-foreground">{transactions.length} opérations</p>
 				</div>
 
 				{/* List */}
@@ -286,17 +282,17 @@ export default function TransactionsPage() {
 									)}
 								</div>
 								<div className="flex flex-col">
-									<Text weight="medium">{tx.description}</Text>
-									<Text size="xs" color="muted">
+									<p className="font-medium">{tx.description}</p>
+									<p className="text-xs text-muted-foreground">
 										{tx.category} · {tx.account}
-									</Text>
+									</p>
 								</div>
 							</div>
 							<div className="flex flex-col items-end">
 								<MoneyDifference amount={tx.amount} size="md" />
-								<Text size="xs" color="muted" style={{ marginTop: '0.125rem' }}>
+								<p className="text-xs text-muted-foreground" style={{ marginTop: '0.125rem' }}>
 									{formatDate(tx.date)}
-								</Text>
+								</p>
 							</div>
 						</div>
 					))}

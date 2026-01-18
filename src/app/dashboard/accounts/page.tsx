@@ -231,9 +231,7 @@ export default function AccountsPage() {
 									<Icon style={{ height: '1.25rem', width: '1.25rem' }} />
 								</div>
 								<div className="flex flex-col">
-									<h3 className="text-lg font-semibold tracking-tight">
-										{group.label}
-									</h3>
+									<h3 className="text-lg font-semibold tracking-tight">{group.label}</h3>
 									<p className="text-sm text-muted-foreground">
 										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
 									</p>

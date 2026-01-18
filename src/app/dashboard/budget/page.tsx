@@ -12,7 +12,6 @@ import {
 	DropdownMenuTrigger,
 	Film,
 	GlassCard,
-	Heading,
 	Heart,
 	Home,
 	MoreHorizontal,
@@ -25,7 +24,6 @@ import {
 	ShoppingCart,
 	StatCard,
 	StatCardGrid,
-	Text,
 	Utensils,
 	Zap,
 } from '@/components';
@@ -170,15 +168,15 @@ export default function BudgetPage() {
 			{/* Global Progress */}
 			<GlassCard padding="lg">
 				<div className="flex justify-between items-center mb-2">
-					<Text weight="medium">Progression du mois</Text>
-					<Text size="sm" color="muted">
+					<p className="font-medium">Progression du mois</p>
+					<p className="text-sm text-muted-foreground">
 						{formatCurrency(totalSpent)} / {formatCurrency(totalBudget)}
-					</Text>
+					</p>
 				</div>
 				<Progress value={(totalSpent / totalBudget) * 100} style={{ height: '0.75rem' }} />
-				<Text size="xs" color="muted" style={{ marginTop: '0.5rem' }}>
+				<p className="text-xs text-muted-foreground" style={{ marginTop: '0.5rem' }}>
 					Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
-				</Text>
+				</p>
 			</GlassCard>
 
 			{/* Categories Grid */}
@@ -203,12 +201,12 @@ export default function BudgetPage() {
 											<category.icon style={{ height: '1.25rem', width: '1.25rem' }} />
 										</div>
 										<div className="flex flex-col">
-											<Text size="md" weight="medium">
+											<p className="text-base font-medium">
 												{category.name}
-											</Text>
-											<Text size="xs" color="muted">
+											</p>
+											<p className="text-xs text-muted-foreground">
 												{formatCurrency(category.spent)} / {formatCurrency(category.budget)}
-											</Text>
+											</p>
 										</div>
 									</div>
 									<DropdownMenu>
@@ -239,19 +237,17 @@ export default function BudgetPage() {
 										}}
 									/>
 									<div className="flex justify-between">
-										<Text
-											size="xs"
-											weight={isOverBudget ? 'medium' : 'normal'}
+										<p
+											className={`text-xs ${isOverBudget ? 'font-medium' : 'text-muted-foreground'}`}
 											style={{ color: isOverBudget ? 'oklch(0.55 0.2 25)' : undefined }}
-											color={isOverBudget ? undefined : 'muted'}
 										>
 											{isOverBudget
 												? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
 												: `Reste ${formatCurrency(remainingBudget)}`}
-										</Text>
-										<Text size="xs" color="muted">
+										</p>
+										<p className="text-xs text-muted-foreground">
 											{Math.round(percentage)}%
-										</Text>
+										</p>
 									</div>
 								</div>
 							</div>

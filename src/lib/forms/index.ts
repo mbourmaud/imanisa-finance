@@ -20,5 +20,8 @@ export {
 	useAppForm,
 } from './form-context';
 
+// Field components
+export { TextField } from './fields/TextField';
+
 // Re-export types
 export type { FormApi, FieldApi } from './form-context';
