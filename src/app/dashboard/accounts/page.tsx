@@ -20,8 +20,11 @@ import {
 	Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAccountsQuery } from '@/features/accounts';
+import { PageHeader } from '@/components/ui/page-header';
+import { StatCard, StatCardGrid } from '@/components/ui/stat-card';
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
+import { EmptyState } from '@/components/ui/empty-state';
 import { formatMoneyCompact } from '@/shared/utils';
 
 // Account type returned by API
@@ -120,116 +123,101 @@ export default function AccountsPage() {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center h-64">
-				<div className="flex flex-col items-center gap-4">
+			<EmptyState
+				title="Chargement des comptes..."
+				iconElement={
 					<div className="relative">
 						<div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 animate-pulse" />
 						<Loader2 className="h-6 w-6 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 					</div>
-					<p className="text-sm text-muted-foreground">Chargement des comptes...</p>
-				</div>
-			</div>
+				}
+				size="md"
+			/>
 		);
 	}
 
 	if (isError) {
 		return (
-			<div className="flex items-center justify-center h-64">
-				<div className="text-muted-foreground">Erreur lors du chargement des comptes</div>
-			</div>
+			<EmptyState
+				icon={Wallet}
+				title="Erreur de chargement"
+				description="Impossible de charger vos comptes. Veuillez réessayer."
+				size="md"
+			/>
 		);
 	}
 
 	return (
 		<div className="space-y-8">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-semibold tracking-tight">Comptes</h1>
-					<p className="mt-1 text-muted-foreground">Gérez vos comptes bancaires et suivez vos soldes</p>
-				</div>
-				<Button className="gap-2">
-					<Plus className="h-4 w-4" />
-					Ajouter un compte
-				</Button>
-			</div>
+			<PageHeader
+				title="Comptes"
+				description="Gérez vos comptes bancaires et suivez vos soldes"
+				actions={
+					<Button className="gap-2">
+						<Plus className="h-4 w-4" />
+						Ajouter un compte
+					</Button>
+				}
+			/>
 
 			{/* Stats Overview */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4 stagger-children">
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Solde total</p>
-							<p className="stat-card-value">{formatMoneyCompact(totalBalance)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<Wallet className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+			<StatCardGrid columns={4}>
+				<StatCard
+					label="Solde total"
+					value={formatMoneyCompact(totalBalance)}
+					icon={Wallet}
+					variant="default"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Comptes courants</p>
-							<p className="stat-card-value">{formatMoneyCompact(checkingTotal)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+				<StatCard
+					label="Comptes courants"
+					value={formatMoneyCompact(checkingTotal)}
+					icon={CreditCard}
+					variant="default"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Épargne</p>
-							<p className="stat-card-value">{formatMoneyCompact(savingsTotal)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<PiggyBank className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
+				<StatCard
+					label="Épargne"
+					value={formatMoneyCompact(savingsTotal)}
+					icon={PiggyBank}
+					variant="teal"
+				/>
 
-				<div className="stat-card">
-					<div className="stat-card-content">
-						<div className="stat-card-text">
-							<p className="text-xs sm:text-sm font-medium text-muted-foreground">Investissements</p>
-							<p className="stat-card-value">{formatMoneyCompact(investmentTotal)}</p>
-						</div>
-						<div className="stat-card-icon">
-							<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
-						</div>
-					</div>
-				</div>
-			</div>
+				<StatCard
+					label="Investissements"
+					value={formatMoneyCompact(investmentTotal)}
+					icon={TrendingUp}
+					variant="mint"
+				/>
+			</StatCardGrid>
 
 			{/* Accounts by Type */}
 			<div className="space-y-6">
 				{accountGroups.map((group) => {
 					const Icon = group.icon;
 					return (
-						<Card key={group.type} className="border-border/60">
-							<CardHeader className="pb-4">
-								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-										<Icon className="h-5 w-5" />
-									</div>
-									<div>
-										<CardTitle className="text-lg font-medium">{group.label}</CardTitle>
-										<p className="text-sm text-muted-foreground">
-											{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
-										</p>
-									</div>
+						<div key={group.type} className="glass-card p-5 sm:p-6">
+							{/* Group Header */}
+							<div className="flex items-center gap-3 mb-4">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+									<Icon className="h-5 w-5" />
 								</div>
-							</CardHeader>
-							<CardContent className="space-y-2">
+								<div>
+									<h3 className="text-lg font-semibold">{group.label}</h3>
+									<p className="text-sm text-muted-foreground">
+										{group.accounts.length} compte{group.accounts.length > 1 ? 's' : ''}
+									</p>
+								</div>
+							</div>
+
+							{/* Account List */}
+							<div className="space-y-2">
 								{group.accounts.map((account) => (
 									<Link
 										key={account.id}
 										href={`/dashboard/accounts/${account.id}`}
-										className="flex items-center justify-between rounded-xl bg-muted/30 p-4 transition-colors hover:bg-muted/50 group"
+										className="flex items-center justify-between rounded-xl bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 p-4 transition-all group border border-white/20"
 									>
 										<div className="flex items-center gap-4">
 											<div
@@ -249,31 +237,30 @@ export default function AccountsPage() {
 											</div>
 										</div>
 										<div className="flex items-center gap-4">
-											<p className="font-medium number-display">{formatMoneyCompact(account.balance)}</p>
+											<MoneyDisplay amount={account.balance} format="compact" size="md" weight="semibold" />
 											<ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
 										</div>
 									</Link>
 								))}
-							</CardContent>
-						</Card>
+							</div>
+						</div>
 					);
 				})}
 
 				{/* Empty state */}
 				{accountGroups.length === 0 && (
-					<div className="text-center py-16">
-						<div className="h-20 w-20 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
-							<Wallet className="h-10 w-10 text-muted-foreground/50" />
-						</div>
-						<p className="font-semibold text-foreground">Aucun compte</p>
-						<p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
-							Ajoutez votre premier compte pour commencer à suivre vos finances
-						</p>
-						<Button className="mt-6 gap-2">
-							<Plus className="h-4 w-4" />
-							Ajouter un compte
-						</Button>
-					</div>
+					<EmptyState
+						icon={Wallet}
+						title="Aucun compte"
+						description="Ajoutez votre premier compte pour commencer à suivre vos finances"
+						size="lg"
+						action={
+							<Button className="gap-2">
+								<Plus className="h-4 w-4" />
+								Ajouter un compte
+							</Button>
+						}
+					/>
 				)}
 			</div>
 		</div>
