@@ -411,3 +411,14 @@ export type { AccountListItemProps } from './accounts/AccountListItem';
 export { AccountListItem } from './accounts/AccountListItem';
 export type { AccountTypeHeaderProps } from './accounts/AccountTypeHeader';
 export { AccountTypeHeader } from './accounts/AccountTypeHeader';
+export type { SearchInputProps, SearchInputSize } from './common/SearchInput';
+export { SearchInput } from './common/SearchInput';
+export type { ListHeaderProps } from './common/ListHeader';
+export { ListHeader } from './common/ListHeader';
+
+// =============================================================================
+// TRANSACTION COMPONENTS
+// =============================================================================
+
+export type { TransactionListItemProps } from './transactions/TransactionListItem';
+export { TransactionListItem } from './transactions/TransactionListItem';

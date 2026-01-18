@@ -16,18 +16,20 @@ import {
 	Download,
 	Filter,
 	GlassCard,
-	Input,
+	ListHeader,
 	PageHeader,
-	Search,
+	Row,
+	SearchInput,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+	Stack,
 	StatCard,
 	StatCardGrid,
+	TransactionListItem,
 } from '@/components';
-import { MoneyDifference } from '@/components/common/MoneyDisplay';
 import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
 
 // Mock transaction data
@@ -136,7 +138,7 @@ function formatDate(dateStr: string): string {
 
 export default function TransactionsPage() {
 	return (
-		<div className="flex flex-col gap-8">
+		<Stack gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Transactions"
@@ -177,29 +179,13 @@ export default function TransactionsPage() {
 
 			{/* Filters */}
 			<GlassCard padding="md">
-				<div className="flex flex-col gap-4">
-					<div className="flex flex-wrap gap-4">
-						<div className="relative flex-1 min-w-[200px]">
-							<Search
-								style={{
-									position: 'absolute',
-									left: '0.75rem',
-									top: '50%',
-									transform: 'translateY(-50%)',
-									height: '1rem',
-									width: '1rem',
-									color: 'hsl(var(--muted-foreground))',
-								}}
-							/>
-							<Input
-								placeholder="Rechercher une transaction..."
-								style={{
-									paddingLeft: '2.5rem',
-									height: '2.75rem',
-									borderRadius: '0.75rem',
-								}}
-							/>
-						</div>
+				<Stack gap="md">
+					<Row gap="md" wrap="wrap">
+						<SearchInput
+							placeholder="Rechercher une transaction..."
+							size="md"
+							minWidth="200px"
+						/>
 						<Select defaultValue="all">
 							<SelectTrigger style={{ width: '180px', height: '2.75rem', borderRadius: '0.75rem' }}>
 								<SelectValue placeholder="Catégorie" />
@@ -237,67 +223,32 @@ export default function TransactionsPage() {
 						>
 							<Filter style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</div>
-				</div>
+					</Row>
+				</Stack>
 			</GlassCard>
 
 			{/* Transactions List */}
 			<GlassCard style={{ padding: 0 }}>
 				{/* Header */}
-				<div
-					className="flex justify-between items-center p-4"
-					style={{ borderBottom: '1px solid hsl(var(--border))' }}
-				>
-					<h3 className="text-base font-semibold tracking-tight">Toutes les transactions</h3>
-					<p className="text-sm text-muted-foreground">{transactions.length} opérations</p>
-				</div>
+				<ListHeader
+					title="Toutes les transactions"
+					subtitle={`${transactions.length} opérations`}
+				/>
 
 				{/* List */}
-				<div className="flex flex-col gap-2 p-4">
+				<Stack gap="xs" style={{ padding: '1rem' }}>
 					{transactions.map((tx) => (
-						<div
+						<TransactionListItem
 							key={tx.id}
-							className="flex justify-between items-center p-4 rounded-xl transition-colors"
-						>
-							<div className="flex items-center gap-4">
-								<div
-									className="flex h-10 w-10 items-center justify-center rounded-xl"
-									style={{
-										backgroundColor:
-											tx.amount > 0 ? 'oklch(0.55 0.15 145 / 0.1)' : 'hsl(var(--muted) / 0.3)',
-									}}
-								>
-									{tx.amount > 0 ? (
-										<ArrowDownLeft
-											style={{ height: '1.25rem', width: '1.25rem', color: 'oklch(0.55 0.15 145)' }}
-										/>
-									) : (
-										<CreditCard
-											style={{
-												height: '1.25rem',
-												width: '1.25rem',
-												color: 'hsl(var(--muted-foreground))',
-											}}
-										/>
-									)}
-								</div>
-								<div className="flex flex-col">
-									<p className="font-medium">{tx.description}</p>
-									<p className="text-xs text-muted-foreground">
-										{tx.category} · {tx.account}
-									</p>
-								</div>
-							</div>
-							<div className="flex flex-col items-end">
-								<MoneyDifference amount={tx.amount} size="md" />
-								<p className="text-xs text-muted-foreground" style={{ marginTop: '0.125rem' }}>
-									{formatDate(tx.date)}
-								</p>
-							</div>
-						</div>
+							description={tx.description}
+							amount={tx.amount}
+							category={tx.category}
+							account={tx.account}
+							dateLabel={formatDate(tx.date)}
+						/>
 					))}
-				</div>
+				</Stack>
 			</GlassCard>
-		</div>
+		</Stack>
 	);
 }
