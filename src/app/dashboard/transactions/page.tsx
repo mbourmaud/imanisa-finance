@@ -15,17 +15,16 @@ import {
 	CreditCard,
 	Download,
 	Filter,
+	Flex,
 	GlassCard,
 	ListHeader,
 	PageHeader,
-	Row,
 	SearchInput,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	Stack,
 	StatCard,
 	StatCardGrid,
 	TransactionListItem,
@@ -138,7 +137,7 @@ function formatDate(dateStr: string): string {
 
 export default function TransactionsPage() {
 	return (
-		<Stack gap="xl">
+		<Flex direction="col" gap="xl">
 			{/* Header */}
 			<PageHeader
 				title="Transactions"
@@ -179,8 +178,8 @@ export default function TransactionsPage() {
 
 			{/* Filters */}
 			<GlassCard padding="md">
-				<Stack gap="md">
-					<Row gap="md" wrap="wrap">
+				<Flex direction="col" gap="md">
+					<Flex direction="row" gap="md" wrap="wrap">
 						<SearchInput
 							placeholder="Rechercher une transaction..."
 							size="md"
@@ -223,8 +222,8 @@ export default function TransactionsPage() {
 						>
 							<Filter style={{ height: '1rem', width: '1rem' }} />
 						</Button>
-					</Row>
-				</Stack>
+					</Flex>
+				</Flex>
 			</GlassCard>
 
 			{/* Transactions List */}
@@ -236,7 +235,7 @@ export default function TransactionsPage() {
 				/>
 
 				{/* List */}
-				<Stack gap="xs" style={{ padding: '1rem' }}>
+				<Flex direction="col" gap="xs" style={{ padding: '1rem' }}>
 					{transactions.map((tx) => (
 						<TransactionListItem
 							key={tx.id}
@@ -247,8 +246,8 @@ export default function TransactionsPage() {
 							dateLabel={formatDate(tx.date)}
 						/>
 					))}
-				</Stack>
+				</Flex>
 			</GlassCard>
-		</Stack>
+		</Flex>
 	);
 }
