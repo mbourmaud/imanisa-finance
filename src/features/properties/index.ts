@@ -1,4 +1,6 @@
 // Types
+export * from './types';
+export * from './types/form-types';
 
 // TanStack Query Hooks - Co-ownership
 export {
@@ -25,6 +27,7 @@ export {
 	useDeletePropertyInsuranceMutation,
 	useUpdatePropertyInsuranceMutation,
 } from './hooks/use-property-insurance-query';
+
 // TanStack Query Hooks - Utility Contracts
 export {
 	useCreateUtilityContractMutation,
@@ -32,6 +35,9 @@ export {
 	useUpdateUtilityContractMutation,
 	utilityContractKeys,
 } from './hooks/use-utility-contracts-query';
+
+// Page hooks
+export { formatCurrency, usePropertyDetailPage } from './hooks/use-property-detail-page';
+
 // Services
 export { propertyService } from './services/property-service';
-export * from './types';
