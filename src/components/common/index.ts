@@ -103,3 +103,4 @@ export { ErrorBanner } from './ErrorBanner'
 // =============================================================================
 
 export { NarrowPageContainer } from './NarrowPageContainer'
+export { RootBody } from './RootBody'
