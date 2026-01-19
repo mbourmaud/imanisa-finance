@@ -38,6 +38,10 @@ export {
 
 // Page hooks
 export { formatCurrency, usePropertyDetailPage } from './hooks/use-property-detail-page';
+export { useRealEstatePage } from './hooks/use-real-estate-page';
+
+// Utils
+export { getPropertyTypeLabel, getPropertyUsageLabel } from './utils/property-labels';
 
 // Services
 export { propertyService } from './services/property-service';

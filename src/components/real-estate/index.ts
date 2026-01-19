@@ -42,3 +42,12 @@ export { PropertyUtilityContractsSection } from './PropertyUtilityContractsSecti
 export { PropertyDetailSkeleton } from './PropertyDetailSkeleton'
 export { PropertyNotFoundState } from './PropertyNotFoundState'
 export { PropertyDetailDialogs } from './PropertyDetailDialogs'
+
+// =============================================================================
+// REAL ESTATE LIST PAGE
+// =============================================================================
+
+export { CreatePropertyDialog } from './CreatePropertyDialog'
+export { PropertyCard } from './PropertyCard'
+export { PropertiesGrid } from './PropertiesGrid'
+export { PropertiesStatsOverview } from './PropertiesStatsOverview'
