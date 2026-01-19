@@ -14,6 +14,7 @@ export {
 
 // Page hooks
 export { useAccountDetailPage } from './hooks/use-account-detail-page';
+export { useAccountsPage, type ApiAccount, type AccountGroup } from './hooks/use-accounts-page';
 
 // Services
 export { accountService } from './services/account-service';
