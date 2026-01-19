@@ -97,3 +97,9 @@ export { ConfirmDialog } from './ConfirmDialog'
 // =============================================================================
 
 export { ErrorBanner } from './ErrorBanner'
+
+// =============================================================================
+// PAGE CONTAINERS
+// =============================================================================
+
+export { NarrowPageContainer } from './NarrowPageContainer'
