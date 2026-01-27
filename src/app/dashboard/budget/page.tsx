@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	BudgetCategoryGrid,
@@ -9,7 +9,6 @@ import {
 	Coffee,
 	CreditCard,
 	Film,
-	Flex,
 	Heart,
 	Home,
 	PieChart,
@@ -19,7 +18,7 @@ import {
 	StatCardGrid,
 	Utensils,
 	Zap,
-} from '@/components'
+} from '@/components';
 
 const categories = [
 	{
@@ -94,11 +93,11 @@ const categories = [
 		budget: 50,
 		spent: 0,
 	},
-]
+];
 
-const totalBudget = categories.reduce((s, c) => s + c.budget, 0)
-const totalSpent = categories.reduce((s, c) => s + c.spent, 0)
-const remaining = totalBudget - totalSpent
+const totalBudget = categories.reduce((s, c) => s + c.budget, 0);
+const totalSpent = categories.reduce((s, c) => s + c.spent, 0);
+const remaining = totalBudget - totalSpent;
 
 const chartData = categories
 	.filter((c) => c.spent > 0)
@@ -106,18 +105,18 @@ const chartData = categories
 		name: c.name,
 		value: c.spent,
 		color: c.color,
-	}))
+	}));
 
 function formatCurrency(amount: number): string {
 	return new Intl.NumberFormat('fr-FR', {
 		style: 'currency',
 		currency: 'EUR',
-	}).format(amount)
+	}).format(amount);
 }
 
 export default function BudgetPage() {
 	return (
-		<Flex direction="col" gap="xl">
+		<div className="flex flex-col gap-8">
 			<BudgetHeader />
 
 			<StatCardGrid columns={3}>
@@ -147,6 +146,6 @@ export default function BudgetPage() {
 			<BudgetCategoryGrid categories={categories} formatCurrency={formatCurrency} />
 
 			<BudgetChartSection chartData={chartData} totalSpent={totalSpent} />
-		</Flex>
-	)
+		</div>
+	);
 }

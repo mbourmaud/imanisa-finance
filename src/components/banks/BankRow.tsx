@@ -1,20 +1,20 @@
-import type { ReactNode } from 'react'
-import { Button, Card, Flex, Plus } from '@/components'
-import { BankLogo } from '@/components/banks/BankLogo'
-import { MoneyDisplay } from '@/components/common/MoneyDisplay'
+import type { ReactNode } from 'react';
+import { Button, Card, Plus } from '@/components';
+import { BankLogo } from '@/components/banks/BankLogo';
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 
 interface BankRowProps {
-	bankId: string
-	bankName: string
-	bankColor: string
-	logo: string | null
-	description?: string | null
-	accountCount: number
-	totalBalance: number
-	onAddAccount: () => void
-	onLogoChange: (url: string) => void
-	accountsList?: ReactNode
-	animationDelay?: number
+	bankId: string;
+	bankName: string;
+	bankColor: string;
+	logo: string | null;
+	description?: string | null;
+	accountCount: number;
+	totalBalance: number;
+	onAddAccount: () => void;
+	onLogoChange: (url: string) => void;
+	accountsList?: ReactNode;
+	animationDelay?: number;
 }
 
 /**
@@ -33,12 +33,12 @@ export function BankRow({
 	accountsList,
 	animationDelay = 0,
 }: BankRowProps) {
-	const hasAccounts = accountCount > 0
+	const hasAccounts = accountCount > 0;
 
 	const contentMarkup = (
 		<>
 			{/* Bank header */}
-			<Flex direction="row" gap="md" className="p-3">
+			<div className="flex gap-4 p-3">
 				<BankLogo
 					bankId={bankId}
 					bankName={bankName}
@@ -47,8 +47,8 @@ export function BankRow({
 					size="lg"
 					onLogoChange={onLogoChange}
 				/>
-				<Flex direction="col" gap="xs" className="min-w-0 flex-1">
-					<Flex direction="row" gap="sm" align="center">
+				<div className="flex flex-col gap-1 min-w-0 flex-1">
+					<div className="flex gap-2 items-center">
 						<h3
 							className={`text-lg font-bold tracking-tight ${!hasAccounts ? 'text-muted-foreground' : ''}`}
 						>
@@ -61,21 +61,19 @@ export function BankRow({
 						) : (
 							<span className="text-xs italic text-muted-foreground">Aucun compte</span>
 						)}
-					</Flex>
-					{description && (
-						<p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
-					)}
-				</Flex>
+					</div>
+					{description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
+				</div>
 				{hasAccounts ? (
 					<>
-						<MoneyDisplay amount={totalBalance} size="lg" weight="semibold" />
+						<MoneyDisplay amount={totalBalance} className="text-lg font-semibold" />
 						<Button
 							variant="ghost"
 							size="sm"
 							iconLeft={<Plus className="h-4 w-4" />}
 							onClick={(e) => {
-								e.stopPropagation()
-								onAddAccount()
+								e.stopPropagation();
+								onAddAccount();
 							}}
 						>
 							Ajouter
@@ -87,23 +85,19 @@ export function BankRow({
 						size="sm"
 						iconLeft={<Plus className="h-4 w-4" />}
 						onClick={(e) => {
-							e.stopPropagation()
-							onAddAccount()
+							e.stopPropagation();
+							onAddAccount();
 						}}
 					>
 						Ajouter un compte
 					</Button>
 				)}
-			</Flex>
+			</div>
 
 			{/* Accounts list */}
-			{accountsList && (
-				<Flex direction="col" gap="sm" className="ml-16 px-4 pb-4">
-					{accountsList}
-				</Flex>
-			)}
+			{accountsList && <div className="flex flex-col gap-2 ml-16 px-4 pb-4">{accountsList}</div>}
 		</>
-	)
+	);
 
 	// Return different markup based on whether bank has accounts
 	if (!hasAccounts) {
@@ -120,7 +114,7 @@ export function BankRow({
 			>
 				{contentMarkup}
 			</button>
-		)
+		);
 	}
 
 	return (
@@ -134,5 +128,5 @@ export function BankRow({
 		>
 			{contentMarkup}
 		</Card>
-	)
+	);
 }

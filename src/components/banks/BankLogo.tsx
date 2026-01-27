@@ -112,9 +112,7 @@ export function BankLogo({
 	};
 
 	const showLogo = currentLogo && !imageError;
-	const colorStyle = !showLogo
-		? { '--bank-color': bankColor } as React.CSSProperties
-		: undefined;
+	const colorStyle = !showLogo ? ({ '--bank-color': bankColor } as React.CSSProperties) : undefined;
 
 	return (
 		<div

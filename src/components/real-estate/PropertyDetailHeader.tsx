@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
+import Link from 'next/link';
 import {
 	ArrowLeft,
 	Button,
@@ -13,42 +13,42 @@ import {
 	MoreHorizontal,
 	Pencil,
 	Trash2,
-} from '@/components'
-import type { PropertyType, PropertyUsage } from '@/features/properties'
+} from '@/components';
+import type { PropertyType, PropertyUsage } from '@/features/properties';
 
 interface PropertyDetailHeaderProps {
-	name: string
-	type: PropertyType
-	usage: PropertyUsage
-	address: string
-	address2: string | null
-	postalCode: string
-	city: string
-	onEdit: () => void
-	onDeleteClick: () => void
+	name: string;
+	type: PropertyType;
+	usage: PropertyUsage;
+	address: string;
+	address2: string | null;
+	postalCode: string;
+	city: string;
+	onEdit: () => void;
+	onDeleteClick: () => void;
 }
 
 function getPropertyTypeLabel(type: PropertyType): string {
 	switch (type) {
 		case 'HOUSE':
-			return 'Maison'
+			return 'Maison';
 		case 'APARTMENT':
-			return 'Appartement'
+			return 'Appartement';
 		default:
-			return type
+			return type;
 	}
 }
 
 function getPropertyUsageLabel(usage: PropertyUsage): string {
 	switch (usage) {
 		case 'PRIMARY':
-			return 'Résidence principale'
+			return 'Résidence principale';
 		case 'SECONDARY':
-			return 'Résidence secondaire'
+			return 'Résidence secondaire';
 		case 'RENTAL':
-			return 'Locatif'
+			return 'Locatif';
 		default:
-			return usage
+			return usage;
 	}
 }
 
@@ -117,5 +117,5 @@ export function PropertyDetailHeader({
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

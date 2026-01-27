@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
-import { Building, ChevronRight } from '@/components'
-import { MoneyDisplay } from '@/components/common/MoneyDisplay'
+import Link from 'next/link';
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+import { Building, ChevronRight } from '@/components';
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 
 // =============================================================================
 // TYPES
@@ -12,17 +12,17 @@ import { MoneyDisplay } from '@/components/common/MoneyDisplay'
 
 interface AccountListItemProps {
 	/** Account ID */
-	id: string
+	id: string;
 	/** Account name */
-	name: string
+	name: string;
 	/** Bank name */
-	bankName?: string
+	bankName?: string;
 	/** Bank color for theming */
-	bankColor?: string
+	bankColor?: string;
 	/** Account balance */
-	balance: number
+	balance: number;
 	/** Currency code */
-	currency?: string
+	currency?: string;
 }
 
 // =============================================================================
@@ -36,8 +36,8 @@ interface AccountListItemProps {
 const AccountListItem = forwardRef<HTMLAnchorElement, AccountListItemProps>(
 	({ id, name, bankName = 'Banque', bankColor, balance, currency = 'EUR' }, ref) => {
 		const colorStyle = bankColor
-			? { '--bank-color': bankColor } as React.CSSProperties
-			: undefined
+			? ({ '--bank-color': bankColor } as React.CSSProperties)
+			: undefined;
 
 		return (
 			<Link
@@ -77,20 +77,19 @@ const AccountListItem = forwardRef<HTMLAnchorElement, AccountListItemProps>(
 						amount={balance}
 						currency={currency as 'EUR' | 'USD' | 'GBP' | 'CHF'}
 						format="compact"
-						size="md"
-						weight="semibold"
+						className="text-base font-semibold"
 					/>
 					<ChevronRight className="h-4 w-4 text-muted-foreground/50 transition-colors group-hover:text-muted-foreground" />
 				</div>
 			</Link>
-		)
+		);
 	},
-)
-AccountListItem.displayName = 'AccountListItem'
+);
+AccountListItem.displayName = 'AccountListItem';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { AccountListItem }
-export type { AccountListItemProps }
+export { AccountListItem };
+export type { AccountListItemProps };

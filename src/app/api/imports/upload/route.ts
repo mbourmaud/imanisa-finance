@@ -7,10 +7,10 @@
  * - Returns the import ID
  */
 
-import { type NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
-import { uploadRawFile } from '@/lib/supabase/storage'
-import { rawImportRepository, userRepository } from '@/server/repositories'
+import { type NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
+import { uploadRawFile } from '@/lib/supabase/storage';
+import { rawImportRepository, userRepository } from '@/server/repositories';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = [
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 		const user = await requireAuth();
 
 		// Ensure user exists in Prisma (sync from Supabase)
-		await userRepository.syncFromAuth(user.id, user.email, user.name)
+		await userRepository.syncFromAuth(user.id, user.email, user.name);
 
 		const formData = await request.formData();
 		const file = formData.get('file') as File | null;

@@ -1,26 +1,26 @@
-import { AccountRowLink, AccountTypeBadge, MemberAvatarGroup } from '@/components'
+import { AccountRowLink, AccountTypeBadge, MemberAvatarGroup } from '@/components';
 
 interface AccountMember {
-	id: string
-	name: string
-	ownerShare: number
-	color?: string | null
+	id: string;
+	name: string;
+	ownerShare: number;
+	color?: string | null;
 }
 
 interface Account {
-	id: string
-	name: string
-	balance: number
-	type: string
-	members: AccountMember[]
+	id: string;
+	name: string;
+	balance: number;
+	type: string;
+	members: AccountMember[];
 }
 
 interface BankAccountsListProps {
-	accounts: Account[]
+	accounts: Account[];
 }
 
 export function BankAccountsList({ accounts }: BankAccountsListProps) {
-	if (accounts.length === 0) return null
+	if (accounts.length === 0) return null;
 
 	return (
 		<>
@@ -29,7 +29,7 @@ export function BankAccountsList({ accounts }: BankAccountsListProps) {
 					id: m.id,
 					name: m.name,
 					color: m.color || undefined,
-				}))
+				}));
 
 				return (
 					<AccountRowLink
@@ -50,8 +50,8 @@ export function BankAccountsList({ accounts }: BankAccountsListProps) {
 						}
 						balance={account.balance}
 					/>
-				)
+				);
 			})}
 		</>
-	)
+	);
 }

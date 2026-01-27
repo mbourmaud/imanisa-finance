@@ -1,9 +1,8 @@
-'use client'
+'use client';
 
 import {
 	ArrowDownRight,
 	ArrowUpRight,
-	Flex,
 	InvestmentActions,
 	InvestmentSourceCard,
 	InvestmentSourceGrid,
@@ -15,8 +14,8 @@ import {
 	StatCardGrid,
 	TrendingUp,
 	Wallet,
-} from '@/components'
-import { InvestmentPerformanceChart } from '@/components/charts'
+} from '@/components';
+import { InvestmentPerformanceChart } from '@/components/charts';
 import {
 	demoPositions,
 	demoSources,
@@ -24,13 +23,13 @@ import {
 	totalInvested,
 	totalPerformance,
 	totalValue,
-} from '@/features/investments'
-import { demoInvestmentPerformance } from '@/lib/demo'
-import { formatMoney } from '@/shared/utils'
+} from '@/features/investments';
+import { demoInvestmentPerformance } from '@/lib/demo';
+import { formatMoney } from '@/shared/utils';
 
 export default function InvestmentsPage() {
 	return (
-		<Flex direction="col" gap="xl">
+		<div className="flex flex-col gap-8">
 			<PageHeader
 				title="Investissements"
 				description="PEA, CTO, Assurance-vie, Crypto"
@@ -79,6 +78,6 @@ export default function InvestmentsPage() {
 			<PortfolioChartSection>
 				<InvestmentPerformanceChart data={demoInvestmentPerformance} height="lg" />
 			</PortfolioChartSection>
-		</Flex>
-	)
+		</div>
+	);
 }

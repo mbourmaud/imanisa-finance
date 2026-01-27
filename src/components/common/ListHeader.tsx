@@ -1,8 +1,7 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
-import { Flex } from '@/components'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 // =============================================================================
 // LIST HEADER COMPONENT
@@ -10,11 +9,11 @@ import { Flex } from '@/components'
 
 interface ListHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Main title */
-	title: string
+	title: string;
 	/** Optional count or subtitle */
-	subtitle?: string
+	subtitle?: string;
 	/** Optional action element */
-	action?: React.ReactNode
+	action?: React.ReactNode;
 }
 
 /**
@@ -26,32 +25,23 @@ const ListHeader = forwardRef<HTMLDivElement, ListHeaderProps>(
 			<div
 				ref={ref}
 				data-slot="list-header"
-				className={cn(
-					'flex items-center justify-between p-4 border-b border-border',
-					className,
-				)}
+				className={cn('flex items-center justify-between p-4 border-b border-border', className)}
 				{...props}
 			>
-				<Flex direction="row" gap="md" align="center">
-					<h3 className="text-base font-semibold">
-						{title}
-					</h3>
-					{subtitle && (
-						<span className="text-sm text-muted-foreground">
-							{subtitle}
-						</span>
-					)}
-				</Flex>
+				<div className="flex items-center gap-4">
+					<h3 className="text-base font-semibold">{title}</h3>
+					{subtitle && <span className="text-sm text-muted-foreground">{subtitle}</span>}
+				</div>
 				{action}
 			</div>
-		)
+		);
 	},
-)
-ListHeader.displayName = 'ListHeader'
+);
+ListHeader.displayName = 'ListHeader';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { ListHeader }
-export type { ListHeaderProps }
+export { ListHeader };
+export type { ListHeaderProps };

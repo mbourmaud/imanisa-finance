@@ -1,15 +1,14 @@
-'use client'
+'use client';
 
 import {
 	CreatePropertyDialog,
 	ErrorBanner,
-	Flex,
 	LoanProgressCard,
 	PageHeader,
 	PropertiesGrid,
 	PropertiesStatsOverview,
-} from '@/components'
-import { formatCurrency, useRealEstatePage } from '@/features/properties'
+} from '@/components';
+import { formatCurrency, useRealEstatePage } from '@/features/properties';
 
 export default function RealEstatePage() {
 	const {
@@ -32,10 +31,10 @@ export default function RealEstatePage() {
 		onShareChange,
 		onSubmit,
 		onReset,
-	} = useRealEstatePage()
+	} = useRealEstatePage();
 
 	return (
-		<Flex direction="col" gap="xl">
+		<div className="flex flex-col gap-8">
 			<PageHeader
 				title="Immobilier"
 				description="Gérez votre patrimoine immobilier"
@@ -60,9 +59,7 @@ export default function RealEstatePage() {
 			/>
 
 			{isError && (
-				<ErrorBanner
-					message={error instanceof Error ? error.message : 'Une erreur est survenue'}
-				/>
+				<ErrorBanner message={error instanceof Error ? error.message : 'Une erreur est survenue'} />
 			)}
 
 			<PropertiesStatsOverview
@@ -86,6 +83,6 @@ export default function RealEstatePage() {
 				formatCurrency={formatCurrency}
 				onAddClick={() => setIsDialogOpen(true)}
 			/>
-		</Flex>
-	)
+		</div>
+	);
 }

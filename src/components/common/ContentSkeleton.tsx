@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type ContentSkeletonVariant = 'text' | 'title' | 'avatar' | 'badge' | 'icon' | 'card'
-type ContentSkeletonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type ContentSkeletonVariant = 'text' | 'title' | 'avatar' | 'badge' | 'icon' | 'card';
+type ContentSkeletonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 // =============================================================================
 // STYLE MAPS
@@ -21,9 +21,12 @@ const variantClasses: Record<ContentSkeletonVariant, string> = {
 	badge: 'rounded-full',
 	icon: 'rounded-xl',
 	card: 'rounded-xl',
-}
+};
 
-const sizeMap: Record<ContentSkeletonVariant, Record<ContentSkeletonSize, { height: string; width: string }>> = {
+const sizeMap: Record<
+	ContentSkeletonVariant,
+	Record<ContentSkeletonSize, { height: string; width: string }>
+> = {
 	text: {
 		xs: { height: '0.75rem', width: '4rem' },
 		sm: { height: '1rem', width: '5rem' },
@@ -66,7 +69,7 @@ const sizeMap: Record<ContentSkeletonVariant, Record<ContentSkeletonSize, { heig
 		lg: { height: '8rem', width: '100%' },
 		xl: { height: '10rem', width: '100%' },
 	},
-}
+};
 
 // =============================================================================
 // CONTENT SKELETON COMPONENT
@@ -74,13 +77,13 @@ const sizeMap: Record<ContentSkeletonVariant, Record<ContentSkeletonSize, { heig
 
 interface ContentSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Type of content being represented */
-	variant?: ContentSkeletonVariant
+	variant?: ContentSkeletonVariant;
 	/** Size preset */
-	size?: ContentSkeletonSize
+	size?: ContentSkeletonSize;
 	/** Custom width (overrides size preset) */
-	width?: string
+	width?: string;
 	/** Custom height (overrides size preset) */
-	height?: string
+	height?: string;
 }
 
 /**
@@ -89,12 +92,12 @@ interface ContentSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const ContentSkeleton = forwardRef<HTMLDivElement, ContentSkeletonProps>(
 	({ variant = 'text', size = 'md', width, height, className, style, ...props }, ref) => {
-		const dimensions = sizeMap[variant][size]
+		const dimensions = sizeMap[variant][size];
 		const dimensionStyle = {
 			'--skeleton-height': height ?? dimensions.height,
 			'--skeleton-width': width ?? dimensions.width,
 			...style,
-		} as React.CSSProperties
+		} as React.CSSProperties;
 
 		return (
 			<div
@@ -108,14 +111,14 @@ const ContentSkeleton = forwardRef<HTMLDivElement, ContentSkeletonProps>(
 				style={dimensionStyle}
 				{...props}
 			/>
-		)
+		);
 	},
-)
-ContentSkeleton.displayName = 'ContentSkeleton'
+);
+ContentSkeleton.displayName = 'ContentSkeleton';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { ContentSkeleton }
-export type { ContentSkeletonProps, ContentSkeletonVariant, ContentSkeletonSize }
+export { ContentSkeleton };
+export type { ContentSkeletonProps, ContentSkeletonVariant, ContentSkeletonSize };

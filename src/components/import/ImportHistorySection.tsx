@@ -1,36 +1,30 @@
-import { Card, EmptyState, FileSpreadsheet, Flex, Loader2 } from '@/components'
-import type { ReactNode } from 'react'
+import { Card, EmptyState, FileSpreadsheet, Loader2 } from '@/components';
+import type { ReactNode } from 'react';
 
 interface ImportHistorySectionProps {
-	isLoading: boolean
-	isEmpty: boolean
-	children: ReactNode
+	isLoading: boolean;
+	isEmpty: boolean;
+	children: ReactNode;
 }
 
 /**
  * Container for import history list
  */
-export function ImportHistorySection({
-	isLoading,
-	isEmpty,
-	children,
-}: ImportHistorySectionProps) {
+export function ImportHistorySection({ isLoading, isEmpty, children }: ImportHistorySectionProps) {
 	return (
 		<Card padding="lg">
-			<Flex direction="col" gap="md">
-				<Flex direction="col" gap="xs">
-					<h3 className="text-base font-semibold tracking-tight">
-						Historique des imports
-					</h3>
+			<div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-1">
+					<h3 className="text-base font-semibold tracking-tight">Historique des imports</h3>
 					<p className="text-sm text-muted-foreground">
 						Fichiers bruts stockés et leur statut de traitement
 					</p>
-				</Flex>
-				<Flex direction="col" gap="sm">
+				</div>
+				<div className="flex flex-col gap-2">
 					{isLoading ? (
-						<Flex direction="row" justify="center" className="py-8">
+						<div className="flex justify-center py-8">
 							<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-						</Flex>
+						</div>
 					) : isEmpty ? (
 						<EmptyState
 							icon={FileSpreadsheet}
@@ -40,8 +34,8 @@ export function ImportHistorySection({
 					) : (
 						children
 					)}
-				</Flex>
-			</Flex>
+				</div>
+			</div>
 		</Card>
-	)
+	);
 }

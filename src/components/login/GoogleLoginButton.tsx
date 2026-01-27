@@ -1,9 +1,9 @@
-import { Button } from '@/components'
-import { GoogleIcon } from './GoogleIcon'
+import { Button } from '@/components';
+import { GoogleIcon } from './GoogleIcon';
 
 interface GoogleLoginButtonProps {
-	onClick: () => void
-	isLoading: boolean
+	onClick: () => void;
+	isLoading: boolean;
 }
 
 /**
@@ -21,5 +21,5 @@ export function GoogleLoginButton({ onClick, isLoading }: GoogleLoginButtonProps
 			<GoogleIcon />
 			{isLoading ? 'Connexion...' : 'Continuer avec Google'}
 		</Button>
-	)
+	);
 }

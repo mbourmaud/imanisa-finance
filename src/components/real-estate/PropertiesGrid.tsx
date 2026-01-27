@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import { PropertiesEmptyState, PropertyCard, PropertyCardSkeleton } from '@/components'
-import type { PropertyWithDetails } from '@/features/properties'
+import { PropertiesEmptyState, PropertyCard, PropertyCardSkeleton } from '@/components';
+import type { PropertyWithDetails } from '@/features/properties';
 
 interface PropertiesGridProps {
-	properties: PropertyWithDetails[]
-	isLoading: boolean
-	formatCurrency: (amount: number) => string
-	onAddClick: () => void
+	properties: PropertyWithDetails[];
+	isLoading: boolean;
+	formatCurrency: (amount: number) => string;
+	onAddClick: () => void;
 }
 
 export function PropertiesGrid({
@@ -22,11 +22,11 @@ export function PropertiesGrid({
 				<PropertyCardSkeleton />
 				<PropertyCardSkeleton />
 			</div>
-		)
+		);
 	}
 
 	if (properties.length === 0) {
-		return <PropertiesEmptyState onAddClick={onAddClick} />
+		return <PropertiesEmptyState onAddClick={onAddClick} />;
 	}
 
 	return (
@@ -35,5 +35,5 @@ export function PropertiesGrid({
 				<PropertyCard key={property.id} property={property} formatCurrency={formatCurrency} />
 			))}
 		</div>
-	)
+	);
 }

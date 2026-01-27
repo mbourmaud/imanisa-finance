@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -17,36 +17,36 @@ import {
 	SelectTrigger,
 	SelectValue,
 	Skeleton,
-} from '@/components'
-import { FormErrorBanner } from './FormErrorBanner'
+} from '@/components';
+import { FormErrorBanner } from './FormErrorBanner';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface InsuranceFormData {
-	memberId: string
-	name: string
-	provider: string
-	contractNumber: string
-	coveragePercent: string
-	monthlyPremium: string
-	link: string
-	notes: string
+	memberId: string;
+	name: string;
+	provider: string;
+	contractNumber: string;
+	coveragePercent: string;
+	monthlyPremium: string;
+	link: string;
+	notes: string;
 }
 
 interface LoanInsuranceFormDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	formData: InsuranceFormData
-	onInputChange: (field: keyof InsuranceFormData, value: string) => void
-	onSubmit: (e: React.FormEvent) => void
-	error: string | null
-	isSubmitting: boolean
-	members: Member[]
-	loadingMembers: boolean
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	formData: InsuranceFormData;
+	onInputChange: (field: keyof InsuranceFormData, value: string) => void;
+	onSubmit: (e: React.FormEvent) => void;
+	error: string | null;
+	isSubmitting: boolean;
+	members: Member[];
+	loadingMembers: boolean;
 }
 
 /**
@@ -93,8 +93,10 @@ export function LoanInsuranceFormDialog({
 										<SelectItem key={member.id} value={member.id}>
 											<span className="flex items-center gap-2">
 												<div
-													className="rounded-full h-4 w-4"
-													style={{ backgroundColor: member.color || '#6b7280' }}
+													className="rounded-full h-4 w-4 bg-[var(--member-color)]"
+													style={
+														{ '--member-color': member.color || '#6b7280' } as React.CSSProperties
+													}
 												/>
 												{member.name}
 											</span>
@@ -213,5 +215,5 @@ export function LoanInsuranceFormDialog({
 				</form>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
-import { ArrowDownLeft, CreditCard, Flex, type LucideIcon } from '@/components'
-import { MoneyDifference } from '@/components/common/MoneyDisplay'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+import { ArrowDownLeft, CreditCard, type LucideIcon } from '@/components';
+import { MoneyDisplay } from '@/components/common/MoneyDisplay';
 
 // =============================================================================
 // TYPES
@@ -11,17 +11,17 @@ import { MoneyDifference } from '@/components/common/MoneyDisplay'
 
 interface TransactionListItemProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Transaction description */
-	description: string
+	description: string;
 	/** Amount (positive for income, negative for expense) */
-	amount: number
+	amount: number;
 	/** Category name */
-	category: string
+	category: string;
 	/** Account name */
-	account: string
+	account: string;
 	/** Formatted date string */
-	dateLabel: string
+	dateLabel: string;
 	/** Custom icon (optional) */
-	icon?: LucideIcon
+	icon?: LucideIcon;
 }
 
 // =============================================================================
@@ -32,21 +32,9 @@ interface TransactionListItemProps extends React.HTMLAttributes<HTMLDivElement> 
  * A single transaction row with icon, description, category, amount and date.
  */
 const TransactionListItem = forwardRef<HTMLDivElement, TransactionListItemProps>(
-	(
-		{
-			description,
-			amount,
-			category,
-			account,
-			dateLabel,
-			icon,
-			className,
-			...props
-		},
-		ref,
-	) => {
-		const isIncome = amount > 0
-		const Icon = icon || (isIncome ? ArrowDownLeft : CreditCard)
+	({ description, amount, category, account, dateLabel, icon, className, ...props }, ref) => {
+		const isIncome = amount > 0;
+		const Icon = icon || (isIncome ? ArrowDownLeft : CreditCard);
 
 		return (
 			<div
@@ -59,7 +47,7 @@ const TransactionListItem = forwardRef<HTMLDivElement, TransactionListItemProps>
 				)}
 				{...props}
 			>
-				<Flex direction="row" gap="md" align="center">
+				<div className="flex items-center gap-4">
 					<div
 						className={cn(
 							'flex h-10 w-10 items-center justify-center rounded-xl',
@@ -67,34 +55,37 @@ const TransactionListItem = forwardRef<HTMLDivElement, TransactionListItemProps>
 						)}
 					>
 						<Icon
-							className={cn(
-								'h-5 w-5',
-								isIncome ? 'text-emerald-500' : 'text-muted-foreground',
-							)}
+							className={cn('h-5 w-5', isIncome ? 'text-emerald-500' : 'text-muted-foreground')}
 						/>
 					</div>
-					<Flex direction="col" gap="none">
+					<div className="flex flex-col gap-0">
 						<span className="font-medium">{description}</span>
 						<span className="text-xs text-muted-foreground">
 							{category} · {account}
 						</span>
-					</Flex>
-				</Flex>
-				<Flex direction="col" gap="none" align="end">
-					<MoneyDifference amount={amount} size="md" />
-					<span className="text-xs text-muted-foreground">
-						{dateLabel}
-					</span>
-				</Flex>
+					</div>
+				</div>
+				<div className="flex flex-col gap-0 items-end">
+					<MoneyDisplay
+						amount={amount}
+						format="withSign"
+						className={cn(
+							'text-base',
+							amount > 0 && 'value-positive',
+							amount < 0 && 'value-negative',
+						)}
+					/>
+					<span className="text-xs text-muted-foreground">{dateLabel}</span>
+				</div>
 			</div>
-		)
+		);
 	},
-)
-TransactionListItem.displayName = 'TransactionListItem'
+);
+TransactionListItem.displayName = 'TransactionListItem';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { TransactionListItem }
-export type { TransactionListItemProps }
+export { TransactionListItem };
+export type { TransactionListItemProps };

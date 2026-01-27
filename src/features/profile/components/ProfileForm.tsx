@@ -43,14 +43,7 @@ export function ProfileForm() {
 	if (isLoadingProfile) {
 		return (
 			<div className="flex items-center justify-center py-8">
-				<Loader2
-					style={{
-						height: '1.5rem',
-						width: '1.5rem',
-						animation: 'spin 1s linear infinite',
-						color: 'hsl(var(--muted-foreground))',
-					}}
-				/>
+				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 			</div>
 		);
 	}

@@ -1,5 +1,5 @@
 // Page hooks
-export { useBanksPage } from './hooks/use-banks-page'
+export { useBanksPage } from './hooks/use-banks-page';
 
 // Types
 export type {
@@ -9,4 +9,4 @@ export type {
 	BanksResponse,
 	BanksSummary,
 	Member as BankMember,
-} from './hooks/use-banks-page'
+} from './hooks/use-banks-page';

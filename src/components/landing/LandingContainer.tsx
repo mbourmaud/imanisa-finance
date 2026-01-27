@@ -1,7 +1,7 @@
-import { ReactNode } from 'react'
+import { ReactNode } from 'react';
 
 interface LandingContainerProps {
-	children: ReactNode
+	children: ReactNode;
 }
 
 /**
@@ -12,5 +12,5 @@ export function LandingContainer({ children }: LandingContainerProps) {
 		<div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6">
 			{children}
 		</div>
-	)
+	);
 }

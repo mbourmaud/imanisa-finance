@@ -1,803 +1,829 @@
 {
-  "id": "code-cleanup",
-  "title": "Clean Architecture & Code Quality Refactor",
-  "description": "Refactoring complet du codebase pour respecter les standards : zero className dans les pages, zero inline styles, Zustand pour client state uniquement, TanStack Query pour server data, repositories pour Prisma, barrel exports par domaine.",
-  "stories": [
-    {
-      "id": "CLEAN-000",
-      "title": "Mettre à jour CLAUDE.md et rules avec les nouveaux critères",
-      "description": "Documenter tous les critères d'acceptation du refactoring dans CLAUDE.md et les fichiers .claude/rules/*.md : zero className dans pages, zero style={{}}, barrel par domaine, structure stores/, pattern pages dashboard, TanStack Form obligatoire.",
-      "files": ["CLAUDE.md", ".claude/rules/ui-architecture.md", ".claude/rules/zustand.md", ".claude/rules/tanstack.md"],
-      "acceptanceCriteria": [
-        "CLAUDE.md mis à jour avec quick reference des nouvelles règles",
-        "ui-architecture.md documente l'interdiction de style={{}}",
-        "zustand.md documente la structure src/shared/stores/",
-        "tanstack.md documente le pattern obligatoire pour les forms"
-      ],
-      "phase": 0,
-      "priority": "critical"
-    },
-    {
-      "id": "CLEAN-001",
-      "title": "Refactor src/app/page.tsx",
-      "description": "Extraire les composants business de la landing page. Supprimer tous les className et style={{}} inline.",
-      "files": ["src/app/page.tsx"],
-      "lines": 163,
-      "violations": ["className", "style={{}}"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Composants extraits dans src/components/"
-      ],
-      "phase": 1,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-002",
-      "title": "Refactor src/app/layout.tsx",
-      "description": "Nettoyer le layout root. Supprimer les className inline.",
-      "files": ["src/app/layout.tsx"],
-      "lines": 50,
-      "violations": ["className"],
-      "acceptanceCriteria": [
-        "Zero className dans le layout",
-        "Configuration app (nom, metadata) propre"
-      ],
-      "phase": 1,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-003",
-      "title": "Refactor src/app/login/page.tsx + créer useGoogleLoginMutation",
-      "description": "Refactorer la page login. Créer un hook mutation TanStack pour le login Google. Supprimer className et style={{}}.",
-      "files": ["src/app/login/page.tsx", "src/features/auth/hooks/use-google-login-mutation.ts"],
-      "lines": 154,
-      "violations": ["className", "style={{}}", "pas de mutation hook"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "useGoogleLoginMutation créé avec TanStack Query",
-        "Composants login extraits"
-      ],
-      "phase": 1,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-004",
-      "title": "Refactor src/app/auth/auth-code-error/page.tsx",
-      "description": "Refactorer la page d'erreur auth. Utiliser composants shadcn (Card, Alert). Supprimer className et style={{}}.",
-      "files": ["src/app/auth/auth-code-error/page.tsx"],
-      "lines": 101,
-      "violations": ["className", "style={{}}"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Utilise Card et Alert de shadcn"
-      ],
-      "phase": 1,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-005",
-      "title": "Refactor src/app/dashboard/layout.tsx",
-      "description": "Nettoyer le layout dashboard. Extraire AppLogo. Supprimer className et style={{}}.",
-      "files": ["src/app/dashboard/layout.tsx"],
-      "lines": 31,
-      "violations": ["className", "style={{}}"],
-      "acceptanceCriteria": [
-        "Zero className dans le layout",
-        "Zero style={{}} dans le layout",
-        "AppLogo extrait en composant réutilisable"
-      ],
-      "phase": 2,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-006",
-      "title": "Vérifier src/app/dashboard/page.tsx",
-      "description": "Vérifier la structure de la page dashboard principale.",
-      "files": ["src/app/dashboard/page.tsx"],
-      "lines": 5,
-      "violations": [],
-      "acceptanceCriteria": [
-        "Structure conforme aux standards"
-      ],
-      "phase": 2,
-      "priority": "low"
-    },
-    {
-      "id": "CLEAN-007",
-      "title": "Refactor budget/page.tsx",
-      "description": "Refactorer la page budget. Supprimer className et style={{}}. Extraire composants si nécessaire.",
-      "files": ["src/app/dashboard/budget/page.tsx"],
-      "lines": 224,
-      "violations": ["className", "style={{}}"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Utilise composants shadcn et business"
-      ],
-      "phase": 3,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-008",
-      "title": "Refactor accounts/page.tsx",
-      "description": "Refactorer la page liste des comptes. Supprimer style={{}}.",
-      "files": ["src/app/dashboard/accounts/page.tsx"],
-      "lines": 238,
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans la page",
-        "Utilise composants shadcn et business"
-      ],
-      "phase": 3,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-009",
-      "title": "Refactor transactions/page.tsx",
-      "description": "Refactorer la page transactions. Supprimer style={{}}.",
-      "files": ["src/app/dashboard/transactions/page.tsx"],
-      "lines": 253,
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans la page",
-        "Utilise composants shadcn et business"
-      ],
-      "phase": 3,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-010",
-      "title": "Refactor investments/page.tsx",
-      "description": "Refactorer la page investissements. Supprimer className et style={{}}. Extraire composants.",
-      "files": ["src/app/dashboard/investments/page.tsx"],
-      "lines": 428,
-      "violations": ["className", "style={{}}"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Composants investissements extraits"
-      ],
-      "phase": 4,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-011",
-      "title": "Refactor loans/page.tsx",
-      "description": "Refactorer la page prêts. Supprimer className et style={{}}. Extraire composants.",
-      "files": ["src/app/dashboard/loans/page.tsx"],
-      "lines": 530,
-      "violations": ["className", "style={{}}"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Composants prêts extraits"
-      ],
-      "phase": 4,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-012",
-      "title": "Refactor import/page.tsx",
-      "description": "Refactorer la page import CSV. Supprimer className et style={{}}. Migrer useState forms vers TanStack Form.",
-      "files": ["src/app/dashboard/import/page.tsx"],
-      "lines": 723,
-      "violations": ["className", "style={{}}", "useState forms"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Forms migrés vers TanStack Form",
-        "Composants import extraits"
-      ],
-      "phase": 5,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-013",
-      "title": "Refactor settings/page.tsx - split par section",
-      "description": "Splitter la page settings en sections : ProfileSection, MembersSection, PreferencesSection. Migrer forms manuels vers TanStack Form.",
-      "files": ["src/app/dashboard/settings/page.tsx", "src/components/settings/ProfileSection.tsx", "src/components/settings/MembersSection.tsx"],
-      "lines": 747,
-      "violations": ["className", "style={{}}", "manual forms"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Page splitée en sections distinctes",
-        "Forms migrés vers TanStack Form + Valibot"
-      ],
-      "phase": 5,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-014",
-      "title": "Refactor banks/page.tsx",
-      "description": "Refactorer la page banques. Supprimer className et style={{}}. Réduire useState.",
-      "files": ["src/app/dashboard/banks/page.tsx"],
-      "lines": 821,
-      "violations": ["className", "style={{}}", "useState"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Composants banques extraits"
-      ],
-      "phase": 5,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-015",
-      "title": "Refactor real-estate/page.tsx",
-      "description": "Refactorer la page liste immobilier. Supprimer className et style={{}}. Extraire composants PropertyCard, PropertyList.",
-      "files": ["src/app/dashboard/real-estate/page.tsx"],
-      "lines": 1213,
-      "violations": ["className", "style={{}}", "useState"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Composants immobilier extraits",
-        "Page < 200 lignes après refactor"
-      ],
-      "phase": 6,
-      "priority": "critical"
-    },
-    {
-      "id": "CLEAN-016",
-      "title": "Refactor accounts/[id]/page.tsx - split dialogs",
-      "description": "Splitter la page détail compte. Extraire tous les dialogs inline en composants séparés. Migrer forms vers TanStack Form.",
-      "files": ["src/app/dashboard/accounts/[id]/page.tsx", "src/components/accounts/AccountDetailsHeader.tsx", "src/components/accounts/TransactionsList.tsx"],
-      "lines": 2101,
-      "violations": ["className", "style={{}}", "useState", "inline dialogs"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "Dialogs extraits en composants",
-        "Forms migrés vers TanStack Form",
-        "Page < 300 lignes après refactor"
-      ],
-      "phase": 6,
-      "priority": "critical"
-    },
-    {
-      "id": "CLEAN-017",
-      "title": "Refactor real-estate/[id]/page.tsx - split forms/dialogs",
-      "description": "Splitter la page détail immobilier (3692 lignes!). Extraire LoanFormDialog, InsuranceFormDialog, CoOwnershipDialog, UtilityContractDialog. Migrer tous les forms vers TanStack Form.",
-      "files": ["src/app/dashboard/real-estate/[id]/page.tsx", "src/components/real-estate/LoanFormDialog.tsx", "src/components/real-estate/InsuranceFormDialog.tsx", "src/components/real-estate/CoOwnershipDialog.tsx", "src/components/real-estate/UtilityContractDialog.tsx"],
-      "lines": 3692,
-      "violations": ["className", "style={{}}", "useState", "4+ inline dialogs", "manual forms"],
-      "acceptanceCriteria": [
-        "Zero className dans la page",
-        "Zero style={{}} dans la page",
-        "4+ dialogs extraits en composants",
-        "Tous les forms migrés vers TanStack Form + Valibot",
-        "Page < 300 lignes après refactor"
-      ],
-      "phase": 6,
-      "priority": "critical"
-    },
-    {
-      "id": "CLEAN-018",
-      "title": "Fix AccountCard.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/accounts/AccountCard.tsx"],
-      "lines": 459,
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant",
-        "Tests existants passent toujours"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-019",
-      "title": "Fix AccountListItem.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/accounts/AccountListItem.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-020",
-      "title": "Fix BankCard.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/banks/BankCard.tsx"],
-      "lines": 312,
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant",
-        "Tests existants passent toujours"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-021",
-      "title": "Fix BankLogo.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/banks/BankLogo.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-022",
-      "title": "Fix TransactionRow.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/transactions/TransactionRow.tsx"],
-      "lines": 524,
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant",
-        "Tests existants passent toujours"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-023",
-      "title": "Fix MemberAvatar.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/members/MemberAvatar.tsx"],
-      "lines": 397,
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant",
-        "Tests existants passent toujours"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-024",
-      "title": "Fix BudgetCategoryCard.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/budget/BudgetCategoryCard.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-025",
-      "title": "Fix pie-chart.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/charts/pie-chart.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-026",
-      "title": "Fix ColorDot.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind ou CSS variables.",
-      "files": ["src/components/common/ColorDot.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant",
-        "Couleur dynamique gérée proprement"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-027",
-      "title": "Fix ContentSkeleton.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/common/ContentSkeleton.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-028",
-      "title": "Fix LoadingSpinner.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/common/LoadingSpinner.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-029",
-      "title": "Fix SearchInput.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind.",
-      "files": ["src/components/common/SearchInput.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-030",
-      "title": "Fix progress.tsx - supprimer inline styles",
-      "description": "Remplacer tous les style={{}} par des classes Tailwind ou CSS variables.",
-      "files": ["src/components/ui/progress.tsx"],
-      "violations": ["style={{}}"],
-      "acceptanceCriteria": [
-        "Zero style={{}} dans le composant",
-        "Valeur dynamique gérée proprement"
-      ],
-      "phase": 7,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-031",
-      "title": "Supprimer/refactor account-store.ts",
-      "description": "Le store Zustand contient du server data (fetchAccounts, createAccount, etc.). Migrer vers TanStack Query hooks existants (useAccountsQuery, useCreateAccountMutation). Garder seulement l'état client (selection UI) si nécessaire.",
-      "files": ["src/features/accounts/stores/account-store.ts"],
-      "violations": ["Server data dans Zustand"],
-      "acceptanceCriteria": [
-        "Store supprimé ou réduit à l'état client pur",
-        "Toutes les pages utilisent useAccountsQuery",
-        "Toutes les mutations utilisent les hooks TanStack"
-      ],
-      "phase": 8,
-      "priority": "critical"
-    },
-    {
-      "id": "CLEAN-032",
-      "title": "Supprimer/refactor transaction-store.ts",
-      "description": "Le store Zustand contient du server data (fetchTransactions, bulkCategorize, etc.). Migrer vers TanStack Query hooks existants. Garder seulement l'état client (selection, filters UI) si nécessaire.",
-      "files": ["src/features/transactions/stores/transaction-store.ts"],
-      "violations": ["Server data dans Zustand"],
-      "acceptanceCriteria": [
-        "Store supprimé ou réduit à l'état client pur",
-        "Toutes les pages utilisent useTransactionsQuery",
-        "Toutes les mutations utilisent les hooks TanStack"
-      ],
-      "phase": 8,
-      "priority": "critical"
-    },
-    {
-      "id": "CLEAN-033",
-      "title": "Créer structure src/shared/stores/",
-      "description": "Créer la structure de stores Zustand pour l'état client pur : ui-store.ts (sidebar, modals), entity-store.ts (selected entity, preferences).",
-      "files": ["src/shared/stores/ui-store.ts", "src/shared/stores/entity-store.ts", "src/shared/stores/index.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "ui-store.ts créé avec sidebarCollapsed, commandPaletteOpen",
-        "entity-store.ts créé avec selectedEntityId",
-        "Stores persistés avec zustand/middleware",
-        "Barrel export dans index.ts"
-      ],
-      "phase": 8,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-034",
-      "title": "Fix auth/callback/route.ts - utiliser repository",
-      "description": "Remplacer les appels Prisma directs par le repository approprié (userRepository ou memberRepository).",
-      "files": ["src/app/auth/callback/route.ts"],
-      "violations": ["Prisma direct"],
-      "acceptanceCriteria": [
-        "Zero appels prisma. directs",
-        "Utilise repository layer",
-        "Auth callback fonctionne toujours"
-      ],
-      "phase": 9,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-035",
-      "title": "Fix imports/upload/route.ts - utiliser repository",
-      "description": "Remplacer les appels Prisma directs par le repository approprié.",
-      "files": ["src/app/api/imports/upload/route.ts"],
-      "violations": ["Prisma direct"],
-      "acceptanceCriteria": [
-        "Zero appels prisma. directs",
-        "Utilise repository layer"
-      ],
-      "phase": 9,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-036",
-      "title": "Fix imports/[id]/process/route.ts - utiliser repository",
-      "description": "Remplacer les appels Prisma directs par le repository approprié.",
-      "files": ["src/app/api/imports/[id]/process/route.ts"],
-      "violations": ["Prisma direct"],
-      "acceptanceCriteria": [
-        "Zero appels prisma. directs",
-        "Utilise repository layer"
-      ],
-      "phase": 9,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-037",
-      "title": "Fix imports/[id]/reprocess/route.ts - utiliser repository",
-      "description": "Remplacer les appels Prisma directs par le repository approprié.",
-      "files": ["src/app/api/imports/[id]/reprocess/route.ts"],
-      "violations": ["Prisma direct"],
-      "acceptanceCriteria": [
-        "Zero appels prisma. directs",
-        "Utilise repository layer"
-      ],
-      "phase": 9,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-038",
-      "title": "Fix profile/route.ts - utiliser repository",
-      "description": "Remplacer les appels Prisma directs par le repository approprié.",
-      "files": ["src/app/api/profile/route.ts"],
-      "violations": ["Prisma direct"],
-      "acceptanceCriteria": [
-        "Zero appels prisma. directs",
-        "Utilise repository layer"
-      ],
-      "phase": 9,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-039",
-      "title": "Alléger globals.css",
-      "description": "Nettoyer globals.css (1011 lignes). Garder les CSS custom properties (--primary, --radius, etc.). Supprimer les utility classes redondantes avec Tailwind.",
-      "files": ["src/app/globals.css"],
-      "lines": 1011,
-      "violations": ["Fichier trop gros", "Utilities redondantes"],
-      "acceptanceCriteria": [
-        "CSS variables conservées",
-        "Utilities Tailwind redondantes supprimées",
-        "Fichier < 300 lignes",
-        "App fonctionne visuellement"
-      ],
-      "phase": 10,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-040",
-      "title": "Réorganiser src/components/index.ts",
-      "description": "Splitter le barrel monolithique en barrels par domaine : ui/index.ts, common/index.ts, etc.",
-      "files": ["src/components/index.ts", "src/components/ui/index.ts", "src/components/common/index.ts"],
-      "violations": ["Barrel monolithique"],
-      "acceptanceCriteria": [
-        "Barrel par domaine créé",
-        "Imports dans les pages mis à jour",
-        "Pas de régression"
-      ],
-      "phase": 11,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-041",
-      "title": "Ajouter barrel src/features/import/index.ts",
-      "description": "Créer le barrel export manquant pour la feature import.",
-      "files": ["src/features/import/index.ts"],
-      "violations": ["Barrel manquant"],
-      "acceptanceCriteria": [
-        "index.ts créé avec exports des parsers",
-        "Imports mis à jour dans les consumers"
-      ],
-      "phase": 11,
-      "priority": "low"
-    },
-    {
-      "id": "CLEAN-042",
-      "title": "Vérifier tous les barrels features",
-      "description": "Auditer et corriger tous les barrel exports dans src/features/*/index.ts pour cohérence.",
-      "files": ["src/features/*/index.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Chaque feature a un index.ts",
-        "Exports cohérents (hooks, types, services)",
-        "Pas d'imports directs dans les fichiers internes"
-      ],
-      "phase": 11,
-      "priority": "low"
-    },
-    {
-      "id": "CLEAN-043",
-      "title": "Créer useGoogleLoginMutation",
-      "description": "Créer un hook mutation TanStack Query pour le login Google, à utiliser dans la page login.",
-      "files": ["src/features/auth/hooks/use-google-login-mutation.ts", "src/features/auth/index.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Hook créé avec useMutation",
-        "Gestion erreur avec toast",
-        "Exporté dans le barrel auth"
-      ],
-      "phase": 12,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-044",
-      "title": "Créer forms TanStack pour settings",
-      "description": "Créer les schemas Valibot et hooks useAppForm pour les formulaires settings : ProfileForm, MemberForm.",
-      "files": ["src/features/settings/forms/profile-form-schema.ts", "src/features/settings/forms/member-form-schema.ts", "src/features/settings/hooks/use-profile-form.ts", "src/features/settings/hooks/use-member-form.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Schemas Valibot créés",
-        "Hooks useAppForm créés",
-        "Messages d'erreur en français"
-      ],
-      "phase": 12,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-045",
-      "title": "Créer forms TanStack pour real-estate",
-      "description": "Créer les schemas Valibot et hooks useAppForm pour les formulaires immobilier : LoanForm, InsuranceForm, UtilityContractForm, CoOwnershipForm.",
-      "files": ["src/features/real-estate/forms/loan-form-schema.ts", "src/features/real-estate/forms/insurance-form-schema.ts", "src/features/real-estate/hooks/use-loan-form.ts", "src/features/real-estate/hooks/use-insurance-form.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Schemas Valibot créés pour tous les forms",
-        "Hooks useAppForm créés",
-        "Messages d'erreur en français"
-      ],
-      "phase": 12,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-046",
-      "title": "Créer forms TanStack pour accounts",
-      "description": "Créer les schemas Valibot et hooks useAppForm pour les formulaires comptes : AccountForm, AccountMemberForm.",
-      "files": ["src/features/accounts/forms/account-form-schema.ts", "src/features/accounts/hooks/use-account-form.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Schemas Valibot créés",
-        "Hooks useAppForm créés",
-        "Messages d'erreur en français"
-      ],
-      "phase": 12,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-047",
-      "title": "Extraire AppLogo",
-      "description": "Extraire le composant AppLogo depuis dashboard/layout.tsx vers src/components/common/.",
-      "files": ["src/components/common/AppLogo.tsx"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Composant réutilisable",
-        "Nom app configurable via props ou config",
-        "Utilisé dans layout et autres endroits"
-      ],
-      "phase": 13,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-048",
-      "title": "Extraire dialogs real-estate",
-      "description": "Extraire tous les dialogs inline de real-estate/[id]/page.tsx : LoanFormDialog, InsuranceFormDialog, CoOwnershipDialog, UtilityContractDialog.",
-      "files": ["src/components/real-estate/LoanFormDialog.tsx", "src/components/real-estate/InsuranceFormDialog.tsx", "src/components/real-estate/CoOwnershipDialog.tsx", "src/components/real-estate/UtilityContractDialog.tsx"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "4 composants dialog créés",
-        "Utilisent les hooks form TanStack",
-        "Props typées proprement"
-      ],
-      "phase": 13,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-049",
-      "title": "Extraire dialogs accounts",
-      "description": "Extraire les dialogs/sheets inline de accounts/[id]/page.tsx : AccountFormSheet, MemberFormSheet.",
-      "files": ["src/components/accounts/AccountFormSheet.tsx", "src/components/accounts/MemberFormSheet.tsx"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Composants sheet créés",
-        "Utilisent les hooks form TanStack",
-        "Props typées proprement"
-      ],
-      "phase": 13,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-050",
-      "title": "Extraire sections settings",
-      "description": "Extraire les sections de settings/page.tsx : ProfileSection, MembersSection, PreferencesSection.",
-      "files": ["src/components/settings/ProfileSection.tsx", "src/components/settings/MembersSection.tsx", "src/components/settings/PreferencesSection.tsx"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "3 composants section créés",
-        "Utilisent les hooks form TanStack",
-        "Page settings < 100 lignes"
-      ],
-      "phase": 13,
-      "priority": "high"
-    },
-    {
-      "id": "CLEAN-051",
-      "title": "Tests nouveaux composants common",
-      "description": "Ajouter tests (snapshots + behavior) pour les nouveaux composants common : AppLogo, etc.",
-      "files": ["src/components/common/__tests__/AppLogo.test.tsx"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Tests snapshots pour chaque variant",
-        "Tests behavior",
-        "100% couverture du composant"
-      ],
-      "phase": 14,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-052",
-      "title": "Tests nouveaux hooks auth",
-      "description": "Ajouter tests pour les hooks auth : useGoogleLoginMutation.",
-      "files": ["src/features/auth/__tests__/use-google-login-mutation.test.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Tests success case",
-        "Tests error case",
-        "Mock Supabase"
-      ],
-      "phase": 14,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-053",
-      "title": "Tests nouveaux forms",
-      "description": "Ajouter tests pour les schemas Valibot et hooks form.",
-      "files": ["src/features/settings/forms/__tests__/", "src/features/real-estate/forms/__tests__/", "src/features/accounts/forms/__tests__/"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Tests validation Valibot",
-        "Tests messages d'erreur FR",
-        "Tests edge cases"
-      ],
-      "phase": 14,
-      "priority": "medium"
-    },
-    {
-      "id": "CLEAN-054",
-      "title": "Tests stores Zustand",
-      "description": "Ajouter tests pour les nouveaux stores Zustand : ui-store, entity-store.",
-      "files": ["src/shared/stores/__tests__/ui-store.test.ts", "src/shared/stores/__tests__/entity-store.test.ts"],
-      "violations": [],
-      "acceptanceCriteria": [
-        "Tests actions",
-        "Tests persistence",
-        "Tests initial state"
-      ],
-      "phase": 14,
-      "priority": "medium"
-    }
-  ],
-  "phases": [
-    { "id": 0, "name": "Documentation", "storyCount": 1 },
-    { "id": 1, "name": "Pages App Root", "storyCount": 4 },
-    { "id": 2, "name": "Dashboard Layout", "storyCount": 2 },
-    { "id": 3, "name": "Dashboard Pages Small (<300 lines)", "storyCount": 3 },
-    { "id": 4, "name": "Dashboard Pages Medium (300-600 lines)", "storyCount": 2 },
-    { "id": 5, "name": "Dashboard Pages Large (600-900 lines)", "storyCount": 3 },
-    { "id": 6, "name": "Dashboard Pages XL (>1000 lines)", "storyCount": 3 },
-    { "id": 7, "name": "Components Inline Styles", "storyCount": 13 },
-    { "id": 8, "name": "Zustand Migration", "storyCount": 3 },
-    { "id": 9, "name": "API Routes Prisma", "storyCount": 5 },
-    { "id": 10, "name": "CSS Cleanup", "storyCount": 1 },
-    { "id": 11, "name": "Barrel Exports", "storyCount": 3 },
-    { "id": 12, "name": "TanStack Form Migration", "storyCount": 4 },
-    { "id": 13, "name": "Extracted Components", "storyCount": 4 },
-    { "id": 14, "name": "Tests", "storyCount": 4 }
-  ],
-  "summary": {
-    "totalStories": 55,
-    "criticalPriority": 6,
-    "highPriority": 21,
-    "mediumPriority": 25,
-    "lowPriority": 3
-  }
+	"id": "code-cleanup",
+	"title": "Clean Architecture & Code Quality Refactor",
+	"description": "Refactoring complet du codebase pour respecter les standards : zero className dans les pages, zero inline styles, Zustand pour client state uniquement, TanStack Query pour server data, repositories pour Prisma, barrel exports par domaine.",
+	"stories": [
+		{
+			"id": "CLEAN-000",
+			"title": "Mettre à jour CLAUDE.md et rules avec les nouveaux critères",
+			"description": "Documenter tous les critères d'acceptation du refactoring dans CLAUDE.md et les fichiers .claude/rules/*.md : zero className dans pages, zero style={{}}, barrel par domaine, structure stores/, pattern pages dashboard, TanStack Form obligatoire.",
+			"files": [
+				"CLAUDE.md",
+				".claude/rules/ui-architecture.md",
+				".claude/rules/zustand.md",
+				".claude/rules/tanstack.md"
+			],
+			"acceptanceCriteria": [
+				"CLAUDE.md mis à jour avec quick reference des nouvelles règles",
+				"ui-architecture.md documente l'interdiction de style={{}}",
+				"zustand.md documente la structure src/shared/stores/",
+				"tanstack.md documente le pattern obligatoire pour les forms"
+			],
+			"phase": 0,
+			"priority": "critical"
+		},
+		{
+			"id": "CLEAN-001",
+			"title": "Refactor src/app/page.tsx",
+			"description": "Extraire les composants business de la landing page. Supprimer tous les className et style={{}} inline.",
+			"files": ["src/app/page.tsx"],
+			"lines": 163,
+			"violations": ["className", "style={{}}"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Composants extraits dans src/components/"
+			],
+			"phase": 1,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-002",
+			"title": "Refactor src/app/layout.tsx",
+			"description": "Nettoyer le layout root. Supprimer les className inline.",
+			"files": ["src/app/layout.tsx"],
+			"lines": 50,
+			"violations": ["className"],
+			"acceptanceCriteria": [
+				"Zero className dans le layout",
+				"Configuration app (nom, metadata) propre"
+			],
+			"phase": 1,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-003",
+			"title": "Refactor src/app/login/page.tsx + créer useGoogleLoginMutation",
+			"description": "Refactorer la page login. Créer un hook mutation TanStack pour le login Google. Supprimer className et style={{}}.",
+			"files": ["src/app/login/page.tsx", "src/features/auth/hooks/use-google-login-mutation.ts"],
+			"lines": 154,
+			"violations": ["className", "style={{}}", "pas de mutation hook"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"useGoogleLoginMutation créé avec TanStack Query",
+				"Composants login extraits"
+			],
+			"phase": 1,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-004",
+			"title": "Refactor src/app/auth/auth-code-error/page.tsx",
+			"description": "Refactorer la page d'erreur auth. Utiliser composants shadcn (Card, Alert). Supprimer className et style={{}}.",
+			"files": ["src/app/auth/auth-code-error/page.tsx"],
+			"lines": 101,
+			"violations": ["className", "style={{}}"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Utilise Card et Alert de shadcn"
+			],
+			"phase": 1,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-005",
+			"title": "Refactor src/app/dashboard/layout.tsx",
+			"description": "Nettoyer le layout dashboard. Extraire AppLogo. Supprimer className et style={{}}.",
+			"files": ["src/app/dashboard/layout.tsx"],
+			"lines": 31,
+			"violations": ["className", "style={{}}"],
+			"acceptanceCriteria": [
+				"Zero className dans le layout",
+				"Zero style={{}} dans le layout",
+				"AppLogo extrait en composant réutilisable"
+			],
+			"phase": 2,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-006",
+			"title": "Vérifier src/app/dashboard/page.tsx",
+			"description": "Vérifier la structure de la page dashboard principale.",
+			"files": ["src/app/dashboard/page.tsx"],
+			"lines": 5,
+			"violations": [],
+			"acceptanceCriteria": ["Structure conforme aux standards"],
+			"phase": 2,
+			"priority": "low"
+		},
+		{
+			"id": "CLEAN-007",
+			"title": "Refactor budget/page.tsx",
+			"description": "Refactorer la page budget. Supprimer className et style={{}}. Extraire composants si nécessaire.",
+			"files": ["src/app/dashboard/budget/page.tsx"],
+			"lines": 224,
+			"violations": ["className", "style={{}}"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Utilise composants shadcn et business"
+			],
+			"phase": 3,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-008",
+			"title": "Refactor accounts/page.tsx",
+			"description": "Refactorer la page liste des comptes. Supprimer style={{}}.",
+			"files": ["src/app/dashboard/accounts/page.tsx"],
+			"lines": 238,
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans la page",
+				"Utilise composants shadcn et business"
+			],
+			"phase": 3,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-009",
+			"title": "Refactor transactions/page.tsx",
+			"description": "Refactorer la page transactions. Supprimer style={{}}.",
+			"files": ["src/app/dashboard/transactions/page.tsx"],
+			"lines": 253,
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans la page",
+				"Utilise composants shadcn et business"
+			],
+			"phase": 3,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-010",
+			"title": "Refactor investments/page.tsx",
+			"description": "Refactorer la page investissements. Supprimer className et style={{}}. Extraire composants.",
+			"files": ["src/app/dashboard/investments/page.tsx"],
+			"lines": 428,
+			"violations": ["className", "style={{}}"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Composants investissements extraits"
+			],
+			"phase": 4,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-011",
+			"title": "Refactor loans/page.tsx",
+			"description": "Refactorer la page prêts. Supprimer className et style={{}}. Extraire composants.",
+			"files": ["src/app/dashboard/loans/page.tsx"],
+			"lines": 530,
+			"violations": ["className", "style={{}}"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Composants prêts extraits"
+			],
+			"phase": 4,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-012",
+			"title": "Refactor import/page.tsx",
+			"description": "Refactorer la page import CSV. Supprimer className et style={{}}. Migrer useState forms vers TanStack Form.",
+			"files": ["src/app/dashboard/import/page.tsx"],
+			"lines": 723,
+			"violations": ["className", "style={{}}", "useState forms"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Forms migrés vers TanStack Form",
+				"Composants import extraits"
+			],
+			"phase": 5,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-013",
+			"title": "Refactor settings/page.tsx - split par section",
+			"description": "Splitter la page settings en sections : ProfileSection, MembersSection, PreferencesSection. Migrer forms manuels vers TanStack Form.",
+			"files": [
+				"src/app/dashboard/settings/page.tsx",
+				"src/components/settings/ProfileSection.tsx",
+				"src/components/settings/MembersSection.tsx"
+			],
+			"lines": 747,
+			"violations": ["className", "style={{}}", "manual forms"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Page splitée en sections distinctes",
+				"Forms migrés vers TanStack Form + Valibot"
+			],
+			"phase": 5,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-014",
+			"title": "Refactor banks/page.tsx",
+			"description": "Refactorer la page banques. Supprimer className et style={{}}. Réduire useState.",
+			"files": ["src/app/dashboard/banks/page.tsx"],
+			"lines": 821,
+			"violations": ["className", "style={{}}", "useState"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Composants banques extraits"
+			],
+			"phase": 5,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-015",
+			"title": "Refactor real-estate/page.tsx",
+			"description": "Refactorer la page liste immobilier. Supprimer className et style={{}}. Extraire composants PropertyCard, PropertyList.",
+			"files": ["src/app/dashboard/real-estate/page.tsx"],
+			"lines": 1213,
+			"violations": ["className", "style={{}}", "useState"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Composants immobilier extraits",
+				"Page < 200 lignes après refactor"
+			],
+			"phase": 6,
+			"priority": "critical"
+		},
+		{
+			"id": "CLEAN-016",
+			"title": "Refactor accounts/[id]/page.tsx - split dialogs",
+			"description": "Splitter la page détail compte. Extraire tous les dialogs inline en composants séparés. Migrer forms vers TanStack Form.",
+			"files": [
+				"src/app/dashboard/accounts/[id]/page.tsx",
+				"src/components/accounts/AccountDetailsHeader.tsx",
+				"src/components/accounts/TransactionsList.tsx"
+			],
+			"lines": 2101,
+			"violations": ["className", "style={{}}", "useState", "inline dialogs"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"Dialogs extraits en composants",
+				"Forms migrés vers TanStack Form",
+				"Page < 300 lignes après refactor"
+			],
+			"phase": 6,
+			"priority": "critical"
+		},
+		{
+			"id": "CLEAN-017",
+			"title": "Refactor real-estate/[id]/page.tsx - split forms/dialogs",
+			"description": "Splitter la page détail immobilier (3692 lignes!). Extraire LoanFormDialog, InsuranceFormDialog, CoOwnershipDialog, UtilityContractDialog. Migrer tous les forms vers TanStack Form.",
+			"files": [
+				"src/app/dashboard/real-estate/[id]/page.tsx",
+				"src/components/real-estate/LoanFormDialog.tsx",
+				"src/components/real-estate/InsuranceFormDialog.tsx",
+				"src/components/real-estate/CoOwnershipDialog.tsx",
+				"src/components/real-estate/UtilityContractDialog.tsx"
+			],
+			"lines": 3692,
+			"violations": ["className", "style={{}}", "useState", "4+ inline dialogs", "manual forms"],
+			"acceptanceCriteria": [
+				"Zero className dans la page",
+				"Zero style={{}} dans la page",
+				"4+ dialogs extraits en composants",
+				"Tous les forms migrés vers TanStack Form + Valibot",
+				"Page < 300 lignes après refactor"
+			],
+			"phase": 6,
+			"priority": "critical"
+		},
+		{
+			"id": "CLEAN-018",
+			"title": "Fix AccountCard.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/accounts/AccountCard.tsx"],
+			"lines": 459,
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans le composant",
+				"Tests existants passent toujours"
+			],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-019",
+			"title": "Fix AccountListItem.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/accounts/AccountListItem.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": ["Zero style={{}} dans le composant"],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-020",
+			"title": "Fix BankCard.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/banks/BankCard.tsx"],
+			"lines": 312,
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans le composant",
+				"Tests existants passent toujours"
+			],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-021",
+			"title": "Fix BankLogo.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/banks/BankLogo.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": ["Zero style={{}} dans le composant"],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-022",
+			"title": "Fix TransactionRow.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/transactions/TransactionRow.tsx"],
+			"lines": 524,
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans le composant",
+				"Tests existants passent toujours"
+			],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-023",
+			"title": "Fix MemberAvatar.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/members/MemberAvatar.tsx"],
+			"lines": 397,
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans le composant",
+				"Tests existants passent toujours"
+			],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-024",
+			"title": "Fix BudgetCategoryCard.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/budget/BudgetCategoryCard.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": ["Zero style={{}} dans le composant"],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-025",
+			"title": "Fix pie-chart.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/charts/pie-chart.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": ["Zero style={{}} dans le composant"],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-026",
+			"title": "Fix ColorDot.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind ou CSS variables.",
+			"files": ["src/components/common/ColorDot.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans le composant",
+				"Couleur dynamique gérée proprement"
+			],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-027",
+			"title": "Fix ContentSkeleton.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/common/ContentSkeleton.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": ["Zero style={{}} dans le composant"],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-028",
+			"title": "Fix LoadingSpinner.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/common/LoadingSpinner.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": ["Zero style={{}} dans le composant"],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-029",
+			"title": "Fix SearchInput.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind.",
+			"files": ["src/components/common/SearchInput.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": ["Zero style={{}} dans le composant"],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-030",
+			"title": "Fix progress.tsx - supprimer inline styles",
+			"description": "Remplacer tous les style={{}} par des classes Tailwind ou CSS variables.",
+			"files": ["src/components/ui/progress.tsx"],
+			"violations": ["style={{}}"],
+			"acceptanceCriteria": [
+				"Zero style={{}} dans le composant",
+				"Valeur dynamique gérée proprement"
+			],
+			"phase": 7,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-031",
+			"title": "Supprimer/refactor account-store.ts",
+			"description": "Le store Zustand contient du server data (fetchAccounts, createAccount, etc.). Migrer vers TanStack Query hooks existants (useAccountsQuery, useCreateAccountMutation). Garder seulement l'état client (selection UI) si nécessaire.",
+			"files": ["src/features/accounts/stores/account-store.ts"],
+			"violations": ["Server data dans Zustand"],
+			"acceptanceCriteria": [
+				"Store supprimé ou réduit à l'état client pur",
+				"Toutes les pages utilisent useAccountsQuery",
+				"Toutes les mutations utilisent les hooks TanStack"
+			],
+			"phase": 8,
+			"priority": "critical"
+		},
+		{
+			"id": "CLEAN-032",
+			"title": "Supprimer/refactor transaction-store.ts",
+			"description": "Le store Zustand contient du server data (fetchTransactions, bulkCategorize, etc.). Migrer vers TanStack Query hooks existants. Garder seulement l'état client (selection, filters UI) si nécessaire.",
+			"files": ["src/features/transactions/stores/transaction-store.ts"],
+			"violations": ["Server data dans Zustand"],
+			"acceptanceCriteria": [
+				"Store supprimé ou réduit à l'état client pur",
+				"Toutes les pages utilisent useTransactionsQuery",
+				"Toutes les mutations utilisent les hooks TanStack"
+			],
+			"phase": 8,
+			"priority": "critical"
+		},
+		{
+			"id": "CLEAN-033",
+			"title": "Créer structure src/shared/stores/",
+			"description": "Créer la structure de stores Zustand pour l'état client pur : ui-store.ts (sidebar, modals), entity-store.ts (selected entity, preferences).",
+			"files": [
+				"src/shared/stores/ui-store.ts",
+				"src/shared/stores/entity-store.ts",
+				"src/shared/stores/index.ts"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"ui-store.ts créé avec sidebarCollapsed, commandPaletteOpen",
+				"entity-store.ts créé avec selectedEntityId",
+				"Stores persistés avec zustand/middleware",
+				"Barrel export dans index.ts"
+			],
+			"phase": 8,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-034",
+			"title": "Fix auth/callback/route.ts - utiliser repository",
+			"description": "Remplacer les appels Prisma directs par le repository approprié (userRepository ou memberRepository).",
+			"files": ["src/app/auth/callback/route.ts"],
+			"violations": ["Prisma direct"],
+			"acceptanceCriteria": [
+				"Zero appels prisma. directs",
+				"Utilise repository layer",
+				"Auth callback fonctionne toujours"
+			],
+			"phase": 9,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-035",
+			"title": "Fix imports/upload/route.ts - utiliser repository",
+			"description": "Remplacer les appels Prisma directs par le repository approprié.",
+			"files": ["src/app/api/imports/upload/route.ts"],
+			"violations": ["Prisma direct"],
+			"acceptanceCriteria": ["Zero appels prisma. directs", "Utilise repository layer"],
+			"phase": 9,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-036",
+			"title": "Fix imports/[id]/process/route.ts - utiliser repository",
+			"description": "Remplacer les appels Prisma directs par le repository approprié.",
+			"files": ["src/app/api/imports/[id]/process/route.ts"],
+			"violations": ["Prisma direct"],
+			"acceptanceCriteria": ["Zero appels prisma. directs", "Utilise repository layer"],
+			"phase": 9,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-037",
+			"title": "Fix imports/[id]/reprocess/route.ts - utiliser repository",
+			"description": "Remplacer les appels Prisma directs par le repository approprié.",
+			"files": ["src/app/api/imports/[id]/reprocess/route.ts"],
+			"violations": ["Prisma direct"],
+			"acceptanceCriteria": ["Zero appels prisma. directs", "Utilise repository layer"],
+			"phase": 9,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-038",
+			"title": "Fix profile/route.ts - utiliser repository",
+			"description": "Remplacer les appels Prisma directs par le repository approprié.",
+			"files": ["src/app/api/profile/route.ts"],
+			"violations": ["Prisma direct"],
+			"acceptanceCriteria": ["Zero appels prisma. directs", "Utilise repository layer"],
+			"phase": 9,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-039",
+			"title": "Alléger globals.css",
+			"description": "Nettoyer globals.css (1011 lignes). Garder les CSS custom properties (--primary, --radius, etc.). Supprimer les utility classes redondantes avec Tailwind.",
+			"files": ["src/app/globals.css"],
+			"lines": 1011,
+			"violations": ["Fichier trop gros", "Utilities redondantes"],
+			"acceptanceCriteria": [
+				"CSS variables conservées",
+				"Utilities Tailwind redondantes supprimées",
+				"Fichier < 300 lignes",
+				"App fonctionne visuellement"
+			],
+			"phase": 10,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-040",
+			"title": "Réorganiser src/components/index.ts",
+			"description": "Splitter le barrel monolithique en barrels par domaine : ui/index.ts, common/index.ts, etc.",
+			"files": [
+				"src/components/index.ts",
+				"src/components/ui/index.ts",
+				"src/components/common/index.ts"
+			],
+			"violations": ["Barrel monolithique"],
+			"acceptanceCriteria": [
+				"Barrel par domaine créé",
+				"Imports dans les pages mis à jour",
+				"Pas de régression"
+			],
+			"phase": 11,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-041",
+			"title": "Ajouter barrel src/features/import/index.ts",
+			"description": "Créer le barrel export manquant pour la feature import.",
+			"files": ["src/features/import/index.ts"],
+			"violations": ["Barrel manquant"],
+			"acceptanceCriteria": [
+				"index.ts créé avec exports des parsers",
+				"Imports mis à jour dans les consumers"
+			],
+			"phase": 11,
+			"priority": "low"
+		},
+		{
+			"id": "CLEAN-042",
+			"title": "Vérifier tous les barrels features",
+			"description": "Auditer et corriger tous les barrel exports dans src/features/*/index.ts pour cohérence.",
+			"files": ["src/features/*/index.ts"],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Chaque feature a un index.ts",
+				"Exports cohérents (hooks, types, services)",
+				"Pas d'imports directs dans les fichiers internes"
+			],
+			"phase": 11,
+			"priority": "low"
+		},
+		{
+			"id": "CLEAN-043",
+			"title": "Créer useGoogleLoginMutation",
+			"description": "Créer un hook mutation TanStack Query pour le login Google, à utiliser dans la page login.",
+			"files": [
+				"src/features/auth/hooks/use-google-login-mutation.ts",
+				"src/features/auth/index.ts"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Hook créé avec useMutation",
+				"Gestion erreur avec toast",
+				"Exporté dans le barrel auth"
+			],
+			"phase": 12,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-044",
+			"title": "Créer forms TanStack pour settings",
+			"description": "Créer les schemas Valibot et hooks useAppForm pour les formulaires settings : ProfileForm, MemberForm.",
+			"files": [
+				"src/features/settings/forms/profile-form-schema.ts",
+				"src/features/settings/forms/member-form-schema.ts",
+				"src/features/settings/hooks/use-profile-form.ts",
+				"src/features/settings/hooks/use-member-form.ts"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Schemas Valibot créés",
+				"Hooks useAppForm créés",
+				"Messages d'erreur en français"
+			],
+			"phase": 12,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-045",
+			"title": "Créer forms TanStack pour real-estate",
+			"description": "Créer les schemas Valibot et hooks useAppForm pour les formulaires immobilier : LoanForm, InsuranceForm, UtilityContractForm, CoOwnershipForm.",
+			"files": [
+				"src/features/real-estate/forms/loan-form-schema.ts",
+				"src/features/real-estate/forms/insurance-form-schema.ts",
+				"src/features/real-estate/hooks/use-loan-form.ts",
+				"src/features/real-estate/hooks/use-insurance-form.ts"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Schemas Valibot créés pour tous les forms",
+				"Hooks useAppForm créés",
+				"Messages d'erreur en français"
+			],
+			"phase": 12,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-046",
+			"title": "Créer forms TanStack pour accounts",
+			"description": "Créer les schemas Valibot et hooks useAppForm pour les formulaires comptes : AccountForm, AccountMemberForm.",
+			"files": [
+				"src/features/accounts/forms/account-form-schema.ts",
+				"src/features/accounts/hooks/use-account-form.ts"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Schemas Valibot créés",
+				"Hooks useAppForm créés",
+				"Messages d'erreur en français"
+			],
+			"phase": 12,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-047",
+			"title": "Extraire AppLogo",
+			"description": "Extraire le composant AppLogo depuis dashboard/layout.tsx vers src/components/common/.",
+			"files": ["src/components/common/AppLogo.tsx"],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Composant réutilisable",
+				"Nom app configurable via props ou config",
+				"Utilisé dans layout et autres endroits"
+			],
+			"phase": 13,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-048",
+			"title": "Extraire dialogs real-estate",
+			"description": "Extraire tous les dialogs inline de real-estate/[id]/page.tsx : LoanFormDialog, InsuranceFormDialog, CoOwnershipDialog, UtilityContractDialog.",
+			"files": [
+				"src/components/real-estate/LoanFormDialog.tsx",
+				"src/components/real-estate/InsuranceFormDialog.tsx",
+				"src/components/real-estate/CoOwnershipDialog.tsx",
+				"src/components/real-estate/UtilityContractDialog.tsx"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"4 composants dialog créés",
+				"Utilisent les hooks form TanStack",
+				"Props typées proprement"
+			],
+			"phase": 13,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-049",
+			"title": "Extraire dialogs accounts",
+			"description": "Extraire les dialogs/sheets inline de accounts/[id]/page.tsx : AccountFormSheet, MemberFormSheet.",
+			"files": [
+				"src/components/accounts/AccountFormSheet.tsx",
+				"src/components/accounts/MemberFormSheet.tsx"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Composants sheet créés",
+				"Utilisent les hooks form TanStack",
+				"Props typées proprement"
+			],
+			"phase": 13,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-050",
+			"title": "Extraire sections settings",
+			"description": "Extraire les sections de settings/page.tsx : ProfileSection, MembersSection, PreferencesSection.",
+			"files": [
+				"src/components/settings/ProfileSection.tsx",
+				"src/components/settings/MembersSection.tsx",
+				"src/components/settings/PreferencesSection.tsx"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"3 composants section créés",
+				"Utilisent les hooks form TanStack",
+				"Page settings < 100 lignes"
+			],
+			"phase": 13,
+			"priority": "high"
+		},
+		{
+			"id": "CLEAN-051",
+			"title": "Tests nouveaux composants common",
+			"description": "Ajouter tests (snapshots + behavior) pour les nouveaux composants common : AppLogo, etc.",
+			"files": ["src/components/common/__tests__/AppLogo.test.tsx"],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Tests snapshots pour chaque variant",
+				"Tests behavior",
+				"100% couverture du composant"
+			],
+			"phase": 14,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-052",
+			"title": "Tests nouveaux hooks auth",
+			"description": "Ajouter tests pour les hooks auth : useGoogleLoginMutation.",
+			"files": ["src/features/auth/__tests__/use-google-login-mutation.test.ts"],
+			"violations": [],
+			"acceptanceCriteria": ["Tests success case", "Tests error case", "Mock Supabase"],
+			"phase": 14,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-053",
+			"title": "Tests nouveaux forms",
+			"description": "Ajouter tests pour les schemas Valibot et hooks form.",
+			"files": [
+				"src/features/settings/forms/__tests__/",
+				"src/features/real-estate/forms/__tests__/",
+				"src/features/accounts/forms/__tests__/"
+			],
+			"violations": [],
+			"acceptanceCriteria": [
+				"Tests validation Valibot",
+				"Tests messages d'erreur FR",
+				"Tests edge cases"
+			],
+			"phase": 14,
+			"priority": "medium"
+		},
+		{
+			"id": "CLEAN-054",
+			"title": "Tests stores Zustand",
+			"description": "Ajouter tests pour les nouveaux stores Zustand : ui-store, entity-store.",
+			"files": [
+				"src/shared/stores/__tests__/ui-store.test.ts",
+				"src/shared/stores/__tests__/entity-store.test.ts"
+			],
+			"violations": [],
+			"acceptanceCriteria": ["Tests actions", "Tests persistence", "Tests initial state"],
+			"phase": 14,
+			"priority": "medium"
+		}
+	],
+	"phases": [
+		{ "id": 0, "name": "Documentation", "storyCount": 1 },
+		{ "id": 1, "name": "Pages App Root", "storyCount": 4 },
+		{ "id": 2, "name": "Dashboard Layout", "storyCount": 2 },
+		{ "id": 3, "name": "Dashboard Pages Small (<300 lines)", "storyCount": 3 },
+		{ "id": 4, "name": "Dashboard Pages Medium (300-600 lines)", "storyCount": 2 },
+		{ "id": 5, "name": "Dashboard Pages Large (600-900 lines)", "storyCount": 3 },
+		{ "id": 6, "name": "Dashboard Pages XL (>1000 lines)", "storyCount": 3 },
+		{ "id": 7, "name": "Components Inline Styles", "storyCount": 13 },
+		{ "id": 8, "name": "Zustand Migration", "storyCount": 3 },
+		{ "id": 9, "name": "API Routes Prisma", "storyCount": 5 },
+		{ "id": 10, "name": "CSS Cleanup", "storyCount": 1 },
+		{ "id": 11, "name": "Barrel Exports", "storyCount": 3 },
+		{ "id": 12, "name": "TanStack Form Migration", "storyCount": 4 },
+		{ "id": 13, "name": "Extracted Components", "storyCount": 4 },
+		{ "id": 14, "name": "Tests", "storyCount": 4 }
+	],
+	"summary": {
+		"totalStories": 55,
+		"criticalPriority": 6,
+		"highPriority": 21,
+		"mediumPriority": 25,
+		"lowPriority": 3
+	}
 }

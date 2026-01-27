@@ -10,6 +10,6 @@ export {
 	getParser,
 	getParserInfo,
 	parseImport,
-} from './parsers'
+} from './parsers';
 
-export type { ParsedPosition, ParsedTransaction, ParseResult, Parser } from './parsers'
+export type { ParsedPosition, ParsedTransaction, ParseResult, Parser } from './parsers';

@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface ImportFormGridProps {
-	formCard: ReactNode
-	statsCard: ReactNode
+	formCard: ReactNode;
+	statsCard: ReactNode;
 }
 
 /**
@@ -16,5 +16,5 @@ export function ImportFormGrid({ formCard, statsCard }: ImportFormGridProps) {
 			{formCard}
 			{statsCard}
 		</div>
-	)
+	);
 }

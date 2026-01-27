@@ -7,15 +7,15 @@
  * - Updates RawImport status with inserted/skipped counts
  */
 
-import { type NextRequest, NextResponse } from 'next/server'
-import { parseImport } from '@/features/import/parsers'
-import { requireAuth } from '@/lib/auth'
-import { downloadRawFile } from '@/lib/supabase/storage'
+import { type NextRequest, NextResponse } from 'next/server';
+import { parseImport } from '@/features/import/parsers';
+import { requireAuth } from '@/lib/auth';
+import { downloadRawFile } from '@/lib/supabase/storage';
 import {
 	accountRepository,
 	rawImportRepository,
 	transactionRepository,
-} from '@/server/repositories'
+} from '@/server/repositories';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -114,10 +114,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 				recordsCount: importResult.inserted,
 				skippedCount: importResult.skipped,
 				processedAt: new Date(),
-				errorMessage:
-					importResult.errors.length > 0 ? importResult.errors.join('; ') : null,
+				errorMessage: importResult.errors.length > 0 ? importResult.errors.join('; ') : null,
 				accountId: accountId,
-			})
+			});
 
 			// Recalculate account balance after import
 			await accountRepository.recalculateBalance(accountId);

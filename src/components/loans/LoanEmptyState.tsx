@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import { Building2, Button, CreditCard, EmptyState } from '@/components'
+import Link from 'next/link';
+import { Building2, Button, CreditCard, EmptyState } from '@/components';
 
 /**
  * Empty state when no loans are available
@@ -19,5 +19,5 @@ export function LoanEmptyState() {
 				</Button>
 			}
 		/>
-	)
+	);
 }

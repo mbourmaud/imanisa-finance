@@ -1,8 +1,8 @@
-import { Button, Flex, PageHeader, Plus, Settings } from '@/components'
+import { Button, PageHeader, Plus, Settings } from '@/components';
 
 interface BudgetHeaderProps {
-	onSettingsClick?: () => void
-	onAddCategoryClick?: () => void
+	onSettingsClick?: () => void;
+	onAddCategoryClick?: () => void;
 }
 
 /**
@@ -14,7 +14,7 @@ export function BudgetHeader({ onSettingsClick, onAddCategoryClick }: BudgetHead
 			title="Budget"
 			description="Suivez vos dépenses par catégorie"
 			actions={
-				<Flex direction="row" gap="sm">
+				<div className="flex gap-2">
 					<Button
 						variant="outline"
 						iconLeft={<Settings className="h-4 w-4" />}
@@ -22,14 +22,11 @@ export function BudgetHeader({ onSettingsClick, onAddCategoryClick }: BudgetHead
 					>
 						Règles
 					</Button>
-					<Button
-						iconLeft={<Plus className="h-4 w-4" />}
-						onClick={onAddCategoryClick}
-					>
+					<Button iconLeft={<Plus className="h-4 w-4" />} onClick={onAddCategoryClick}>
 						Nouvelle catégorie
 					</Button>
-				</Flex>
+				</div>
 			}
 		/>
-	)
+	);
 }

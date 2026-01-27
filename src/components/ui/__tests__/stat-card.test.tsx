@@ -8,7 +8,6 @@ describe('StatCard', () => {
 		const { container } = render(<StatCard label="Total" value="$1,234" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('stat-card');
 		expect(screen.getByText('Total')).toBeInTheDocument();
 		expect(screen.getByText('$1,234')).toBeInTheDocument();
 	});
@@ -21,90 +20,52 @@ describe('StatCard', () => {
 	it('renders with variant default', () => {
 		const { container } = render(<StatCard variant="default" label="Test" value="100" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('stat-card');
+		expect(card).toBeInTheDocument();
 	});
 
 	it('renders with variant coral', () => {
 		const { container } = render(<StatCard variant="coral" label="Test" value="100" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('stat-card', 'stat-card-coral');
+		expect(card).toBeInTheDocument();
+		expect(card).toHaveClass('border-l-4');
 	});
 
 	it('renders with variant teal', () => {
 		const { container } = render(<StatCard variant="teal" label="Test" value="100" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('stat-card', 'stat-card-teal');
+		expect(card).toBeInTheDocument();
+		expect(card).toHaveClass('border-l-4');
 	});
 
 	it('renders with variant purple', () => {
 		const { container } = render(<StatCard variant="purple" label="Test" value="100" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('stat-card', 'stat-card-purple');
+		expect(card).toBeInTheDocument();
+		expect(card).toHaveClass('border-l-4');
 	});
 
 	it('renders with variant gold', () => {
 		const { container } = render(<StatCard variant="gold" label="Test" value="100" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('stat-card', 'stat-card-gold');
+		expect(card).toBeInTheDocument();
+		expect(card).toHaveClass('border-l-4');
 	});
 
 	it('renders with variant mint', () => {
 		const { container } = render(<StatCard variant="mint" label="Test" value="100" />);
 		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('stat-card');
+		expect(card).toBeInTheDocument();
+		expect(card).toHaveClass('border-l-4');
 	});
 
 	it('renders with icon', () => {
 		const { container } = render(<StatCard label="Balance" value="$5,000" icon={Wallet} />);
-		const icon = container.querySelector('.stat-card-icon');
-		expect(icon).toBeInTheDocument();
 		expect(container.querySelector('svg')).toBeInTheDocument();
 	});
 
 	it('renders with description', () => {
 		render(<StatCard label="Revenue" value="$10,000" description="This month" />);
 		expect(screen.getByText('This month')).toBeInTheDocument();
-	});
-
-	it('renders with trend up', () => {
-		const { container } = render(
-			<StatCard label="Growth" value="$500" trend="up" trendValue="+12.5%" />,
-		);
-		expect(screen.getByText('+12.5%')).toBeInTheDocument();
-		// The trend value is inside a span with value-positive class
-		const trendElement = container.querySelector('.value-positive');
-		expect(trendElement).toBeInTheDocument();
-		expect(trendElement).toHaveTextContent('+12.5%');
-		// Should have TrendingUp icon
-		const trendIcon = container.querySelectorAll('svg');
-		expect(trendIcon.length).toBeGreaterThan(0);
-	});
-
-	it('renders with trend down', () => {
-		const { container } = render(
-			<StatCard label="Expenses" value="$800" trend="down" trendValue="-5.2%" />,
-		);
-		expect(screen.getByText('-5.2%')).toBeInTheDocument();
-		// The trend value is inside a span with value-negative class
-		const trendElement = container.querySelector('.value-negative');
-		expect(trendElement).toBeInTheDocument();
-		expect(trendElement).toHaveTextContent('-5.2%');
-	});
-
-	it('renders with trend neutral (no indicator)', () => {
-		const { container } = render(<StatCard label="Balance" value="$1,000" trend="neutral" />);
-		// Should not have trend icon when neutral
-		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toBeInTheDocument();
-		// No value-positive or value-negative classes
-		expect(container.querySelector('.value-positive')).not.toBeInTheDocument();
-		expect(container.querySelector('.value-negative')).not.toBeInTheDocument();
-	});
-
-	it('renders with interactive prop', () => {
-		const { container } = render(<StatCard label="Click me" value="$100" interactive />);
-		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('cursor-pointer');
 	});
 
 	it('accepts custom className', () => {
@@ -121,18 +82,15 @@ describe('StatCard', () => {
 				label="Total Revenue"
 				value="$12,345"
 				description="vs last month"
-				trend="up"
-				trendValue="+15%"
-				interactive
 			/>,
 		);
 
 		const card = container.querySelector('[data-slot="stat-card"]');
-		expect(card).toHaveClass('stat-card', 'stat-card-coral', 'cursor-pointer');
+		expect(card).toBeInTheDocument();
 		expect(screen.getByText('Total Revenue')).toBeInTheDocument();
 		expect(screen.getByText('$12,345')).toBeInTheDocument();
 		expect(screen.getByText('vs last month')).toBeInTheDocument();
-		expect(screen.getByText('+15%')).toBeInTheDocument();
+		expect(container.querySelector('svg')).toBeInTheDocument();
 	});
 });
 
@@ -202,19 +160,21 @@ describe('StatCardSkeleton', () => {
 		const { container } = render(<StatCardSkeleton />);
 		const skeleton = container.querySelector('[data-slot="stat-card-skeleton"]');
 		expect(skeleton).toBeInTheDocument();
-		expect(skeleton).toHaveClass('stat-card', 'animate-pulse');
+		expect(skeleton).toHaveClass('animate-pulse');
 	});
 
 	it('renders with variant coral', () => {
 		const { container } = render(<StatCardSkeleton variant="coral" />);
 		const skeleton = container.querySelector('[data-slot="stat-card-skeleton"]');
-		expect(skeleton).toHaveClass('stat-card-coral');
+		expect(skeleton).toBeInTheDocument();
+		expect(skeleton).toHaveClass('border-l-4');
 	});
 
 	it('renders with variant teal', () => {
 		const { container } = render(<StatCardSkeleton variant="teal" />);
 		const skeleton = container.querySelector('[data-slot="stat-card-skeleton"]');
-		expect(skeleton).toHaveClass('stat-card-teal');
+		expect(skeleton).toBeInTheDocument();
+		expect(skeleton).toHaveClass('border-l-4');
 	});
 
 	it('accepts custom className', () => {
@@ -235,23 +195,9 @@ describe('StatCard composition', () => {
 	it('renders multiple cards in a grid', () => {
 		const { container } = render(
 			<StatCardGrid>
-				<StatCard
-					variant="coral"
-					icon={Wallet}
-					label="Account Balance"
-					value="$10,500"
-					trend="up"
-					trendValue="+5%"
-				/>
+				<StatCard variant="coral" icon={Wallet} label="Account Balance" value="$10,500" />
 				<StatCard variant="teal" icon={Users} label="Family Members" value="4" />
-				<StatCard
-					variant="purple"
-					icon={PiggyBank}
-					label="Total Savings"
-					value="$2,300"
-					trend="down"
-					trendValue="-2%"
-				/>
+				<StatCard variant="purple" icon={PiggyBank} label="Total Savings" value="$2,300" />
 				<StatCard variant="gold" icon={TrendingUp} label="Monthly Growth" value="12%" />
 			</StatCardGrid>,
 		);

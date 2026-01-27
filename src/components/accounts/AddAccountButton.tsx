@@ -1,7 +1,7 @@
-import { Button, Plus } from '@/components'
+import { Button, Plus } from '@/components';
 
 interface AddAccountButtonProps {
-	onClick?: () => void
+	onClick?: () => void;
 }
 
 /**
@@ -13,5 +13,5 @@ export function AddAccountButton({ onClick }: AddAccountButtonProps) {
 			<Plus className="h-4 w-4" />
 			Ajouter un compte
 		</Button>
-	)
+	);
 }

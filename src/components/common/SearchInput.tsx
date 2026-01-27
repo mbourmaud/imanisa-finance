@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
-import { Input, Search } from '@/components'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+import { Input, Search } from '@/components';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type SearchInputSize = 'sm' | 'md' | 'lg'
+type SearchInputSize = 'sm' | 'md' | 'lg';
 
 // =============================================================================
 // STYLE MAPS
@@ -30,7 +30,7 @@ const sizeClasses: Record<SearchInputSize, { wrapper: string; icon: string; inpu
 		icon: 'left-4 h-5 w-5',
 		input: 'h-12 pl-12 rounded-xl',
 	},
-}
+};
 
 // =============================================================================
 // SEARCH INPUT COMPONENT
@@ -38,9 +38,9 @@ const sizeClasses: Record<SearchInputSize, { wrapper: string; icon: string; inpu
 
 interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
 	/** Size of the search input */
-	size?: SearchInputSize
+	size?: SearchInputSize;
 	/** Minimum width for responsive layouts */
-	minWidth?: string
+	minWidth?: string;
 }
 
 /**
@@ -48,8 +48,8 @@ interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
  */
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 	({ size = 'md', minWidth = '200px', className, style, ...props }, ref) => {
-		const classes = sizeClasses[size]
-		const containerStyle = { '--search-min-width': minWidth, ...style } as React.CSSProperties
+		const classes = sizeClasses[size];
+		const containerStyle = { '--search-min-width': minWidth, ...style } as React.CSSProperties;
 
 		return (
 			<div
@@ -62,20 +62,16 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 						classes.icon,
 					)}
 				/>
-				<Input
-					ref={ref}
-					className={classes.input}
-					{...props}
-				/>
+				<Input ref={ref} className={classes.input} {...props} />
 			</div>
-		)
+		);
 	},
-)
-SearchInput.displayName = 'SearchInput'
+);
+SearchInput.displayName = 'SearchInput';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { SearchInput }
-export type { SearchInputProps, SearchInputSize }
+export { SearchInput };
+export type { SearchInputProps, SearchInputSize };

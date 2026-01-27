@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type ColorDotSize = 'xs' | 'sm' | 'md' | 'lg'
+type ColorDotSize = 'xs' | 'sm' | 'md' | 'lg';
 
 // =============================================================================
 // STYLE MAPS
@@ -18,7 +18,7 @@ const sizeClasses: Record<ColorDotSize, string> = {
 	sm: 'h-2 w-2',
 	md: 'h-2.5 w-2.5',
 	lg: 'h-3 w-3',
-}
+};
 
 // =============================================================================
 // COLOR DOT COMPONENT
@@ -26,9 +26,9 @@ const sizeClasses: Record<ColorDotSize, string> = {
 
 interface ColorDotProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Color of the dot (CSS color value) */
-	color: string
+	color: string;
 	/** Size of the dot */
-	size?: ColorDotSize
+	size?: ColorDotSize;
 }
 
 /**
@@ -37,7 +37,7 @@ interface ColorDotProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const ColorDot = forwardRef<HTMLDivElement, ColorDotProps>(
 	({ color, size = 'sm', className, ...props }, ref) => {
-		const colorStyle = { '--dot-color': color } as React.CSSProperties
+		const colorStyle = { '--dot-color': color } as React.CSSProperties;
 		return (
 			<div
 				ref={ref}
@@ -46,14 +46,14 @@ const ColorDot = forwardRef<HTMLDivElement, ColorDotProps>(
 				style={colorStyle}
 				{...props}
 			/>
-		)
+		);
 	},
-)
-ColorDot.displayName = 'ColorDot'
+);
+ColorDot.displayName = 'ColorDot';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { ColorDot }
-export type { ColorDotProps, ColorDotSize }
+export { ColorDot };
+export type { ColorDotProps, ColorDotSize };

@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
-import { Loader2 } from '@/components'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+import { Loader2 } from '@/components';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type LoadingSpinnerSize = 'sm' | 'md' | 'lg'
+type LoadingSpinnerSize = 'sm' | 'md' | 'lg';
 
 // =============================================================================
 // STYLE MAPS
@@ -18,14 +18,14 @@ const iconSizeClasses: Record<LoadingSpinnerSize, string> = {
 	sm: 'h-4 w-4',
 	md: 'h-8 w-8',
 	lg: 'h-12 w-12',
-}
+};
 
 // =============================================================================
 // LOADING SPINNER COMPONENT
 // =============================================================================
 
 interface LoadingSpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
-	size?: LoadingSpinnerSize
+	size?: LoadingSpinnerSize;
 }
 
 /**
@@ -42,14 +42,14 @@ const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
 			>
 				<Loader2 className={cn('animate-spin text-primary', iconSizeClasses[size])} />
 			</div>
-		)
+		);
 	},
-)
-LoadingSpinner.displayName = 'LoadingSpinner'
+);
+LoadingSpinner.displayName = 'LoadingSpinner';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { LoadingSpinner }
-export type { LoadingSpinnerProps, LoadingSpinnerSize }
+export { LoadingSpinner };
+export type { LoadingSpinnerProps, LoadingSpinnerSize };

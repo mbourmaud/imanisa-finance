@@ -1,34 +1,25 @@
-'use client'
+'use client';
 
 import {
 	AddAccountDialog,
 	BankAccountsSection,
 	BanksStatsSection,
-	Flex,
 	InvestmentAccountsSection,
 	NarrowPageContainer,
 	PageHeader,
-} from '@/components'
-import { useBanksPage } from '@/features/banks'
+} from '@/components';
+import { useBanksPage } from '@/features/banks';
 
 export default function BanksPage() {
-	const page = useBanksPage()
+	const page = useBanksPage();
 
 	return (
 		<NarrowPageContainer>
-			<PageHeader
-				title="Banques"
-				description="Gérez vos établissements et importez vos données"
-				size="sm"
-			/>
+			<PageHeader title="Banques" description="Gérez vos établissements et importez vos données" />
 
-			<BanksStatsSection
-				summary={page.data?.summary}
-				loading={page.loading}
-				error={page.error}
-			/>
+			<BanksStatsSection summary={page.data?.summary} loading={page.loading} error={page.error} />
 
-			<Flex direction="col" gap="xl">
+			<div className="flex flex-col gap-8">
 				<BankAccountsSection
 					banks={page.data?.bankAccounts}
 					loading={page.loading}
@@ -44,7 +35,7 @@ export default function BanksPage() {
 					getBankLogo={page.getBankLogo}
 					onLogoChange={page.handleLogoChange}
 				/>
-			</Flex>
+			</div>
 
 			<AddAccountDialog
 				open={page.showAddAccount}
@@ -66,5 +57,5 @@ export default function BanksPage() {
 				onSubmit={page.handleCreateAccount}
 			/>
 		</NarrowPageContainer>
-	)
+	);
 }

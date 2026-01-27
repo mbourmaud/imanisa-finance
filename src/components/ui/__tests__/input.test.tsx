@@ -66,9 +66,7 @@ describe('Input', () => {
 	});
 
 	it('renders with all props combined', () => {
-		const { container } = render(
-			<Input size="lg" type="email" placeholder="email@example.com" />,
-		);
+		const { container } = render(<Input size="lg" type="email" placeholder="email@example.com" />);
 		const input = container.querySelector('input');
 		expect(input).toHaveClass('h-11');
 		expect(input).toHaveAttribute('type', 'email');

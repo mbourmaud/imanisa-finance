@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import {
 	AuthErrorBackground,
 	AuthErrorCard,
 	AuthErrorContainer,
 	AuthErrorFooter,
 	AuthErrorLogo,
-} from '@/components'
+} from '@/components';
 
 export default function AuthCodeErrorPage() {
-	const router = useRouter()
+	const router = useRouter();
 
 	return (
 		<AuthErrorContainer>
@@ -19,5 +19,5 @@ export default function AuthCodeErrorPage() {
 			<AuthErrorCard onRetry={() => router.push('/login')} />
 			<AuthErrorFooter />
 		</AuthErrorContainer>
-	)
+	);
 }

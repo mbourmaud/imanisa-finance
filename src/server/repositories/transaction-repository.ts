@@ -366,7 +366,7 @@ export const transactionRepository = {
 	async delete(id: string): Promise<void> {
 		await prisma.transaction.delete({
 			where: { id },
-		})
+		});
 	},
 
 	/**
@@ -386,7 +386,7 @@ export const transactionRepository = {
 					lte: maxDate,
 				},
 			},
-		})
+		});
 	},
 
 	/**
@@ -408,7 +408,7 @@ export const transactionRepository = {
 				bankCategory: tx.bankCategory,
 				isInternal: false,
 			})),
-		})
+		});
 	},
 
 	/**

@@ -1,5 +1,5 @@
 interface FormErrorBannerProps {
-	message: string
+	message: string;
 }
 
 /**
@@ -10,5 +10,5 @@ export function FormErrorBanner({ message }: FormErrorBannerProps) {
 		<div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3">
 			<span className="text-sm text-destructive">{message}</span>
 		</div>
-	)
+	);
 }

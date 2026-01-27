@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { Building2, CreditCard, Landmark, StatCard, StatCardGrid, Wallet } from '@/components'
+import { Building2, CreditCard, Landmark, StatCard, StatCardGrid, Wallet } from '@/components';
 
 interface PropertyStatsSummaryProps {
-	currentValue: number
-	purchasePrice: number
-	equity: number
-	totalLoansRemaining: number
-	totalInvestment: number
-	loansCount: number
+	currentValue: number;
+	purchasePrice: number;
+	equity: number;
+	totalLoansRemaining: number;
+	totalInvestment: number;
+	loansCount: number;
 }
 
 function formatCurrency(amount: number): string {
@@ -16,7 +16,7 @@ function formatCurrency(amount: number): string {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount)
+	}).format(amount);
 }
 
 export function PropertyStatsSummary({
@@ -27,7 +27,7 @@ export function PropertyStatsSummary({
 	totalInvestment,
 	loansCount,
 }: PropertyStatsSummaryProps) {
-	const appreciation = ((currentValue - purchasePrice) / purchasePrice) * 100
+	const appreciation = ((currentValue - purchasePrice) / purchasePrice) * 100;
 
 	return (
 		<StatCardGrid columns={4}>
@@ -37,7 +37,6 @@ export function PropertyStatsSummary({
 				icon={Building2}
 				variant="default"
 				description={`${appreciation >= 0 ? '+' : ''}${appreciation.toFixed(1)}% depuis l'achat`}
-				trend={appreciation >= 0 ? 'up' : 'down'}
 			/>
 			<StatCard
 				label="Équité"
@@ -63,5 +62,5 @@ export function PropertyStatsSummary({
 				description="Prix + frais"
 			/>
 		</StatCardGrid>
-	)
+	);
 }

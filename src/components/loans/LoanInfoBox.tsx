@@ -1,10 +1,10 @@
-import { Flex, type LucideIcon } from '@/components'
+import type { LucideIcon } from '@/components';
 
 interface LoanInfoBoxProps {
-	icon: LucideIcon
-	label: string
-	value: string
-	sublabel?: string
+	icon: LucideIcon;
+	label: string;
+	value: string;
+	sublabel?: string;
 }
 
 /**
@@ -12,15 +12,13 @@ interface LoanInfoBoxProps {
  */
 export function LoanInfoBox({ icon: Icon, label, value, sublabel }: LoanInfoBoxProps) {
 	return (
-		<Flex direction="col" gap="xs" className="bg-muted/30 rounded-xl p-3">
-			<Flex direction="row" gap="sm" className="text-muted-foreground">
+		<div className="flex flex-col gap-1 bg-muted/30 rounded-xl p-3">
+			<div className="flex gap-2 text-muted-foreground">
 				<Icon className="h-3.5 w-3.5" />
 				<span className="text-xs">{label}</span>
-			</Flex>
+			</div>
 			<span className="font-semibold tabular-nums">{value}</span>
-			{sublabel && (
-				<span className="text-xs text-muted-foreground">{sublabel}</span>
-			)}
-		</Flex>
-	)
+			{sublabel && <span className="text-xs text-muted-foreground">{sublabel}</span>}
+		</div>
+	);
 }

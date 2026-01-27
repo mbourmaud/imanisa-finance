@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { AlertCircle, Button, CheckCircle2, Flex, X } from '@/components'
+import { AlertCircle, Button, CheckCircle2, X } from '@/components';
 
 interface FloatingToastProps {
-	message: string
-	isSuccess?: boolean
-	onClose: () => void
+	message: string;
+	isSuccess?: boolean;
+	onClose: () => void;
 }
 
 /**
@@ -18,7 +18,7 @@ export function FloatingToast({ message, isSuccess = false, onClose }: FloatingT
 				isSuccess ? 'border-emerald-500/50' : 'border-red-500/50'
 			}`}
 		>
-			<Flex direction="row" gap="sm" align="start">
+			<div className="flex gap-2 items-start">
 				<div
 					className={`flex items-center justify-center flex-shrink-0 h-8 w-8 rounded-lg ${
 						isSuccess ? 'bg-emerald-500/10' : 'bg-red-500/10'
@@ -30,12 +30,14 @@ export function FloatingToast({ message, isSuccess = false, onClose }: FloatingT
 						<AlertCircle className="h-4 w-4 text-red-500" />
 					)}
 				</div>
-				<Flex direction="col" gap="xs" className="flex-grow min-w-0">
-					<span className={`text-sm font-semibold ${isSuccess ? 'text-emerald-500' : 'text-red-500'}`}>
+				<div className="flex flex-col gap-1 flex-grow min-w-0">
+					<span
+						className={`text-sm font-semibold ${isSuccess ? 'text-emerald-500' : 'text-red-500'}`}
+					>
 						{isSuccess ? 'Import réussi' : 'Erreur'}
 					</span>
 					<span className="text-sm text-foreground">{message}</span>
-				</Flex>
+				</div>
 				<Button
 					variant="ghost"
 					size="icon"
@@ -44,7 +46,7 @@ export function FloatingToast({ message, isSuccess = false, onClose }: FloatingT
 				>
 					<X className="h-4 w-4" />
 				</Button>
-			</Flex>
+			</div>
 		</div>
-	)
+	);
 }

@@ -1,4 +1,4 @@
-import { Wallet } from '@/components/ui/icon'
+import { Wallet } from 'lucide-react';
 
 /**
  * Compact logo for auth error page
@@ -10,5 +10,5 @@ export function AuthErrorLogo() {
 				<Wallet className="h-8 w-8 text-white" />
 			</div>
 		</div>
-	)
+	);
 }

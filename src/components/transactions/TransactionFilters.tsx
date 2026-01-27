@@ -3,14 +3,13 @@ import {
 	Calendar,
 	Card,
 	Filter,
-	Flex,
 	SearchInput,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components'
+} from '@/components';
 
 /**
  * Transaction filters component
@@ -18,13 +17,9 @@ import {
 export function TransactionFilters() {
 	return (
 		<Card padding="md">
-			<Flex direction="col" gap="md">
-				<Flex direction="row" gap="md" wrap="wrap">
-					<SearchInput
-						placeholder="Rechercher une transaction..."
-						size="md"
-						minWidth="200px"
-					/>
+			<div className="flex flex-col gap-4">
+				<div className="flex flex-row gap-4 flex-wrap">
+					<SearchInput placeholder="Rechercher une transaction..." size="md" minWidth="200px" />
 					<Select defaultValue="all">
 						<SelectTrigger className="h-11 w-[180px] rounded-xl">
 							<SelectValue placeholder="Catégorie" />
@@ -55,15 +50,11 @@ export function TransactionFilters() {
 					>
 						Janvier 2025
 					</Button>
-					<Button
-						variant="outline"
-						size="icon"
-						className="h-11 w-11 rounded-xl"
-					>
+					<Button variant="outline" size="icon" className="h-11 w-11 rounded-xl">
 						<Filter className="h-4 w-4" />
 					</Button>
-				</Flex>
-			</Flex>
+				</div>
+			</div>
 		</Card>
-	)
+	);
 }

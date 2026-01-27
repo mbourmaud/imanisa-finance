@@ -1,10 +1,9 @@
-'use client'
+'use client';
 
 import {
 	Button,
 	ExternalLink,
 	FileSpreadsheet,
-	Flex,
 	Input,
 	Loader2,
 	Plus,
@@ -15,93 +14,93 @@ import {
 	SheetTitle,
 	Trash2,
 	X,
-} from '@/components'
-import { AccountImportRow } from './AccountImportRow'
-import { MemberChip } from './MemberChip'
-import { AddMemberDropdown } from './AddMemberDropdown'
+} from '@/components';
+import { AccountImportRow } from './AccountImportRow';
+import { MemberChip } from './MemberChip';
+import { AddMemberDropdown } from './AddMemberDropdown';
 
 interface AccountMember {
-	id: string
-	memberId: string
-	ownerShare: number
+	id: string;
+	memberId: string;
+	ownerShare: number;
 	member: {
-		id: string
-		name: string
-		color: string | null
-	}
+		id: string;
+		name: string;
+		color: string | null;
+	};
 }
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface RawImport {
-	id: string
-	filename: string
-	status: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
-	createdAt: string
-	recordsCount: number | null
+	id: string;
+	filename: string;
+	status: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
+	createdAt: string;
+	recordsCount: number | null;
 }
 
 interface AccountSettingsSheetProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
 	// Account data
-	accountName: string
-	accountDescription: string | null
-	accountExportUrl: string | null
-	accountInitialBalance: number
-	accountInitialBalanceDate: string | null
-	accountMembers: AccountMember[]
-	transactionCount: number
+	accountName: string;
+	accountDescription: string | null;
+	accountExportUrl: string | null;
+	accountInitialBalance: number;
+	accountInitialBalanceDate: string | null;
+	accountMembers: AccountMember[];
+	transactionCount: number;
 	// Edit states
-	editName: string
-	onNameChange: (value: string) => void
-	onNameBlur: () => void
-	onNameFocus: () => void
-	editDescription: string
-	onDescriptionChange: (value: string) => void
-	onDescriptionBlur: () => void
-	onDescriptionFocus: () => void
-	exportUrlInput: string
-	onExportUrlChange: (value: string) => void
-	onExportUrlBlur: () => void
-	onExportUrlFocus: () => void
-	editInitialBalance: string
-	onInitialBalanceChange: (value: string) => void
-	onInitialBalanceBlur: () => void
-	onInitialBalanceFocus: () => void
-	editInitialBalanceDate: string
-	onInitialBalanceDateChange: (value: string) => void
-	onInitialBalanceDateBlur: () => void
+	editName: string;
+	onNameChange: (value: string) => void;
+	onNameBlur: () => void;
+	onNameFocus: () => void;
+	editDescription: string;
+	onDescriptionChange: (value: string) => void;
+	onDescriptionBlur: () => void;
+	onDescriptionFocus: () => void;
+	exportUrlInput: string;
+	onExportUrlChange: (value: string) => void;
+	onExportUrlBlur: () => void;
+	onExportUrlFocus: () => void;
+	editInitialBalance: string;
+	onInitialBalanceChange: (value: string) => void;
+	onInitialBalanceBlur: () => void;
+	onInitialBalanceFocus: () => void;
+	editInitialBalanceDate: string;
+	onInitialBalanceDateChange: (value: string) => void;
+	onInitialBalanceDateBlur: () => void;
 	// Members
-	allMembers: Member[]
-	availableMembers: Member[]
-	showMemberDropdown: boolean
-	onMemberDropdownChange: (open: boolean) => void
-	onAddMember: (memberId: string) => void
-	onRemoveMember: (memberId: string) => void
-	addMemberPending: boolean
-	addMemberVariables?: { memberId: string }
-	removeMemberPending: boolean
-	removeMemberVariables?: { memberId: string }
+	allMembers: Member[];
+	availableMembers: Member[];
+	showMemberDropdown: boolean;
+	onMemberDropdownChange: (open: boolean) => void;
+	onAddMember: (memberId: string) => void;
+	onRemoveMember: (memberId: string) => void;
+	addMemberPending: boolean;
+	addMemberVariables?: { memberId: string };
+	removeMemberPending: boolean;
+	removeMemberVariables?: { memberId: string };
 	// Imports
-	imports: RawImport[]
-	showAllImports: boolean
-	onShowAllImportsChange: (show: boolean) => void
-	onProcessImport: (importId: string) => void
-	onReprocessImport: (importId: string) => void
-	onDeleteImport: (importId: string) => void
-	processImportPending: boolean
-	processImportVariables?: { importId: string }
-	reprocessImportPending: boolean
-	reprocessImportVariables?: { importId: string }
-	deleteImportPending: boolean
-	deleteImportId: string | null
+	imports: RawImport[];
+	showAllImports: boolean;
+	onShowAllImportsChange: (show: boolean) => void;
+	onProcessImport: (importId: string) => void;
+	onReprocessImport: (importId: string) => void;
+	onDeleteImport: (importId: string) => void;
+	processImportPending: boolean;
+	processImportVariables?: { importId: string };
+	reprocessImportPending: boolean;
+	reprocessImportVariables?: { importId: string };
+	deleteImportPending: boolean;
+	deleteImportId: string | null;
 	// Delete account
-	onDeleteAccountClick: () => void
+	onDeleteAccountClick: () => void;
 }
 
 /**
@@ -176,15 +175,15 @@ export function AccountSettingsSheet({
 					</SheetHeader>
 				</div>
 
-				<Flex direction="col" gap="none">
+				<div className="flex flex-col">
 					{/* Section 1: Informations */}
-					<Flex direction="col" gap="md" className="p-4 border-b border-border">
+					<div className="flex flex-col gap-4 p-4 border-b border-border">
 						<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
 							Informations
 						</span>
 
 						{/* Account name */}
-						<Flex direction="col" gap="sm">
+						<div className="flex flex-col gap-2">
 							<label htmlFor="settings-account-name" className="text-sm text-muted-foreground">
 								Nom du compte
 							</label>
@@ -197,11 +196,14 @@ export function AccountSettingsSheet({
 								className="h-10 text-sm font-medium"
 								placeholder="Nom du compte"
 							/>
-						</Flex>
+						</div>
 
 						{/* Description */}
-						<Flex direction="col" gap="sm">
-							<label htmlFor="settings-account-description" className="text-sm text-muted-foreground">
+						<div className="flex flex-col gap-2">
+							<label
+								htmlFor="settings-account-description"
+								className="text-sm text-muted-foreground"
+							>
 								Description
 							</label>
 							<Input
@@ -213,24 +215,21 @@ export function AccountSettingsSheet({
 								className="h-10 text-sm"
 								placeholder="Description (optionnel)"
 							/>
-						</Flex>
+						</div>
 
 						{/* Owners - Multi-select */}
-						<Flex direction="col" gap="sm">
+						<div className="flex flex-col gap-2">
 							<span className="text-sm text-muted-foreground">Titulaires</span>
-							<Flex
-								direction="row"
-								gap="sm"
-								wrap="wrap"
-								className="p-2 rounded-md border border-border bg-background min-h-[42px]"
-							>
+							<div className="flex flex-row gap-2 flex-wrap p-2 rounded-md border border-border bg-background min-h-[42px]">
 								{accountMembers.map((am) => (
 									<MemberChip
 										key={am.id}
 										memberId={am.memberId}
 										memberName={am.member.name}
 										memberColor={am.member.color}
-										isRemoving={removeMemberPending && removeMemberVariables?.memberId === am.memberId}
+										isRemoving={
+											removeMemberPending && removeMemberVariables?.memberId === am.memberId
+										}
 										onRemove={() => onRemoveMember(am.memberId)}
 										disabled={removeMemberPending || addMemberPending}
 									/>
@@ -242,16 +241,20 @@ export function AccountSettingsSheet({
 									onSelectMember={onAddMember}
 									isPending={addMemberPending}
 									pendingMemberId={addMemberVariables?.memberId}
-									pendingMemberName={allMembers.find((m) => m.id === addMemberVariables?.memberId)?.name}
-									pendingMemberColor={allMembers.find((m) => m.id === addMemberVariables?.memberId)?.color}
+									pendingMemberName={
+										allMembers.find((m) => m.id === addMemberVariables?.memberId)?.name
+									}
+									pendingMemberColor={
+										allMembers.find((m) => m.id === addMemberVariables?.memberId)?.color
+									}
 									disabled={addMemberPending || removeMemberPending}
 								/>
-							</Flex>
-						</Flex>
+							</div>
+						</div>
 
 						{/* Export URL */}
-						<Flex direction="col" gap="sm">
-							<Flex direction="row" justify="between" align="center">
+						<div className="flex flex-col gap-2">
+							<div className="flex flex-row justify-between items-center">
 								<label htmlFor="settings-export-url" className="text-sm text-muted-foreground">
 									Lien d&apos;export banque
 								</label>
@@ -266,7 +269,7 @@ export function AccountSettingsSheet({
 										<ExternalLink className="h-3 w-3" />
 									</a>
 								)}
-							</Flex>
+							</div>
 							<Input
 								id="settings-export-url"
 								type="url"
@@ -277,12 +280,12 @@ export function AccountSettingsSheet({
 								placeholder="https://www.banque.fr/espace-client"
 								className="h-10 text-sm"
 							/>
-						</Flex>
+						</div>
 
 						{/* Initial Balance */}
-						<Flex direction="col" gap="sm">
+						<div className="flex flex-col gap-2">
 							<span className="text-sm text-muted-foreground">Solde initial</span>
-							<Flex direction="row" gap="sm">
+							<div className="flex flex-row gap-2">
 								<div className="relative flex-grow">
 									<Input
 										type="text"
@@ -314,13 +317,13 @@ export function AccountSettingsSheet({
 									onBlur={onInitialBalanceDateBlur}
 									className="h-10 text-sm flex-1"
 								/>
-							</Flex>
-						</Flex>
-					</Flex>
+							</div>
+						</div>
+					</div>
 
 					{/* Section 2: Imports */}
-					<Flex direction="col" gap="sm" className="p-4 border-b border-border">
-						<Flex direction="row" justify="between" align="center">
+					<div className="flex flex-col gap-2 p-4 border-b border-border">
+						<div className="flex flex-row justify-between items-center">
 							<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
 								Imports
 								{imports.length > 0 && (
@@ -337,20 +340,15 @@ export function AccountSettingsSheet({
 									{showAllImports ? 'Réduire' : 'Tout voir'}
 								</Button>
 							)}
-						</Flex>
+						</div>
 
 						{imports.length === 0 ? (
-							<Flex
-								direction="col"
-								gap="sm"
-								align="center"
-								className="p-6 rounded-lg border border-dashed border-border bg-muted/20"
-							>
+							<div className="flex flex-col gap-2 items-center p-6 rounded-lg border border-dashed border-border bg-muted/20">
 								<FileSpreadsheet className="h-6 w-6 text-muted-foreground/40" />
 								<span className="text-xs text-muted-foreground">Aucun import</span>
-							</Flex>
+							</div>
 						) : (
-							<Flex direction="col" gap="sm">
+							<div className="flex flex-col gap-2">
 								{(showAllImports ? imports : imports.slice(0, 5)).map((imp) => (
 									<AccountImportRow
 										key={imp.id}
@@ -362,17 +360,21 @@ export function AccountSettingsSheet({
 										onProcess={() => onProcessImport(imp.id)}
 										onReprocess={() => onReprocessImport(imp.id)}
 										onDelete={() => onDeleteImport(imp.id)}
-										isProcessing={processImportPending && processImportVariables?.importId === imp.id}
-										isReprocessing={reprocessImportPending && reprocessImportVariables?.importId === imp.id}
+										isProcessing={
+											processImportPending && processImportVariables?.importId === imp.id
+										}
+										isReprocessing={
+											reprocessImportPending && reprocessImportVariables?.importId === imp.id
+										}
 										isDeleting={deleteImportPending && deleteImportId === imp.id}
 									/>
 								))}
-							</Flex>
+							</div>
 						)}
-					</Flex>
+					</div>
 
 					{/* Section 3: Gestion du compte */}
-					<Flex direction="col" gap="sm" className="px-4 py-2">
+					<div className="flex flex-col gap-2 px-4 py-2">
 						<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
 							Gestion du compte
 						</span>
@@ -393,9 +395,9 @@ export function AccountSettingsSheet({
 								{transactionCount > 1 ? 's' : ''}
 							</span>
 						)}
-					</Flex>
-				</Flex>
+					</div>
+				</div>
 			</SheetContent>
 		</Sheet>
-	)
+	);
 }

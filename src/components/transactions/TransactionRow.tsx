@@ -155,7 +155,7 @@ export interface CategoryBadgeProps extends React.HTMLAttributes<HTMLSpanElement
 export const CategoryBadge = forwardRef<HTMLSpanElement, CategoryBadgeProps>(
 	({ className, category, size = 'sm', ...props }, ref) => {
 		const colorStyle = category.color
-			? { '--category-color': category.color } as React.CSSProperties
+			? ({ '--category-color': category.color } as React.CSSProperties)
 			: undefined;
 
 		return (

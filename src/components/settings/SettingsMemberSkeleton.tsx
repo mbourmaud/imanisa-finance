@@ -1,24 +1,19 @@
-import { Flex, Skeleton } from '@/components'
+import { Skeleton } from '@/components';
 
 /**
  * Skeleton loading state for a member row
  */
 export function SettingsMemberSkeleton() {
 	return (
-		<Flex
-			direction="row"
-			justify="between"
-			align="center"
-			className="rounded-xl bg-muted/30 p-4"
-		>
-			<Flex direction="row" gap="md" align="center">
+		<div className="flex justify-between items-center rounded-xl bg-muted/30 p-4">
+			<div className="flex items-center gap-4">
 				<Skeleton className="h-10 w-10 rounded-lg" />
-				<Flex direction="col" gap="sm">
+				<div className="flex flex-col gap-2">
 					<Skeleton className="h-5 w-24" />
 					<Skeleton className="h-4 w-16" />
-				</Flex>
-			</Flex>
+				</div>
+			</div>
 			<Skeleton className="h-8 w-8" />
-		</Flex>
-	)
+		</div>
+	);
 }

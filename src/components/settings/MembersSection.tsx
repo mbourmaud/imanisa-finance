@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { useState } from 'react';
+import { toast } from 'sonner';
 import {
 	Button,
 	ConfirmDialog,
@@ -11,7 +11,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 	EmptyState,
-	Flex,
 	Input,
 	Label,
 	MemberAvatar,
@@ -21,24 +20,24 @@ import {
 	SettingsMemberSkeleton,
 	SettingsSectionCard,
 	Users,
-} from '@/components'
+} from '@/components';
 import {
 	useCreateMemberMutation,
 	useDeleteMemberMutation,
 	useMembersQuery,
 	useUpdateMemberMutation,
 	type Member,
-} from '@/features/members'
+} from '@/features/members';
 
 interface MemberWithAccounts extends Member {
 	accountMembers: {
-		id: string
-		ownerShare: number
+		id: string;
+		ownerShare: number;
 		account: {
-			id: string
-			name: string
-		}
-	}[]
+			id: string;
+			name: string;
+		};
+	}[];
 }
 
 const MEMBER_COLORS = [
@@ -50,72 +49,72 @@ const MEMBER_COLORS = [
 	{ name: 'Pink', value: '#EC4899' },
 	{ name: 'Indigo', value: '#6366F1' },
 	{ name: 'Teal', value: '#14B8A6' },
-]
+];
 
 export function MembersSection() {
 	// TanStack Query for members
 	const { data: members = [], isLoading: loadingMembers } = useMembersQuery() as {
-		data: MemberWithAccounts[] | undefined
-		isLoading: boolean
-	}
-	const createMutation = useCreateMemberMutation()
-	const updateMutation = useUpdateMemberMutation()
-	const deleteMutation = useDeleteMemberMutation()
+		data: MemberWithAccounts[] | undefined;
+		isLoading: boolean;
+	};
+	const createMutation = useCreateMemberMutation();
+	const updateMutation = useUpdateMemberMutation();
+	const deleteMutation = useDeleteMemberMutation();
 
 	// UI state
-	const [editingMember, setEditingMember] = useState<MemberWithAccounts | null>(null)
-	const [showAddMember, setShowAddMember] = useState(false)
-	const [newMemberName, setNewMemberName] = useState('')
-	const [newMemberColor, setNewMemberColor] = useState(MEMBER_COLORS[0].value)
-	const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null)
+	const [editingMember, setEditingMember] = useState<MemberWithAccounts | null>(null);
+	const [showAddMember, setShowAddMember] = useState(false);
+	const [newMemberName, setNewMemberName] = useState('');
+	const [newMemberColor, setNewMemberColor] = useState(MEMBER_COLORS[0].value);
+	const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null);
 
 	// Add member
 	const handleAddMember = async () => {
-		if (!newMemberName.trim()) return
+		if (!newMemberName.trim()) return;
 
 		try {
-			await createMutation.mutateAsync({ name: newMemberName, color: newMemberColor })
-			toast.success('Membre ajouté avec succès')
-			setNewMemberName('')
-			setNewMemberColor(MEMBER_COLORS[0].value)
-			setShowAddMember(false)
+			await createMutation.mutateAsync({ name: newMemberName, color: newMemberColor });
+			toast.success('Membre ajouté avec succès');
+			setNewMemberName('');
+			setNewMemberColor(MEMBER_COLORS[0].value);
+			setShowAddMember(false);
 		} catch {
-			toast.error("Impossible d'ajouter le membre")
+			toast.error("Impossible d'ajouter le membre");
 		}
-	}
+	};
 
 	// Update member
 	const handleUpdateMember = async () => {
-		if (!editingMember || !editingMember.name.trim()) return
+		if (!editingMember || !editingMember.name.trim()) return;
 
 		try {
 			await updateMutation.mutateAsync({
 				id: editingMember.id,
 				input: { name: editingMember.name, color: editingMember.color ?? undefined },
-			})
-			toast.success('Membre mis à jour')
-			setEditingMember(null)
+			});
+			toast.success('Membre mis à jour');
+			setEditingMember(null);
 		} catch {
-			toast.error('Impossible de mettre à jour le membre')
+			toast.error('Impossible de mettre à jour le membre');
 		}
-	}
+	};
 
 	// Delete member
 	const confirmDeleteMember = async () => {
-		if (!deleteMemberId) return
+		if (!deleteMemberId) return;
 
 		try {
-			await deleteMutation.mutateAsync(deleteMemberId)
-			toast.success('Membre supprimé')
+			await deleteMutation.mutateAsync(deleteMemberId);
+			toast.success('Membre supprimé');
 		} catch {
-			toast.error('Impossible de supprimer le membre')
+			toast.error('Impossible de supprimer le membre');
 		} finally {
-			setDeleteMemberId(null)
+			setDeleteMemberId(null);
 		}
-	}
+	};
 
-	const memberToDelete = members.find((m) => m.id === deleteMemberId)
-	const isSaving = createMutation.isPending || updateMutation.isPending
+	const memberToDelete = members.find((m) => m.id === deleteMemberId);
+	const isSaving = createMutation.isPending || updateMutation.isPending;
 
 	return (
 		<>
@@ -134,8 +133,8 @@ export function MembersSection() {
 							<DialogHeader>
 								<DialogTitle>Ajouter un membre</DialogTitle>
 							</DialogHeader>
-							<Flex direction="col" gap="md" className="pt-4">
-								<Flex direction="col" gap="sm">
+							<div className="flex flex-col gap-4 pt-4">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="memberName">Nom</Label>
 									<Input
 										id="memberName"
@@ -143,26 +142,26 @@ export function MembersSection() {
 										value={newMemberName}
 										onChange={(e) => setNewMemberName(e.target.value)}
 									/>
-								</Flex>
+								</div>
 								<SettingsColorPicker
 									colors={MEMBER_COLORS}
 									selected={newMemberColor}
 									onChange={setNewMemberColor}
 								/>
-								<Flex direction="row" justify="end" gap="md" className="pt-4">
+								<div className="flex flex-row justify-end gap-4 pt-4">
 									<Button variant="outline" onClick={() => setShowAddMember(false)}>
 										Annuler
 									</Button>
 									<Button onClick={handleAddMember} disabled={isSaving || !newMemberName.trim()}>
 										{createMutation.isPending ? 'Ajout...' : 'Ajouter'}
 									</Button>
-								</Flex>
-							</Flex>
+								</div>
+							</div>
 						</DialogContent>
 					</Dialog>
 				}
 			>
-				<Flex direction="col" gap="sm">
+				<div className="flex flex-col gap-2">
 					{loadingMembers ? (
 						<>
 							<SettingsMemberSkeleton />
@@ -174,7 +173,6 @@ export function MembersSection() {
 							icon={Users}
 							title="Aucun membre"
 							description="Ajoutez votre premier membre pour commencer"
-							size="sm"
 						/>
 					) : (
 						members.map((member) => (
@@ -205,8 +203,8 @@ export function MembersSection() {
 												<DialogTitle>Modifier le membre</DialogTitle>
 											</DialogHeader>
 											{editingMember && (
-												<Flex direction="col" gap="md" className="pt-4">
-													<Flex direction="col" gap="sm">
+												<div className="flex flex-col gap-4 pt-4">
+													<div className="flex flex-col gap-2">
 														<Label htmlFor="editMemberName">Nom</Label>
 														<Input
 															id="editMemberName"
@@ -215,21 +213,21 @@ export function MembersSection() {
 																setEditingMember({ ...editingMember, name: e.target.value })
 															}
 														/>
-													</Flex>
+													</div>
 													<SettingsColorPicker
 														colors={MEMBER_COLORS}
 														selected={editingMember.color || MEMBER_COLORS[0].value}
 														onChange={(color) => setEditingMember({ ...editingMember, color })}
 													/>
-													<Flex direction="row" justify="end" gap="md" className="pt-4">
+													<div className="flex flex-row justify-end gap-4 pt-4">
 														<Button variant="outline" onClick={() => setEditingMember(null)}>
 															Annuler
 														</Button>
 														<Button onClick={handleUpdateMember} disabled={isSaving}>
 															{updateMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
 														</Button>
-													</Flex>
-												</Flex>
+													</div>
+												</div>
 											)}
 										</DialogContent>
 									</Dialog>
@@ -237,7 +235,7 @@ export function MembersSection() {
 							/>
 						))
 					)}
-				</Flex>
+				</div>
 			</SettingsSectionCard>
 
 			<ConfirmDialog
@@ -254,5 +252,5 @@ export function MembersSection() {
 				onConfirm={confirmDeleteMember}
 			/>
 		</>
-	)
+	);
 }

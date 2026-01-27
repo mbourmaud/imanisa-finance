@@ -1,7 +1,6 @@
-'use client'
+'use client';
 
 import {
-	Flex,
 	Label,
 	Select,
 	SelectContent,
@@ -10,14 +9,14 @@ import {
 	SelectValue,
 	SettingsSectionCard,
 	User,
-} from '@/components'
-import { ProfileForm } from '@/features/profile'
+} from '@/components';
+import { ProfileForm } from '@/features/profile';
 
 export function ProfileSection() {
 	return (
 		<SettingsSectionCard icon={User} title="Profil" description="Vos informations personnelles">
 			<ProfileForm />
-			<Flex direction="col" gap="sm">
+			<div className="flex flex-col gap-2">
 				<Label htmlFor="currency">Devise par défaut</Label>
 				<Select defaultValue="eur">
 					<SelectTrigger id="currency" className="w-full max-w-[200px]">
@@ -30,7 +29,7 @@ export function ProfileSection() {
 						<SelectItem value="chf">CHF</SelectItem>
 					</SelectContent>
 				</Select>
-			</Flex>
+			</div>
 		</SettingsSectionCard>
-	)
+	);
 }

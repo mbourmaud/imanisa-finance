@@ -1,8 +1,8 @@
-import { Button, Flex, Plus, RefreshCw } from '@/components'
+import { Button, Plus, RefreshCw } from '@/components';
 
 interface InvestmentActionsProps {
-	onRefresh?: () => void
-	onAddSource?: () => void
+	onRefresh?: () => void;
+	onAddSource?: () => void;
 }
 
 /**
@@ -10,17 +10,13 @@ interface InvestmentActionsProps {
  */
 export function InvestmentActions({ onRefresh, onAddSource }: InvestmentActionsProps) {
 	return (
-		<Flex direction="row" gap="sm">
-			<Button
-				variant="outline"
-				iconLeft={<RefreshCw className="h-4 w-4" />}
-				onClick={onRefresh}
-			>
+		<div className="flex gap-2">
+			<Button variant="outline" iconLeft={<RefreshCw className="h-4 w-4" />} onClick={onRefresh}>
 				Actualiser
 			</Button>
 			<Button iconLeft={<Plus className="h-4 w-4" />} onClick={onAddSource}>
 				Nouvelle source
 			</Button>
-		</Flex>
-	)
+		</div>
+	);
 }

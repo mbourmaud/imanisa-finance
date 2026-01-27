@@ -1,14 +1,14 @@
-import { Flex, Label } from '@/components'
+import { Label } from '@/components';
 
 interface ColorOption {
-	name: string
-	value: string
+	name: string;
+	value: string;
 }
 
 interface SettingsColorPickerProps {
-	colors: ColorOption[]
-	selected: string
-	onChange: (value: string) => void
+	colors: ColorOption[];
+	selected: string;
+	onChange: (value: string) => void;
 }
 
 /**
@@ -16,24 +16,22 @@ interface SettingsColorPickerProps {
  */
 export function SettingsColorPicker({ colors, selected, onChange }: SettingsColorPickerProps) {
 	return (
-		<Flex direction="col" gap="sm">
+		<div className="flex flex-col gap-2">
 			<Label>Couleur</Label>
-			<Flex direction="row" wrap="wrap" gap="md">
+			<div className="flex flex-wrap gap-4">
 				{colors.map((color) => (
 					<button
 						key={color.value}
 						type="button"
 						onClick={() => onChange(color.value)}
-						className={`h-8 w-8 rounded-full transition-all ${
-							selected === color.value
-								? 'outline outline-2 outline-offset-2 outline-primary'
-								: ''
+						className={`h-8 w-8 rounded-full transition-all bg-[var(--color-value)] ${
+							selected === color.value ? 'outline outline-2 outline-offset-2 outline-primary' : ''
 						}`}
-						style={{ backgroundColor: color.value }}
+						style={{ '--color-value': color.value } as React.CSSProperties}
 						title={color.name}
 					/>
 				))}
-			</Flex>
-		</Flex>
-	)
+			</div>
+		</div>
+	);
 }

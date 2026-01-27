@@ -1,42 +1,35 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import {
-	Button,
-	ChevronDown,
-	ChevronUp,
-	Plus,
-	Progress,
-	Shield,
-} from '@/components'
+import { useState } from 'react';
+import { Button, ChevronDown, ChevronUp, Plus, Progress, Shield } from '@/components';
 
 interface LoanInsurance {
-	id: string
-	provider: string
-	coveragePercent: number
-	monthlyPremium: number
+	id: string;
+	provider: string;
+	coveragePercent: number;
+	monthlyPremium: number;
 	member: {
-		name: string
-		color: string | null
-	}
+		name: string;
+		color: string | null;
+	};
 }
 
 interface Loan {
-	id: string
-	name: string
-	lender: string | null
-	loanNumber: string | null
-	initialAmount: number
-	remainingAmount: number
-	monthlyPayment: number
-	rate: number
-	loanInsurances?: LoanInsurance[]
+	id: string;
+	name: string;
+	lender: string | null;
+	loanNumber: string | null;
+	initialAmount: number;
+	remainingAmount: number;
+	monthlyPayment: number;
+	rate: number;
+	loanInsurances?: LoanInsurance[];
 }
 
 interface PropertyDetailLoanCardProps {
-	loan: Loan
-	onAddInsurance: (loanId: string) => void
-	formatCurrency: (amount: number) => string
+	loan: Loan;
+	onAddInsurance: (loanId: string) => void;
+	formatCurrency: (amount: number) => string;
 }
 
 /**
@@ -47,17 +40,17 @@ export function PropertyDetailLoanCard({
 	onAddInsurance,
 	formatCurrency,
 }: PropertyDetailLoanCardProps) {
-	const [isExpanded, setIsExpanded] = useState(false)
+	const [isExpanded, setIsExpanded] = useState(false);
 	const paidPercent =
 		loan.initialAmount > 0
 			? ((loan.initialAmount - loan.remainingAmount) / loan.initialAmount) * 100
-			: 0
+			: 0;
 
-	const hasInsurances = loan.loanInsurances && loan.loanInsurances.length > 0
+	const hasInsurances = loan.loanInsurances && loan.loanInsurances.length > 0;
 	const totalInsurancePremium =
-		loan.loanInsurances?.reduce((sum, ins) => sum + ins.monthlyPremium, 0) || 0
+		loan.loanInsurances?.reduce((sum, ins) => sum + ins.monthlyPremium, 0) || 0;
 	const totalCoverage =
-		loan.loanInsurances?.reduce((sum, ins) => sum + ins.coveragePercent, 0) || 0
+		loan.loanInsurances?.reduce((sum, ins) => sum + ins.coveragePercent, 0) || 0;
 
 	return (
 		<div className="rounded-xl border border-border/60 p-4">
@@ -65,9 +58,7 @@ export function PropertyDetailLoanCard({
 				<div className="flex justify-between items-start gap-4">
 					<div className="min-w-0">
 						<p className="font-medium truncate">{loan.name}</p>
-						{loan.lender && (
-							<p className="text-sm text-muted-foreground">{loan.lender}</p>
-						)}
+						{loan.lender && <p className="text-sm text-muted-foreground">{loan.lender}</p>}
 					</div>
 					<div className="text-right shrink-0">
 						<p className="text-lg font-semibold tabular-nums">
@@ -149,16 +140,18 @@ export function PropertyDetailLoanCard({
 											className="flex items-center gap-3 p-3 rounded-lg bg-muted/30"
 										>
 											<div
-												className="flex items-center justify-center h-8 w-8 rounded-full text-xs font-medium text-white shrink-0"
-												style={{ backgroundColor: insurance.member.color || '#6b7280' }}
+												className="flex items-center justify-center h-8 w-8 rounded-full text-xs font-medium text-white shrink-0 bg-[var(--member-color)]"
+												style={
+													{
+														'--member-color': insurance.member.color || '#6b7280',
+													} as React.CSSProperties
+												}
 											>
 												{insurance.member.name.charAt(0).toUpperCase()}
 											</div>
 											<div className="flex-1 min-w-0">
 												<div className="flex items-center gap-3 flex-wrap">
-													<p className="text-sm font-medium truncate">
-														{insurance.member.name}
-													</p>
+													<p className="text-sm font-medium truncate">{insurance.member.name}</p>
 													<span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
 														{insurance.coveragePercent}%
 													</span>
@@ -172,9 +165,7 @@ export function PropertyDetailLoanCard({
 								</div>
 							) : (
 								<div className="text-center py-3">
-									<p className="text-sm text-muted-foreground mb-2">
-										Aucune assurance emprunteur
-									</p>
+									<p className="text-sm text-muted-foreground mb-2">Aucune assurance emprunteur</p>
 								</div>
 							)}
 							<Button
@@ -191,5 +182,5 @@ export function PropertyDetailLoanCard({
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

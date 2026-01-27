@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { Button, Card, CreditCard, Plus, PropertyDetailLoanCard } from '@/components'
-import type { Loan } from '@/features/properties'
+import { Button, Card, CreditCard, Plus, PropertyDetailLoanCard } from '@/components';
+import type { Loan } from '@/features/properties';
 
 interface PropertyLoansSectionProps {
-	loans: Loan[]
-	onAddLoan: () => void
-	onAddInsurance: (loanId: string) => void
+	loans: Loan[];
+	onAddLoan: () => void;
+	onAddInsurance: (loanId: string) => void;
 }
 
 function formatCurrency(amount: number): string {
@@ -14,7 +14,7 @@ function formatCurrency(amount: number): string {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount)
+	}).format(amount);
 }
 
 function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
@@ -32,7 +32,7 @@ function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
 				Ajouter un prêt
 			</Button>
 		</div>
-	)
+	);
 }
 
 export function PropertyLoansSection({
@@ -40,10 +40,10 @@ export function PropertyLoansSection({
 	onAddLoan,
 	onAddInsurance,
 }: PropertyLoansSectionProps) {
-	const totalLoansRemaining = loans.reduce((sum, loan) => sum + loan.remainingAmount, 0)
-	const totalMonthlyPayment = loans.reduce((sum, l) => sum + l.monthlyPayment, 0)
+	const totalLoansRemaining = loans.reduce((sum, loan) => sum + loan.remainingAmount, 0);
+	const totalMonthlyPayment = loans.reduce((sum, l) => sum + l.monthlyPayment, 0);
 	const averageRate =
-		loans.length > 0 ? loans.reduce((sum, l) => sum + l.rate, 0) / loans.length : 0
+		loans.length > 0 ? loans.reduce((sum, l) => sum + l.rate, 0) / loans.length : 0;
 
 	return (
 		<Card padding="lg">
@@ -92,5 +92,5 @@ export function PropertyLoansSection({
 				</div>
 			)}
 		</Card>
-	)
+	);
 }

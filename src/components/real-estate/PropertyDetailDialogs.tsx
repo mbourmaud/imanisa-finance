@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	CoOwnershipFormDialog,
@@ -8,7 +8,7 @@ import {
 	PropertyEditDialog,
 	PropertyInsuranceFormDialog,
 	UtilityContractFormDialog,
-} from '@/components'
+} from '@/components';
 import type {
 	CoOwnershipFormData,
 	InsuranceFormData,
@@ -17,62 +17,62 @@ import type {
 	PropertyFormData,
 	PropertyInsuranceFormData,
 	UtilityContractFormData,
-} from '@/features/properties'
+} from '@/features/properties';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface DialogState<T> {
-	isOpen: boolean
-	setOpen: (open: boolean) => void
-	formData: T
-	formError: string | null
-	isSubmitting: boolean
-	onInputChange: (field: keyof T, value: string) => void
-	onSubmit: (e: React.FormEvent) => Promise<void>
-	reset: () => void
+	isOpen: boolean;
+	setOpen: (open: boolean) => void;
+	formData: T;
+	formError: string | null;
+	isSubmitting: boolean;
+	onInputChange: (field: keyof T, value: string) => void;
+	onSubmit: (e: React.FormEvent) => Promise<void>;
+	reset: () => void;
 }
 
 interface PropertyDetailDialogsProps {
-	propertyName: string
-	members: Member[]
-	loadingMembers: boolean
-	formatCurrency: (amount: number) => string
-	loanDialog: DialogState<LoanFormData>
-	insuranceDialog: DialogState<InsuranceFormData>
+	propertyName: string;
+	members: Member[];
+	loadingMembers: boolean;
+	formatCurrency: (amount: number) => string;
+	loanDialog: DialogState<LoanFormData>;
+	insuranceDialog: DialogState<InsuranceFormData>;
 	propertyInsuranceDialog: DialogState<PropertyInsuranceFormData> & {
-		isEditing: boolean
-	}
+		isEditing: boolean;
+	};
 	coOwnershipDialog: DialogState<CoOwnershipFormData> & {
-		isEditing: boolean
-	}
+		isEditing: boolean;
+	};
 	utilityContractDialog: DialogState<UtilityContractFormData> & {
-		isEditing: boolean
-	}
+		isEditing: boolean;
+	};
 	propertyEditDialog: {
-		isOpen: boolean
-		setOpen: (open: boolean) => void
-		formData: PropertyFormData
-		memberShares: MemberShare[]
-		formError: string | null
-		isSubmitting: boolean
-		onInputChange: (field: keyof PropertyFormData, value: string) => void
-		onAddMember: () => void
-		onRemoveMember: (memberId: string) => void
-		onMemberChange: (index: number, memberId: string) => void
-		onShareChange: (index: number, share: number) => void
-		onSubmit: (e: React.FormEvent) => Promise<void>
-		reset: () => void
-	}
+		isOpen: boolean;
+		setOpen: (open: boolean) => void;
+		formData: PropertyFormData;
+		memberShares: MemberShare[];
+		formError: string | null;
+		isSubmitting: boolean;
+		onInputChange: (field: keyof PropertyFormData, value: string) => void;
+		onAddMember: () => void;
+		onRemoveMember: (memberId: string) => void;
+		onMemberChange: (index: number, memberId: string) => void;
+		onShareChange: (index: number, share: number) => void;
+		onSubmit: (e: React.FormEvent) => Promise<void>;
+		reset: () => void;
+	};
 	deletePropertyDialog: {
-		isOpen: boolean
-		setOpen: (open: boolean) => void
-		isDeleting: boolean
-		onDelete: () => Promise<void>
-	}
+		isOpen: boolean;
+		setOpen: (open: boolean) => void;
+		isDeleting: boolean;
+		onDelete: () => Promise<void>;
+	};
 }
 
 export function PropertyDetailDialogs({
@@ -93,8 +93,8 @@ export function PropertyDetailDialogs({
 			<LoanFormDialog
 				open={loanDialog.isOpen}
 				onOpenChange={(open) => {
-					loanDialog.setOpen(open)
-					if (!open) loanDialog.reset()
+					loanDialog.setOpen(open);
+					if (!open) loanDialog.reset();
 				}}
 				formData={loanDialog.formData}
 				onInputChange={loanDialog.onInputChange}
@@ -106,8 +106,8 @@ export function PropertyDetailDialogs({
 			<LoanInsuranceFormDialog
 				open={insuranceDialog.isOpen}
 				onOpenChange={(open) => {
-					insuranceDialog.setOpen(open)
-					if (!open) insuranceDialog.reset()
+					insuranceDialog.setOpen(open);
+					if (!open) insuranceDialog.reset();
 				}}
 				formData={insuranceDialog.formData}
 				onInputChange={insuranceDialog.onInputChange}
@@ -121,8 +121,8 @@ export function PropertyDetailDialogs({
 			<PropertyInsuranceFormDialog
 				open={propertyInsuranceDialog.isOpen}
 				onOpenChange={(open) => {
-					propertyInsuranceDialog.setOpen(open)
-					if (!open) propertyInsuranceDialog.reset()
+					propertyInsuranceDialog.setOpen(open);
+					if (!open) propertyInsuranceDialog.reset();
 				}}
 				formData={propertyInsuranceDialog.formData}
 				onInputChange={propertyInsuranceDialog.onInputChange}
@@ -136,8 +136,8 @@ export function PropertyDetailDialogs({
 			<CoOwnershipFormDialog
 				open={coOwnershipDialog.isOpen}
 				onOpenChange={(open) => {
-					coOwnershipDialog.setOpen(open)
-					if (!open) coOwnershipDialog.reset()
+					coOwnershipDialog.setOpen(open);
+					if (!open) coOwnershipDialog.reset();
 				}}
 				formData={coOwnershipDialog.formData}
 				onInputChange={coOwnershipDialog.onInputChange}
@@ -151,8 +151,8 @@ export function PropertyDetailDialogs({
 			<UtilityContractFormDialog
 				open={utilityContractDialog.isOpen}
 				onOpenChange={(open) => {
-					utilityContractDialog.setOpen(open)
-					if (!open) utilityContractDialog.reset()
+					utilityContractDialog.setOpen(open);
+					if (!open) utilityContractDialog.reset();
 				}}
 				formData={utilityContractDialog.formData}
 				onInputChange={utilityContractDialog.onInputChange}
@@ -166,8 +166,8 @@ export function PropertyDetailDialogs({
 			<PropertyEditDialog
 				open={propertyEditDialog.isOpen}
 				onOpenChange={(open) => {
-					propertyEditDialog.setOpen(open)
-					if (!open) propertyEditDialog.reset()
+					propertyEditDialog.setOpen(open);
+					if (!open) propertyEditDialog.reset();
 				}}
 				formData={propertyEditDialog.formData}
 				memberShares={propertyEditDialog.memberShares}
@@ -191,5 +191,5 @@ export function PropertyDetailDialogs({
 				isDeleting={deletePropertyDialog.isDeleting}
 			/>
 		</>
-	)
+	);
 }

@@ -314,5 +314,4 @@
 	.dark .scrollbar-thin::-webkit-scrollbar-thumb {
 		background: oklch(0.3 0.02 280);
 	}
-
 }

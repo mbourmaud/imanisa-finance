@@ -1,9 +1,9 @@
-import { Button, Card, Flex } from '@/components'
-import type { ReactNode } from 'react'
+import { Button, Card } from '@/components';
+import type { ReactNode } from 'react';
 
 interface PositionsSectionProps {
-	children: ReactNode
-	onViewAll?: () => void
+	children: ReactNode;
+	onViewAll?: () => void;
 }
 
 /**
@@ -12,20 +12,18 @@ interface PositionsSectionProps {
 export function PositionsSection({ children, onViewAll }: PositionsSectionProps) {
 	return (
 		<Card padding="lg">
-			<Flex direction="row" justify="between" className="mb-4">
-				<Flex direction="col" gap="xs">
+			<div className="flex justify-between mb-4">
+				<div className="flex flex-col gap-1">
 					<h3 className="text-lg font-bold tracking-tight">Positions</h3>
 					<span className="text-sm text-muted-foreground">
 						Toutes vos positions d&apos;investissement
 					</span>
-				</Flex>
+				</div>
 				<Button variant="outline" size="sm" onClick={onViewAll}>
 					Voir tout
 				</Button>
-			</Flex>
-			<Flex direction="col" gap="sm">
-				{children}
-			</Flex>
+			</div>
+			<div className="flex flex-col gap-2">{children}</div>
 		</Card>
-	)
+	);
 }

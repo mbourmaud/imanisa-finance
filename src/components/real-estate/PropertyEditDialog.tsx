@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -18,60 +18,60 @@ import {
 	SelectTrigger,
 	SelectValue,
 	Skeleton,
-} from '@/components'
-import { FormErrorBanner } from './FormErrorBanner'
-import { MemberShareRow } from './MemberShareRow'
+} from '@/components';
+import { FormErrorBanner } from './FormErrorBanner';
+import { MemberShareRow } from './MemberShareRow';
 
-type PropertyType = 'HOUSE' | 'APARTMENT'
-type PropertyUsage = 'PRIMARY' | 'SECONDARY' | 'RENTAL'
+type PropertyType = 'HOUSE' | 'APARTMENT';
+type PropertyUsage = 'PRIMARY' | 'SECONDARY' | 'RENTAL';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface MemberShare {
-	memberId: string
-	ownershipShare: number
+	memberId: string;
+	ownershipShare: number;
 }
 
 interface PropertyFormData {
-	name: string
-	type: PropertyType | ''
-	usage: PropertyUsage | ''
-	address: string
-	address2: string
-	city: string
-	postalCode: string
-	surface: string
-	rooms: string
-	bedrooms: string
-	purchasePrice: string
-	purchaseDate: string
-	notaryFees: string
-	agencyFees: string
-	currentValue: string
-	rentAmount: string
-	rentCharges: string
-	notes: string
+	name: string;
+	type: PropertyType | '';
+	usage: PropertyUsage | '';
+	address: string;
+	address2: string;
+	city: string;
+	postalCode: string;
+	surface: string;
+	rooms: string;
+	bedrooms: string;
+	purchasePrice: string;
+	purchaseDate: string;
+	notaryFees: string;
+	agencyFees: string;
+	currentValue: string;
+	rentAmount: string;
+	rentCharges: string;
+	notes: string;
 }
 
 interface PropertyEditDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	formData: PropertyFormData
-	memberShares: MemberShare[]
-	members: Member[]
-	loadingMembers: boolean
-	onInputChange: (field: keyof PropertyFormData, value: string) => void
-	onAddMember: () => void
-	onRemoveMember: (memberId: string) => void
-	onMemberChange: (index: number, memberId: string) => void
-	onShareChange: (index: number, share: number) => void
-	onSubmit: (e: React.FormEvent) => void
-	error: string | null
-	isSubmitting: boolean
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	formData: PropertyFormData;
+	memberShares: MemberShare[];
+	members: Member[];
+	loadingMembers: boolean;
+	onInputChange: (field: keyof PropertyFormData, value: string) => void;
+	onAddMember: () => void;
+	onRemoveMember: (memberId: string) => void;
+	onMemberChange: (index: number, memberId: string) => void;
+	onShareChange: (index: number, share: number) => void;
+	onSubmit: (e: React.FormEvent) => void;
+	error: string | null;
+	isSubmitting: boolean;
 }
 
 /**
@@ -93,17 +93,15 @@ export function PropertyEditDialog({
 	error,
 	isSubmitting,
 }: PropertyEditDialogProps) {
-	const isRental = formData.usage === 'RENTAL'
-	const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)
+	const isRental = formData.usage === 'RENTAL';
+	const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Modifier le bien immobilier</DialogTitle>
-					<DialogDescription>
-						Modifiez les informations de votre bien immobilier.
-					</DialogDescription>
+					<DialogDescription>Modifiez les informations de votre bien immobilier.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={onSubmit}>
 					<div className="flex flex-col gap-6">
@@ -307,9 +305,7 @@ export function PropertyEditDialog({
 						{/* Rental info */}
 						{isRental && (
 							<div className="flex flex-col gap-4">
-								<p className="text-sm font-medium text-muted-foreground">
-									Informations locatives
-								</p>
+								<p className="text-sm font-medium text-muted-foreground">Informations locatives</p>
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 									<div className="flex flex-col gap-2">
 										<Label htmlFor="edit-rentAmount">Loyer mensuel (€)</Label>
@@ -344,12 +340,7 @@ export function PropertyEditDialog({
 							<div className="flex justify-between items-center">
 								<p className="text-sm font-medium text-muted-foreground">Propriétaires</p>
 								{members.length > memberShares.length && (
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										onClick={onAddMember}
-									>
+									<Button type="button" variant="outline" size="sm" onClick={onAddMember}>
 										<Plus className="mr-1 h-3 w-3" />
 										Ajouter
 									</Button>
@@ -368,8 +359,8 @@ export function PropertyEditDialog({
 										const availableMembers = members.filter(
 											(m) =>
 												m.id === ms.memberId ||
-												!memberShares.some((other) => other.memberId === m.id)
-										)
+												!memberShares.some((other) => other.memberId === m.id),
+										);
 										return (
 											<MemberShareRow
 												key={ms.memberId}
@@ -381,15 +372,13 @@ export function PropertyEditDialog({
 												onShareChange={(share) => onShareChange(index, share)}
 												onRemove={() => onRemoveMember(ms.memberId)}
 											/>
-										)
+										);
 									})}
 									{memberShares.length > 0 && (
 										<p className="text-xs text-muted-foreground text-right">
 											Total: {totalShare}%
 											{totalShare !== 100 && (
-												<span className="ml-1 text-destructive">
-													(doit être 100%)
-												</span>
+												<span className="ml-1 text-destructive">(doit être 100%)</span>
 											)}
 										</p>
 									)}
@@ -432,5 +421,5 @@ export function PropertyEditDialog({
 				</form>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

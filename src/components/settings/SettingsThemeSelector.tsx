@@ -1,39 +1,35 @@
-import { Flex, Globe, Label, Moon, Sun } from '@/components'
+import { Globe, Label, Moon, Sun } from '@/components';
 
-type Theme = 'light' | 'dark' | 'system'
+type Theme = 'light' | 'dark' | 'system';
 
 interface SettingsThemeSelectorProps {
-	theme: Theme
-	onChange: (theme: Theme) => void
-	mounted: boolean
+	theme: Theme;
+	onChange: (theme: Theme) => void;
+	mounted: boolean;
 }
 
 interface ThemeOption {
-	value: Theme
-	label: string
-	icon: typeof Sun
+	value: Theme;
+	label: string;
+	icon: typeof Sun;
 }
 
 const themeOptions: ThemeOption[] = [
 	{ value: 'light', label: 'Clair', icon: Sun },
 	{ value: 'dark', label: 'Sombre', icon: Moon },
 	{ value: 'system', label: 'Système', icon: Globe },
-]
+];
 
 /**
  * Theme selection buttons (light/dark/system)
  */
-export function SettingsThemeSelector({
-	theme,
-	onChange,
-	mounted,
-}: SettingsThemeSelectorProps) {
+export function SettingsThemeSelector({ theme, onChange, mounted }: SettingsThemeSelectorProps) {
 	return (
-		<Flex direction="col" gap="md">
+		<div className="flex flex-col gap-4">
 			<Label>Thème</Label>
 			<div className="grid grid-cols-3 gap-2">
 				{themeOptions.map(({ value, label, icon: Icon }) => {
-					const isSelected = mounted && theme === value
+					const isSelected = mounted && theme === value;
 
 					return (
 						<button
@@ -49,9 +45,9 @@ export function SettingsThemeSelector({
 							<Icon className="h-5 w-5" />
 							<span className="text-sm font-medium">{label}</span>
 						</button>
-					)
+					);
 				})}
 			</div>
-		</Flex>
-	)
+		</div>
+	);
 }

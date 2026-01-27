@@ -1,9 +1,8 @@
-'use client'
+'use client';
 
 import {
 	Button,
 	Check,
-	Flex,
 	Input,
 	Loader2,
 	Sheet,
@@ -11,23 +10,23 @@ import {
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-} from '@/components'
-import { BankLogoBox } from './BankLogoBox'
+} from '@/components';
+import { BankLogoBox } from './BankLogoBox';
 
 interface AccountEditSheetProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	bankName: string
-	bankColor: string
-	editName: string
-	onNameChange: (value: string) => void
-	editDescription: string
-	onDescriptionChange: (value: string) => void
-	editAccountNumber: string
-	onAccountNumberChange: (value: string) => void
-	isPending: boolean
-	onSave: () => void
-	onCancel: () => void
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	bankName: string;
+	bankColor: string;
+	editName: string;
+	onNameChange: (value: string) => void;
+	editDescription: string;
+	onDescriptionChange: (value: string) => void;
+	editAccountNumber: string;
+	onAccountNumberChange: (value: string) => void;
+	isPending: boolean;
+	onSave: () => void;
+	onCancel: () => void;
 }
 
 /**
@@ -59,14 +58,14 @@ export function AccountEditSheet({
 					<SheetDescription>Modifiez les informations du compte.</SheetDescription>
 				</SheetHeader>
 
-				<Flex direction="col" gap="lg">
+				<div className="flex flex-col gap-6">
 					{/* Bank logo centered */}
 					<div className="relative mx-auto w-fit">
 						<BankLogoBox bankName={bankName} bankColor={bankColor} />
 					</div>
 
-					<Flex direction="col" gap="md">
-						<Flex direction="col" gap="sm">
+					<div className="flex flex-col gap-4">
+						<div className="flex flex-col gap-2">
 							<label htmlFor="edit-account-name" className="text-sm font-semibold">
 								Nom du compte
 							</label>
@@ -77,8 +76,8 @@ export function AccountEditSheet({
 								placeholder="Ex: Compte Joint"
 								className="h-12 text-base rounded-xl bg-background/60 border-border/30"
 							/>
-						</Flex>
-						<Flex direction="col" gap="sm">
+						</div>
+						<div className="flex flex-col gap-2">
 							<label htmlFor="edit-account-number" className="text-sm font-semibold">
 								Numéro de compte
 								<span className="ml-1 text-xs font-normal text-muted-foreground">(optionnel)</span>
@@ -90,8 +89,8 @@ export function AccountEditSheet({
 								placeholder="Ex: FR76 1234 5678 9012"
 								className="h-12 font-mono rounded-xl bg-background/60 border-border/30"
 							/>
-						</Flex>
-						<Flex direction="col" gap="sm">
+						</div>
+						<div className="flex flex-col gap-2">
 							<label htmlFor="edit-account-description" className="text-sm font-semibold">
 								Description
 								<span className="ml-1 text-xs font-normal text-muted-foreground">(optionnel)</span>
@@ -103,10 +102,10 @@ export function AccountEditSheet({
 								placeholder="Ex: Compte pour les dépenses courantes"
 								className="h-12 rounded-xl bg-background/60 border-border/30"
 							/>
-						</Flex>
-					</Flex>
+						</div>
+					</div>
 
-					<Flex direction="row" gap="sm" className="pt-4">
+					<div className="flex flex-row gap-2 pt-4">
 						<Button
 							variant="outline"
 							onClick={onCancel}
@@ -127,9 +126,9 @@ export function AccountEditSheet({
 							)}
 							Enregistrer
 						</Button>
-					</Flex>
-				</Flex>
+					</div>
+				</div>
 			</SheetContent>
 		</Sheet>
-	)
+	);
 }

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	AlertDialog,
@@ -18,22 +18,22 @@ import {
 	Pencil,
 	Plus,
 	Trash2,
-} from '@/components'
+} from '@/components';
 
 interface CoOwnership {
-	id: string
-	name: string
-	quarterlyAmount: number
-	link: string | null
-	notes: string | null
+	id: string;
+	name: string;
+	quarterlyAmount: number;
+	link: string | null;
+	notes: string | null;
 }
 
 interface PropertyCoOwnershipSectionProps {
-	coOwnership: CoOwnership | null
-	onAdd: () => void
-	onEdit: () => void
-	onDelete: () => void
-	isDeleting: boolean
+	coOwnership: CoOwnership | null;
+	onAdd: () => void;
+	onEdit: () => void;
+	onDelete: () => void;
+	isDeleting: boolean;
 }
 
 function formatCurrency(amount: number): string {
@@ -41,7 +41,7 @@ function formatCurrency(amount: number): string {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount)
+	}).format(amount);
 }
 
 export function PropertyCoOwnershipSection({
@@ -166,5 +166,5 @@ export function PropertyCoOwnershipSection({
 				</div>
 			)}
 		</Card>
-	)
+	);
 }

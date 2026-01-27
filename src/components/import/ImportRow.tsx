@@ -4,118 +4,108 @@ import {
 	CheckCircle2,
 	Clock,
 	FileSpreadsheet,
-	Flex,
 	Loader2,
 	RefreshCw,
 	RotateCcw,
 	Trash2,
-} from '@/components'
+} from '@/components';
 
-type ImportStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
+type ImportStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
 
 interface ImportAccount {
-	id: string
-	name: string
+	id: string;
+	name: string;
 }
 
 export interface ImportData {
-	id: string
-	filename: string
-	bankKey: string
-	fileSize: number
-	createdAt: string
-	status: ImportStatus
-	recordsCount: number | null
-	errorMessage: string | null
-	account?: ImportAccount | null
+	id: string;
+	filename: string;
+	bankKey: string;
+	fileSize: number;
+	createdAt: string;
+	status: ImportStatus;
+	recordsCount: number | null;
+	errorMessage: string | null;
+	account?: ImportAccount | null;
 }
 
 interface ImportRowProps {
-	data: ImportData
-	bankName: string
-	onProcess: (importId: string, accountId?: string) => void
-	onReprocess: (importId: string, accountId?: string) => void
-	onDelete: () => void
+	data: ImportData;
+	bankName: string;
+	onProcess: (importId: string, accountId?: string) => void;
+	onReprocess: (importId: string, accountId?: string) => void;
+	onDelete: () => void;
 }
 
 function getStatusIcon(status: ImportStatus) {
 	switch (status) {
 		case 'PROCESSED':
-			return <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+			return <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />;
 		case 'PROCESSING':
-			return <Loader2 className="h-4 w-4 animate-spin text-primary" />
+			return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
 		case 'FAILED':
-			return <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+			return <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />;
 		default:
-			return <Clock className="h-4 w-4 text-muted-foreground" />
+			return <Clock className="h-4 w-4 text-muted-foreground" />;
 	}
 }
 
 function getStatusLabel(status: ImportStatus) {
 	switch (status) {
 		case 'PROCESSED':
-			return 'Traité'
+			return 'Traité';
 		case 'PROCESSING':
-			return 'En cours...'
+			return 'En cours...';
 		case 'FAILED':
-			return 'Erreur'
+			return 'Erreur';
 		default:
-			return 'En attente'
+			return 'En attente';
 	}
 }
 
 function formatFileSize(bytes: number): string {
-	if (bytes < 1024) return `${bytes} B`
-	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+	if (bytes < 1024) return `${bytes} B`;
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function formatDate(dateStr: string): string {
-	const date = new Date(dateStr)
+	const date = new Date(dateStr);
 	return date.toLocaleDateString('fr-FR', {
 		day: '2-digit',
 		month: '2-digit',
 		year: 'numeric',
 		hour: '2-digit',
 		minute: '2-digit',
-	})
+	});
 }
 
 function getStatusBadgeClasses(status: ImportStatus) {
 	switch (status) {
 		case 'PROCESSED':
-			return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+			return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
 		case 'PROCESSING':
-			return 'bg-primary/10 text-primary'
+			return 'bg-primary/10 text-primary';
 		case 'FAILED':
-			return 'bg-red-500/10 text-red-600 dark:text-red-400'
+			return 'bg-red-500/10 text-red-600 dark:text-red-400';
 		default:
-			return 'bg-muted text-muted-foreground'
+			return 'bg-muted text-muted-foreground';
 	}
 }
 
 /**
  * Single row in import history list
  */
-export function ImportRow({
-	data,
-	bankName,
-	onProcess,
-	onReprocess,
-	onDelete,
-}: ImportRowProps) {
-	const isFailed = data.status === 'FAILED'
+export function ImportRow({ data, bankName, onProcess, onReprocess, onDelete }: ImportRowProps) {
+	const isFailed = data.status === 'FAILED';
 
 	return (
-		<Flex
-			direction="row"
-			justify="between"
-			align="center"
-			className={`rounded-xl p-4 transition-colors ${
+		<div
+			className={`flex flex-row justify-between items-center rounded-xl p-4 transition-colors ${
 				isFailed ? 'border border-red-500/20 bg-red-500/5' : 'bg-white/50'
 			}`}
 		>
-			<Flex direction="row" gap="md" align="center">
+			<div className="flex flex-row gap-4 items-center">
 				<div
 					className={`flex h-10 w-10 items-center justify-center rounded-lg ${
 						isFailed ? 'bg-red-500/10' : 'bg-background'
@@ -127,19 +117,16 @@ export function ImportRow({
 						}`}
 					/>
 				</div>
-				<Flex direction="col">
-					<Flex direction="row" gap="md" align="center">
+				<div className="flex flex-col">
+					<div className="flex flex-row gap-4 items-center">
 						<span className="font-medium">{data.filename}</span>
-						<Flex
-							direction="row"
-							gap="xs"
-							align="center"
-							className={`rounded-full px-2 py-1 text-xs ${getStatusBadgeClasses(data.status)}`}
+						<div
+							className={`flex flex-row gap-1 items-center rounded-full px-2 py-1 text-xs ${getStatusBadgeClasses(data.status)}`}
 						>
 							{getStatusIcon(data.status)}
 							<span>{getStatusLabel(data.status)}</span>
-						</Flex>
-					</Flex>
+						</div>
+					</div>
 					<p className="text-xs text-muted-foreground">
 						{bankName}
 						{data.account && ` → ${data.account.name}`} · {formatFileSize(data.fileSize)} ·{' '}
@@ -154,9 +141,9 @@ export function ImportRow({
 							<span className="text-red-600 dark:text-red-400"> · {data.errorMessage}</span>
 						)}
 					</p>
-				</Flex>
-			</Flex>
-			<Flex direction="row" gap="md" align="center">
+				</div>
+			</div>
+			<div className="flex flex-row gap-4 items-center">
 				{data.status === 'PENDING' && (
 					<Button
 						variant="outline"
@@ -195,7 +182,7 @@ export function ImportRow({
 				>
 					<Trash2 className="h-4 w-4" />
 				</Button>
-			</Flex>
-		</Flex>
-	)
+			</div>
+		</div>
+	);
 }

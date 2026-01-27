@@ -195,25 +195,11 @@ export function createTransactionColumns(
 							<Button
 								variant="ghost"
 								size="icon"
-								style={{ height: '2rem', width: '2rem' }}
+								className="h-8 w-8"
 								onClick={(e) => e.stopPropagation()}
 							>
-								<span
-									style={{
-										position: 'absolute',
-										width: '1px',
-										height: '1px',
-										padding: 0,
-										margin: '-1px',
-										overflow: 'hidden',
-										clip: 'rect(0,0,0,0)',
-										whiteSpace: 'nowrap',
-										border: 0,
-									}}
-								>
-									Ouvrir le menu
-								</span>
-								<MoreHorizontal style={{ height: '1rem', width: '1rem' }} />
+								<span className="sr-only">Ouvrir le menu</span>
+								<MoreHorizontal className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
@@ -235,7 +221,7 @@ export function createTransactionColumns(
 							{options?.onDelete && (
 								<DropdownMenuItem
 									onClick={() => options.onDelete?.(transaction)}
-									style={{ color: 'hsl(var(--destructive))' }}
+									className="text-destructive"
 								>
 									Supprimer
 								</DropdownMenuItem>

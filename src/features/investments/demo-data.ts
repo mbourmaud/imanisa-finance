@@ -1,5 +1,5 @@
-import { Bitcoin, Briefcase, Building, TrendingUp } from 'lucide-react'
-import type { InvestmentSource, Position } from '@/components'
+import { Bitcoin, Briefcase, Building, TrendingUp } from 'lucide-react';
+import type { InvestmentSource, Position } from '@/components';
 
 export const demoSources: InvestmentSource[] = [
 	{
@@ -42,7 +42,7 @@ export const demoSources: InvestmentSource[] = [
 		performance: 45.0,
 		positions: 4,
 	},
-]
+];
 
 export const demoPositions: Position[] = [
 	{
@@ -105,10 +105,10 @@ export const demoPositions: Position[] = [
 		gain: 150.0,
 		gainPercent: 16.67,
 	},
-]
+];
 
 // Computed totals
-export const totalValue = demoSources.reduce((s, src) => s + src.value, 0)
-export const totalInvested = demoSources.reduce((s, src) => s + src.invested, 0)
-export const totalGain = totalValue - totalInvested
-export const totalPerformance = ((totalValue - totalInvested) / totalInvested) * 100
+export const totalValue = demoSources.reduce((s, src) => s + src.value, 0);
+export const totalInvested = demoSources.reduce((s, src) => s + src.invested, 0);
+export const totalGain = totalValue - totalInvested;
+export const totalPerformance = ((totalValue - totalInvested) / totalInvested) * 100;

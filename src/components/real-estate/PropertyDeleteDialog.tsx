@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	AlertDialog,
@@ -10,14 +10,14 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	Loader2,
-} from '@/components'
+} from '@/components';
 
 interface PropertyDeleteDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	propertyName: string
-	onDelete: () => void
-	isDeleting: boolean
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	propertyName: string;
+	onDelete: () => void;
+	isDeleting: boolean;
 }
 
 /**
@@ -36,8 +36,8 @@ export function PropertyDeleteDialog({
 				<AlertDialogHeader>
 					<AlertDialogTitle>Supprimer ce bien ?</AlertDialogTitle>
 					<AlertDialogDescription>
-						Cette action est irréversible. Le bien « {propertyName} » sera définitivement
-						supprimé, ainsi que tous les prêts, assurances et contrats associés.
+						Cette action est irréversible. Le bien « {propertyName} » sera définitivement supprimé,
+						ainsi que tous les prêts, assurances et contrats associés.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
@@ -59,5 +59,5 @@ export function PropertyDeleteDialog({
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
-	)
+	);
 }

@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface NarrowPageContainerProps {
-	children: ReactNode
+	children: ReactNode;
 }
 
 /**
@@ -9,5 +9,5 @@ interface NarrowPageContainerProps {
  * Used for pages like banks/settings that work better with limited width.
  */
 export function NarrowPageContainer({ children }: NarrowPageContainerProps) {
-	return <div className="max-w-4xl">{children}</div>
+	return <div className="max-w-4xl">{children}</div>;
 }

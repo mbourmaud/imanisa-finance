@@ -6,4 +6,4 @@ export {
 	totalInvested,
 	totalPerformance,
 	totalValue,
-} from './demo-data'
+} from './demo-data';
