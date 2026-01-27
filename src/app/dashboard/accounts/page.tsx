@@ -4,10 +4,10 @@ import {
 	AccountListItem,
 	AccountTypeHeader,
 	AddAccountButton,
+	Card,
 	CreditCard,
 	EmptyState,
 	Flex,
-	GlassCard,
 	LoadingSpinner,
 	PageHeader,
 	PiggyBank,
@@ -79,7 +79,7 @@ export default function AccountsPage() {
 
 			<Flex direction="col" gap="lg">
 				{page.accountGroups.map((group) => (
-					<GlassCard key={group.type} padding="lg">
+					<Card key={group.type} padding="lg">
 						<AccountTypeHeader
 							icon={group.icon}
 							title={group.label}
@@ -98,7 +98,7 @@ export default function AccountsPage() {
 								/>
 							))}
 						</Flex>
-					</GlassCard>
+					</Card>
 				))}
 
 				{!page.hasAccounts && (

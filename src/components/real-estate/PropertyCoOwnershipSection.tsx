@@ -12,8 +12,8 @@ import {
 	AlertDialogTrigger,
 	Building2,
 	Button,
+	Card,
 	ExternalLink,
-	GlassCard,
 	Loader2,
 	Pencil,
 	Plus,
@@ -52,7 +52,7 @@ export function PropertyCoOwnershipSection({
 	isDeleting,
 }: PropertyCoOwnershipSectionProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<div className="flex justify-between items-center">
 				<h3 className="text-base font-semibold tracking-tight flex items-center gap-2">
 					<Building2 className="h-4 w-4 text-muted-foreground" />
@@ -165,6 +165,6 @@ export function PropertyCoOwnershipSection({
 					</Button>
 				</div>
 			)}
-		</GlassCard>
+		</Card>
 	)
 }

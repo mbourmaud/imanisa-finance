@@ -34,12 +34,6 @@ describe('Input', () => {
 		expect(input).toHaveClass('border-input', 'bg-transparent');
 	});
 
-	it('renders with variant glass', () => {
-		const { container } = render(<Input variant="glass" />);
-		const input = container.querySelector('input');
-		expect(input).toHaveClass('border-border/50', 'bg-background/50', 'backdrop-blur-sm');
-	});
-
 	it('renders with type text', () => {
 		const { container } = render(<Input type="text" />);
 		const input = container.querySelector('input');
@@ -73,10 +67,10 @@ describe('Input', () => {
 
 	it('renders with all props combined', () => {
 		const { container } = render(
-			<Input size="lg" variant="glass" type="email" placeholder="email@example.com" />,
+			<Input size="lg" type="email" placeholder="email@example.com" />,
 		);
 		const input = container.querySelector('input');
-		expect(input).toHaveClass('h-11', 'backdrop-blur-sm');
+		expect(input).toHaveClass('h-11');
 		expect(input).toHaveAttribute('type', 'email');
 		expect(input).toHaveAttribute('placeholder', 'email@example.com');
 	});

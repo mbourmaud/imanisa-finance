@@ -11,10 +11,10 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 	Button,
+	Card,
 	Droplets,
 	ExternalLink,
 	Flame,
-	GlassCard,
 	Loader2,
 	Pencil,
 	Plus,
@@ -82,7 +82,7 @@ export function PropertyUtilityContractsSection({
 	const totalMonthly = contracts.reduce((sum, c) => sum + c.monthlyAmount, 0)
 
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<div className="flex justify-between items-center">
 				<h3 className="text-base font-semibold tracking-tight flex items-center gap-2">
 					<Zap className="h-4 w-4 text-muted-foreground" />
@@ -224,6 +224,6 @@ export function PropertyUtilityContractsSection({
 					</div>
 				</div>
 			)}
-		</GlassCard>
+		</Card>
 	)
 }

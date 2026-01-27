@@ -1,4 +1,4 @@
-import { Flex, GlassCard } from '@/components'
+import { Card, Flex } from '@/components'
 import { ChartLegend, DonutChart } from '@/components/charts'
 
 interface ChartDataItem {
@@ -17,7 +17,7 @@ interface BudgetChartSectionProps {
  */
 export function BudgetChartSection({ chartData, totalSpent }: BudgetChartSectionProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="col" gap="md">
 				<Flex direction="col" gap="xs">
 					<h3 className="text-md font-semibold">Répartition des dépenses</h3>
@@ -28,6 +28,6 @@ export function BudgetChartSection({ chartData, totalSpent }: BudgetChartSection
 					<ChartLegend items={chartData} total={totalSpent} />
 				</div>
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

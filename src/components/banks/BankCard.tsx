@@ -109,7 +109,7 @@ const BankCard = forwardRef<HTMLDivElement, BankCardProps>(
 				ref={ref}
 				data-slot="bank-card"
 				className={cn(
-					'glass-card',
+					'bg-card border rounded-2xl shadow-sm',
 					isCompact ? 'p-3' : 'p-4',
 					interactive &&
 						'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg',

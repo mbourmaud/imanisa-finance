@@ -4,13 +4,13 @@ import Link from 'next/link'
 import {
 	Building2,
 	Button,
+	Card,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	Flex,
-	GlassCard,
 	Home,
 	IconBox,
 	MapPin,
@@ -39,7 +39,7 @@ export function PropertyCard({ property, formatCurrency }: PropertyCardProps) {
 	const isRentalProperty = property.usage === 'RENTAL'
 
 	return (
-		<GlassCard padding="lg" className="overflow-hidden">
+		<Card padding="lg" className="overflow-hidden">
 			<Flex direction="col" gap="md">
 				{/* Header */}
 				<Flex direction="row" justify="between">
@@ -144,6 +144,6 @@ export function PropertyCard({ property, formatCurrency }: PropertyCardProps) {
 					/>
 				)}
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

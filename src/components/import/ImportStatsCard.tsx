@@ -1,9 +1,9 @@
 import {
+	Card,
 	CheckCircle2,
 	Clock,
 	FileSpreadsheet,
 	Flex,
-	GlassCard,
 	RefreshCw,
 	StatCard,
 	StatCardGrid,
@@ -26,7 +26,7 @@ export function ImportStatsCard({
 	pendingCount,
 }: ImportStatsCardProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="col" gap="md">
 				<h3 className="text-base font-semibold tracking-tight">
 					Statistiques d&apos;import
@@ -60,6 +60,6 @@ export function ImportStatsCard({
 					</ol>
 				</div>
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

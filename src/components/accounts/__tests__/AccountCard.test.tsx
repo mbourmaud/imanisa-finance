@@ -193,7 +193,7 @@ describe('AccountCard', () => {
 		const { container } = render(<AccountCard account={mockAccount} />);
 		const card = container.querySelector('[data-slot="account-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('glass-card');
+		expect(card).toHaveClass('bg-card');
 		expect(within(card as HTMLElement).getByText('Compte Principal')).toBeInTheDocument();
 	});
 
@@ -360,7 +360,7 @@ describe('AccountCardSkeleton', () => {
 		const { container } = render(<AccountCardSkeleton />);
 		const skeleton = container.querySelector('[data-slot="account-card-skeleton"]');
 		expect(skeleton).toBeInTheDocument();
-		expect(skeleton).toHaveClass('glass-card', 'animate-pulse');
+		expect(skeleton).toHaveClass('bg-card', 'animate-pulse');
 	});
 
 	it('renders with variant compact', () => {

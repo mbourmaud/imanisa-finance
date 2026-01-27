@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { AlertTriangle, ArrowLeft, RefreshCw } from '@/components/ui/icon'
 import { Button } from '@/components/ui/button'
-import { GlassCard } from '@/components/ui/glass-card'
+import { Card } from '@/components/ui/card'
 
 interface AuthErrorCardProps {
 	onRetry: () => void
@@ -13,7 +13,7 @@ interface AuthErrorCardProps {
 export function AuthErrorCard({ onRetry }: AuthErrorCardProps) {
 	return (
 		<div className="w-full max-w-md">
-			<GlassCard padding="lg" variant="elevated">
+			<Card padding="lg" variant="elevated">
 				<div className="flex flex-col items-center gap-6">
 					{/* Error icon */}
 					<div className="flex h-16 w-16 items-center justify-center rounded-full bg-[oklch(0.9_0.05_25)]">
@@ -51,7 +51,7 @@ export function AuthErrorCard({ onRetry }: AuthErrorCardProps) {
 						</Button>
 					</div>
 				</div>
-			</GlassCard>
+			</Card>
 		</div>
 	)
 }

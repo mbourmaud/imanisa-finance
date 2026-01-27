@@ -92,7 +92,7 @@ describe('BankCard', () => {
 		const { container } = render(<BankCard bank={mockBank} />);
 		const card = container.querySelector('[data-slot="bank-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('glass-card');
+		expect(card).toHaveClass('bg-card', 'border', 'rounded-2xl');
 		expect(within(card as HTMLElement).getByText('Crédit Mutuel')).toBeInTheDocument();
 	});
 

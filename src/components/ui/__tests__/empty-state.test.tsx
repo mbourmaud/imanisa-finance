@@ -67,13 +67,13 @@ describe('EmptyState', () => {
 	it('renders with variant default', () => {
 		const { container } = render(<EmptyState title="Default" variant="default" />);
 		const emptyState = container.querySelector('[data-slot="empty-state"]');
-		expect(emptyState).not.toHaveClass('glass-card');
+		expect(emptyState).not.toHaveClass('bg-card');
 	});
 
 	it('renders with variant card', () => {
 		const { container } = render(<EmptyState title="Card" variant="card" />);
 		const emptyState = container.querySelector('[data-slot="empty-state"]');
-		expect(emptyState).toHaveClass('glass-card', 'p-8');
+		expect(emptyState).toHaveClass('bg-card', 'p-8');
 	});
 
 	it('renders with variant inline', () => {
@@ -121,7 +121,7 @@ describe('EmptyState', () => {
 		);
 
 		const emptyState = container.querySelector('[data-slot="empty-state"]') as HTMLElement;
-		expect(emptyState).toHaveClass('glass-card', 'p-8');
+		expect(emptyState).toHaveClass('bg-card', 'p-8');
 		expect(container.querySelector('svg')).toBeInTheDocument();
 		expect(within(emptyState).getByText('Your inbox is empty')).toBeInTheDocument();
 		expect(

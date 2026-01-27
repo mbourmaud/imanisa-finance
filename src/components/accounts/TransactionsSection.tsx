@@ -3,11 +3,11 @@
 import type { RefObject } from 'react'
 import {
 	Button,
+	Card,
 	CheckCircle2,
 	EmptyState,
 	FileSpreadsheet,
 	Flex,
-	GlassCard,
 	Input,
 	Loader2,
 	Search,
@@ -73,7 +73,7 @@ export function TransactionsSection({
 	loadMoreRef,
 }: TransactionsSectionProps) {
 	return (
-		<GlassCard className="p-0">
+		<Card className="p-0">
 			{/* Header */}
 			<div className="p-6 pb-4">
 				<Flex direction="col" gap="md">
@@ -203,6 +203,6 @@ export function TransactionsSection({
 					</Flex>
 				)}
 			</div>
-		</GlassCard>
+		</Card>
 	)
 }

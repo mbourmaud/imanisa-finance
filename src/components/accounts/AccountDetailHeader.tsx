@@ -5,8 +5,8 @@ import Link from 'next/link'
 import {
 	ArrowLeft,
 	Button,
+	Card,
 	Flex,
-	GlassCard,
 	Pencil,
 	Settings,
 	Trash2,
@@ -73,7 +73,7 @@ export function AccountDetailHeader({
 			</Link>
 
 			{/* Header card */}
-			<GlassCard padding="lg" className="relative">
+			<Card padding="lg" className="relative">
 				{/* Gradient accent bar */}
 				<div
 					className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
@@ -180,7 +180,7 @@ export function AccountDetailHeader({
 						)}
 					</Flex>
 				</Flex>
-			</GlassCard>
+			</Card>
 		</>
 	)
 }

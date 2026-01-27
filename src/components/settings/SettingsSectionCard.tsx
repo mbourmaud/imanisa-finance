@@ -1,4 +1,4 @@
-import { Flex, GlassCard, type LucideIcon } from '@/components'
+import { Card, Flex, type LucideIcon } from '@/components'
 import type { ReactNode } from 'react'
 
 interface SettingsSectionCardProps {
@@ -20,7 +20,7 @@ export function SettingsSectionCard({
 	children,
 }: SettingsSectionCardProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="col" gap="md">
 				<Flex direction="row" justify="between" align="center" className="pb-2">
 					<Flex direction="row" gap="md" align="center">
@@ -38,6 +38,6 @@ export function SettingsSectionCard({
 				</Flex>
 				{children}
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

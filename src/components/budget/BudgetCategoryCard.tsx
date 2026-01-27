@@ -4,13 +4,13 @@ import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 import {
 	Button,
+	Card,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	Flex,
-	GlassCard,
 	MoreHorizontal,
 	Progress,
 	type LucideIcon,
@@ -69,7 +69,7 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 		const colorStyle = { '--category-color': color } as React.CSSProperties
 
 		return (
-			<GlassCard ref={ref} padding="md" style={colorStyle}>
+			<Card ref={ref} padding="md" style={colorStyle}>
 				<Flex direction="col" gap="sm">
 					<Flex direction="row" justify="between" align="start">
 						<Flex direction="row" gap="sm" align="center">
@@ -123,7 +123,7 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 						</Flex>
 					</Flex>
 				</Flex>
-			</GlassCard>
+			</Card>
 		)
 	},
 )

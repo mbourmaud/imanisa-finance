@@ -14,16 +14,14 @@ interface FloatingToastProps {
 export function FloatingToast({ message, isSuccess = false, onClose }: FloatingToastProps) {
 	return (
 		<div
-			className={`fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-300 backdrop-blur-xl ${
-				isSuccess
-					? 'bg-emerald-500/10 border border-emerald-500/20'
-					: 'bg-red-500/10 border border-red-500/20'
+			className={`fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-lg shadow-lg border bg-background animate-in fade-in slide-in-from-bottom-4 duration-300 ${
+				isSuccess ? 'border-emerald-500/50' : 'border-red-500/50'
 			}`}
 		>
 			<Flex direction="row" gap="sm" align="start">
 				<div
-					className={`flex items-center justify-center flex-shrink-0 h-8 w-8 rounded-xl ${
-						isSuccess ? 'bg-emerald-500/20' : 'bg-red-500/20'
+					className={`flex items-center justify-center flex-shrink-0 h-8 w-8 rounded-lg ${
+						isSuccess ? 'bg-emerald-500/10' : 'bg-red-500/10'
 					}`}
 				>
 					{isSuccess ? (
@@ -36,7 +34,7 @@ export function FloatingToast({ message, isSuccess = false, onClose }: FloatingT
 					<span className={`text-sm font-semibold ${isSuccess ? 'text-emerald-500' : 'text-red-500'}`}>
 						{isSuccess ? 'Import réussi' : 'Erreur'}
 					</span>
-					<span className="text-sm text-foreground/80">{message}</span>
+					<span className="text-sm text-foreground">{message}</span>
 				</Flex>
 				<Button
 					variant="ghost"

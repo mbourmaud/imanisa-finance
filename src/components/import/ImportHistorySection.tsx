@@ -1,4 +1,4 @@
-import { EmptyState, FileSpreadsheet, Flex, GlassCard, Loader2 } from '@/components'
+import { Card, EmptyState, FileSpreadsheet, Flex, Loader2 } from '@/components'
 import type { ReactNode } from 'react'
 
 interface ImportHistorySectionProps {
@@ -16,7 +16,7 @@ export function ImportHistorySection({
 	children,
 }: ImportHistorySectionProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="col" gap="md">
 				<Flex direction="col" gap="xs">
 					<h3 className="text-base font-semibold tracking-tight">
@@ -42,6 +42,6 @@ export function ImportHistorySection({
 					)}
 				</Flex>
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

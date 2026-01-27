@@ -1,4 +1,4 @@
-import { Flex, GlassCard, Progress } from '@/components'
+import { Card, Flex, Progress } from '@/components'
 
 interface LoanProgressCardProps {
 	loansRemaining: number
@@ -20,7 +20,7 @@ export function LoanProgressCard({
 	const equityPercentage = totalValue > 0 ? (equity / totalValue) * 100 : 0
 
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="row" justify="between" className="mb-4">
 				<Flex direction="col" gap="xs">
 					<span className="font-medium">Capital restant dû</span>
@@ -34,6 +34,6 @@ export function LoanProgressCard({
 			<span className="mt-2 block text-xs text-muted-foreground">
 				Équité: {formatCurrency(equity)} ({equityPercentage.toFixed(1)}%)
 			</span>
-		</GlassCard>
+		</Card>
 	)
 }

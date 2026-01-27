@@ -1,4 +1,4 @@
-import { GlassCard } from '@/components'
+import { Card } from '@/components'
 
 interface ErrorBannerProps {
 	message: string
@@ -6,8 +6,8 @@ interface ErrorBannerProps {
 
 export function ErrorBanner({ message }: ErrorBannerProps) {
 	return (
-		<GlassCard padding="md" className="border-destructive/50 bg-destructive/5">
+		<Card padding="md" className="border-destructive/50 bg-destructive/5">
 			<span className="text-sm text-destructive">{message}</span>
-		</GlassCard>
+		</Card>
 	)
 }

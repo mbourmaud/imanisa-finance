@@ -1,6 +1,6 @@
 'use client'
 
-import { GlassCard, Home } from '@/components'
+import { Card, Home } from '@/components'
 import type { PropertyUsage } from '@/features/properties'
 
 interface PropertyInfoSectionProps {
@@ -79,7 +79,7 @@ export function PropertyInfoSection({
 	const isRental = usage === 'RENTAL'
 
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<div className="flex flex-col gap-4">
 				<div className="flex items-center gap-3">
 					<Home className="h-4 w-4 text-muted-foreground" />
@@ -131,6 +131,6 @@ export function PropertyInfoSection({
 					</div>
 				)}
 			</div>
-		</GlassCard>
+		</Card>
 	)
 }

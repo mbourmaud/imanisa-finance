@@ -1,12 +1,12 @@
 import {
 	Button,
+	Card,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	Flex,
-	GlassCard,
 	IconBox,
 	MoreHorizontal,
 	type LucideIcon,
@@ -44,7 +44,7 @@ export function InvestmentSourceCard({
 	const isPositive = gain >= 0
 
 	return (
-		<GlassCard padding="md" className="flex flex-col gap-3 group">
+		<Card padding="md" className="flex flex-col gap-3 group">
 			<Flex direction="row" justify="between">
 				<IconBox icon={source.icon} size="md" variant="primary" rounded="xl" />
 				<DropdownMenu>
@@ -94,6 +94,6 @@ export function InvestmentSourceCard({
 					</span>
 				</Flex>
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

@@ -1,4 +1,4 @@
-import { Flex, GlassCard, Progress } from '@/components'
+import { Card, Flex, Progress } from '@/components'
 
 interface BudgetProgressProps {
 	totalBudget: number
@@ -13,7 +13,7 @@ export function BudgetProgress({ totalBudget, totalSpent, formatCurrency }: Budg
 	const remaining = totalBudget - totalSpent
 
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="row" justify="between" align="center">
 				<span className="font-medium">Progression du mois</span>
 				<span className="text-sm text-muted-foreground">
@@ -24,6 +24,6 @@ export function BudgetProgress({ totalBudget, totalSpent, formatCurrency }: Budg
 			<span className="mt-2 block text-xs text-muted-foreground">
 				Il vous reste {remaining > 0 ? formatCurrency(remaining) : '0 €'} à dépenser ce mois
 			</span>
-		</GlassCard>
+		</Card>
 	)
 }

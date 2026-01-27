@@ -14,16 +14,10 @@ type LoadingSpinnerSize = 'sm' | 'md' | 'lg'
 // STYLE MAPS
 // =============================================================================
 
-const containerSizeClasses: Record<LoadingSpinnerSize, string> = {
-	sm: 'h-8 w-8',
-	md: 'h-12 w-12',
-	lg: 'h-16 w-16',
-}
-
 const iconSizeClasses: Record<LoadingSpinnerSize, string> = {
 	sm: 'h-4 w-4',
-	md: 'h-6 w-6',
-	lg: 'h-8 w-8',
+	md: 'h-8 w-8',
+	lg: 'h-12 w-12',
 }
 
 // =============================================================================
@@ -35,7 +29,7 @@ interface LoadingSpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Animated loading spinner with gradient background.
+ * Simple animated loading spinner.
  */
 const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
 	({ size = 'md', className, ...props }, ref) => {
@@ -43,21 +37,10 @@ const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
 			<div
 				ref={ref}
 				data-slot="loading-spinner"
-				className={cn('relative', className)}
+				className={cn('flex items-center justify-center', className)}
 				{...props}
 			>
-				<div
-					className={cn(
-						'rounded-full animate-pulse bg-gradient-to-br from-primary/20 to-primary/5',
-						containerSizeClasses[size],
-					)}
-				/>
-				<Loader2
-					className={cn(
-						'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin text-primary',
-						iconSizeClasses[size],
-					)}
-				/>
+				<Loader2 className={cn('animate-spin text-primary', iconSizeClasses[size])} />
 			</div>
 		)
 	},

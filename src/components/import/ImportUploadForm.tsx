@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Flex, GlassCard, ImportDropZone, Label } from '@/components'
+import { Card, Flex, ImportDropZone, Label } from '@/components'
 import { SelectField } from '@/lib/forms'
 
 interface SelectOption {
@@ -48,7 +48,7 @@ export function ImportUploadForm({
 	onFileSelect,
 }: ImportUploadFormProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="col" gap="md">
 				{bankFieldSlot}
 				{accountFieldSlot}
@@ -67,6 +67,6 @@ export function ImportUploadForm({
 					/>
 				</Flex>
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

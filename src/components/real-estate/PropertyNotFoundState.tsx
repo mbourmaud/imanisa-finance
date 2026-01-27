@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Button, GlassCard } from '@/components'
+import { ArrowLeft, Button, Card } from '@/components'
 
 interface PropertyNotFoundStateProps {
 	error: string | null
@@ -20,7 +20,7 @@ export function PropertyNotFoundState({ error }: PropertyNotFoundStateProps) {
 				<ArrowLeft className="h-4 w-4" />
 				Retour aux biens
 			</Link>
-			<GlassCard padding="lg" className="border-destructive/50 bg-destructive/5">
+			<Card padding="lg" className="border-destructive/50 bg-destructive/5">
 				<p className="text-sm text-destructive">{error || 'Bien non trouvé'}</p>
 				<Button
 					variant="outline"
@@ -30,7 +30,7 @@ export function PropertyNotFoundState({ error }: PropertyNotFoundStateProps) {
 				>
 					Retour à la liste
 				</Button>
-			</GlassCard>
+			</Card>
 		</div>
 	)
 }
