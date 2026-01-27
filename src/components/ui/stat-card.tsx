@@ -3,6 +3,7 @@
 import { type LucideIcon, TrendingDown, TrendingUp } from 'lucide-react';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import { Card } from './card';
 
 // =============================================================================
 // STAT CARD TYPES
@@ -16,21 +17,21 @@ type TrendDirection = 'up' | 'down' | 'neutral';
 // =============================================================================
 
 const cardVariantClasses: Record<StatCardVariant, string> = {
-	default: 'stat-card',
-	coral: 'stat-card stat-card-coral',
-	teal: 'stat-card stat-card-teal',
-	purple: 'stat-card stat-card-purple',
-	gold: 'stat-card stat-card-gold',
-	mint: 'stat-card',
+	default: '',
+	coral: 'border-l-4 border-l-[oklch(0.7_0.2_25)]',
+	teal: 'border-l-4 border-l-[oklch(0.7_0.15_180)]',
+	purple: 'border-l-4 border-l-[oklch(0.65_0.18_290)]',
+	gold: 'border-l-4 border-l-[oklch(0.8_0.15_85)]',
+	mint: 'border-l-4 border-l-[oklch(0.7_0.15_160)]',
 };
 
 const iconVariantClasses: Record<StatCardVariant, string> = {
-	default: 'stat-card-icon bg-primary',
-	coral: 'stat-card-icon stat-card-icon-coral',
-	teal: 'stat-card-icon stat-card-icon-teal',
-	purple: 'stat-card-icon stat-card-icon-purple',
-	gold: 'stat-card-icon stat-card-icon-gold',
-	mint: 'stat-card-icon stat-card-icon-mint',
+	default: 'bg-primary text-primary-foreground',
+	coral: 'bg-[oklch(0.7_0.2_25)] text-white',
+	teal: 'bg-[oklch(0.7_0.15_180)] text-white',
+	purple: 'bg-[oklch(0.65_0.18_290)] text-white',
+	gold: 'bg-[oklch(0.8_0.15_85)] text-white',
+	mint: 'bg-[oklch(0.7_0.15_160)] text-white',
 };
 
 // =============================================================================
@@ -73,16 +74,24 @@ const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
 		ref,
 	) => {
 		return (
-			<div
+			<Card
 				ref={ref}
 				data-slot="stat-card"
-				className={cn(cardVariantClasses[variant], interactive && 'cursor-pointer', className)}
+				padding="md"
+				className={cn(
+					'transition-all',
+					cardVariantClasses[variant],
+					interactive && 'cursor-pointer hover:-translate-y-0.5 hover:shadow-lg',
+					className,
+				)}
 				{...props}
 			>
-				<div className="stat-card-content">
-					<div className="stat-card-text">
+				<div className="flex items-start justify-between gap-4">
+					<div className="min-w-0 flex-1">
 						<p className="text-xs sm:text-sm font-medium text-muted-foreground">{label}</p>
-						<p className="stat-card-value">{value}</p>
+						<p className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight tabular-nums">
+							{value}
+						</p>
 						{(description || trend) && (
 							<div className="mt-1 flex items-center gap-2">
 								{description && (
@@ -92,8 +101,8 @@ const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
 									<span
 										className={cn(
 											'inline-flex items-center gap-0.5 text-xs font-medium',
-											trend === 'up' && 'value-positive',
-											trend === 'down' && 'value-negative',
+											trend === 'up' && 'text-[oklch(0.55_0.18_145)]',
+											trend === 'down' && 'text-[oklch(0.6_0.2_25)]',
 										)}
 									>
 										{trend === 'up' ? (
@@ -108,12 +117,17 @@ const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
 						)}
 					</div>
 					{Icon && (
-						<div className={iconVariantClasses[variant]}>
+						<div
+							className={cn(
+								'flex-shrink-0 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl',
+								iconVariantClasses[variant],
+							)}
+						>
 							<Icon className="h-5 w-5 sm:h-6 sm:w-6" />
 						</div>
 					)}
 				</div>
-			</div>
+			</Card>
 		);
 	},
 );
@@ -157,19 +171,25 @@ interface StatCardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function StatCardSkeleton({ className, variant = 'default', ...props }: StatCardSkeletonProps) {
 	return (
-		<div
+		<Card
 			data-slot="stat-card-skeleton"
+			padding="md"
 			className={cn(cardVariantClasses[variant], 'animate-pulse', className)}
 			{...props}
 		>
-			<div className="stat-card-content">
-				<div className="stat-card-text space-y-2">
+			<div className="flex items-start justify-between gap-4">
+				<div className="min-w-0 flex-1 space-y-2">
 					<div className="h-4 w-24 rounded bg-muted" />
 					<div className="h-8 w-32 rounded bg-muted" />
 				</div>
-				<div className={cn(iconVariantClasses[variant], 'opacity-50')} />
+				<div
+					className={cn(
+						'flex-shrink-0 h-12 w-12 sm:h-14 sm:w-14 rounded-2xl opacity-50',
+						iconVariantClasses[variant],
+					)}
+				/>
 			</div>
-		</div>
+		</Card>
 	);
 }
 

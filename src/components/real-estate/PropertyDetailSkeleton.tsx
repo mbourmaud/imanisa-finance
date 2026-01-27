@@ -1,6 +1,6 @@
 'use client'
 
-import { GlassCard, Skeleton } from '@/components'
+import { Card, Skeleton } from '@/components'
 
 function DetailItemSkeleton() {
 	return (
@@ -13,7 +13,7 @@ function DetailItemSkeleton() {
 
 function SectionSkeleton() {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<div className="flex flex-col gap-4">
 				<Skeleton className="h-5 w-32" />
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -22,7 +22,7 @@ function SectionSkeleton() {
 					<DetailItemSkeleton />
 				</div>
 			</div>
-		</GlassCard>
+		</Card>
 	)
 }
 

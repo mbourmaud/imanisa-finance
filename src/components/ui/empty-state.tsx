@@ -47,7 +47,7 @@ const descriptionSizeClasses: Record<EmptyStateSize, string> = {
 
 const variantClasses: Record<EmptyStateVariant, string> = {
 	default: '',
-	card: 'glass-card p-8',
+	card: 'bg-card border rounded-2xl shadow-sm p-8',
 	inline: 'flex flex-row items-center gap-4 text-left',
 };
 

@@ -24,7 +24,7 @@ export function AccountRowLink({
 	return (
 		<Link
 			href={`/dashboard/accounts/${accountId}`}
-			className="flex items-center justify-between rounded-xl bg-card/50 p-2 backdrop-blur-sm transition-all hover:bg-card/70"
+			className="flex items-center justify-between rounded-lg border border-border/40 bg-card p-3 transition-colors hover:bg-accent"
 		>
 			<Flex direction="row" gap="sm">
 				<Flex direction="col" gap="xs">
@@ -37,7 +37,7 @@ export function AccountRowLink({
 			</Flex>
 			<Flex direction="row" gap="sm" align="center">
 				<MoneyDisplay amount={balance} size="sm" weight="semibold" autoColor />
-				<ChevronRight className="h-4 w-4 text-muted-foreground/40 transition-all" />
+				<ChevronRight className="h-4 w-4 text-muted-foreground" />
 			</Flex>
 		</Link>
 	)

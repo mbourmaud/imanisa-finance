@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 // =============================================================================
 
 type InputSize = 'sm' | 'md' | 'lg';
-type InputVariant = 'default' | 'glass';
+type InputVariant = 'default';
 
 const inputSizeClasses: Record<InputSize, string> = {
 	sm: 'h-8 px-2.5 py-1 text-xs',
@@ -18,7 +18,6 @@ const inputSizeClasses: Record<InputSize, string> = {
 
 const inputVariantClasses: Record<InputVariant, string> = {
 	default: 'border-input bg-transparent dark:bg-input/30',
-	glass: 'border-border/50 bg-background/50 backdrop-blur-sm',
 };
 
 // =============================================================================

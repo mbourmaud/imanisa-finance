@@ -1,11 +1,11 @@
-import { ContentSkeleton, Flex, GlassCard } from '@/components'
+import { Card, ContentSkeleton, Flex } from '@/components'
 
 /**
  * Skeleton loading state for stats card
  */
 export function StatsCardSkeleton() {
 	return (
-		<GlassCard padding="md">
+		<Card padding="md">
 			<Flex direction="row" justify="between">
 				<Flex direction="col" gap="sm">
 					<ContentSkeleton variant="text" size="md" />
@@ -14,6 +14,6 @@ export function StatsCardSkeleton() {
 				</Flex>
 				<ContentSkeleton variant="icon" size="md" />
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

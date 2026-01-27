@@ -1,6 +1,6 @@
 'use client'
 
-import { GlassCard, Users } from '@/components'
+import { Card, Users } from '@/components'
 
 interface PropertyMemberInfo {
 	id: string
@@ -19,7 +19,7 @@ interface PropertyOwnersSectionProps {
 
 export function PropertyOwnersSection({ propertyMembers }: PropertyOwnersSectionProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<div className="flex flex-col gap-4">
 				<div className="flex items-center gap-3">
 					<Users className="h-4 w-4 text-muted-foreground" />
@@ -49,6 +49,6 @@ export function PropertyOwnersSection({ propertyMembers }: PropertyOwnersSection
 					</div>
 				)}
 			</div>
-		</GlassCard>
+		</Card>
 	)
 }

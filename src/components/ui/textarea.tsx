@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 // =============================================================================
 
 type TextareaSize = 'sm' | 'md' | 'lg';
-type TextareaVariant = 'default' | 'glass';
+type TextareaVariant = 'default';
 
 const textareaSizeClasses: Record<TextareaSize, string> = {
 	sm: 'min-h-[80px] px-2.5 py-1.5 text-xs',
@@ -18,7 +18,6 @@ const textareaSizeClasses: Record<TextareaSize, string> = {
 
 const textareaVariantClasses: Record<TextareaVariant, string> = {
 	default: 'border-input bg-transparent dark:bg-input/30',
-	glass: 'border-border/50 bg-background/50 backdrop-blur-sm',
 };
 
 // =============================================================================

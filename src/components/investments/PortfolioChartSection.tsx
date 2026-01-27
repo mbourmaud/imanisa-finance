@@ -1,4 +1,4 @@
-import { Flex, GlassCard } from '@/components'
+import { Card, Flex } from '@/components'
 import type { ReactNode } from 'react'
 
 interface PortfolioChartSectionProps {
@@ -10,7 +10,7 @@ interface PortfolioChartSectionProps {
  */
 export function PortfolioChartSection({ children }: PortfolioChartSectionProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="row" justify="between" className="mb-4">
 				<Flex direction="col" gap="xs">
 					<h3 className="text-lg font-bold tracking-tight">
@@ -32,6 +32,6 @@ export function PortfolioChartSection({ children }: PortfolioChartSectionProps) 
 				</Flex>
 			</Flex>
 			{children}
-		</GlassCard>
+		</Card>
 	)
 }

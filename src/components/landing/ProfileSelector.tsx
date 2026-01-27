@@ -1,3 +1,4 @@
+import { Card } from '@/components'
 import { ProfileButton } from './ProfileButton'
 
 interface Entity {
@@ -18,20 +19,19 @@ export function ProfileSelector({ entities, onSelectProfile }: ProfileSelectorPr
 	const individualEntities = entities.filter((e) => e.type === 'individual')
 
 	return (
-		<div className="w-full max-w-sm">
+		<Card className="w-full max-w-sm p-6">
 			<p className="mb-6 text-center text-xl font-semibold">
 				Qui êtes-vous ?
 			</p>
 			<div className="flex flex-col gap-4">
-				{individualEntities.map((entity, index) => (
+				{individualEntities.map((entity) => (
 					<ProfileButton
 						key={entity.id}
 						name={entity.name}
 						onClick={() => onSelectProfile(entity.id)}
-						animationDelay={`${0.1 + index * 0.1}s`}
 					/>
 				))}
 			</div>
-		</div>
+		</Card>
 	)
 }

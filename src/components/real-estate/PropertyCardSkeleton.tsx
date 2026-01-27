@@ -1,11 +1,11 @@
-import { Flex, GlassCard, Skeleton } from '@/components'
+import { Card, Flex, Skeleton } from '@/components'
 
 /**
  * Skeleton loading state for property card
  */
 export function PropertyCardSkeleton() {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="col" gap="md">
 				<Flex direction="row" justify="between">
 					<Flex direction="row" gap="md">
@@ -22,6 +22,6 @@ export function PropertyCardSkeleton() {
 				</div>
 				<Skeleton className="h-6 w-full" />
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

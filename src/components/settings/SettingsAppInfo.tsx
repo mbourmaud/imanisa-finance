@@ -1,4 +1,4 @@
-import { Flex, GlassCard } from '@/components'
+import { Card, Flex } from '@/components'
 
 interface SettingsAppInfoProps {
 	version: string
@@ -9,7 +9,7 @@ interface SettingsAppInfoProps {
  */
 export function SettingsAppInfo({ version }: SettingsAppInfoProps) {
 	return (
-		<GlassCard padding="lg" className="bg-muted/20">
+		<Card padding="lg" className="bg-muted/20">
 			<Flex direction="col" align="center" className="text-center">
 				<p className="font-medium">Imanisa Finance</p>
 				<p className="text-sm text-muted-foreground">Version {version}</p>
@@ -25,6 +25,6 @@ export function SettingsAppInfo({ version }: SettingsAppInfoProps) {
 					Voir sur GitHub
 				</a>
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

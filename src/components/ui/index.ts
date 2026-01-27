@@ -175,14 +175,6 @@ export { Textarea } from './textarea'
 
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
 export type {
-	AccentColor,
-	GlassCardHeaderProps,
-	GlassCardPadding,
-	GlassCardProps,
-	GlassCardVariant,
-} from './glass-card'
-export { GlassCard, GlassCardContent, GlassCardFooter, GlassCardHeader } from './glass-card'
-export type {
 	StatCardGridProps,
 	StatCardProps,
 	StatCardSkeletonProps,

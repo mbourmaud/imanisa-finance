@@ -1,4 +1,4 @@
-import { Button, Flex, GlassCard } from '@/components'
+import { Button, Card, Flex } from '@/components'
 import type { ReactNode } from 'react'
 
 interface PositionsSectionProps {
@@ -11,7 +11,7 @@ interface PositionsSectionProps {
  */
 export function PositionsSection({ children, onViewAll }: PositionsSectionProps) {
 	return (
-		<GlassCard padding="lg">
+		<Card padding="lg">
 			<Flex direction="row" justify="between" className="mb-4">
 				<Flex direction="col" gap="xs">
 					<h3 className="text-lg font-bold tracking-tight">Positions</h3>
@@ -26,6 +26,6 @@ export function PositionsSection({ children, onViewAll }: PositionsSectionProps)
 			<Flex direction="col" gap="sm">
 				{children}
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

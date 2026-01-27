@@ -30,12 +30,6 @@ describe('Textarea', () => {
 		expect(textarea).toHaveClass('min-h-[120px]', 'text-base');
 	});
 
-	it('renders with variant glass', () => {
-		const { container } = render(<Textarea variant="glass" />);
-		const textarea = container.querySelector('textarea');
-		expect(textarea).toHaveClass('border-border/50', 'bg-background/50', 'backdrop-blur-sm');
-	});
-
 	it('renders disabled state', () => {
 		const { container } = render(<Textarea disabled />);
 		const textarea = container.querySelector('textarea');

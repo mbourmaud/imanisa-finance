@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Button, Flex, GlassCard, Plus } from '@/components'
+import { Button, Card, Flex, Plus } from '@/components'
 import { BankLogo } from '@/components/banks/BankLogo'
 import { MoneyDisplay } from '@/components/common/MoneyDisplay'
 
@@ -124,7 +124,7 @@ export function BankRow({
 	}
 
 	return (
-		<GlassCard
+		<Card
 			className="overflow-hidden p-0 transition-all"
 			style={{
 				borderLeft: `4px solid ${bankColor}`,
@@ -133,6 +133,6 @@ export function BankRow({
 			}}
 		>
 			{contentMarkup}
-		</GlassCard>
+		</Card>
 	)
 }

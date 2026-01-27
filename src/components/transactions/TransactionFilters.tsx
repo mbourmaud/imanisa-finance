@@ -1,9 +1,9 @@
 import {
 	Button,
 	Calendar,
+	Card,
 	Filter,
 	Flex,
-	GlassCard,
 	SearchInput,
 	Select,
 	SelectContent,
@@ -17,7 +17,7 @@ import {
  */
 export function TransactionFilters() {
 	return (
-		<GlassCard padding="md">
+		<Card padding="md">
 			<Flex direction="col" gap="md">
 				<Flex direction="row" gap="md" wrap="wrap">
 					<SearchInput
@@ -64,6 +64,6 @@ export function TransactionFilters() {
 					</Button>
 				</Flex>
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }

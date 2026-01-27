@@ -1,9 +1,9 @@
 'use client'
 
 import {
+	Card,
 	ConfirmDialog,
 	Flex,
-	GlassCard,
 	ImportDropZone,
 	ImportErrorBanner,
 	ImportFormGrid,
@@ -34,7 +34,7 @@ export default function ImportPage() {
 
 			<ImportFormGrid
 				formCard={
-					<GlassCard padding="lg">
+					<Card padding="lg">
 						<Flex direction="col" gap="md">
 							<page.form.AppField name="bankId">
 								{() => (
@@ -73,7 +73,7 @@ export default function ImportPage() {
 								/>
 							</Flex>
 						</Flex>
-					</GlassCard>
+					</Card>
 				}
 				statsCard={
 					<ImportStatsCard

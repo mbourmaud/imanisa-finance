@@ -70,7 +70,7 @@ const DashboardMain = forwardRef<HTMLElement, DashboardMainProps>(
 				className={cn('flex-1 p-6', className)}
 				{...props}
 			>
-				<div className="mx-auto max-w-7xl animate-fadeIn">{children}</div>
+				<div className="mx-auto max-w-7xl">{children}</div>
 			</main>
 		)
 	},

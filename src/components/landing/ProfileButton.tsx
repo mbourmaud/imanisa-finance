@@ -9,15 +9,15 @@ interface ProfileButtonProps {
 /**
  * Profile selection button for landing page
  */
-export function ProfileButton({ name, onClick, animationDelay }: ProfileButtonProps) {
+export function ProfileButton({ name, onClick }: ProfileButtonProps) {
 	return (
 		<Button
 			variant="ghost"
 			onClick={onClick}
 			fullWidth
-			className={`flex items-center justify-start gap-5 rounded-3xl border border-border/40 bg-card/80 p-6 backdrop-blur-sm ${animationDelay ? `[animation-delay:${animationDelay}]` : ''}`}
+			className="flex items-center justify-start gap-5 rounded-xl border bg-card p-6 transition-colors hover:bg-accent"
 		>
-			<div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-[oklch(0.6_0.2_30/0.2)] shadow-[0_10px_15px_-3px_hsl(var(--primary)/0.1)]">
+			<div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10">
 				<User className="h-8 w-8 text-primary" />
 			</div>
 			<div className="flex-1 text-left">

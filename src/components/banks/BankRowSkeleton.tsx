@@ -1,11 +1,11 @@
-import { ContentSkeleton, Flex, FlexItem, GlassCard } from '@/components'
+import { Card, ContentSkeleton, Flex, FlexItem } from '@/components'
 
 /**
  * Skeleton loading state for bank row
  */
 export function BankRowSkeleton() {
 	return (
-		<GlassCard padding="sm">
+		<Card padding="sm">
 			<Flex direction="row" gap="md">
 				<ContentSkeleton variant="icon" size="md" />
 				<Flex direction="col" gap="sm">
@@ -16,6 +16,6 @@ export function BankRowSkeleton() {
 				</Flex>
 				<ContentSkeleton variant="text" size="lg" />
 			</Flex>
-		</GlassCard>
+		</Card>
 	)
 }
