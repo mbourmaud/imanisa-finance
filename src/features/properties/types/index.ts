@@ -247,3 +247,7 @@ export interface UpdateUtilityContractInput {
 }
 
 export type { PropertyType, PropertyUsage, InsuranceType, UtilityType };
+
+// Form types
+export type { PropertyFormData } from './form-types';
+export { initialPropertyFormData } from './form-types';
