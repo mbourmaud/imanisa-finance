@@ -1,4 +1,4 @@
-import { Wallet } from '@/components'
+import { Wallet } from '@/components';
 
 /**
  * Login page logo with smaller margin than landing
@@ -10,11 +10,9 @@ export function LoginLogo() {
 				<Wallet className="h-10 w-10 text-white" />
 			</div>
 			<div className="flex flex-col items-center gap-2">
-				<h1 className="text-2xl font-bold tracking-tight">
-					Imanisa
-				</h1>
+				<h1 className="text-2xl font-bold tracking-tight">Imanisa</h1>
 				<p className="text-lg text-muted-foreground">Finance familiale</p>
 			</div>
 		</div>
-	)
+	);
 }

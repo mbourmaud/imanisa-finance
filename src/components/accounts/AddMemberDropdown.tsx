@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
-import { Button, Flex, Loader2, Plus } from '@/components'
+import { Button, Loader2, Plus } from '@/components';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface AddMemberDropdownProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	availableMembers: Member[]
-	onSelectMember: (memberId: string) => void
-	isPending?: boolean
-	pendingMemberId?: string
-	pendingMemberName?: string
-	pendingMemberColor?: string | null
-	disabled?: boolean
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	availableMembers: Member[];
+	onSelectMember: (memberId: string) => void;
+	isPending?: boolean;
+	pendingMemberId?: string;
+	pendingMemberName?: string;
+	pendingMemberColor?: string | null;
+	disabled?: boolean;
 }
 
 /**
@@ -38,20 +38,15 @@ export function AddMemberDropdown({
 		<div className="relative">
 			{/* Loading indicator when adding */}
 			{isPending && pendingMemberId && (
-				<Flex
-					direction="row"
-					gap="xs"
-					align="center"
-					className="pl-1.5 pr-2 py-1 text-sm rounded-md bg-muted/50 animate-pulse"
-				>
+				<div className="flex items-center gap-1 pl-1.5 pr-2 py-1 text-sm rounded-md bg-muted/50 animate-pulse">
 					<div
-						className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium"
-						style={{ backgroundColor: pendingMemberColor || '#6b7280' }}
+						className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium bg-[var(--member-color)]"
+						style={{ '--member-color': pendingMemberColor || '#6b7280' } as React.CSSProperties}
 					>
 						<Loader2 className="h-3 w-3 animate-spin" />
 					</div>
 					<span className="font-medium text-muted-foreground">{pendingMemberName}</span>
-				</Flex>
+				</div>
 			)}
 
 			{/* Add button */}
@@ -80,8 +75,8 @@ export function AddMemberDropdown({
 							className="flex items-center gap-2 px-2 py-1.5 rounded text-sm justify-start text-left transition-all"
 						>
 							<div
-								className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium"
-								style={{ backgroundColor: member.color || '#6b7280' }}
+								className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium bg-[var(--member-color)]"
+								style={{ '--member-color': member.color || '#6b7280' } as React.CSSProperties}
 							>
 								{member.name.charAt(0).toUpperCase()}
 							</div>
@@ -96,5 +91,5 @@ export function AddMemberDropdown({
 				</div>
 			)}
 		</div>
-	)
+	);
 }

@@ -2,20 +2,19 @@ import {
 	AddBankDropdown,
 	BankRow,
 	BankRowSkeleton,
-	Flex,
 	IconBox,
 	Landmark,
 	SectionHeader,
-} from '@/components'
-import { BankAccountsList } from './BankAccountsList'
-import type { Bank } from '@/features/banks'
+} from '@/components';
+import { BankAccountsList } from './BankAccountsList';
+import type { Bank } from '@/features/banks';
 
 interface BankAccountsSectionProps {
-	banks: Bank[] | undefined
-	loading: boolean
-	onAddAccountClick: (bank: Bank) => void
-	getBankLogo: (bankId: string, originalLogo: string | null) => string | null
-	onLogoChange: (bankId: string, url: string) => void
+	banks: Bank[] | undefined;
+	loading: boolean;
+	onAddAccountClick: (bank: Bank) => void;
+	getBankLogo: (bankId: string, originalLogo: string | null) => string | null;
+	onLogoChange: (bankId: string, url: string) => void;
 }
 
 export function BankAccountsSection({
@@ -26,25 +25,20 @@ export function BankAccountsSection({
 	onLogoChange,
 }: BankAccountsSectionProps) {
 	return (
-		<Flex direction="col" gap="sm">
+		<div className="flex flex-col gap-2">
 			<SectionHeader
 				title="Comptes bancaires"
-				size="sm"
-				icon={<IconBox icon={Landmark} size="sm" variant="primary" rounded="md" />}
-				showLine
-				action={
-					banks && <AddBankDropdown banks={banks} onSelectBank={onAddAccountClick} />
-				}
+				action={banks && <AddBankDropdown banks={banks} onSelectBank={onAddAccountClick} />}
 			/>
 
 			{loading ? (
-				<Flex direction="col" gap="sm">
+				<div className="flex flex-col gap-2">
 					<BankRowSkeleton />
 					<BankRowSkeleton />
 					<BankRowSkeleton />
-				</Flex>
+				</div>
 			) : (
-				<Flex direction="col" gap="sm">
+				<div className="flex flex-col gap-2">
 					{banks?.map((bank, index) => (
 						<BankRow
 							key={bank.id}
@@ -61,8 +55,8 @@ export function BankAccountsSection({
 							animationDelay={index * 50}
 						/>
 					))}
-				</Flex>
+				</div>
 			)}
-		</Flex>
-	)
+		</div>
+	);
 }

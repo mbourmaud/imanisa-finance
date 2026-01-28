@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -7,7 +7,7 @@ import {
 	SettingsNotificationRow,
 	SettingsSectionCard,
 	Shield,
-} from '@/components'
+} from '@/components';
 
 export function SecuritySection() {
 	return (
@@ -27,5 +27,5 @@ export function SecuritySection() {
 				defaultChecked
 			/>
 		</SettingsSectionCard>
-	)
+	);
 }

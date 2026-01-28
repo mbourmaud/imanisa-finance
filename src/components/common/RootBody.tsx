@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface RootBodyProps {
-	children: ReactNode
-	fontClasses: string
+	children: ReactNode;
+	fontClasses: string;
 }
 
 /**
@@ -10,5 +10,5 @@ interface RootBodyProps {
  * Extracts className from layout.tsx to maintain "zero className in pages" rule.
  */
 export function RootBody({ children, fontClasses }: RootBodyProps) {
-	return <body className={`${fontClasses} antialiased`}>{children}</body>
+	return <body className={`${fontClasses} antialiased`}>{children}</body>;
 }

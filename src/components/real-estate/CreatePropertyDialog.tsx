@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -9,7 +9,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-	Flex,
 	FormErrorBanner,
 	Input,
 	Label,
@@ -22,30 +21,30 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components'
-import type { MemberShare, PropertyFormData } from '@/features/properties'
+} from '@/components';
+import type { MemberShare, PropertyFormData } from '@/features/properties';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface CreatePropertyDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	formData: PropertyFormData
-	memberShares: MemberShare[]
-	members: Member[]
-	formError: string | null
-	isSubmitting: boolean
-	onInputChange: (field: keyof PropertyFormData, value: string) => void
-	onAddMember: () => void
-	onRemoveMember: (memberId: string) => void
-	onMemberChange: (index: number, memberId: string) => void
-	onShareChange: (index: number, share: number) => void
-	onSubmit: (e: React.FormEvent) => Promise<void>
-	onReset: () => void
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	formData: PropertyFormData;
+	memberShares: MemberShare[];
+	members: Member[];
+	formError: string | null;
+	isSubmitting: boolean;
+	onInputChange: (field: keyof PropertyFormData, value: string) => void;
+	onAddMember: () => void;
+	onRemoveMember: (memberId: string) => void;
+	onMemberChange: (index: number, memberId: string) => void;
+	onShareChange: (index: number, share: number) => void;
+	onSubmit: (e: React.FormEvent) => Promise<void>;
+	onReset: () => void;
 }
 
 export function CreatePropertyDialog({
@@ -64,14 +63,14 @@ export function CreatePropertyDialog({
 	onSubmit,
 	onReset,
 }: CreatePropertyDialogProps) {
-	const isRental = formData.usage === 'RENTAL'
+	const isRental = formData.usage === 'RENTAL';
 
 	return (
 		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
-				onOpenChange(isOpen)
-				if (!isOpen) onReset()
+				onOpenChange(isOpen);
+				if (!isOpen) onReset();
 			}}
 		>
 			<DialogTrigger asChild>
@@ -85,16 +84,16 @@ export function CreatePropertyDialog({
 					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={onSubmit}>
-					<Flex direction="col" gap="lg">
+					<div className="flex flex-col gap-6">
 						{formError && <FormErrorBanner message={formError} />}
 
 						{/* Basic info */}
-						<Flex direction="col" gap="md">
+						<div className="flex flex-col gap-4">
 							<span className="text-sm font-medium text-muted-foreground">
 								Informations générales
 							</span>
 							<PropertyFormGrid>
-								<Flex direction="col" gap="sm">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="name">Nom du bien *</Label>
 									<Input
 										id="name"
@@ -102,8 +101,8 @@ export function CreatePropertyDialog({
 										value={formData.name}
 										onChange={(e) => onInputChange('name', e.target.value)}
 									/>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="type">Type *</Label>
 									<Select
 										value={formData.type}
@@ -117,8 +116,8 @@ export function CreatePropertyDialog({
 											<SelectItem value="HOUSE">Maison</SelectItem>
 										</SelectContent>
 									</Select>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="usage">Usage *</Label>
 									<Select
 										value={formData.usage}
@@ -133,8 +132,8 @@ export function CreatePropertyDialog({
 											<SelectItem value="RENTAL">Locatif</SelectItem>
 										</SelectContent>
 									</Select>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="surface">Surface (m²) *</Label>
 									<Input
 										id="surface"
@@ -145,8 +144,8 @@ export function CreatePropertyDialog({
 										value={formData.surface}
 										onChange={(e) => onInputChange('surface', e.target.value)}
 									/>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="rooms">Pièces</Label>
 									<Input
 										id="rooms"
@@ -156,8 +155,8 @@ export function CreatePropertyDialog({
 										value={formData.rooms}
 										onChange={(e) => onInputChange('rooms', e.target.value)}
 									/>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="bedrooms">Chambres</Label>
 									<Input
 										id="bedrooms"
@@ -167,15 +166,15 @@ export function CreatePropertyDialog({
 										value={formData.bedrooms}
 										onChange={(e) => onInputChange('bedrooms', e.target.value)}
 									/>
-								</Flex>
+								</div>
 							</PropertyFormGrid>
-						</Flex>
+						</div>
 
 						{/* Address */}
-						<Flex direction="col" gap="md">
+						<div className="flex flex-col gap-4">
 							<span className="text-sm font-medium text-muted-foreground">Adresse</span>
-							<Flex direction="col" gap="md">
-								<Flex direction="col" gap="sm">
+							<div className="flex flex-col gap-4">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="address">Adresse *</Label>
 									<Input
 										id="address"
@@ -183,8 +182,8 @@ export function CreatePropertyDialog({
 										value={formData.address}
 										onChange={(e) => onInputChange('address', e.target.value)}
 									/>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="address2">Complément d&apos;adresse</Label>
 									<Input
 										id="address2"
@@ -192,9 +191,9 @@ export function CreatePropertyDialog({
 										value={formData.address2}
 										onChange={(e) => onInputChange('address2', e.target.value)}
 									/>
-								</Flex>
+								</div>
 								<PropertyFormGrid>
-									<Flex direction="col" gap="sm">
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="city">Ville *</Label>
 										<Input
 											id="city"
@@ -202,8 +201,8 @@ export function CreatePropertyDialog({
 											value={formData.city}
 											onChange={(e) => onInputChange('city', e.target.value)}
 										/>
-									</Flex>
-									<Flex direction="col" gap="sm">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="postalCode">Code postal *</Label>
 										<Input
 											id="postalCode"
@@ -211,16 +210,16 @@ export function CreatePropertyDialog({
 											value={formData.postalCode}
 											onChange={(e) => onInputChange('postalCode', e.target.value)}
 										/>
-									</Flex>
+									</div>
 								</PropertyFormGrid>
-							</Flex>
-						</Flex>
+							</div>
+						</div>
 
 						{/* Purchase info */}
-						<Flex direction="col" gap="md">
+						<div className="flex flex-col gap-4">
 							<span className="text-sm font-medium text-muted-foreground">Achat</span>
 							<PropertyFormGrid>
-								<Flex direction="col" gap="sm">
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="purchasePrice">Prix d&apos;achat (€) *</Label>
 									<Input
 										id="purchasePrice"
@@ -231,8 +230,8 @@ export function CreatePropertyDialog({
 										value={formData.purchasePrice}
 										onChange={(e) => onInputChange('purchasePrice', e.target.value)}
 									/>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="purchaseDate">Date d&apos;achat *</Label>
 									<Input
 										id="purchaseDate"
@@ -240,8 +239,8 @@ export function CreatePropertyDialog({
 										value={formData.purchaseDate}
 										onChange={(e) => onInputChange('purchaseDate', e.target.value)}
 									/>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="notaryFees">Frais de notaire (€) *</Label>
 									<Input
 										id="notaryFees"
@@ -252,8 +251,8 @@ export function CreatePropertyDialog({
 										value={formData.notaryFees}
 										onChange={(e) => onInputChange('notaryFees', e.target.value)}
 									/>
-								</Flex>
-								<Flex direction="col" gap="sm">
+								</div>
+								<div className="flex flex-col gap-2">
 									<Label htmlFor="agencyFees">Frais d&apos;agence (€)</Label>
 									<Input
 										id="agencyFees"
@@ -264,14 +263,14 @@ export function CreatePropertyDialog({
 										value={formData.agencyFees}
 										onChange={(e) => onInputChange('agencyFees', e.target.value)}
 									/>
-								</Flex>
+								</div>
 							</PropertyFormGrid>
-						</Flex>
+						</div>
 
 						{/* Current value */}
-						<Flex direction="col" gap="md">
+						<div className="flex flex-col gap-4">
 							<span className="text-sm font-medium text-muted-foreground">Valeur actuelle</span>
-							<Flex direction="col" gap="sm">
+							<div className="flex flex-col gap-2">
 								<Label htmlFor="currentValue">Valeur estimée (€) *</Label>
 								<Input
 									id="currentValue"
@@ -282,17 +281,17 @@ export function CreatePropertyDialog({
 									value={formData.currentValue}
 									onChange={(e) => onInputChange('currentValue', e.target.value)}
 								/>
-							</Flex>
-						</Flex>
+							</div>
+						</div>
 
 						{/* Rental info */}
 						{isRental && (
-							<Flex direction="col" gap="md">
+							<div className="flex flex-col gap-4">
 								<span className="text-sm font-medium text-muted-foreground">
 									Informations locatives
 								</span>
 								<PropertyFormGrid>
-									<Flex direction="col" gap="sm">
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="rentAmount">Loyer mensuel (€)</Label>
 										<Input
 											id="rentAmount"
@@ -303,8 +302,8 @@ export function CreatePropertyDialog({
 											value={formData.rentAmount}
 											onChange={(e) => onInputChange('rentAmount', e.target.value)}
 										/>
-									</Flex>
-									<Flex direction="col" gap="sm">
+									</div>
+									<div className="flex flex-col gap-2">
 										<Label htmlFor="rentCharges">Charges locatives (€)</Label>
 										<Input
 											id="rentCharges"
@@ -315,14 +314,14 @@ export function CreatePropertyDialog({
 											value={formData.rentCharges}
 											onChange={(e) => onInputChange('rentCharges', e.target.value)}
 										/>
-									</Flex>
+									</div>
 								</PropertyFormGrid>
-							</Flex>
+							</div>
 						)}
 
 						{/* Members/Owners */}
-						<Flex direction="col" gap="md">
-							<Flex direction="row" justify="between">
+						<div className="flex flex-col gap-4">
+							<div className="flex flex-row justify-between">
 								<span className="text-sm font-medium text-muted-foreground">Propriétaires</span>
 								{members.length > memberShares.length && (
 									<Button
@@ -335,20 +334,20 @@ export function CreatePropertyDialog({
 										Ajouter
 									</Button>
 								)}
-							</Flex>
+							</div>
 							{memberShares.length === 0 ? (
 								<span className="text-sm text-muted-foreground">
 									Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des
 									propriétaires.
 								</span>
 							) : (
-								<Flex direction="col" gap="md">
+								<div className="flex flex-col gap-4">
 									{memberShares.map((ms, index) => {
 										const availableMembers = members.filter(
 											(m) =>
 												m.id === ms.memberId ||
-												!memberShares.some((other) => other.memberId === m.id)
-										)
+												!memberShares.some((other) => other.memberId === m.id),
+										);
 										return (
 											<MemberShareRow
 												key={ms.memberId}
@@ -360,7 +359,7 @@ export function CreatePropertyDialog({
 												onShareChange={(share) => onShareChange(index, share)}
 												onRemove={() => onRemoveMember(ms.memberId)}
 											/>
-										)
+										);
 									})}
 									{memberShares.length > 0 && (
 										<span className="text-right text-xs text-muted-foreground">
@@ -370,12 +369,12 @@ export function CreatePropertyDialog({
 											)}
 										</span>
 									)}
-								</Flex>
+								</div>
 							)}
-						</Flex>
+						</div>
 
 						{/* Notes */}
-						<Flex direction="col" gap="sm">
+						<div className="flex flex-col gap-2">
 							<Label htmlFor="notes">Notes</Label>
 							<Input
 								id="notes"
@@ -383,7 +382,7 @@ export function CreatePropertyDialog({
 								value={formData.notes}
 								onChange={(e) => onInputChange('notes', e.target.value)}
 							/>
-						</Flex>
+						</div>
 
 						<DialogFooter className="pt-4">
 							<Button
@@ -405,9 +404,9 @@ export function CreatePropertyDialog({
 								)}
 							</Button>
 						</DialogFooter>
-					</Flex>
+					</div>
 				</form>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

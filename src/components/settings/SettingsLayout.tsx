@@ -1,9 +1,8 @@
-import type { ReactNode } from 'react'
-import { Flex } from '@/components'
+import type { ReactNode } from 'react';
 
 interface SettingsLayoutProps {
-	mainContent: ReactNode
-	sidebarContent: ReactNode
+	mainContent: ReactNode;
+	sidebarContent: ReactNode;
 }
 
 /**
@@ -13,12 +12,8 @@ interface SettingsLayoutProps {
 export function SettingsLayout({ mainContent, sidebarContent }: SettingsLayoutProps) {
 	return (
 		<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-			<Flex direction="col" gap="lg" className="lg:col-span-2">
-				{mainContent}
-			</Flex>
-			<Flex direction="col" gap="lg">
-				{sidebarContent}
-			</Flex>
+			<div className="flex flex-col gap-6 lg:col-span-2">{mainContent}</div>
+			<div className="flex flex-col gap-6">{sidebarContent}</div>
 		</div>
-	)
+	);
 }

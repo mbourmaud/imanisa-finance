@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { Card, Skeleton } from '@/components'
+import { Card, Skeleton } from '@/components';
 
 function DetailItemSkeleton() {
 	return (
@@ -8,7 +8,7 @@ function DetailItemSkeleton() {
 			<Skeleton className="h-3 w-16" />
 			<Skeleton className="h-5 w-24" />
 		</div>
-	)
+	);
 }
 
 function SectionSkeleton() {
@@ -23,7 +23,7 @@ function SectionSkeleton() {
 				</div>
 			</div>
 		</Card>
-	)
+	);
 }
 
 export function PropertyDetailSkeleton() {
@@ -39,5 +39,5 @@ export function PropertyDetailSkeleton() {
 			<SectionSkeleton />
 			<SectionSkeleton />
 		</div>
-	)
+	);
 }

@@ -1,9 +1,9 @@
-import { Button, ChevronRight, User } from '@/components'
+import { Button, ChevronRight, User } from '@/components';
 
 interface ProfileButtonProps {
-	name: string
-	onClick: () => void
-	animationDelay?: string
+	name: string;
+	onClick: () => void;
+	animationDelay?: string;
 }
 
 /**
@@ -22,13 +22,11 @@ export function ProfileButton({ name, onClick }: ProfileButtonProps) {
 			</div>
 			<div className="flex-1 text-left">
 				<p className="text-lg font-semibold">{name}</p>
-				<p className="mt-0.5 text-sm text-muted-foreground">
-					Accéder à mon espace
-				</p>
+				<p className="mt-0.5 text-sm text-muted-foreground">Accéder à mon espace</p>
 			</div>
 			<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
 				<ChevronRight className="h-5 w-5 text-primary" />
 			</div>
 		</Button>
-	)
+	);
 }

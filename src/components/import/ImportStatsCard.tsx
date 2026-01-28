@@ -3,17 +3,16 @@ import {
 	CheckCircle2,
 	Clock,
 	FileSpreadsheet,
-	Flex,
 	RefreshCw,
 	StatCard,
 	StatCardGrid,
-} from '@/components'
+} from '@/components';
 
 interface ImportStatsCardProps {
-	totalFiles: number
-	processedCount: number
-	totalRecords: number
-	pendingCount: number
+	totalFiles: number;
+	processedCount: number;
+	totalRecords: number;
+	pendingCount: number;
 }
 
 /**
@@ -27,10 +26,8 @@ export function ImportStatsCard({
 }: ImportStatsCardProps) {
 	return (
 		<Card padding="lg">
-			<Flex direction="col" gap="md">
-				<h3 className="text-base font-semibold tracking-tight">
-					Statistiques d&apos;import
-				</h3>
+			<div className="flex flex-col gap-4">
+				<h3 className="text-base font-semibold tracking-tight">Statistiques d&apos;import</h3>
 				<StatCardGrid columns={3}>
 					<StatCard label="Fichiers" value={String(totalFiles)} icon={FileSpreadsheet} />
 					<StatCard label="Traités" value={String(processedCount)} icon={CheckCircle2} />
@@ -39,13 +36,12 @@ export function ImportStatsCard({
 
 				{pendingCount > 0 && (
 					<div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-						<Flex direction="row" align="center" gap="md">
+						<div className="flex flex-row items-center gap-4">
 							<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
 							<span className="text-sm font-medium text-amber-600 dark:text-amber-400">
-								{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de
-								traitement
+								{pendingCount} fichier{pendingCount > 1 ? 's' : ''} en attente de traitement
 							</span>
-						</Flex>
+						</div>
 					</div>
 				)}
 
@@ -59,7 +55,7 @@ export function ImportStatsCard({
 						<li>Les transactions sont importées automatiquement</li>
 					</ol>
 				</div>
-			</Flex>
+			</div>
 		</Card>
-	)
+	);
 }

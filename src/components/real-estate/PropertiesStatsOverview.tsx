@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { Building2, StatCard, StatCardGrid, StatsCardSkeleton, TrendingUp } from '@/components'
-import type { PropertySummary } from '@/features/properties'
+import { Building2, StatCard, StatCardGrid, StatsCardSkeleton, TrendingUp } from '@/components';
+import type { PropertySummary } from '@/features/properties';
 
 interface PropertiesStatsOverviewProps {
-	summary: PropertySummary | null
-	isLoading: boolean
-	formatCurrency: (amount: number) => string
+	summary: PropertySummary | null;
+	isLoading: boolean;
+	formatCurrency: (amount: number) => string;
 }
 
 export function PropertiesStatsOverview({
@@ -22,11 +22,11 @@ export function PropertiesStatsOverview({
 				<StatsCardSkeleton />
 				<StatsCardSkeleton />
 			</StatCardGrid>
-		)
+		);
 	}
 
 	if (!summary) {
-		return null
+		return null;
 	}
 
 	return (
@@ -71,5 +71,5 @@ export function PropertiesStatsOverview({
 				variant="default"
 			/>
 		</StatCardGrid>
-	)
+	);
 }

@@ -2,20 +2,19 @@ import {
 	AddBankDropdown,
 	BankRow,
 	BankRowSkeleton,
-	Flex,
 	IconBox,
 	SectionHeader,
 	TrendingUp,
-} from '@/components'
-import { BankAccountsList } from './BankAccountsList'
-import type { Bank } from '@/features/banks'
+} from '@/components';
+import { BankAccountsList } from './BankAccountsList';
+import type { Bank } from '@/features/banks';
 
 interface InvestmentAccountsSectionProps {
-	banks: Bank[] | undefined
-	loading: boolean
-	onAddAccountClick: (bank: Bank) => void
-	getBankLogo: (bankId: string, originalLogo: string | null) => string | null
-	onLogoChange: (bankId: string, url: string) => void
+	banks: Bank[] | undefined;
+	loading: boolean;
+	onAddAccountClick: (bank: Bank) => void;
+	getBankLogo: (bankId: string, originalLogo: string | null) => string | null;
+	onLogoChange: (bankId: string, url: string) => void;
 }
 
 export function InvestmentAccountsSection({
@@ -26,33 +25,19 @@ export function InvestmentAccountsSection({
 	onLogoChange,
 }: InvestmentAccountsSectionProps) {
 	return (
-		<Flex direction="col" gap="sm">
+		<div className="flex flex-col gap-2">
 			<SectionHeader
 				title="Investissements"
-				size="sm"
-				icon={
-					<IconBox
-						icon={TrendingUp}
-						size="sm"
-						variant="custom"
-						bgColor="hsl(270 60% 95%)"
-						iconColor="hsl(270 60% 50%)"
-						rounded="md"
-					/>
-				}
-				showLine
-				action={
-					banks && <AddBankDropdown banks={banks} onSelectBank={onAddAccountClick} />
-				}
+				action={banks && <AddBankDropdown banks={banks} onSelectBank={onAddAccountClick} />}
 			/>
 
 			{loading ? (
-				<Flex direction="col" gap="sm">
+				<div className="flex flex-col gap-2">
 					<BankRowSkeleton />
 					<BankRowSkeleton />
-				</Flex>
+				</div>
 			) : (
-				<Flex direction="col" gap="sm">
+				<div className="flex flex-col gap-2">
 					{banks?.map((bank, index) => (
 						<BankRow
 							key={bank.id}
@@ -69,8 +54,8 @@ export function InvestmentAccountsSection({
 							animationDelay={index * 50}
 						/>
 					))}
-				</Flex>
+				</div>
 			)}
-		</Flex>
-	)
+		</div>
+	);
 }

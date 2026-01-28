@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 import {
 	Button,
 	Dialog,
@@ -7,7 +7,6 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	Flex,
 	Input,
 	Label,
 	Select,
@@ -16,33 +15,33 @@ import {
 	SelectTrigger,
 	SelectValue,
 	Textarea,
-} from '@/components'
-import { MemberSelectorChips } from './MemberSelectorChips'
+} from '@/components';
+import { MemberSelectorChips } from './MemberSelectorChips';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface AddAccountDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	bankName: string
-	error?: string | null
-	isPending: boolean
-	name: string
-	onNameChange: (value: string) => void
-	description: string
-	onDescriptionChange: (value: string) => void
-	exportUrl: string
-	onExportUrlChange: (value: string) => void
-	accountType: string
-	onAccountTypeChange: (value: string) => void
-	members: Member[]
-	selectedMemberIds: string[]
-	onMemberToggle: (id: string) => void
-	onSubmit: () => void
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	bankName: string;
+	error?: string | null;
+	isPending: boolean;
+	name: string;
+	onNameChange: (value: string) => void;
+	description: string;
+	onDescriptionChange: (value: string) => void;
+	exportUrl: string;
+	onExportUrlChange: (value: string) => void;
+	accountType: string;
+	onAccountTypeChange: (value: string) => void;
+	members: Member[];
+	selectedMemberIds: string[];
+	onMemberToggle: (id: string) => void;
+	onSubmit: () => void;
 }
 
 /**
@@ -75,7 +74,7 @@ export function AddAccountDialog({
 					<DialogDescription>{bankName}</DialogDescription>
 				</DialogHeader>
 
-				<Flex direction="col" gap="lg">
+				<div className="flex flex-col gap-6">
 					{/* Error message */}
 					{error && (
 						<div className="rounded-md border border-destructive/20 bg-destructive/10 p-3">
@@ -84,7 +83,7 @@ export function AddAccountDialog({
 					)}
 
 					{/* Account name */}
-					<Flex direction="col" gap="sm">
+					<div className="flex flex-col gap-2">
 						<Label htmlFor="accountName" className="text-sm font-medium text-muted-foreground">
 							Nom du compte
 						</Label>
@@ -95,10 +94,10 @@ export function AddAccountDialog({
 							onChange={(e) => onNameChange(e.target.value)}
 							className="h-10"
 						/>
-					</Flex>
+					</div>
 
 					{/* Description (optional) */}
-					<Flex direction="col" gap="sm">
+					<div className="flex flex-col gap-2">
 						<Label
 							htmlFor="accountDescription"
 							className="text-sm font-medium text-muted-foreground"
@@ -113,10 +112,10 @@ export function AddAccountDialog({
 							onChange={(e) => onDescriptionChange(e.target.value)}
 							className="min-h-20 resize-none"
 						/>
-					</Flex>
+					</div>
 
 					{/* Account type */}
-					<Flex direction="col" gap="sm">
+					<div className="flex flex-col gap-2">
 						<Label htmlFor="accountType" className="text-sm font-medium text-muted-foreground">
 							Type de compte
 						</Label>
@@ -131,14 +130,11 @@ export function AddAccountDialog({
 								<SelectItem value="LOAN">Prêt</SelectItem>
 							</SelectContent>
 						</Select>
-					</Flex>
+					</div>
 
 					{/* Export URL (optional) */}
-					<Flex direction="col" gap="sm">
-						<Label
-							htmlFor="accountExportUrl"
-							className="text-sm font-medium text-muted-foreground"
-						>
+					<div className="flex flex-col gap-2">
+						<Label htmlFor="accountExportUrl" className="text-sm font-medium text-muted-foreground">
 							Lien d'export
 							<span className="ml-1 text-xs font-normal">(optionnel)</span>
 						</Label>
@@ -153,18 +149,18 @@ export function AddAccountDialog({
 						<span className="text-xs text-muted-foreground">
 							URL vers l'espace client pour exporter les relevés
 						</span>
-					</Flex>
+					</div>
 
 					{/* Member selection */}
-					<Flex direction="col" gap="sm">
+					<div className="flex flex-col gap-2">
 						<Label className="text-sm font-medium text-muted-foreground">Titulaires</Label>
 						<MemberSelectorChips
 							members={members}
 							selectedIds={selectedMemberIds}
 							onToggle={onMemberToggle}
 						/>
-					</Flex>
-				</Flex>
+					</div>
+				</div>
 
 				<DialogFooter className="pt-4">
 					<Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
@@ -176,5 +172,5 @@ export function AddAccountDialog({
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

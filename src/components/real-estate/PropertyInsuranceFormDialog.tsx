@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -16,33 +16,33 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components'
-import { FormErrorBanner } from './FormErrorBanner'
+} from '@/components';
+import { FormErrorBanner } from './FormErrorBanner';
 
-type InsuranceType = 'PNO' | 'MRH'
+type InsuranceType = 'PNO' | 'MRH';
 
 interface PropertyInsuranceFormData {
-	type: InsuranceType | ''
-	provider: string
-	contractNumber: string
-	monthlyPremium: string
-	startDate: string
-	endDate: string
-	coverage: string
-	link: string
-	notes: string
+	type: InsuranceType | '';
+	provider: string;
+	contractNumber: string;
+	monthlyPremium: string;
+	startDate: string;
+	endDate: string;
+	coverage: string;
+	link: string;
+	notes: string;
 }
 
 interface PropertyInsuranceFormDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	formData: PropertyInsuranceFormData
-	onInputChange: (field: keyof PropertyInsuranceFormData, value: string) => void
-	onSubmit: (e: React.FormEvent) => void
-	error: string | null
-	isSubmitting: boolean
-	isEditing: boolean
-	formatCurrency: (amount: number) => string
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	formData: PropertyInsuranceFormData;
+	onInputChange: (field: keyof PropertyInsuranceFormData, value: string) => void;
+	onSubmit: (e: React.FormEvent) => void;
+	error: string | null;
+	isSubmitting: boolean;
+	isEditing: boolean;
+	formatCurrency: (amount: number) => string;
 }
 
 /**
@@ -63,9 +63,7 @@ export function PropertyInsuranceFormDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>
-						{isEditing ? "Modifier l'assurance" : 'Ajouter une assurance'}
-					</DialogTitle>
+					<DialogTitle>{isEditing ? "Modifier l'assurance" : 'Ajouter une assurance'}</DialogTitle>
 					<DialogDescription>
 						Renseignez les informations de l&apos;assurance habitation (MRH ou PNO).
 					</DialogDescription>
@@ -77,10 +75,7 @@ export function PropertyInsuranceFormDialog({
 						{/* Type selection */}
 						<div className="flex flex-col gap-2">
 							<Label htmlFor="property-insurance-type">Type d&apos;assurance *</Label>
-							<Select
-								value={formData.type}
-								onValueChange={(value) => onInputChange('type', value)}
-							>
+							<Select value={formData.type} onValueChange={(value) => onInputChange('type', value)}>
 								<SelectTrigger id="property-insurance-type">
 									<SelectValue placeholder="Sélectionner le type" />
 								</SelectTrigger>
@@ -223,5 +218,5 @@ export function PropertyInsuranceFormDialog({
 				</form>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

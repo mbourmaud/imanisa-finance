@@ -291,10 +291,10 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
 	);
 }
 
-type SidebarInsetVariant = 'default' | 'muted'
+type SidebarInsetVariant = 'default' | 'muted';
 
 interface SidebarInsetProps extends React.ComponentProps<'main'> {
-	variant?: SidebarInsetVariant
+	variant?: SidebarInsetVariant;
 }
 
 function SidebarInset({ className, variant = 'default', ...props }: SidebarInsetProps) {

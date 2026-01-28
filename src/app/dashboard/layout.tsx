@@ -6,8 +6,8 @@ import {
 	SidebarInset,
 	SidebarProvider,
 	SidebarTrigger,
-} from '@/components'
-import { AppSidebar } from '@/components/app-sidebar'
+} from '@/components';
+import { AppSidebar } from '@/components/app-sidebar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -23,5 +23,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 				<DashboardMain>{children}</DashboardMain>
 			</SidebarInset>
 		</SidebarProvider>
-	)
+	);
 }

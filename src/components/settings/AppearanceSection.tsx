@@ -1,9 +1,8 @@
-'use client'
+'use client';
 
-import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 import {
-	Flex,
 	Label,
 	Palette,
 	Select,
@@ -14,16 +13,16 @@ import {
 	Separator,
 	SettingsSectionCard,
 	SettingsThemeSelector,
-} from '@/components'
+} from '@/components';
 
 export function AppearanceSection() {
-	const [mounted, setMounted] = useState(false)
-	const { theme, setTheme } = useTheme()
+	const [mounted, setMounted] = useState(false);
+	const { theme, setTheme } = useTheme();
 
 	// Avoid hydration mismatch by only rendering theme-dependent UI after mount
 	useEffect(() => {
-		setMounted(true)
-	}, [])
+		setMounted(true);
+	}, []);
 
 	return (
 		<SettingsSectionCard icon={Palette} title="Apparence" description="Personnalisez l'interface">
@@ -36,7 +35,7 @@ export function AppearanceSection() {
 			<Separator />
 
 			{/* Language */}
-			<Flex direction="col" gap="sm">
+			<div className="flex flex-col gap-2">
 				<Label htmlFor="language">Langue</Label>
 				<Select defaultValue="fr">
 					<SelectTrigger id="language" className="w-full max-w-[200px]">
@@ -47,7 +46,7 @@ export function AppearanceSection() {
 						<SelectItem value="en">English</SelectItem>
 					</SelectContent>
 				</Select>
-			</Flex>
+			</div>
 		</SettingsSectionCard>
-	)
+	);
 }

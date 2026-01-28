@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	AlertDialog,
@@ -18,28 +18,28 @@ import {
 	Plus,
 	Shield,
 	Trash2,
-} from '@/components'
-import type { InsuranceType } from '@/features/properties'
+} from '@/components';
+import type { InsuranceType } from '@/features/properties';
 
 interface PropertyInsurance {
-	id: string
-	type: InsuranceType
-	provider: string
-	contractNumber: string | null
-	monthlyPremium: number
-	startDate: Date | string
-	endDate: Date | string | null
-	coverage: string | null
-	link: string | null
-	notes: string | null
+	id: string;
+	type: InsuranceType;
+	provider: string;
+	contractNumber: string | null;
+	monthlyPremium: number;
+	startDate: Date | string;
+	endDate: Date | string | null;
+	coverage: string | null;
+	link: string | null;
+	notes: string | null;
 }
 
 interface PropertyInsuranceSectionProps {
-	insurance: PropertyInsurance | null
-	onAdd: () => void
-	onEdit: () => void
-	onDelete: () => void
-	isDeleting: boolean
+	insurance: PropertyInsurance | null;
+	onAdd: () => void;
+	onEdit: () => void;
+	onDelete: () => void;
+	isDeleting: boolean;
 }
 
 function formatCurrency(amount: number): string {
@@ -47,7 +47,7 @@ function formatCurrency(amount: number): string {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount)
+	}).format(amount);
 }
 
 function formatDate(dateString: string): string {
@@ -55,28 +55,28 @@ function formatDate(dateString: string): string {
 		day: 'numeric',
 		month: 'long',
 		year: 'numeric',
-	})
+	});
 }
 
 function getInsuranceTypeLabel(type: InsuranceType): string {
 	switch (type) {
 		case 'PNO':
-			return 'Propriétaire Non-Occupant'
+			return 'Propriétaire Non-Occupant';
 		case 'MRH':
-			return 'Multirisque Habitation'
+			return 'Multirisque Habitation';
 		default:
-			return type
+			return type;
 	}
 }
 
 function getInsuranceTypeBadge(type: InsuranceType): string {
 	switch (type) {
 		case 'PNO':
-			return 'PNO'
+			return 'PNO';
 		case 'MRH':
-			return 'MRH'
+			return 'MRH';
 		default:
-			return type
+			return type;
 	}
 }
 
@@ -134,8 +134,8 @@ export function PropertyInsuranceSection({
 									<AlertDialogHeader>
 										<AlertDialogTitle>Supprimer l&apos;assurance ?</AlertDialogTitle>
 										<AlertDialogDescription>
-											Cette action est irréversible. L&apos;assurance habitation sera
-											définitivement supprimée.
+											Cette action est irréversible. L&apos;assurance habitation sera définitivement
+											supprimée.
 										</AlertDialogDescription>
 									</AlertDialogHeader>
 									<AlertDialogFooter>
@@ -162,9 +162,7 @@ export function PropertyInsuranceSection({
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
 						<div>
 							<p className="text-xs text-muted-foreground">Prime mensuelle</p>
-							<p className="font-medium tabular-nums">
-								{formatCurrency(insurance.monthlyPremium)}
-							</p>
+							<p className="font-medium tabular-nums">{formatCurrency(insurance.monthlyPremium)}</p>
 							<p className="text-xs text-muted-foreground mt-0.5">
 								{formatCurrency(insurance.monthlyPremium * 12)}/an
 							</p>
@@ -228,5 +226,5 @@ export function PropertyInsuranceSection({
 				</div>
 			)}
 		</Card>
-	)
+	);
 }

@@ -1,18 +1,17 @@
 import {
 	CreditCard,
-	Flex,
 	Landmark,
 	StatCard,
 	StatCardGrid,
 	StatCardSkeleton,
 	Wallet,
-} from '@/components'
-import type { BanksSummary } from '@/features/banks'
+} from '@/components';
+import type { BanksSummary } from '@/features/banks';
 
 interface BanksStatsSectionProps {
-	summary: BanksSummary | undefined
-	loading: boolean
-	error: string | null
+	summary: BanksSummary | undefined;
+	loading: boolean;
+	error: string | null;
 }
 
 export function BanksStatsSection({ summary, loading, error }: BanksStatsSectionProps) {
@@ -23,21 +22,21 @@ export function BanksStatsSection({ summary, loading, error }: BanksStatsSection
 				<StatCardSkeleton variant="teal" />
 				<StatCardSkeleton variant="mint" />
 			</StatCardGrid>
-		)
+		);
 	}
 
 	if (error) {
 		return (
-			<Flex direction="col" gap="lg">
+			<div className="flex flex-col gap-6">
 				<span className="text-destructive">{error}</span>
-			</Flex>
-		)
+			</div>
+		);
 	}
 
 	const formattedBalance = new Intl.NumberFormat('fr-FR', {
 		style: 'currency',
 		currency: 'EUR',
-	}).format(summary?.totalBalance ?? 0)
+	}).format(summary?.totalBalance ?? 0);
 
 	return (
 		<StatCardGrid columns={3}>
@@ -56,5 +55,5 @@ export function BanksStatsSection({ summary, loading, error }: BanksStatsSection
 			/>
 			<StatCard variant="mint" icon={Wallet} label="Solde total" value={formattedBalance} />
 		</StatCardGrid>
-	)
+	);
 }

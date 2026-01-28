@@ -12,7 +12,7 @@ export type {
 	MemberListProps,
 	MemberSelectorProps,
 	MemberWithShare,
-} from './MemberAvatar'
+} from './MemberAvatar';
 
 export {
 	MemberAvatar,
@@ -21,4 +21,4 @@ export {
 	MemberBadge,
 	MemberList,
 	MemberSelector,
-} from './MemberAvatar'
+} from './MemberAvatar';

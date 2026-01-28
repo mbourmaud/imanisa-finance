@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	LandingBackground,
@@ -6,11 +6,11 @@ import {
 	LandingFooter,
 	LoginCard,
 	LoginLogo,
-} from '@/components'
-import { useGoogleLoginMutation } from '@/features/auth'
+} from '@/components';
+import { useGoogleLoginMutation } from '@/features/auth';
 
 export default function LoginPage() {
-	const { mutate: handleGoogleLogin, isPending } = useGoogleLoginMutation()
+	const { mutate: handleGoogleLogin, isPending } = useGoogleLoginMutation();
 
 	return (
 		<LandingContainer>
@@ -19,5 +19,5 @@ export default function LoginPage() {
 			<LoginCard onGoogleLogin={() => handleGoogleLogin()} isLoading={isPending} />
 			<LandingFooter />
 		</LandingContainer>
-	)
+	);
 }

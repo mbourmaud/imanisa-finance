@@ -1,55 +1,54 @@
-'use client'
+'use client';
 
-import type { RefObject } from 'react'
+import type { RefObject } from 'react';
 import {
 	Button,
 	Card,
 	CheckCircle2,
 	EmptyState,
 	FileSpreadsheet,
-	Flex,
 	Input,
 	Loader2,
 	Search,
 	Upload,
-} from '@/components'
-import { TransactionRow } from './TransactionRow'
+} from '@/components';
+import { TransactionRow } from './TransactionRow';
 
 interface TransactionCategory {
-	categoryId: string
+	categoryId: string;
 	category: {
-		id: string
-		name: string
-		icon: string
-		color: string
-	}
+		id: string;
+		name: string;
+		icon: string;
+		color: string;
+	};
 }
 
 interface Transaction {
-	id: string
-	date: string
-	description: string
-	amount: number
-	type: string
-	transactionCategory?: TransactionCategory | null
+	id: string;
+	date: string;
+	description: string;
+	amount: number;
+	type: string;
+	transactionCategory?: TransactionCategory | null;
 }
 
 interface TransactionsSectionProps {
-	transactions: Transaction[]
-	totalTransactions: number
-	searchQuery: string
-	onSearchChange: (value: string) => void
-	isUploading: boolean
-	isLoadingMore: boolean
-	hasMore: boolean
-	dragActive: boolean
-	onDragEnter: (e: React.DragEvent) => void
-	onDragLeave: (e: React.DragEvent) => void
-	onDragOver: (e: React.DragEvent) => void
-	onDrop: (e: React.DragEvent) => void
-	onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
-	onLoadMore: () => void
-	loadMoreRef: RefObject<HTMLDivElement | null>
+	transactions: Transaction[];
+	totalTransactions: number;
+	searchQuery: string;
+	onSearchChange: (value: string) => void;
+	isUploading: boolean;
+	isLoadingMore: boolean;
+	hasMore: boolean;
+	dragActive: boolean;
+	onDragEnter: (e: React.DragEvent) => void;
+	onDragLeave: (e: React.DragEvent) => void;
+	onDragOver: (e: React.DragEvent) => void;
+	onDrop: (e: React.DragEvent) => void;
+	onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	onLoadMore: () => void;
+	loadMoreRef: RefObject<HTMLDivElement | null>;
 }
 
 /**
@@ -76,17 +75,17 @@ export function TransactionsSection({
 		<Card className="p-0">
 			{/* Header */}
 			<div className="p-6 pb-4">
-				<Flex direction="col" gap="md">
+				<div className="flex flex-col gap-4">
 					{/* Title row */}
-					<Flex direction="row" justify="between" align="center">
-						<Flex direction="row" gap="sm" align="center">
+					<div className="flex flex-row justify-between items-center">
+						<div className="flex flex-row gap-2 items-center">
 							<h2 className="text-xl font-bold tracking-tight">Transactions</h2>
 							{totalTransactions > 0 && (
 								<span className="inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
 									{totalTransactions}
 								</span>
 							)}
-						</Flex>
+						</div>
 						<label htmlFor="transaction-import-file" className="cursor-pointer">
 							<input
 								id="transaction-import-file"
@@ -96,7 +95,11 @@ export function TransactionsSection({
 								className="hidden"
 								disabled={isUploading}
 							/>
-							<Button disabled={isUploading} asChild className="gap-2 rounded-xl shadow-md transition-all">
+							<Button
+								disabled={isUploading}
+								asChild
+								className="gap-2 rounded-xl shadow-md transition-all"
+							>
 								<span>
 									{isUploading ? (
 										<Loader2 className="h-4 w-4 animate-spin" />
@@ -107,7 +110,7 @@ export function TransactionsSection({
 								</span>
 							</Button>
 						</label>
-					</Flex>
+					</div>
 					{/* Search row */}
 					<div className="relative">
 						<Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors" />
@@ -118,7 +121,7 @@ export function TransactionsSection({
 							className="pl-12 h-12 text-base rounded-xl bg-background/60 border-border/30 transition-all shadow-sm"
 						/>
 					</div>
-				</Flex>
+				</div>
 			</div>
 
 			{/* Content */}
@@ -132,19 +135,13 @@ export function TransactionsSection({
 			>
 				{/* Drag overlay */}
 				{dragActive && (
-					<Flex
-						direction="col"
-						gap="sm"
-						align="center"
-						justify="center"
-						className="absolute inset-2 rounded-2xl z-10 bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-dashed border-primary/50"
-					>
+					<div className="flex flex-col gap-2 items-center justify-center absolute inset-2 rounded-2xl z-10 bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-dashed border-primary/50">
 						<div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10">
 							<Upload className="h-8 w-8 text-primary" />
 						</div>
 						<span className="text-sm font-semibold text-primary">Déposez votre fichier ici</span>
 						<span className="text-xs text-primary/70">CSV, XLSX ou XLS</span>
-					</Flex>
+					</div>
 				)}
 
 				{transactions.length === 0 ? (
@@ -152,30 +149,25 @@ export function TransactionsSection({
 						icon={FileSpreadsheet}
 						title="Aucune transaction"
 						description="Glissez un fichier CSV ou cliquez sur Importer pour ajouter vos transactions"
-						size="md"
 					/>
 				) : (
-					<Flex direction="col" gap="sm">
+					<div className="flex flex-col gap-2">
 						{transactions.map((tx, index) => (
-							<TransactionRow
-								key={tx.id}
-								{...tx}
-								animationDelay={Math.min(index, 10) * 20}
-							/>
+							<TransactionRow key={tx.id} {...tx} animationDelay={Math.min(index, 10) * 20} />
 						))}
 
 						{/* Infinite scroll trigger & loading indicator */}
 						<div ref={loadMoreRef} className="py-8">
 							{isLoadingMore ? (
-								<Flex direction="row" gap="sm" justify="center" align="center">
+								<div className="flex flex-row gap-2 justify-center items-center">
 									<div className="relative">
 										<div className="h-8 w-8 rounded-full bg-primary/10 animate-pulse" />
 										<Loader2 className="h-5 w-5 animate-spin text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 									</div>
 									<span className="text-sm text-muted-foreground font-medium">Chargement...</span>
-								</Flex>
+								</div>
 							) : hasMore ? (
-								<Flex direction="col" gap="sm" align="center">
+								<div className="flex flex-col gap-2 items-center">
 									<Button
 										variant="ghost"
 										size="sm"
@@ -184,25 +176,19 @@ export function TransactionsSection({
 									>
 										Charger plus de transactions
 									</Button>
-								</Flex>
+								</div>
 							) : transactions.length > 0 ? (
-								<Flex
-									direction="row"
-									gap="sm"
-									justify="center"
-									align="center"
-									className="pt-4 border-t border-border/30"
-								>
+								<div className="flex flex-row gap-2 justify-center items-center pt-4 border-t border-border/30">
 									<CheckCircle2 className="h-4 w-4 text-muted-foreground/50" />
 									<span className="text-sm text-muted-foreground">
 										{transactions.length} transactions affichées
 									</span>
-								</Flex>
+								</div>
 							) : null}
 						</div>
-					</Flex>
+					</div>
 				)}
 			</div>
 		</Card>
-	)
+	);
 }

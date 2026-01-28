@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 // =============================================================================
 // DASHBOARD HEADER COMPONENT
 // =============================================================================
 
 interface DashboardHeaderProps extends React.HTMLAttributes<HTMLElement> {
-	children: React.ReactNode
+	children: React.ReactNode;
 }
 
 /**
@@ -29,17 +29,17 @@ const DashboardHeader = forwardRef<HTMLElement, DashboardHeaderProps>(
 			>
 				{children}
 			</header>
-		)
+		);
 	},
-)
-DashboardHeader.displayName = 'DashboardHeader'
+);
+DashboardHeader.displayName = 'DashboardHeader';
 
 // =============================================================================
 // DASHBOARD HEADER CONTENT (mobile only)
 // =============================================================================
 
 interface DashboardHeaderMobileProps {
-	children: React.ReactNode
+	children: React.ReactNode;
 }
 
 /**
@@ -47,7 +47,7 @@ interface DashboardHeaderMobileProps {
  * Contains the sidebar trigger and branding.
  */
 function DashboardHeaderMobile({ children }: DashboardHeaderMobileProps) {
-	return <div className="flex items-center gap-4 lg:hidden">{children}</div>
+	return <div className="flex items-center gap-4 lg:hidden">{children}</div>;
 }
 
 // =============================================================================
@@ -55,7 +55,7 @@ function DashboardHeaderMobile({ children }: DashboardHeaderMobileProps) {
 // =============================================================================
 
 interface DashboardMainProps extends React.HTMLAttributes<HTMLElement> {
-	children: React.ReactNode
+	children: React.ReactNode;
 }
 
 /**
@@ -64,22 +64,17 @@ interface DashboardMainProps extends React.HTMLAttributes<HTMLElement> {
 const DashboardMain = forwardRef<HTMLElement, DashboardMainProps>(
 	({ children, className, ...props }, ref) => {
 		return (
-			<main
-				ref={ref}
-				data-slot="dashboard-main"
-				className={cn('flex-1 p-6', className)}
-				{...props}
-			>
+			<main ref={ref} data-slot="dashboard-main" className={cn('flex-1 p-6', className)} {...props}>
 				<div className="mx-auto max-w-7xl">{children}</div>
 			</main>
-		)
+		);
 	},
-)
-DashboardMain.displayName = 'DashboardMain'
+);
+DashboardMain.displayName = 'DashboardMain';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { DashboardHeader, DashboardHeaderMobile, DashboardMain }
-export type { DashboardHeaderProps, DashboardMainProps }
+export { DashboardHeader, DashboardHeaderMobile, DashboardMain };
+export type { DashboardHeaderProps, DashboardMainProps };

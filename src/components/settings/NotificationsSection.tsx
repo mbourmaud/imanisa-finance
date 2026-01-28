@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { Bell, Separator, SettingsNotificationRow, SettingsSectionCard } from '@/components'
+import { Bell, Separator, SettingsNotificationRow, SettingsSectionCard } from '@/components';
 
 export function NotificationsSection() {
 	return (
@@ -13,11 +13,7 @@ export function NotificationsSection() {
 			<Separator />
 			<SettingsNotificationRow title="Transactions" description="Nouvelles transactions" />
 			<Separator />
-			<SettingsNotificationRow
-				title="Rappels"
-				description="Échéances de prêts"
-				defaultChecked
-			/>
+			<SettingsNotificationRow title="Rappels" description="Échéances de prêts" defaultChecked />
 		</SettingsSectionCard>
-	)
+	);
 }

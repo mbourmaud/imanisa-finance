@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -20,30 +20,30 @@ import {
 	SelectValue,
 	Wifi,
 	Zap,
-} from '@/components'
-import { FormErrorBanner } from './FormErrorBanner'
+} from '@/components';
+import { FormErrorBanner } from './FormErrorBanner';
 
-type UtilityType = 'ELECTRICITY' | 'GAS' | 'WATER' | 'INTERNET' | 'OTHER'
+type UtilityType = 'ELECTRICITY' | 'GAS' | 'WATER' | 'INTERNET' | 'OTHER';
 
 interface UtilityContractFormData {
-	type: UtilityType | ''
-	provider: string
-	contractNumber: string
-	monthlyAmount: string
-	link: string
-	notes: string
+	type: UtilityType | '';
+	provider: string;
+	contractNumber: string;
+	monthlyAmount: string;
+	link: string;
+	notes: string;
 }
 
 interface UtilityContractFormDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	formData: UtilityContractFormData
-	onInputChange: (field: keyof UtilityContractFormData, value: string) => void
-	onSubmit: (e: React.FormEvent) => void
-	error: string | null
-	isSubmitting: boolean
-	isEditing: boolean
-	formatCurrency: (amount: number) => string
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	formData: UtilityContractFormData;
+	onInputChange: (field: keyof UtilityContractFormData, value: string) => void;
+	onSubmit: (e: React.FormEvent) => void;
+	error: string | null;
+	isSubmitting: boolean;
+	isEditing: boolean;
+	formatCurrency: (amount: number) => string;
 }
 
 /**
@@ -64,9 +64,7 @@ export function UtilityContractFormDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>
-						{isEditing ? 'Modifier le contrat' : 'Ajouter un contrat'}
-					</DialogTitle>
+					<DialogTitle>{isEditing ? 'Modifier le contrat' : 'Ajouter un contrat'}</DialogTitle>
 					<DialogDescription>
 						Renseignez les informations du contrat ou abonnement.
 					</DialogDescription>
@@ -78,10 +76,7 @@ export function UtilityContractFormDialog({
 						{/* Type selection */}
 						<div className="flex flex-col gap-2">
 							<Label htmlFor="utility-contract-type">Type de contrat *</Label>
-							<Select
-								value={formData.type}
-								onValueChange={(value) => onInputChange('type', value)}
-							>
+							<Select value={formData.type} onValueChange={(value) => onInputChange('type', value)}>
 								<SelectTrigger id="utility-contract-type">
 									<SelectValue placeholder="Sélectionner le type" />
 								</SelectTrigger>
@@ -209,5 +204,5 @@ export function UtilityContractFormDialog({
 				</form>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

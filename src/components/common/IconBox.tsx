@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
-import type { LucideIcon } from '@/components'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+import type { LucideIcon } from '@/components';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-type IconBoxSize = 'sm' | 'md' | 'lg'
-type IconBoxVariant = 'default' | 'primary' | 'muted' | 'custom'
-type IconBoxRounded = 'md' | 'lg' | 'xl' | 'full'
+type IconBoxSize = 'sm' | 'md' | 'lg';
+type IconBoxVariant = 'default' | 'primary' | 'muted' | 'custom';
+type IconBoxRounded = 'md' | 'lg' | 'xl' | 'full';
 
 // =============================================================================
 // STYLE MAPS
@@ -20,14 +20,14 @@ const sizeClasses: Record<IconBoxSize, { container: string; icon: string }> = {
 	sm: { container: 'h-8 w-8', icon: 'h-4 w-4' },
 	md: { container: 'h-10 w-10', icon: 'h-5 w-5' },
 	lg: { container: 'h-12 w-12', icon: 'h-6 w-6' },
-}
+};
 
 const roundedClasses: Record<IconBoxRounded, string> = {
 	md: 'rounded-md',
 	lg: 'rounded-lg',
 	xl: 'rounded-xl',
 	full: 'rounded-full',
-}
+};
 
 const variantClasses: Record<IconBoxVariant, { container: string; icon: string }> = {
 	default: {
@@ -46,7 +46,7 @@ const variantClasses: Record<IconBoxVariant, { container: string; icon: string }
 		container: '',
 		icon: '',
 	},
-}
+};
 
 // =============================================================================
 // ICON BOX COMPONENT
@@ -54,17 +54,17 @@ const variantClasses: Record<IconBoxVariant, { container: string; icon: string }
 
 interface IconBoxProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Icon component to render */
-	icon: LucideIcon
+	icon: LucideIcon;
 	/** Size of the icon box */
-	size?: IconBoxSize
+	size?: IconBoxSize;
 	/** Visual variant */
-	variant?: IconBoxVariant
+	variant?: IconBoxVariant;
 	/** Border radius */
-	rounded?: IconBoxRounded
+	rounded?: IconBoxRounded;
 	/** Custom background color (for variant="custom") */
-	bgColor?: string
+	bgColor?: string;
 	/** Custom icon color (for variant="custom") */
-	iconColor?: string
+	iconColor?: string;
 }
 
 /**
@@ -84,7 +84,7 @@ const IconBox = forwardRef<HTMLDivElement, IconBoxProps>(
 		},
 		ref,
 	) => {
-		const isCustom = variant === 'custom'
+		const isCustom = variant === 'custom';
 
 		return (
 			<div
@@ -101,21 +101,18 @@ const IconBox = forwardRef<HTMLDivElement, IconBoxProps>(
 				{...props}
 			>
 				<Icon
-					className={cn(
-						sizeClasses[size].icon,
-						!isCustom && variantClasses[variant].icon,
-					)}
+					className={cn(sizeClasses[size].icon, !isCustom && variantClasses[variant].icon)}
 					style={isCustom ? { color: iconColor } : undefined}
 				/>
 			</div>
-		)
+		);
 	},
-)
-IconBox.displayName = 'IconBox'
+);
+IconBox.displayName = 'IconBox';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { IconBox }
-export type { IconBoxProps, IconBoxSize, IconBoxVariant, IconBoxRounded }
+export { IconBox };
+export type { IconBoxProps, IconBoxSize, IconBoxVariant, IconBoxRounded };

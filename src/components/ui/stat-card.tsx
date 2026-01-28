@@ -1,6 +1,6 @@
 'use client';
 
-import { type LucideIcon, TrendingDown, TrendingUp } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Card } from './card';
@@ -10,7 +10,6 @@ import { Card } from './card';
 // =============================================================================
 
 type StatCardVariant = 'default' | 'coral' | 'teal' | 'purple' | 'gold' | 'mint';
-type TrendDirection = 'up' | 'down' | 'neutral';
 
 // =============================================================================
 // VARIANT CLASSES
@@ -49,41 +48,16 @@ interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
 	value: string | number;
 	/** Optional description text */
 	description?: string;
-	/** Trend direction for indicator */
-	trend?: TrendDirection;
-	/** Trend value (e.g., "+12.5%") */
-	trendValue?: string;
-	/** Whether the card is interactive (clickable) */
-	interactive?: boolean;
 }
 
 const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
-	(
-		{
-			className,
-			variant = 'default',
-			icon: Icon,
-			label,
-			value,
-			description,
-			trend,
-			trendValue,
-			interactive = false,
-			...props
-		},
-		ref,
-	) => {
+	({ className, variant = 'default', icon: Icon, label, value, description, ...props }, ref) => {
 		return (
 			<Card
 				ref={ref}
 				data-slot="stat-card"
 				padding="md"
-				className={cn(
-					'transition-all',
-					cardVariantClasses[variant],
-					interactive && 'cursor-pointer hover:-translate-y-0.5 hover:shadow-lg',
-					className,
-				)}
+				className={cn('transition-all', cardVariantClasses[variant], className)}
 				{...props}
 			>
 				<div className="flex items-start justify-between gap-4">
@@ -92,29 +66,7 @@ const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
 						<p className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight tabular-nums">
 							{value}
 						</p>
-						{(description || trend) && (
-							<div className="mt-1 flex items-center gap-2">
-								{description && (
-									<span className="text-xs text-muted-foreground">{description}</span>
-								)}
-								{trend && trend !== 'neutral' && (
-									<span
-										className={cn(
-											'inline-flex items-center gap-0.5 text-xs font-medium',
-											trend === 'up' && 'text-[oklch(0.55_0.18_145)]',
-											trend === 'down' && 'text-[oklch(0.6_0.2_25)]',
-										)}
-									>
-										{trend === 'up' ? (
-											<TrendingUp className="h-3 w-3" />
-										) : (
-											<TrendingDown className="h-3 w-3" />
-										)}
-										{trendValue}
-									</span>
-								)}
-							</div>
-						)}
+						{description && <p className="mt-1 text-xs text-muted-foreground">{description}</p>}
 					</div>
 					{Icon && (
 						<div
@@ -198,10 +150,4 @@ function StatCardSkeleton({ className, variant = 'default', ...props }: StatCard
 // =============================================================================
 
 export { StatCard, StatCardGrid, StatCardSkeleton };
-export type {
-	StatCardProps,
-	StatCardGridProps,
-	StatCardSkeletonProps,
-	StatCardVariant,
-	TrendDirection,
-};
+export type { StatCardProps, StatCardGridProps, StatCardSkeletonProps, StatCardVariant };

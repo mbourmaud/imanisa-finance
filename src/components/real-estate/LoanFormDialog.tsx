@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -11,30 +11,30 @@ import {
 	Input,
 	Label,
 	Loader2,
-} from '@/components'
-import { FormErrorBanner } from './FormErrorBanner'
+} from '@/components';
+import { FormErrorBanner } from './FormErrorBanner';
 
 interface LoanFormData {
-	name: string
-	lender: string
-	loanNumber: string
-	initialAmount: string
-	remainingAmount: string
-	rate: string
-	monthlyPayment: string
-	startDate: string
-	endDate: string
-	notes: string
+	name: string;
+	lender: string;
+	loanNumber: string;
+	initialAmount: string;
+	remainingAmount: string;
+	rate: string;
+	monthlyPayment: string;
+	startDate: string;
+	endDate: string;
+	notes: string;
 }
 
 interface LoanFormDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	formData: LoanFormData
-	onInputChange: (field: keyof LoanFormData, value: string) => void
-	onSubmit: (e: React.FormEvent) => void
-	error: string | null
-	isSubmitting: boolean
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	formData: LoanFormData;
+	onInputChange: (field: keyof LoanFormData, value: string) => void;
+	onSubmit: (e: React.FormEvent) => void;
+	error: string | null;
+	isSubmitting: boolean;
 }
 
 /**
@@ -54,9 +54,7 @@ export function LoanFormDialog({
 			<DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Ajouter un prêt</DialogTitle>
-					<DialogDescription>
-						Renseignez les informations du crédit immobilier.
-					</DialogDescription>
+					<DialogDescription>Renseignez les informations du crédit immobilier.</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={onSubmit}>
 					<div className="flex flex-col gap-4">
@@ -213,5 +211,5 @@ export function LoanFormDialog({
 				</form>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

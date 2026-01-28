@@ -19,7 +19,7 @@
 
 import { useStore } from '@tanstack/react-store';
 import { Button, type ButtonProps } from '@/components/ui/button';
-import { Loader2 } from '@/components/ui/icon';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useFormContext } from '../form-context';
 

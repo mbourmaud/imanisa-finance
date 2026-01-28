@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	AlertDialog,
@@ -21,15 +21,18 @@ import {
 	Trash2,
 	Wifi,
 	Zap,
-} from '@/components'
-import type { UtilityContract as PropertyUtilityContract, UtilityType } from '@/features/properties'
+} from '@/components';
+import type {
+	UtilityContract as PropertyUtilityContract,
+	UtilityType,
+} from '@/features/properties';
 
 interface PropertyUtilityContractsSectionProps {
-	contracts: PropertyUtilityContract[]
-	onAddContract: () => void
-	onEditContract: (contract: PropertyUtilityContract) => void
-	onDeleteContract: (contractId: string) => void
-	deletingContractId: string | null
+	contracts: PropertyUtilityContract[];
+	onAddContract: () => void;
+	onEditContract: (contract: PropertyUtilityContract) => void;
+	onDeleteContract: (contractId: string) => void;
+	deletingContractId: string | null;
 }
 
 function formatCurrency(amount: number): string {
@@ -37,38 +40,38 @@ function formatCurrency(amount: number): string {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount)
+	}).format(amount);
 }
 
 function getUtilityTypeLabel(type: UtilityType): string {
 	switch (type) {
 		case 'ELECTRICITY':
-			return 'Électricité'
+			return 'Électricité';
 		case 'GAS':
-			return 'Gaz'
+			return 'Gaz';
 		case 'WATER':
-			return 'Eau'
+			return 'Eau';
 		case 'INTERNET':
-			return 'Internet'
+			return 'Internet';
 		case 'OTHER':
-			return 'Autre'
+			return 'Autre';
 		default:
-			return type
+			return type;
 	}
 }
 
 function getUtilityTypeIcon(type: UtilityType): React.ElementType {
 	switch (type) {
 		case 'ELECTRICITY':
-			return Zap
+			return Zap;
 		case 'GAS':
-			return Flame
+			return Flame;
 		case 'WATER':
-			return Droplets
+			return Droplets;
 		case 'INTERNET':
-			return Wifi
+			return Wifi;
 		default:
-			return Zap
+			return Zap;
 	}
 }
 
@@ -79,7 +82,7 @@ export function PropertyUtilityContractsSection({
 	onDeleteContract,
 	deletingContractId,
 }: PropertyUtilityContractsSectionProps) {
-	const totalMonthly = contracts.reduce((sum, c) => sum + c.monthlyAmount, 0)
+	const totalMonthly = contracts.reduce((sum, c) => sum + c.monthlyAmount, 0);
 
 	return (
 		<Card padding="lg">
@@ -121,7 +124,7 @@ export function PropertyUtilityContractsSection({
 					</div>
 					<div className="flex flex-col gap-3">
 						{contracts.map((contract) => {
-							const IconComponent = getUtilityTypeIcon(contract.type)
+							const IconComponent = getUtilityTypeIcon(contract.type);
 							return (
 								<div key={contract.id} className="rounded-xl border border-border/60 p-4">
 									<div className="flex justify-between items-start gap-4">
@@ -155,11 +158,7 @@ export function PropertyUtilityContractsSection({
 											</Button>
 											<AlertDialog>
 												<AlertDialogTrigger asChild>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 text-destructive"
-													>
+													<Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
 														<Trash2 className="h-4 w-4" />
 													</Button>
 												</AlertDialogTrigger>
@@ -219,11 +218,11 @@ export function PropertyUtilityContractsSection({
 										</div>
 									)}
 								</div>
-							)
+							);
 						})}
 					</div>
 				</div>
 			)}
 		</Card>
-	)
+	);
 }

@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useParams } from 'next/navigation'
+import { useParams } from 'next/navigation';
 import {
 	AccountDetailHeader,
 	AccountEditSheet,
@@ -8,29 +8,28 @@ import {
 	AccountNotFoundState,
 	AccountSettingsSheet,
 	ConfirmDialog,
-	Flex,
 	FloatingToast,
 	TransactionsSection,
-} from '@/components'
-import { useAccountDetailPage } from '@/features/accounts'
+} from '@/components';
+import { useAccountDetailPage } from '@/features/accounts';
 
 export default function AccountDetailPage() {
-	const params = useParams()
-	const accountId = params.id as string
-	const page = useAccountDetailPage(accountId)
+	const params = useParams();
+	const accountId = params.id as string;
+	const page = useAccountDetailPage(accountId);
 
 	if (page.isLoadingAccount) {
-		return <AccountLoadingState />
+		return <AccountLoadingState />;
 	}
 
 	if (page.isAccountError || !page.account) {
-		return <AccountNotFoundState />
+		return <AccountNotFoundState />;
 	}
 
-	const { account } = page
+	const { account } = page;
 
 	return (
-		<Flex direction="col" gap="lg">
+		<div className="flex flex-col gap-6">
 			<AccountDetailHeader
 				accountName={account.name}
 				accountDescription={account.description}
@@ -166,6 +165,6 @@ export default function AccountDetailPage() {
 				variant="destructive"
 				onConfirm={page.confirmDeleteImport}
 			/>
-		</Flex>
-	)
+		</div>
+	);
 }

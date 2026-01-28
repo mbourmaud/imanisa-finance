@@ -1,18 +1,18 @@
-import type { LucideIcon } from 'lucide-react'
-import { BudgetCategoryCard } from './BudgetCategoryCard'
+import type { LucideIcon } from 'lucide-react';
+import { BudgetCategoryCard } from './BudgetCategoryCard';
 
 interface Category {
-	id: string
-	name: string
-	icon: LucideIcon
-	color: string
-	budget: number
-	spent: number
+	id: string;
+	name: string;
+	icon: LucideIcon;
+	color: string;
+	budget: number;
+	spent: number;
 }
 
 interface BudgetCategoryGridProps {
-	categories: Category[]
-	formatCurrency: (amount: number) => string
+	categories: Category[];
+	formatCurrency: (amount: number) => string;
 }
 
 /**
@@ -33,5 +33,5 @@ export function BudgetCategoryGrid({ categories, formatCurrency }: BudgetCategor
 				/>
 			))}
 		</div>
-	)
+	);
 }

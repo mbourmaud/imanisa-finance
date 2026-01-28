@@ -1,9 +1,8 @@
-'use client'
+'use client';
 
 import {
 	Card,
 	ConfirmDialog,
-	Flex,
 	ImportDropZone,
 	ImportErrorBanner,
 	ImportFormGrid,
@@ -13,15 +12,15 @@ import {
 	ImportStatsCard,
 	Label,
 	PageHeader,
-} from '@/components'
-import { useImportPage } from '@/features/imports'
-import { SelectField } from '@/lib/forms'
+} from '@/components';
+import { useImportPage } from '@/features/imports';
+import { SelectField } from '@/lib/forms';
 
 export default function ImportPage() {
-	const page = useImportPage()
+	const page = useImportPage();
 
 	return (
-		<Flex direction="col" gap="xl">
+		<div className="flex flex-col gap-8">
 			<PageHeader
 				title="Import"
 				description="Importez vos relevés bancaires et conservez les fichiers bruts"
@@ -35,7 +34,7 @@ export default function ImportPage() {
 			<ImportFormGrid
 				formCard={
 					<Card padding="lg">
-						<Flex direction="col" gap="md">
+						<div className="flex flex-col gap-4">
 							<page.form.AppField name="bankId">
 								{() => (
 									<SelectField
@@ -59,7 +58,7 @@ export default function ImportPage() {
 								)}
 							</page.form.AppField>
 
-							<Flex direction="col" gap="xs">
+							<div className="flex flex-col gap-1">
 								<Label htmlFor="import-file-input">3. Fichier</Label>
 								<ImportDropZone
 									canUpload={!!page.canUpload}
@@ -71,8 +70,8 @@ export default function ImportPage() {
 									onDrop={page.handleDrop}
 									onFileSelect={page.handleFileSelect}
 								/>
-							</Flex>
-						</Flex>
+							</div>
+						</div>
 					</Card>
 				}
 				statsCard={
@@ -107,6 +106,6 @@ export default function ImportPage() {
 				variant="destructive"
 				onConfirm={page.confirmDeleteImport}
 			/>
-		</Flex>
-	)
+		</div>
+	);
 }

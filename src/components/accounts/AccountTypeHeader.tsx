@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
-import type { LucideIcon } from '@/components'
-import { IconBox } from '@/components/common/IconBox'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+import type { LucideIcon } from '@/components';
+import { IconBox } from '@/components/common/IconBox';
 
 // =============================================================================
 // TYPES
@@ -11,11 +11,11 @@ import { IconBox } from '@/components/common/IconBox'
 
 interface AccountTypeHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** Icon for the account type */
-	icon: LucideIcon
+	icon: LucideIcon;
 	/** Title (e.g., "Comptes courants") */
-	title: string
+	title: string;
 	/** Count of accounts */
-	count: number
+	count: number;
 }
 
 // =============================================================================
@@ -43,14 +43,14 @@ const AccountTypeHeader = forwardRef<HTMLDivElement, AccountTypeHeaderProps>(
 					</p>
 				</div>
 			</div>
-		)
+		);
 	},
-)
-AccountTypeHeader.displayName = 'AccountTypeHeader'
+);
+AccountTypeHeader.displayName = 'AccountTypeHeader';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { AccountTypeHeader }
-export type { AccountTypeHeaderProps }
+export { AccountTypeHeader };
+export type { AccountTypeHeaderProps };

@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
-import { Button, Flex, Loader2, RefreshCw, RotateCcw, Trash2 } from '@/components'
-import { formatRelativeTime } from '@/shared/utils'
-import { ImportStatusIcon } from './ImportStatusIcon'
+import { Button, Loader2, RefreshCw, RotateCcw, Trash2 } from '@/components';
+import { formatRelativeTime } from '@/shared/utils';
+import { ImportStatusIcon } from './ImportStatusIcon';
 
-type ImportStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
+type ImportStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
 
 interface AccountImportRowProps {
-	id: string
-	filename: string
-	status: ImportStatus
-	createdAt: string
-	recordsCount: number | null
-	onProcess: () => void
-	onReprocess: () => void
-	onDelete: () => void
-	isProcessing?: boolean
-	isReprocessing?: boolean
-	isDeleting?: boolean
+	id: string;
+	filename: string;
+	status: ImportStatus;
+	createdAt: string;
+	recordsCount: number | null;
+	onProcess: () => void;
+	onReprocess: () => void;
+	onDelete: () => void;
+	isProcessing?: boolean;
+	isReprocessing?: boolean;
+	isDeleting?: boolean;
 }
 
 /**
@@ -39,7 +39,7 @@ export function AccountImportRow({
 	const statusBgClass =
 		status === 'FAILED'
 			? 'bg-destructive/5 border-destructive/20'
-			: 'bg-muted/20 border-transparent'
+			: 'bg-muted/20 border-transparent';
 
 	const iconBgClass =
 		status === 'PROCESSED'
@@ -48,28 +48,23 @@ export function AccountImportRow({
 				? 'bg-destructive/10'
 				: status === 'PROCESSING'
 					? 'bg-primary/10'
-					: 'bg-muted'
+					: 'bg-muted';
 
 	return (
-		<Flex
-			direction="row"
-			gap="sm"
-			align="center"
-			className={`p-3 text-sm rounded-lg border ${statusBgClass}`}
-		>
-			<div className={`flex items-center justify-center h-6 w-6 flex-shrink-0 rounded-md ${iconBgClass}`}>
+		<div className={`flex gap-2 items-center p-3 text-sm rounded-lg border ${statusBgClass}`}>
+			<div
+				className={`flex items-center justify-center h-6 w-6 flex-shrink-0 rounded-md ${iconBgClass}`}
+			>
 				<ImportStatusIcon status={status} />
 			</div>
-			<Flex direction="col" gap="xs" className="flex-grow min-w-0">
+			<div className="flex flex-col gap-1 flex-grow min-w-0">
 				<span className="text-xs font-medium truncate">{filename}</span>
 				<span className="text-[11px] text-muted-foreground">
 					{formatRelativeTime(createdAt)}
-					{recordsCount !== null && (
-						<span className="text-emerald-500"> • {recordsCount} tx</span>
-					)}
+					{recordsCount !== null && <span className="text-emerald-500"> • {recordsCount} tx</span>}
 				</span>
-			</Flex>
-			<Flex direction="row" gap="xs" className="flex-shrink-0">
+			</div>
+			<div className="flex gap-1 flex-shrink-0">
 				{status === 'PENDING' && (
 					<Button
 						variant="outline"
@@ -120,9 +115,13 @@ export function AccountImportRow({
 					disabled={isDeleting}
 					className="h-6 w-6 text-muted-foreground"
 				>
-					{isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+					{isDeleting ? (
+						<Loader2 className="h-3 w-3 animate-spin" />
+					) : (
+						<Trash2 className="h-3 w-3" />
+					)}
 				</Button>
-			</Flex>
-		</Flex>
-	)
+			</div>
+		</div>
+	);
 }

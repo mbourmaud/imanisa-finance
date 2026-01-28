@@ -3,28 +3,28 @@
  * Handles data access for authenticated users
  */
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma';
 
 export interface CreateUserDTO {
-	id: string
-	email: string
-	name?: string | null
-	avatarUrl?: string | null
+	id: string;
+	email: string;
+	name?: string | null;
+	avatarUrl?: string | null;
 }
 
 export interface UpdateUserDTO {
-	email?: string
-	name?: string | null
-	avatarUrl?: string | null
+	email?: string;
+	name?: string | null;
+	avatarUrl?: string | null;
 }
 
 export interface User {
-	id: string
-	email: string
-	name: string | null
-	avatarUrl: string | null
-	createdAt: Date
-	memberId: string | null
+	id: string;
+	email: string;
+	name: string | null;
+	avatarUrl: string | null;
+	createdAt: Date;
+	memberId: string | null;
 }
 
 /**
@@ -37,7 +37,7 @@ export const userRepository = {
 	async getById(id: string): Promise<User | null> {
 		return prisma.user.findUnique({
 			where: { id },
-		})
+		});
 	},
 
 	/**
@@ -46,7 +46,7 @@ export const userRepository = {
 	async getByEmail(email: string): Promise<User | null> {
 		return prisma.user.findUnique({
 			where: { email },
-		})
+		});
 	},
 
 	/**
@@ -60,7 +60,7 @@ export const userRepository = {
 				name: data.name,
 				avatarUrl: data.avatarUrl,
 			},
-		})
+		});
 	},
 
 	/**
@@ -70,20 +70,17 @@ export const userRepository = {
 		return prisma.user.update({
 			where: { id },
 			data,
-		})
+		});
 	},
 
 	/**
 	 * Update a user by email (also updates the ID if needed)
 	 */
-	async updateByEmail(
-		email: string,
-		data: UpdateUserDTO & { id?: string },
-	): Promise<User> {
+	async updateByEmail(email: string, data: UpdateUserDTO & { id?: string }): Promise<User> {
 		return prisma.user.update({
 			where: { email },
 			data,
-		})
+		});
 	},
 
 	/**
@@ -98,17 +95,15 @@ export const userRepository = {
 	): Promise<User> {
 		const existingUserById = await prisma.user.findUnique({
 			where: { id: supabaseId },
-		})
-		const existingUserByEmail = email
-			? await prisma.user.findUnique({ where: { email } })
-			: null
+		});
+		const existingUserByEmail = email ? await prisma.user.findUnique({ where: { email } }) : null;
 
 		if (existingUserById) {
 			// User exists with correct ID, update their info
 			return prisma.user.update({
 				where: { id: supabaseId },
 				data: { email, name, avatarUrl },
-			})
+			});
 		}
 
 		if (existingUserByEmail) {
@@ -116,12 +111,12 @@ export const userRepository = {
 			return prisma.user.update({
 				where: { email },
 				data: { id: supabaseId, name, avatarUrl },
-			})
+			});
 		}
 
 		// New user, create them
 		return prisma.user.create({
 			data: { id: supabaseId, email, name, avatarUrl },
-		})
+		});
 	},
-}
+};

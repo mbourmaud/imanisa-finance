@@ -1,10 +1,10 @@
-import { Flex, Switch } from '@/components'
+import { Switch } from '@/components';
 
 interface SettingsNotificationRowProps {
-	title: string
-	description: string
-	defaultChecked?: boolean
-	onChange?: (checked: boolean) => void
+	title: string;
+	description: string;
+	defaultChecked?: boolean;
+	onChange?: (checked: boolean) => void;
 }
 
 /**
@@ -17,12 +17,12 @@ export function SettingsNotificationRow({
 	onChange,
 }: SettingsNotificationRowProps) {
 	return (
-		<Flex direction="row" justify="between" align="center">
-			<Flex direction="col">
+		<div className="flex justify-between items-center">
+			<div className="flex flex-col">
 				<p className="font-medium">{title}</p>
 				<p className="text-xs text-muted-foreground">{description}</p>
-			</Flex>
+			</div>
 			<Switch defaultChecked={defaultChecked} onCheckedChange={onChange} />
-		</Flex>
-	)
+		</div>
+	);
 }

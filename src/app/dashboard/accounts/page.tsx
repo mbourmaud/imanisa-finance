@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	AccountListItem,
@@ -7,7 +7,6 @@ import {
 	Card,
 	CreditCard,
 	EmptyState,
-	Flex,
 	LoadingSpinner,
 	PageHeader,
 	PiggyBank,
@@ -15,20 +14,16 @@ import {
 	StatCardGrid,
 	TrendingUp,
 	Wallet,
-} from '@/components'
-import { useAccountsPage } from '@/features/accounts'
+} from '@/components';
+import { useAccountsPage } from '@/features/accounts';
 
 export default function AccountsPage() {
-	const page = useAccountsPage()
+	const page = useAccountsPage();
 
 	if (page.isLoading) {
 		return (
-			<EmptyState
-				title="Chargement des comptes..."
-				iconElement={<LoadingSpinner size="md" />}
-				size="md"
-			/>
-		)
+			<EmptyState title="Chargement des comptes..." iconElement={<LoadingSpinner size="md" />} />
+		);
 	}
 
 	if (page.isError) {
@@ -37,13 +32,12 @@ export default function AccountsPage() {
 				icon={Wallet}
 				title="Erreur de chargement"
 				description="Impossible de charger vos comptes. Veuillez réessayer."
-				size="md"
 			/>
-		)
+		);
 	}
 
 	return (
-		<Flex direction="col" gap="xl">
+		<div className="flex flex-col gap-8">
 			<PageHeader
 				title="Comptes"
 				description="Gérez vos comptes bancaires et suivez vos soldes"
@@ -77,7 +71,7 @@ export default function AccountsPage() {
 				/>
 			</StatCardGrid>
 
-			<Flex direction="col" gap="lg">
+			<div className="flex flex-col gap-6">
 				{page.accountGroups.map((group) => (
 					<Card key={group.type} padding="lg">
 						<AccountTypeHeader
@@ -85,7 +79,7 @@ export default function AccountsPage() {
 							title={group.label}
 							count={group.accounts.length}
 						/>
-						<Flex direction="col" gap="sm">
+						<div className="flex flex-col gap-2">
 							{group.accounts.map((account) => (
 								<AccountListItem
 									key={account.id}
@@ -97,7 +91,7 @@ export default function AccountsPage() {
 									currency={account.currency}
 								/>
 							))}
-						</Flex>
+						</div>
 					</Card>
 				))}
 
@@ -106,11 +100,10 @@ export default function AccountsPage() {
 						icon={Wallet}
 						title="Aucun compte"
 						description="Ajoutez votre premier compte pour commencer à suivre vos finances"
-						size="lg"
 						action={<AddAccountButton />}
 					/>
 				)}
-			</Flex>
-		</Flex>
-	)
+			</div>
+		</div>
+	);
 }

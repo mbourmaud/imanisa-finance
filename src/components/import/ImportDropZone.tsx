@@ -1,14 +1,14 @@
-import { Button, FileSpreadsheet, Flex, Loader2, Upload } from '@/components'
+import { Button, FileSpreadsheet, Loader2, Upload } from '@/components';
 
 interface ImportDropZoneProps {
-	canUpload: boolean
-	isUploading: boolean
-	isDragActive: boolean
-	onDragEnter: (e: React.DragEvent) => void
-	onDragLeave: (e: React.DragEvent) => void
-	onDragOver: (e: React.DragEvent) => void
-	onDrop: (e: React.DragEvent) => void
-	onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
+	canUpload: boolean;
+	isUploading: boolean;
+	isDragActive: boolean;
+	onDragEnter: (e: React.DragEvent) => void;
+	onDragLeave: (e: React.DragEvent) => void;
+	onDragOver: (e: React.DragEvent) => void;
+	onDrop: (e: React.DragEvent) => void;
+	onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 /**
@@ -28,13 +28,9 @@ export function ImportDropZone({
 		? 'border-border/40'
 		: isDragActive
 			? 'border-primary'
-			: 'border-border/60'
+			: 'border-border/60';
 
-	const bgColor = !canUpload
-		? 'bg-muted/10'
-		: isDragActive
-			? 'bg-primary/5'
-			: 'bg-white/50'
+	const bgColor = !canUpload ? 'bg-muted/10' : isDragActive ? 'bg-primary/5' : 'bg-white/50';
 
 	return (
 		<div
@@ -67,15 +63,11 @@ export function ImportDropZone({
 					className="hidden"
 					disabled={!canUpload}
 				/>
-				<Button
-					disabled={!canUpload}
-					asChild
-					iconLeft={<Upload className="h-4 w-4" />}
-				>
+				<Button disabled={!canUpload} asChild iconLeft={<Upload className="h-4 w-4" />}>
 					<span>Sélectionner un fichier</span>
 				</Button>
 			</label>
 			<p className="mt-2 text-xs text-muted-foreground">.csv, .xlsx · Max 10 MB</p>
 		</div>
-	)
+	);
 }

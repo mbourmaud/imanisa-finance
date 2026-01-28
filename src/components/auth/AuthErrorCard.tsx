@@ -1,10 +1,10 @@
-import Link from 'next/link'
-import { AlertTriangle, ArrowLeft, RefreshCw } from '@/components/ui/icon'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import Link from 'next/link';
+import { AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 interface AuthErrorCardProps {
-	onRetry: () => void
+	onRetry: () => void;
 }
 
 /**
@@ -33,11 +33,7 @@ export function AuthErrorCard({ onRetry }: AuthErrorCardProps) {
 
 					{/* Actions */}
 					<div className="flex w-full flex-col gap-3">
-						<Button
-							onClick={onRetry}
-							iconLeft={<RefreshCw className="h-5 w-5" />}
-							fullWidth
-						>
+						<Button onClick={onRetry} iconLeft={<RefreshCw className="h-5 w-5" />} fullWidth>
 							Réessayer
 						</Button>
 
@@ -53,5 +49,5 @@ export function AuthErrorCard({ onRetry }: AuthErrorCardProps) {
 				</div>
 			</Card>
 		</div>
-	)
+	);
 }

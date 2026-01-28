@@ -1,4 +1,4 @@
-import { Card, ContentSkeleton, Flex, FlexItem } from '@/components'
+import { Card, ContentSkeleton } from '@/components';
 
 /**
  * Skeleton loading state for bank row
@@ -6,16 +6,16 @@ import { Card, ContentSkeleton, Flex, FlexItem } from '@/components'
 export function BankRowSkeleton() {
 	return (
 		<Card padding="sm">
-			<Flex direction="row" gap="md">
+			<div className="flex gap-4">
 				<ContentSkeleton variant="icon" size="md" />
-				<Flex direction="col" gap="sm">
-					<FlexItem grow="full">
+				<div className="flex flex-col gap-2">
+					<div className="flex-1">
 						<ContentSkeleton variant="title" size="sm" />
 						<ContentSkeleton variant="text" size="sm" />
-					</FlexItem>
-				</Flex>
+					</div>
+				</div>
 				<ContentSkeleton variant="text" size="lg" />
-			</Flex>
+			</div>
 		</Card>
-	)
+	);
 }

@@ -1,7 +1,7 @@
-import { Building2, Button, EmptyState, Plus } from '@/components'
+import { Building2, Button, EmptyState, Plus } from '@/components';
 
 interface PropertiesEmptyStateProps {
-	onAddClick: () => void
+	onAddClick: () => void;
 }
 
 /**
@@ -19,5 +19,5 @@ export function PropertiesEmptyState({ onAddClick }: PropertiesEmptyStateProps) 
 				</Button>
 			}
 		/>
-	)
+	);
 }

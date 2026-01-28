@@ -146,9 +146,10 @@ export const AccountIcon = forwardRef<HTMLDivElement, AccountIconProps>(
 		const Icon = config.icon;
 		const bankColor = account.bank?.color;
 
-		const colorStyle = showBankColor && bankColor
-			? { '--account-color': bankColor } as React.CSSProperties
-			: undefined;
+		const colorStyle =
+			showBankColor && bankColor
+				? ({ '--account-color': bankColor } as React.CSSProperties)
+				: undefined;
 
 		return (
 			<div

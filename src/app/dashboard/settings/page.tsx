@@ -1,9 +1,8 @@
-'use client'
+'use client';
 
 import {
 	AppearanceSection,
 	DataSection,
-	Flex,
 	MembersSection,
 	NotificationsSection,
 	PageHeader,
@@ -11,11 +10,11 @@ import {
 	SecuritySection,
 	SettingsAppInfo,
 	SettingsLayout,
-} from '@/components'
+} from '@/components';
 
 export default function SettingsPage() {
 	return (
-		<Flex direction="col" gap="xl">
+		<div className="flex flex-col gap-8">
 			<PageHeader title="Paramètres" description="Configurez votre application" />
 
 			<SettingsLayout
@@ -35,6 +34,6 @@ export default function SettingsPage() {
 					</>
 				}
 			/>
-		</Flex>
-	)
+		</div>
+	);
 }

@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 import {
 	Button,
 	Card,
@@ -10,11 +10,10 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	Flex,
 	MoreHorizontal,
 	Progress,
 	type LucideIcon,
-} from '@/components'
+} from '@/components';
 
 // =============================================================================
 // TYPES
@@ -22,23 +21,23 @@ import {
 
 interface BudgetCategoryCardProps {
 	/** Category name */
-	name: string
+	name: string;
 	/** Icon component */
-	icon: LucideIcon
+	icon: LucideIcon;
 	/** Category color (oklch format) */
-	color: string
+	color: string;
 	/** Budget amount */
-	budget: number
+	budget: number;
 	/** Amount spent */
-	spent: number
+	spent: number;
 	/** Currency formatter function */
-	formatCurrency: (amount: number) => string
+	formatCurrency: (amount: number) => string;
 	/** Called when view transactions is clicked */
-	onViewTransactions?: () => void
+	onViewTransactions?: () => void;
 	/** Called when edit budget is clicked */
-	onEditBudget?: () => void
+	onEditBudget?: () => void;
 	/** Called when delete is clicked */
-	onDelete?: () => void
+	onDelete?: () => void;
 }
 
 // =============================================================================
@@ -63,26 +62,26 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 		},
 		ref,
 	) => {
-		const percentage = (spent / budget) * 100
-		const isOverBudget = spent > budget
-		const remainingBudget = budget - spent
-		const colorStyle = { '--category-color': color } as React.CSSProperties
+		const percentage = (spent / budget) * 100;
+		const isOverBudget = spent > budget;
+		const remainingBudget = budget - spent;
+		const colorStyle = { '--category-color': color } as React.CSSProperties;
 
 		return (
 			<Card ref={ref} padding="md" style={colorStyle}>
-				<Flex direction="col" gap="sm">
-					<Flex direction="row" justify="between" align="start">
-						<Flex direction="row" gap="sm" align="center">
+				<div className="flex flex-col gap-2">
+					<div className="flex flex-row justify-between items-start">
+						<div className="flex flex-row gap-2 items-center">
 							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--category-color)]/10 text-[var(--category-color)]">
 								<Icon className="h-5 w-5" />
 							</div>
-							<Flex direction="col" gap="none">
+							<div className="flex flex-col">
 								<span className="font-medium">{name}</span>
 								<span className="text-xs text-muted-foreground">
 									{formatCurrency(spent)} / {formatCurrency(budget)}
 								</span>
-							</Flex>
-						</Flex>
+							</div>
+						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" size="icon" className="h-8 w-8">
@@ -100,13 +99,13 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
-					</Flex>
-					<Flex direction="col" gap="xs">
+					</div>
+					<div className="flex flex-col gap-1">
 						<Progress
 							value={Math.min(percentage, 100)}
 							className={cn('h-2', isOverBudget && '[&>div]:bg-destructive')}
 						/>
-						<Flex direction="row" justify="between">
+						<div className="flex flex-row justify-between">
 							<span
 								className={cn(
 									'text-xs',
@@ -117,21 +116,19 @@ const BudgetCategoryCard = forwardRef<HTMLDivElement, BudgetCategoryCardProps>(
 									? `Dépassé de ${formatCurrency(Math.abs(remainingBudget))}`
 									: `Reste ${formatCurrency(remainingBudget)}`}
 							</span>
-							<span className="text-xs text-muted-foreground">
-								{Math.round(percentage)}%
-							</span>
-						</Flex>
-					</Flex>
-				</Flex>
+							<span className="text-xs text-muted-foreground">{Math.round(percentage)}%</span>
+						</div>
+					</div>
+				</div>
 			</Card>
-		)
+		);
 	},
-)
-BudgetCategoryCard.displayName = 'BudgetCategoryCard'
+);
+BudgetCategoryCard.displayName = 'BudgetCategoryCard';
 
 // =============================================================================
 // EXPORTS
 // =============================================================================
 
-export { BudgetCategoryCard }
-export type { BudgetCategoryCardProps }
+export { BudgetCategoryCard };
+export type { BudgetCategoryCardProps };

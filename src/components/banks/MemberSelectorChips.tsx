@@ -1,15 +1,15 @@
-import { Button, ColorDot, Flex } from '@/components'
+import { Button, ColorDot } from '@/components';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface MemberSelectorChipsProps {
-	members: Member[]
-	selectedIds: string[]
-	onToggle: (id: string) => void
+	members: Member[];
+	selectedIds: string[];
+	onToggle: (id: string) => void;
 }
 
 /**
@@ -17,9 +17,9 @@ interface MemberSelectorChipsProps {
  */
 export function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSelectorChipsProps) {
 	return (
-		<Flex direction="row" gap="sm" wrap="wrap">
+		<div className="flex gap-2 flex-wrap">
 			{members.map((member) => {
-				const isSelected = selectedIds.includes(member.id)
+				const isSelected = selectedIds.includes(member.id);
 				return (
 					<Button
 						key={member.id}
@@ -35,8 +35,8 @@ export function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSe
 						<ColorDot color={member.color || '#6b7280'} size="md" />
 						<span>{member.name}</span>
 					</Button>
-				)
+				);
 			})}
-		</Flex>
-	)
+		</div>
+	);
 }

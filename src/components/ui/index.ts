@@ -6,20 +6,12 @@
  */
 
 // =============================================================================
-// ICONS
+// ICONS (Re-exported from lucide-react for convenience)
 // =============================================================================
 
-export type {
-	IconColor,
-	IconName,
-	IconProps,
-	IconSize,
-	IconWrapperProps,
-	LucideIcon,
-	LucideProps,
-} from './icon'
+export type { LucideIcon, LucideProps } from 'lucide-react';
+
 export {
-	// Re-exported Lucide icons
 	AlertCircle,
 	AlertTriangle,
 	ArrowDown,
@@ -74,8 +66,6 @@ export {
 	Grid as GridIcon,
 	Heart,
 	Home,
-	Icon,
-	IconWrapper,
 	Image,
 	Inbox,
 	Info,
@@ -128,20 +118,20 @@ export {
 	X,
 	XCircle,
 	Zap,
-} from './icon'
+} from 'lucide-react';
 
 // =============================================================================
 // BUTTONS
 // =============================================================================
 
-export type { ButtonProps } from './button'
-export { Button, buttonVariants } from './button'
+export type { ButtonProps } from './button';
+export { Button, buttonVariants } from './button';
 
 // =============================================================================
 // FORM ELEMENTS
 // =============================================================================
 
-export { Checkbox } from './checkbox'
+export { Checkbox } from './checkbox';
 export {
 	FormControl,
 	FormDescription,
@@ -149,10 +139,10 @@ export {
 	FormLabel,
 	FormMessage,
 	useFormField,
-} from './form'
-export type { InputProps } from './input'
-export { Input } from './input'
-export { Label } from './label'
+} from './form';
+export type { InputProps } from './input';
+export { Input } from './input';
+export { Label } from './label';
 export {
 	Select,
 	SelectContent,
@@ -164,37 +154,30 @@ export {
 	SelectSeparator,
 	SelectTrigger,
 	SelectValue,
-} from './select'
-export { Switch } from './switch'
-export type { TextareaProps } from './textarea'
-export { Textarea } from './textarea'
+} from './select';
+export { Switch } from './switch';
+export type { TextareaProps } from './textarea';
+export { Textarea } from './textarea';
 
 // =============================================================================
 // CARDS
 // =============================================================================
 
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card';
 export type {
 	StatCardGridProps,
 	StatCardProps,
 	StatCardSkeletonProps,
 	StatCardVariant,
-	TrendDirection,
-} from './stat-card'
-export { StatCard, StatCardGrid, StatCardSkeleton } from './stat-card'
+} from './stat-card';
+export { StatCard, StatCardGrid, StatCardSkeleton } from './stat-card';
 
 // =============================================================================
 // NAVIGATION & LAYOUT
 // =============================================================================
 
-export type {
-	BreadcrumbItem,
-	PageHeaderProps,
-	PageHeaderSize,
-	SectionHeaderProps,
-	SectionHeaderSize,
-} from './page-header'
-export { PageHeader, SectionHeader } from './page-header'
+export type { PageHeaderProps, SectionHeaderProps } from './page-header';
+export { PageHeader, SectionHeader } from './page-header';
 export {
 	Sheet,
 	SheetBody,
@@ -205,7 +188,7 @@ export {
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
-} from './sheet'
+} from './sheet';
 export {
 	Sidebar,
 	SidebarContent,
@@ -231,17 +214,17 @@ export {
 	SidebarSeparator,
 	SidebarTrigger,
 	useSidebar,
-} from './sidebar'
+} from './sidebar';
 
 // =============================================================================
 // DATA DISPLAY
 // =============================================================================
 
-export { Avatar, AvatarFallback, AvatarImage } from './avatar'
-export { Badge, badgeVariants } from './badge'
-export { DataTable } from './data-table'
-export { Progress } from './progress'
-export { Skeleton } from './skeleton'
+export { Avatar, AvatarFallback, AvatarImage } from './avatar';
+export { Badge, badgeVariants } from './badge';
+export { DataTable } from './data-table';
+export { Progress } from './progress';
+export { Skeleton } from './skeleton';
 export {
 	Table,
 	TableBody,
@@ -251,7 +234,7 @@ export {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from './table'
+} from './table';
 
 // =============================================================================
 // FEEDBACK
@@ -269,7 +252,7 @@ export {
 	AlertDialogPortal,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from './alert-dialog'
+} from './alert-dialog';
 export {
 	Dialog,
 	DialogClose,
@@ -281,21 +264,10 @@ export {
 	DialogPortal,
 	DialogTitle,
 	DialogTrigger,
-} from './dialog'
-export type {
-	EmptyStatePresetProps,
-	EmptyStateProps,
-	EmptyStateSize,
-	EmptyStateVariant,
-} from './empty-state'
-export {
-	EmptyState,
-	EmptyStateError,
-	EmptyStateNoAccounts,
-	EmptyStateNoResults,
-	EmptyStateNoTransactions,
-} from './empty-state'
-export { Toaster } from './sonner'
+} from './dialog';
+export type { EmptyStateProps } from './empty-state';
+export { EmptyState } from './empty-state';
+export { Toaster } from './sonner';
 
 // =============================================================================
 // OVERLAYS & POPOVERS
@@ -311,7 +283,7 @@ export {
 	CommandList,
 	CommandSeparator,
 	CommandShortcut,
-} from './command'
+} from './command';
 export {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -328,25 +300,25 @@ export {
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
-} from './dropdown-menu'
-export { Popover, PopoverContent, PopoverTrigger } from './popover'
+} from './dropdown-menu';
+export { Popover, PopoverContent, PopoverTrigger } from './popover';
 export {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from './tooltip'
+} from './tooltip';
 
 // =============================================================================
 // TABS & ACCORDION
 // =============================================================================
 
-export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion'
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
+export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
 
 // =============================================================================
 // SCROLL & SEPARATOR
 // =============================================================================
 
-export { ScrollArea, ScrollBar } from './scroll-area'
-export { Separator } from './separator'
+export { ScrollArea, ScrollBar } from './scroll-area';
+export { Separator } from './separator';

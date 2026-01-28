@@ -1,8 +1,7 @@
-'use client'
+'use client';
 
-import { useParams } from 'next/navigation'
+import { useParams } from 'next/navigation';
 import {
-	Flex,
 	PropertyCoOwnershipSection,
 	PropertyDetailDialogs,
 	PropertyDetailHeader,
@@ -14,12 +13,12 @@ import {
 	PropertyOwnersSection,
 	PropertyStatsSummary,
 	PropertyUtilityContractsSection,
-} from '@/components'
-import { formatCurrency, usePropertyDetailPage } from '@/features/properties'
+} from '@/components';
+import { formatCurrency, usePropertyDetailPage } from '@/features/properties';
 
 export default function PropertyDetailPage() {
-	const params = useParams()
-	const propertyId = params.id as string
+	const params = useParams();
+	const propertyId = params.id as string;
 
 	const {
 		property,
@@ -35,18 +34,18 @@ export default function PropertyDetailPage() {
 		utilityContractDialog,
 		propertyEditDialog,
 		deletePropertyDialog,
-	} = usePropertyDetailPage(propertyId)
+	} = usePropertyDetailPage(propertyId);
 
 	if (loading) {
-		return <PropertyDetailSkeleton />
+		return <PropertyDetailSkeleton />;
 	}
 
 	if (error || !property) {
-		return <PropertyNotFoundState error={error} />
+		return <PropertyNotFoundState error={error} />;
 	}
 
 	return (
-		<Flex direction="col" gap="lg">
+		<div className="flex flex-col gap-6">
 			<PropertyDetailHeader
 				name={property.name}
 				type={property.type}
@@ -128,6 +127,6 @@ export default function PropertyDetailPage() {
 				propertyEditDialog={propertyEditDialog}
 				deletePropertyDialog={deletePropertyDialog}
 			/>
-		</Flex>
-	)
+		</div>
+	);
 }

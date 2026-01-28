@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { ArrowLeft, Button, Card } from '@/components'
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Button, Card } from '@/components';
 
 interface PropertyNotFoundStateProps {
-	error: string | null
+	error: string | null;
 }
 
 export function PropertyNotFoundState({ error }: PropertyNotFoundStateProps) {
-	const router = useRouter()
+	const router = useRouter();
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -32,5 +32,5 @@ export function PropertyNotFoundState({ error }: PropertyNotFoundStateProps) {
 				</Button>
 			</Card>
 		</div>
-	)
+	);
 }

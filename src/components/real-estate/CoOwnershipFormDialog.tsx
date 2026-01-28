@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
 	Button,
@@ -11,26 +11,26 @@ import {
 	Input,
 	Label,
 	Loader2,
-} from '@/components'
-import { FormErrorBanner } from './FormErrorBanner'
+} from '@/components';
+import { FormErrorBanner } from './FormErrorBanner';
 
 interface CoOwnershipFormData {
-	name: string
-	quarterlyAmount: string
-	link: string
-	notes: string
+	name: string;
+	quarterlyAmount: string;
+	link: string;
+	notes: string;
 }
 
 interface CoOwnershipFormDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	formData: CoOwnershipFormData
-	onInputChange: (field: keyof CoOwnershipFormData, value: string) => void
-	onSubmit: (e: React.FormEvent) => void
-	error: string | null
-	isSubmitting: boolean
-	isEditing: boolean
-	formatCurrency: (amount: number) => string
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	formData: CoOwnershipFormData;
+	onInputChange: (field: keyof CoOwnershipFormData, value: string) => void;
+	onSubmit: (e: React.FormEvent) => void;
+	error: string | null;
+	isSubmitting: boolean;
+	isEditing: boolean;
+	formatCurrency: (amount: number) => string;
 }
 
 /**
@@ -140,5 +140,5 @@ export function CoOwnershipFormDialog({
 				</form>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

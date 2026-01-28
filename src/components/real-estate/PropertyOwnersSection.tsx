@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import { Card, Users } from '@/components'
+import { Card, Users } from '@/components';
 
 interface PropertyMemberInfo {
-	id: string
-	memberId: string
-	ownershipShare: number
+	id: string;
+	memberId: string;
+	ownershipShare: number;
 	member: {
-		id: string
-		name: string
-		color: string | null
-	}
+		id: string;
+		name: string;
+		color: string | null;
+	};
 }
 
 interface PropertyOwnersSectionProps {
-	propertyMembers: PropertyMemberInfo[]
+	propertyMembers: PropertyMemberInfo[];
 }
 
 export function PropertyOwnersSection({ propertyMembers }: PropertyOwnersSectionProps) {
@@ -30,13 +30,10 @@ export function PropertyOwnersSection({ propertyMembers }: PropertyOwnersSection
 				) : (
 					<div className="flex flex-wrap gap-3">
 						{propertyMembers.map((pm) => (
-							<div
-								key={pm.id}
-								className="flex items-center gap-3 rounded-xl px-4 py-3 bg-muted/30"
-							>
+							<div key={pm.id} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-muted/30">
 								<div
-									className="flex items-center justify-center shrink-0 h-10 w-10 rounded-full text-sm font-medium text-white"
-									style={{ backgroundColor: pm.member.color || '#6b7280' }}
+									className="flex items-center justify-center shrink-0 h-10 w-10 rounded-full text-sm font-medium text-white bg-[var(--member-color)]"
+									style={{ '--member-color': pm.member.color || '#6b7280' } as React.CSSProperties}
 								>
 									{pm.member.name.charAt(0).toUpperCase()}
 								</div>
@@ -50,5 +47,5 @@ export function PropertyOwnersSection({ propertyMembers }: PropertyOwnersSection
 				)}
 			</div>
 		</Card>
-	)
+	);
 }

@@ -1,21 +1,21 @@
-'use client'
+'use client';
 
-import { Card, Home } from '@/components'
-import type { PropertyUsage } from '@/features/properties'
+import { Card, Home } from '@/components';
+import type { PropertyUsage } from '@/features/properties';
 
 interface PropertyInfoSectionProps {
-	surface: number
-	rooms: number | null
-	bedrooms: number | null
-	purchasePrice: number
-	notaryFees: number
-	agencyFees: number | null
-	purchaseDate: string
-	currentValue: number
-	rentAmount: number | null
-	rentCharges: number | null
-	usage: PropertyUsage
-	notes: string | null
+	surface: number;
+	rooms: number | null;
+	bedrooms: number | null;
+	purchasePrice: number;
+	notaryFees: number;
+	agencyFees: number | null;
+	purchaseDate: string;
+	currentValue: number;
+	rentAmount: number | null;
+	rentCharges: number | null;
+	usage: PropertyUsage;
+	notes: string | null;
 }
 
 function formatCurrency(amount: number): string {
@@ -23,7 +23,7 @@ function formatCurrency(amount: number): string {
 		style: 'currency',
 		currency: 'EUR',
 		maximumFractionDigits: 0,
-	}).format(amount)
+	}).format(amount);
 }
 
 function formatDate(dateString: string): string {
@@ -31,17 +31,17 @@ function formatDate(dateString: string): string {
 		day: 'numeric',
 		month: 'long',
 		year: 'numeric',
-	})
+	});
 }
 
 function DetailItem({
 	label,
 	value,
 }: {
-	label: string
-	value: string | number | null | undefined
+	label: string;
+	value: string | number | null | undefined;
 }) {
-	if (value === null || value === undefined) return null
+	if (value === null || value === undefined) return null;
 	return (
 		<div className="flex flex-col">
 			<p className="text-xs text-muted-foreground">{label}</p>
@@ -49,17 +49,17 @@ function DetailItem({
 				{typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
 			</p>
 		</div>
-	)
+	);
 }
 
 function CurrencyItem({ label, value }: { label: string; value: number | null | undefined }) {
-	if (value === null || value === undefined) return null
+	if (value === null || value === undefined) return null;
 	return (
 		<div className="flex flex-col">
 			<p className="text-xs text-muted-foreground">{label}</p>
 			<p className="font-medium tabular-nums">{formatCurrency(value)}</p>
 		</div>
-	)
+	);
 }
 
 export function PropertyInfoSection({
@@ -76,7 +76,7 @@ export function PropertyInfoSection({
 	usage,
 	notes,
 }: PropertyInfoSectionProps) {
-	const isRental = usage === 'RENTAL'
+	const isRental = usage === 'RENTAL';
 
 	return (
 		<Card padding="lg">
@@ -132,5 +132,5 @@ export function PropertyInfoSection({
 				)}
 			</div>
 		</Card>
-	)
+	);
 }

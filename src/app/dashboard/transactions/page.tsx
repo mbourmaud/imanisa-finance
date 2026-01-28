@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 /**
  * Transactions Page
@@ -12,15 +12,14 @@ import {
 	ArrowUpRight,
 	CreditCard,
 	ExportButton,
-	Flex,
 	PageHeader,
 	StatCard,
 	StatCardGrid,
 	TransactionFilters,
 	TransactionListContainer,
 	TransactionListItem,
-} from '@/components'
-import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils'
+} from '@/components';
+import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
 
 // Mock transaction data
 const transactions = [
@@ -104,31 +103,31 @@ const transactions = [
 		category: 'Abonnements',
 		account: 'Compte principal',
 	},
-]
+];
 
-const income = transactions.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0)
+const income = transactions.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0);
 const expenses = transactions
 	.filter((t) => t.amount < 0)
-	.reduce((s, t) => s + Math.abs(t.amount), 0)
+	.reduce((s, t) => s + Math.abs(t.amount), 0);
 
 function formatDate(dateStr: string): string {
-	const date = new Date(dateStr)
-	const today = new Date()
-	const yesterday = new Date(today)
-	yesterday.setDate(yesterday.getDate() - 1)
+	const date = new Date(dateStr);
+	const today = new Date();
+	const yesterday = new Date(today);
+	yesterday.setDate(yesterday.getDate() - 1);
 
 	if (date.toDateString() === today.toDateString()) {
-		return "Aujourd'hui"
+		return "Aujourd'hui";
 	}
 	if (date.toDateString() === yesterday.toDateString()) {
-		return 'Hier'
+		return 'Hier';
 	}
-	return formatDateUtil(dateStr, 'D MMM')
+	return formatDateUtil(dateStr, 'D MMM');
 }
 
 export default function TransactionsPage() {
 	return (
-		<Flex direction="col" gap="xl">
+		<div className="flex flex-col gap-8">
 			<PageHeader
 				title="Transactions"
 				description="Historique de toutes vos transactions"
@@ -175,6 +174,6 @@ export default function TransactionsPage() {
 					/>
 				))}
 			</TransactionListContainer>
-		</Flex>
-	)
+		</div>
+	);
 }

@@ -6,29 +6,28 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	Flex,
 	IconBox,
 	MoreHorizontal,
 	type LucideIcon,
-} from '@/components'
-import { formatMoney } from '@/shared/utils'
+} from '@/components';
+import { formatMoney } from '@/shared/utils';
 
 export interface InvestmentSource {
-	id: string
-	name: string
-	type: string
-	icon: LucideIcon
-	value: number
-	invested: number
-	performance: number
-	positions: number
+	id: string;
+	name: string;
+	type: string;
+	icon: LucideIcon;
+	value: number;
+	invested: number;
+	performance: number;
+	positions: number;
 }
 
 interface InvestmentSourceCardProps {
-	source: InvestmentSource
-	onViewPositions?: () => void
-	onAddTransaction?: () => void
-	onDelete?: () => void
+	source: InvestmentSource;
+	onViewPositions?: () => void;
+	onAddTransaction?: () => void;
+	onDelete?: () => void;
 }
 
 /**
@@ -40,12 +39,12 @@ export function InvestmentSourceCard({
 	onAddTransaction,
 	onDelete,
 }: InvestmentSourceCardProps) {
-	const gain = source.value - source.invested
-	const isPositive = gain >= 0
+	const gain = source.value - source.invested;
+	const isPositive = gain >= 0;
 
 	return (
 		<Card padding="md" className="flex flex-col gap-3 group">
-			<Flex direction="row" justify="between">
+			<div className="flex flex-row justify-between">
 				<IconBox icon={source.icon} size="md" variant="primary" rounded="xl" />
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -58,33 +57,24 @@ export function InvestmentSourceCard({
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={onViewPositions}>
-							Voir les positions
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={onAddTransaction}>
-							Ajouter une transaction
-						</DropdownMenuItem>
+						<DropdownMenuItem onClick={onViewPositions}>Voir les positions</DropdownMenuItem>
+						<DropdownMenuItem onClick={onAddTransaction}>Ajouter une transaction</DropdownMenuItem>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							className="text-destructive"
-							onClick={onDelete}
-						>
+						<DropdownMenuItem className="text-destructive" onClick={onDelete}>
 							Supprimer
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
-			</Flex>
-			<Flex direction="col" gap="md">
-				<Flex direction="col" gap="xs">
+			</div>
+			<div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-1">
 					<span className="font-medium">{source.name}</span>
 					<span className="text-xs text-muted-foreground">
 						{source.positions} position{source.positions > 1 ? 's' : ''} · {source.type}
 					</span>
-				</Flex>
-				<Flex direction="col" gap="xs">
-					<span className="text-2xl font-semibold tabular-nums">
-						{formatMoney(source.value)}
-					</span>
+				</div>
+				<div className="flex flex-col gap-1">
+					<span className="text-2xl font-semibold tabular-nums">{formatMoney(source.value)}</span>
 					<span
 						className={`text-sm font-medium ${isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
 					>
@@ -92,8 +82,8 @@ export function InvestmentSourceCard({
 						{formatMoney(gain)} ({isPositive ? '+' : ''}
 						{source.performance.toFixed(2)}%)
 					</span>
-				</Flex>
-			</Flex>
+				</div>
+			</div>
 		</Card>
-	)
+	);
 }
