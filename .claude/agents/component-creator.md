@@ -1,187 +1,196 @@
 # Component Creator Agent
 
-Create new UI components following project patterns.
+Create React components following project architecture and shadcn/ui patterns.
 
-## Trigger
+## When to Use
 
-Use this agent when:
-- Creating new shadcn-based components
-- Adding new feature components
-- Extending existing components with variants
+- Creating new feature components
+- Wrapping shadcn/ui components with custom variants
+- Building business components for pages
+
+## Architecture Rules
+
+1. **No `className` in pages** - Pages use business components, not Tailwind
+2. **No `style={{}}`** - Use Tailwind classes or CSS variables
+3. **shadcn/ui for base** - Compose from existing components
+4. **`cn()` for merging** - Always use for conditional/merged classes
+5. **Named exports** matching filename
+6. **TypeScript interfaces** for all props (no `any`)
+
+## File Naming
+
+| Location | Convention | Example |
+|----------|------------|---------|
+| `src/components/ui/` | kebab-case | `button.tsx`, `field.tsx` |
+| `src/components/{feature}/` | PascalCase | `AccountCard.tsx` |
 
 ## Templates
 
-### 1. shadcn/ui Base Component
-
-Location: `src/components/ui/{component-name}.tsx`
-
-```tsx
-import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
-
-const componentVariants = cva(
-  // Base classes
-  'inline-flex items-center justify-center',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary text-primary-foreground',
-        outline: 'border border-input bg-background',
-      },
-      size: {
-        default: 'h-10 px-4',
-        sm: 'h-9 px-3',
-        lg: 'h-11 px-8',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-)
-
-export interface ComponentNameProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof componentVariants> {}
-
-const ComponentName = React.forwardRef<HTMLDivElement, ComponentNameProps>(
-  ({ className, variant, size, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(componentVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
-)
-ComponentName.displayName = 'ComponentName'
-
-export { ComponentName, componentVariants }
-```
-
-### 2. Feature Component
+### Feature Component
 
 Location: `src/components/{feature}/{ComponentName}.tsx`
 
 ```tsx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
-interface FeatureComponentProps {
-  data: DataType
+interface AccountCardProps {
+  account: Account
   className?: string
 }
 
-export function FeatureComponent({ data, className }: FeatureComponentProps) {
+export function AccountCard({ account, className }: AccountCardProps) {
   return (
     <Card className={cn('', className)}>
       <CardHeader>
-        <CardTitle>{data.title}</CardTitle>
+        <CardTitle>{account.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Content */}
+        <Badge variant={account.isActive ? 'default' : 'secondary'}>
+          {account.type}
+        </Badge>
       </CardContent>
     </Card>
   )
 }
 ```
 
-### 3. Interactive Component (Client)
-
-Location: `src/components/{feature}/{ComponentName}.tsx`
+### Interactive Component (Client)
 
 ```tsx
 'use client'
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 
-interface InteractiveComponentProps {
-  initialValue: string
-  onSubmit: (value: string) => Promise<void>
+interface DeleteAccountDialogProps {
+  accountId: string
+  accountName: string
+  onDelete: (id: string) => Promise<void>
 }
 
-export function InteractiveComponent({ initialValue, onSubmit }: InteractiveComponentProps) {
-  const [value, setValue] = useState(initialValue)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleSubmit = async () => {
-    setIsLoading(true)
-    try {
-      await onSubmit(value)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+export function DeleteAccountDialog({
+  accountId,
+  accountName,
+  onDelete,
+}: DeleteAccountDialogProps) {
+  const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex gap-2">
-      <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="flex-1"
-      />
-      <Button onClick={handleSubmit} disabled={isLoading}>
-        {isLoading ? 'Saving...' : 'Save'}
-      </Button>
-    </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="destructive" size="sm">
+          Supprimer
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            Supprimer {accountName} ?
+          </DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground">
+          Cette action est irréversible.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Annuler
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={async () => {
+              await onDelete(accountId)
+              setOpen(false)
+            }}
+          >
+            Supprimer
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 ```
 
-### 4. Component with Dynamic Color
+### Component with Dynamic Color
 
 ```tsx
 import type { CSSProperties } from 'react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
-interface ColoredAvatarProps {
-  color: string
+interface MemberAvatarProps {
   name: string
+  color: string
 }
 
-export function ColoredAvatar({ color, name }: ColoredAvatarProps) {
+export function MemberAvatar({ name, color }: MemberAvatarProps) {
   return (
-    <div
+    <Avatar
       style={{ '--avatar-color': color } as CSSProperties}
-      className="h-8 w-8 rounded-full bg-[var(--avatar-color)] flex items-center justify-center text-white text-sm font-medium"
+      className="bg-[var(--avatar-color)]"
     >
-      {name.charAt(0).toUpperCase()}
+      <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
+    </Avatar>
+  )
+}
+```
+
+### shadcn/ui Extension (CVA Variant)
+
+Location: `src/components/ui/{component}.tsx`
+
+```tsx
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
+
+const statVariants = cva(
+  'rounded-lg border p-4',
+  {
+    variants: {
+      trend: {
+        up: 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950',
+        down: 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950',
+        neutral: 'border-border bg-card',
+      },
+    },
+    defaultVariants: {
+      trend: 'neutral',
+    },
+  }
+)
+
+interface StatCardProps extends VariantProps<typeof statVariants> {
+  label: string
+  value: string
+  className?: string
+}
+
+export function StatCard({ label, value, trend, className }: StatCardProps) {
+  return (
+    <div className={cn(statVariants({ trend }), className)}>
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
   )
 }
 ```
 
-## Checklist Before Creating
+## Checklist
 
 - [ ] Does a similar component already exist?
-- [ ] Can an existing shadcn component be extended?
+- [ ] Can an existing shadcn component be extended instead?
 - [ ] Is it truly reusable or just page-specific?
-- [ ] Does it need `'use client'`? (Only if interactive)
-
-## Naming Rules
-
-| Type | Location | Naming |
-|------|----------|--------|
-| shadcn base | `ui/` | kebab-case |
-| Feature component | `{feature}/` | PascalCase |
-| Hook | `hooks/` | `use-{name}.ts` |
-| Type | inline or `types/` | PascalCase |
-
-## Export Pattern
-
-```tsx
-// Named export matching filename
-// File: AccountCard.tsx
-export function AccountCard() { ... }
-
-// NOT default export
-export default function AccountCard() { ... }  // ❌
-```
-
-## After Creating
-
-1. Add to barrel export if applicable (`index.ts`)
-2. Add test file if in `ui/` directory
-3. Verify no `className` leaks to pages
-4. Run `npm run check` to verify
+- [ ] Does it need `'use client'`? (Only if interactive: useState, useEffect, handlers)
+- [ ] Named export matches filename?
+- [ ] No `any` types?
+- [ ] No inline `style={{}}` (except CSS variables)?
+- [ ] `cn()` used for className merging?
+- [ ] French for user-visible text, English for code?

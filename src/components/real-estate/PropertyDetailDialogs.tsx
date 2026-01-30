@@ -13,9 +13,8 @@ import type {
 	CoOwnershipFormData,
 	InsuranceFormData,
 	LoanFormData,
-	MemberShare,
-	PropertyFormData,
 	PropertyInsuranceFormData,
+	PropertyWithDetails,
 	UtilityContractFormData,
 } from '@/features/properties';
 
@@ -37,7 +36,7 @@ interface DialogState<T> {
 }
 
 interface PropertyDetailDialogsProps {
-	propertyName: string;
+	property: PropertyWithDetails;
 	members: Member[];
 	loadingMembers: boolean;
 	formatCurrency: (amount: number) => string;
@@ -55,17 +54,6 @@ interface PropertyDetailDialogsProps {
 	propertyEditDialog: {
 		isOpen: boolean;
 		setOpen: (open: boolean) => void;
-		formData: PropertyFormData;
-		memberShares: MemberShare[];
-		formError: string | null;
-		isSubmitting: boolean;
-		onInputChange: (field: keyof PropertyFormData, value: string) => void;
-		onAddMember: () => void;
-		onRemoveMember: (memberId: string) => void;
-		onMemberChange: (index: number, memberId: string) => void;
-		onShareChange: (index: number, share: number) => void;
-		onSubmit: (e: React.FormEvent) => Promise<void>;
-		reset: () => void;
 	};
 	deletePropertyDialog: {
 		isOpen: boolean;
@@ -76,7 +64,7 @@ interface PropertyDetailDialogsProps {
 }
 
 export function PropertyDetailDialogs({
-	propertyName,
+	property,
 	members,
 	loadingMembers,
 	formatCurrency,
@@ -165,28 +153,16 @@ export function PropertyDetailDialogs({
 
 			<PropertyEditDialog
 				open={propertyEditDialog.isOpen}
-				onOpenChange={(open) => {
-					propertyEditDialog.setOpen(open);
-					if (!open) propertyEditDialog.reset();
-				}}
-				formData={propertyEditDialog.formData}
-				memberShares={propertyEditDialog.memberShares}
+				onOpenChange={propertyEditDialog.setOpen}
+				property={property}
 				members={members}
 				loadingMembers={loadingMembers}
-				onInputChange={propertyEditDialog.onInputChange}
-				onAddMember={propertyEditDialog.onAddMember}
-				onRemoveMember={propertyEditDialog.onRemoveMember}
-				onMemberChange={propertyEditDialog.onMemberChange}
-				onShareChange={propertyEditDialog.onShareChange}
-				onSubmit={propertyEditDialog.onSubmit}
-				error={propertyEditDialog.formError}
-				isSubmitting={propertyEditDialog.isSubmitting}
 			/>
 
 			<PropertyDeleteDialog
 				open={deletePropertyDialog.isOpen}
 				onOpenChange={deletePropertyDialog.setOpen}
-				propertyName={propertyName}
+				propertyName={property.name}
 				onDelete={deletePropertyDialog.onDelete}
 				isDeleting={deletePropertyDialog.isDeleting}
 			/>

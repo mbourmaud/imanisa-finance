@@ -9,5 +9,5 @@ interface NarrowPageContainerProps {
  * Used for pages like banks/settings that work better with limited width.
  */
 export function NarrowPageContainer({ children }: NarrowPageContainerProps) {
-	return <div className="max-w-4xl">{children}</div>;
+	return <div className="flex max-w-4xl flex-col gap-8">{children}</div>;
 }

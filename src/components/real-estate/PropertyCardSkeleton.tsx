@@ -16,7 +16,7 @@ export function PropertyCardSkeleton() {
 						</div>
 					</div>
 				</div>
-				<div className="grid grid-cols-2 gap-4">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<Skeleton className="h-20 rounded-xl" />
 					<Skeleton className="h-20 rounded-xl" />
 				</div>

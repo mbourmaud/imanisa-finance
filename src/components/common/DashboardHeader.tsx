@@ -64,8 +64,8 @@ interface DashboardMainProps extends React.HTMLAttributes<HTMLElement> {
 const DashboardMain = forwardRef<HTMLElement, DashboardMainProps>(
 	({ children, className, ...props }, ref) => {
 		return (
-			<main ref={ref} data-slot="dashboard-main" className={cn('flex-1 p-6', className)} {...props}>
-				<div className="mx-auto max-w-7xl">{children}</div>
+			<main ref={ref} data-slot="dashboard-main" className={cn('flex-1 p-4 md:p-6', className)} {...props}>
+				<div className="mx-auto flex max-w-7xl flex-col gap-8">{children}</div>
 			</main>
 		);
 	},

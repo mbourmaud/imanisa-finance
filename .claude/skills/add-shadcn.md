@@ -13,120 +13,78 @@ Examples:
 /add-shadcn accordion
 /add-shadcn alert-dialog
 /add-shadcn calendar
+/add-shadcn radio-group
 ```
 
-## Execution Steps
+## Steps
 
-### Step 1: Check Available Components
+### 1. Install Component
 
 ```bash
-npx shadcn@latest add --help
+npx shadcn@latest add <component-name> --yes
 ```
+
+**Important:** Do NOT use `--overwrite` as it replaces customized components (like our `button.tsx` with `iconLeft`, `fullWidth` props).
+
+If the CLI asks to overwrite an existing file, **decline** unless you intentionally want to reset to defaults.
+
+### 2. Verify Installation
+
+```bash
+ls src/components/ui/<component-name>.tsx
+```
+
+### 3. Check for Type Errors
+
+```bash
+npx tsc --noEmit 2>&1 | head -20
+```
+
+If there are type conflicts (e.g., custom `size` prop vs native HTML `size`), fix the newly added component to match existing types.
+
+### 4. Type Check Pass
+
+Ensure `npx tsc --noEmit` passes with zero errors before proceeding.
+
+## Available Components
 
 Common components:
 - `accordion`, `alert`, `alert-dialog`, `avatar`
 - `badge`, `button`, `calendar`, `card`
 - `checkbox`, `collapsible`, `command`, `context-menu`
-- `dialog`, `dropdown-menu`, `form`, `hover-card`
-- `input`, `label`, `menubar`, `navigation-menu`
-- `popover`, `progress`, `radio-group`, `scroll-area`
-- `select`, `separator`, `sheet`, `skeleton`
-- `slider`, `switch`, `table`, `tabs`
-- `textarea`, `toast`, `toggle`, `tooltip`
+- `dialog`, `dropdown-menu`, `field`, `hover-card`
+- `input`, `input-group`, `label`, `menubar`
+- `navigation-menu`, `popover`, `progress`, `radio-group`
+- `scroll-area`, `select`, `separator`, `sheet`
+- `skeleton`, `slider`, `switch`, `table`
+- `tabs`, `textarea`, `toggle`, `tooltip`
 
-### Step 2: Add Component
+## Customization After Install
 
-```bash
-npx shadcn@latest add <component-name>
-```
-
-This will:
-1. Create the component in `src/components/ui/`
-2. Add any required dependencies
-3. Use kebab-case filename (e.g., `alert-dialog.tsx`)
-
-### Step 3: Verify Installation
-
-```bash
-# Check file was created
-ls src/components/ui/<component-name>.tsx
-
-# Check exports
-grep "export" src/components/ui/<component-name>.tsx
-```
-
-### Step 4: Add to Barrel Export (if needed)
+### Add Variants (CVA)
 
 ```typescript
-// src/components/ui/index.ts
-export * from './<component-name>'
-```
-
-### Step 5: Add Test File (UI components need tests)
-
-Create `src/components/ui/__tests__/<component-name>.test.tsx`:
-
-```tsx
-import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/react'
-import { ComponentName } from '../<component-name>'
-
-describe('ComponentName', () => {
-  describe('snapshots', () => {
-    it('renders default variant', () => {
-      const { container } = render(<ComponentName>Test</ComponentName>)
-      expect(container).toMatchSnapshot()
-    })
-  })
-
-  describe('behavior', () => {
-    it('renders children', () => {
-      const { getByText } = render(<ComponentName>Hello</ComponentName>)
-      expect(getByText('Hello')).toBeInTheDocument()
-    })
-  })
-})
-```
-
-## Post-Installation Checklist
-
-- [ ] Component added to `src/components/ui/`
-- [ ] Filename is kebab-case
-- [ ] Exported from `index.ts`
-- [ ] Test file created
-- [ ] `npm run build` passes
-- [ ] `npm run check` passes
-
-## Customization
-
-After adding, you can customize the component:
-
-1. **Add variants** - Edit the CVA definition
-2. **Change defaults** - Modify `defaultVariants`
-3. **Add props** - Extend the interface
-
-```typescript
-// Example: Add a "warning" variant to Button
-const buttonVariants = cva('...', {
+const componentVariants = cva('base-classes', {
   variants: {
     variant: {
-      // ...existing
-      warning: 'bg-warning text-warning-foreground hover:bg-warning/90',
+      default: '...',
+      custom: '...',  // Add new variant
     },
   },
 })
 ```
 
-## Troubleshooting
+### Extend Props
 
-**Component not found:**
-```bash
-# List all available components
-npx shadcn@latest add
+```typescript
+interface CustomProps extends React.ComponentProps<'div'> {
+  customProp?: boolean
+}
 ```
 
-**Dependency issues:**
-```bash
-npm install  # Reinstall deps
-npx shadcn@latest add <component> --overwrite  # Force reinstall
-```
+## Rules
+
+- Filename stays **kebab-case** in `src/components/ui/`
+- Use `cn()` for className merging
+- Don't modify shadcn source for app logic - create wrapper components
+- Run type check after every install

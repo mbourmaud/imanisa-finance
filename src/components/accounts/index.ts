@@ -44,5 +44,4 @@ export { ImportStatusIcon } from './ImportStatusIcon';
 export { AccountImportRow } from './AccountImportRow';
 export { MemberChip } from './MemberChip';
 export { AddMemberDropdown } from './AddMemberDropdown';
-export { TransactionRow } from './TransactionRow';
 export { TransactionsSection } from './TransactionsSection';

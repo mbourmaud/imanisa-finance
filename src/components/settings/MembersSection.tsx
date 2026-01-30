@@ -1,18 +1,20 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useState } from 'react'
+import { useForm } from '@tanstack/react-form'
+import { toast } from 'sonner'
+
 import {
 	Button,
 	ConfirmDialog,
 	Dialog,
 	DialogContent,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 	EmptyState,
 	Input,
-	Label,
 	MemberAvatar,
 	Plus,
 	SettingsColorPicker,
@@ -20,24 +22,26 @@ import {
 	SettingsMemberSkeleton,
 	SettingsSectionCard,
 	Users,
-} from '@/components';
+} from '@/components'
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import {
 	useCreateMemberMutation,
 	useDeleteMemberMutation,
 	useMembersQuery,
 	useUpdateMemberMutation,
 	type Member,
-} from '@/features/members';
+} from '@/features/members'
+import { memberFormSchema } from '@/features/members/forms/member-form-schema'
 
 interface MemberWithAccounts extends Member {
 	accountMembers: {
-		id: string;
-		ownerShare: number;
+		id: string
+		ownerShare: number
 		account: {
-			id: string;
-			name: string;
-		};
-	}[];
+			id: string
+			name: string
+		}
+	}[]
 }
 
 const MEMBER_COLORS = [
@@ -49,72 +53,78 @@ const MEMBER_COLORS = [
 	{ name: 'Pink', value: '#EC4899' },
 	{ name: 'Indigo', value: '#6366F1' },
 	{ name: 'Teal', value: '#14B8A6' },
-];
+]
 
 export function MembersSection() {
-	// TanStack Query for members
 	const { data: members = [], isLoading: loadingMembers } = useMembersQuery() as {
-		data: MemberWithAccounts[] | undefined;
-		isLoading: boolean;
-	};
-	const createMutation = useCreateMemberMutation();
-	const updateMutation = useUpdateMemberMutation();
-	const deleteMutation = useDeleteMemberMutation();
+		data: MemberWithAccounts[] | undefined
+		isLoading: boolean
+	}
+	const createMutation = useCreateMemberMutation()
+	const updateMutation = useUpdateMemberMutation()
+	const deleteMutation = useDeleteMemberMutation()
 
-	// UI state
-	const [editingMember, setEditingMember] = useState<MemberWithAccounts | null>(null);
-	const [showAddMember, setShowAddMember] = useState(false);
-	const [newMemberName, setNewMemberName] = useState('');
-	const [newMemberColor, setNewMemberColor] = useState(MEMBER_COLORS[0].value);
-	const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null);
+	const [showAddMember, setShowAddMember] = useState(false)
+	const [editingMember, setEditingMember] = useState<MemberWithAccounts | null>(null)
+	const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null)
 
-	// Add member
-	const handleAddMember = async () => {
-		if (!newMemberName.trim()) return;
+	// Add member form
+	const addForm = useForm({
+		defaultValues: {
+			name: '',
+			color: MEMBER_COLORS[0].value,
+		},
+		validators: {
+			onSubmit: memberFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			await createMutation.mutateAsync({ name: value.name, color: value.color })
+			toast.success('Membre ajouté avec succès')
+			addForm.reset()
+			setShowAddMember(false)
+		},
+	})
 
-		try {
-			await createMutation.mutateAsync({ name: newMemberName, color: newMemberColor });
-			toast.success('Membre ajouté avec succès');
-			setNewMemberName('');
-			setNewMemberColor(MEMBER_COLORS[0].value);
-			setShowAddMember(false);
-		} catch {
-			toast.error("Impossible d'ajouter le membre");
-		}
-	};
-
-	// Update member
-	const handleUpdateMember = async () => {
-		if (!editingMember || !editingMember.name.trim()) return;
-
-		try {
+	// Edit member form
+	const editForm = useForm({
+		defaultValues: {
+			name: editingMember?.name ?? '',
+			color: editingMember?.color ?? MEMBER_COLORS[0].value,
+		},
+		validators: {
+			onSubmit: memberFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (!editingMember) return
 			await updateMutation.mutateAsync({
 				id: editingMember.id,
-				input: { name: editingMember.name, color: editingMember.color ?? undefined },
-			});
-			toast.success('Membre mis à jour');
-			setEditingMember(null);
-		} catch {
-			toast.error('Impossible de mettre à jour le membre');
-		}
-	};
+				input: { name: value.name, color: value.color },
+			})
+			toast.success('Membre mis à jour')
+			setEditingMember(null)
+		},
+	})
 
-	// Delete member
+	const handleOpenEdit = (member: MemberWithAccounts) => {
+		setEditingMember(member)
+		editForm.reset()
+		editForm.setFieldValue('name', member.name)
+		editForm.setFieldValue('color', member.color ?? MEMBER_COLORS[0].value)
+	}
+
 	const confirmDeleteMember = async () => {
-		if (!deleteMemberId) return;
-
+		if (!deleteMemberId) return
 		try {
-			await deleteMutation.mutateAsync(deleteMemberId);
-			toast.success('Membre supprimé');
+			await deleteMutation.mutateAsync(deleteMemberId)
+			toast.success('Membre supprimé')
 		} catch {
-			toast.error('Impossible de supprimer le membre');
+			toast.error('Impossible de supprimer le membre')
 		} finally {
-			setDeleteMemberId(null);
+			setDeleteMemberId(null)
 		}
-	};
+	}
 
-	const memberToDelete = members.find((m) => m.id === deleteMemberId);
-	const isSaving = createMutation.isPending || updateMutation.isPending;
+	const memberToDelete = members.find((m) => m.id === deleteMemberId)
 
 	return (
 		<>
@@ -133,30 +143,59 @@ export function MembersSection() {
 							<DialogHeader>
 								<DialogTitle>Ajouter un membre</DialogTitle>
 							</DialogHeader>
-							<div className="flex flex-col gap-4 pt-4">
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="memberName">Nom</Label>
-									<Input
-										id="memberName"
-										placeholder="Prénom"
-										value={newMemberName}
-										onChange={(e) => setNewMemberName(e.target.value)}
+							<form
+								id="add-member-form"
+								onSubmit={(e) => {
+									e.preventDefault()
+									addForm.handleSubmit()
+								}}
+							>
+								<FieldGroup>
+									<addForm.Field
+										name="name"
+										children={(field) => {
+											const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+											return (
+												<Field data-invalid={isInvalid}>
+													<FieldLabel htmlFor="add-member-name">Nom</FieldLabel>
+													<Input
+														id="add-member-name"
+														name={field.name}
+														value={field.state.value}
+														onBlur={field.handleBlur}
+														onChange={(e) => field.handleChange(e.target.value)}
+														aria-invalid={isInvalid}
+														placeholder="Prénom"
+													/>
+													{isInvalid && <FieldError errors={field.state.meta.errors} />}
+												</Field>
+											)
+										}}
 									/>
-								</div>
-								<SettingsColorPicker
-									colors={MEMBER_COLORS}
-									selected={newMemberColor}
-									onChange={setNewMemberColor}
-								/>
-								<div className="flex flex-row justify-end gap-4 pt-4">
-									<Button variant="outline" onClick={() => setShowAddMember(false)}>
-										Annuler
-									</Button>
-									<Button onClick={handleAddMember} disabled={isSaving || !newMemberName.trim()}>
-										{createMutation.isPending ? 'Ajout...' : 'Ajouter'}
-									</Button>
-								</div>
-							</div>
+									<addForm.Field
+										name="color"
+										children={(field) => (
+											<SettingsColorPicker
+												colors={MEMBER_COLORS}
+												selected={field.state.value}
+												onChange={field.handleChange}
+											/>
+										)}
+									/>
+								</FieldGroup>
+							</form>
+							<DialogFooter>
+								<Button variant="outline" onClick={() => setShowAddMember(false)}>
+									Annuler
+								</Button>
+								<Button
+									type="submit"
+									form="add-member-form"
+									disabled={createMutation.isPending}
+								>
+									{createMutation.isPending ? 'Ajout...' : 'Ajouter'}
+								</Button>
+							</DialogFooter>
 						</DialogContent>
 					</Dialog>
 				}
@@ -191,7 +230,7 @@ export function MembersSection() {
 								}
 								name={member.name}
 								accountCount={member.accountMembers?.length ?? 0}
-								onEdit={() => setEditingMember(member)}
+								onEdit={() => handleOpenEdit(member)}
 								onDelete={() => setDeleteMemberId(member.id)}
 								editDialog={
 									<Dialog
@@ -202,33 +241,65 @@ export function MembersSection() {
 											<DialogHeader>
 												<DialogTitle>Modifier le membre</DialogTitle>
 											</DialogHeader>
-											{editingMember && (
-												<div className="flex flex-col gap-4 pt-4">
-													<div className="flex flex-col gap-2">
-														<Label htmlFor="editMemberName">Nom</Label>
-														<Input
-															id="editMemberName"
-															value={editingMember.name}
-															onChange={(e) =>
-																setEditingMember({ ...editingMember, name: e.target.value })
-															}
+											{editingMember?.id === member.id && (
+												<form
+													id={`edit-member-form-${member.id}`}
+													onSubmit={(e) => {
+														e.preventDefault()
+														editForm.handleSubmit()
+													}}
+												>
+													<FieldGroup>
+														<editForm.Field
+															name="name"
+															children={(field) => {
+																const isInvalid =
+																	field.state.meta.isTouched && !field.state.meta.isValid
+																return (
+																	<Field data-invalid={isInvalid}>
+																		<FieldLabel htmlFor="edit-member-name">
+																			Nom
+																		</FieldLabel>
+																		<Input
+																			id="edit-member-name"
+																			name={field.name}
+																			value={field.state.value}
+																			onBlur={field.handleBlur}
+																			onChange={(e) => field.handleChange(e.target.value)}
+																			aria-invalid={isInvalid}
+																		/>
+																		{isInvalid && (
+																			<FieldError errors={field.state.meta.errors} />
+																		)}
+																	</Field>
+																)
+															}}
 														/>
-													</div>
-													<SettingsColorPicker
-														colors={MEMBER_COLORS}
-														selected={editingMember.color || MEMBER_COLORS[0].value}
-														onChange={(color) => setEditingMember({ ...editingMember, color })}
-													/>
-													<div className="flex flex-row justify-end gap-4 pt-4">
-														<Button variant="outline" onClick={() => setEditingMember(null)}>
-															Annuler
-														</Button>
-														<Button onClick={handleUpdateMember} disabled={isSaving}>
-															{updateMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
-														</Button>
-													</div>
-												</div>
+														<editForm.Field
+															name="color"
+															children={(field) => (
+																<SettingsColorPicker
+																	colors={MEMBER_COLORS}
+																	selected={field.state.value}
+																	onChange={field.handleChange}
+																/>
+															)}
+														/>
+													</FieldGroup>
+												</form>
 											)}
+											<DialogFooter>
+												<Button variant="outline" onClick={() => setEditingMember(null)}>
+													Annuler
+												</Button>
+												<Button
+													type="submit"
+													form={`edit-member-form-${member.id}`}
+													disabled={updateMutation.isPending}
+												>
+													{updateMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
+												</Button>
+											</DialogFooter>
 										</DialogContent>
 									</Dialog>
 								}
@@ -252,5 +323,5 @@ export function MembersSection() {
 				onConfirm={confirmDeleteMember}
 			/>
 		</>
-	);
+	)
 }

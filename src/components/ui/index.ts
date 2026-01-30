@@ -322,3 +322,29 @@ export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
 
 export { ScrollArea, ScrollBar } from './scroll-area';
 export { Separator } from './separator';
+
+// =============================================================================
+// FORM FIELD COMPONENTS
+// =============================================================================
+
+export {
+	Field,
+	FieldContent,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+	FieldLegend,
+	FieldSeparator,
+	FieldSet,
+	FieldTitle,
+} from './field';
+
+export {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+	InputGroupText,
+	InputGroupTextarea,
+} from './input-group';

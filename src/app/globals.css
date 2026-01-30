@@ -244,6 +244,19 @@
 		font-feature-settings: "tnum" 1;
 	}
 
+	/* Value colors - for financial amounts */
+	.value-positive {
+		@apply text-emerald-600;
+	}
+
+	.dark .value-positive {
+		@apply text-emerald-400;
+	}
+
+	.value-negative {
+		@apply text-destructive;
+	}
+
 	/* 🏷️ Badge style */
 	.badge-fun {
 		@apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;

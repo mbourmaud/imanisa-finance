@@ -20,21 +20,10 @@ export default function RealEstatePage() {
 		members,
 		isDialogOpen,
 		setIsDialogOpen,
-		formData,
-		memberShares,
-		formError,
-		isSubmitting,
-		onInputChange,
-		onAddMember,
-		onRemoveMember,
-		onMemberChange,
-		onShareChange,
-		onSubmit,
-		onReset,
 	} = useRealEstatePage();
 
 	return (
-		<div className="flex flex-col gap-8">
+		<>
 			<PageHeader
 				title="Immobilier"
 				description="Gérez votre patrimoine immobilier"
@@ -42,18 +31,7 @@ export default function RealEstatePage() {
 					<CreatePropertyDialog
 						open={isDialogOpen}
 						onOpenChange={setIsDialogOpen}
-						formData={formData}
-						memberShares={memberShares}
 						members={members}
-						formError={formError}
-						isSubmitting={isSubmitting}
-						onInputChange={onInputChange}
-						onAddMember={onAddMember}
-						onRemoveMember={onRemoveMember}
-						onMemberChange={onMemberChange}
-						onShareChange={onShareChange}
-						onSubmit={onSubmit}
-						onReset={onReset}
 					/>
 				}
 			/>
@@ -83,6 +61,6 @@ export default function RealEstatePage() {
 				formatCurrency={formatCurrency}
 				onAddClick={() => setIsDialogOpen(true)}
 			/>
-		</div>
+		</>
 	);
 }

@@ -1,27 +1,6 @@
 /**
- * TanStack Form Context Setup
- *
- * This file sets up the form hook pattern with createFormHookContexts for
- * integrating TanStack Form with shadcn/ui components.
- *
- * PATTERN:
- * 1. createFormHookContexts creates React contexts for form state and field state
- * 2. createFormHook creates a custom useForm hook that uses these contexts
- * 3. Components can use useFieldContext and useFormContext to access state
- *
- * USAGE:
- * ```tsx
- * // In a form component
- * const form = useAppForm({
- *   defaultValues: { name: '' },
- *   validators: { onChange: mySchema },
- *   onSubmit: async ({ value }) => { ... }
- * });
- *
- * // In field components
- * const field = useFieldContext();
- * const { errors, value, handleChange, handleBlur } = field.state;
- * ```
+ * @deprecated Use `useForm` from `@tanstack/react-form` directly with shadcn Field components.
+ * See `.claude/rules/tanstack.md` for the new pattern.
  */
 
 import {

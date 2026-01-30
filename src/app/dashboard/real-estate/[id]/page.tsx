@@ -45,7 +45,7 @@ export default function PropertyDetailPage() {
 	}
 
 	return (
-		<div className="flex flex-col gap-6">
+		<>
 			<PropertyDetailHeader
 				name={property.name}
 				type={property.type}
@@ -54,7 +54,7 @@ export default function PropertyDetailPage() {
 				address2={property.address2}
 				postalCode={property.postalCode}
 				city={property.city}
-				onEdit={propertyEditDialog.open}
+				onEdit={() => propertyEditDialog.setOpen(true)}
 				onDeleteClick={() => deletePropertyDialog.setOpen(true)}
 			/>
 
@@ -115,7 +115,7 @@ export default function PropertyDetailPage() {
 			/>
 
 			<PropertyDetailDialogs
-				propertyName={property.name}
+				property={property}
 				members={members}
 				loadingMembers={loadingMembers}
 				formatCurrency={formatCurrency}
@@ -127,6 +127,6 @@ export default function PropertyDetailPage() {
 				propertyEditDialog={propertyEditDialog}
 				deletePropertyDialog={deletePropertyDialog}
 			/>
-		</div>
+		</>
 	);
 }

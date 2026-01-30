@@ -31,7 +31,9 @@ export const accountService = {
 			throw new Error('Failed to fetch accounts');
 		}
 
-		return response.json();
+		const data = await response.json();
+		// API returns { accounts, summary } - extract accounts array
+		return data.accounts ?? data;
 	},
 
 	/**

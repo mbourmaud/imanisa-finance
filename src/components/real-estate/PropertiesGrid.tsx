@@ -18,7 +18,7 @@ export function PropertiesGrid({
 }: PropertiesGridProps) {
 	if (isLoading) {
 		return (
-			<div className="grid grid-cols-2 gap-6">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<PropertyCardSkeleton />
 				<PropertyCardSkeleton />
 			</div>
@@ -30,7 +30,7 @@ export function PropertiesGrid({
 	}
 
 	return (
-		<div className="grid grid-cols-2 gap-6">
+		<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 			{properties.map((property) => (
 				<PropertyCard key={property.id} property={property} formatCurrency={formatCurrency} />
 			))}

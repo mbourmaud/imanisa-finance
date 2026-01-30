@@ -1,22 +1,9 @@
 'use client';
 
 /**
- * FieldError Component
- *
- * A reusable error display component for form fields.
- * Only shows errors when field is touched and invalid.
- *
- * USAGE:
- * ```tsx
- * <form.AppField name="email">
- *   {(field) => (
- *     <>
- *       <Input {...} />
- *       <FieldError />
- *     </>
- *   )}
- * </form.AppField>
- * ```
+ * @deprecated Use `FieldError` from `@/components/ui/field` instead.
+ * The new FieldError accepts an `errors` prop directly.
+ * See `.claude/rules/tanstack.md` for the new pattern.
  */
 
 import { cn } from '@/lib/utils';

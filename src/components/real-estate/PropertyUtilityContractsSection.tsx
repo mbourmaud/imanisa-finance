@@ -112,7 +112,7 @@ export function PropertyUtilityContractsSection({
 				</div>
 			) : (
 				<div className="flex flex-col gap-4">
-					<div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-muted/30">
+					<div className="grid grid-cols-2 gap-2 sm:gap-4 p-4 rounded-xl bg-muted/30">
 						<div className="flex flex-col items-center">
 							<p className="text-xs text-muted-foreground">Nombre de contrats</p>
 							<p className="text-lg font-semibold">{contracts.length}</p>
@@ -151,7 +151,7 @@ export function PropertyUtilityContractsSection({
 											<Button
 												variant="ghost"
 												size="icon"
-												className="h-8 w-8"
+												className="h-10 w-10"
 												onClick={() => onEditContract(contract)}
 											>
 												<Pencil className="h-4 w-4" />

@@ -1,14 +1,19 @@
 /**
- * TanStack Form Integration
+ * @deprecated This entire module is deprecated. Use `useForm` from `@tanstack/react-form`
+ * with shadcn Field components (`Field`, `FieldLabel`, `FieldError` from `@/components/ui/field`)
+ * instead. See `.claude/rules/tanstack.md` for the new pattern.
  *
- * This module provides a pre-configured TanStack Form setup with shadcn/ui components.
+ * Old pattern (deprecated):
+ * ```tsx
+ * import { useAppForm, TextField } from '@/lib/forms'
+ * ```
  *
- * EXPORTS:
- * - useAppForm: Main form hook for creating forms
- * - fieldContext, formContext: React contexts for form/field state
- * - useFieldContext, useFormContext: Hooks to access form/field state in components
- * - Field components: TextField, SelectField, NumberField, TextAreaField
- * - Form components: SubmitButton, FormActions, FieldError
+ * New pattern:
+ * ```tsx
+ * import { useForm } from '@tanstack/react-form'
+ * import { Field, FieldLabel, FieldError, FieldGroup } from '@/components/ui/field'
+ * import { Input } from '@/components/ui/input'
+ * ```
  */
 
 export { FieldError } from './components/FieldError';

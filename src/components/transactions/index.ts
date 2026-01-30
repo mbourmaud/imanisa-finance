@@ -1,5 +1,20 @@
-export { ExportButton } from './ExportButton';
-export { TransactionFilters } from './TransactionFilters';
-export { TransactionListContainer } from './TransactionListContainer';
-export { TransactionListItem } from './TransactionListItem';
-export type { TransactionListItemProps } from './TransactionListItem';
+export { ExportButton } from './ExportButton'
+export { TransactionFilters } from './TransactionFilters'
+export { TransactionListContainer } from './TransactionListContainer'
+export { TransactionListItem } from './TransactionListItem'
+export type { TransactionListItemProps } from './TransactionListItem'
+
+// Transaction component library
+export type { TransactionType, TransactionCategory, TransactionData } from './transaction-types'
+export { TransactionIcon } from './TransactionIcon'
+export type { TransactionIconSize, TransactionIconProps } from './TransactionIcon'
+export { CategoryBadge } from './CategoryBadge'
+export type { CategoryBadgeProps } from './CategoryBadge'
+export { TransactionAmount } from './TransactionAmount'
+export type { TransactionAmountProps } from './TransactionAmount'
+export { TransactionRow } from './TransactionRow'
+export type { TransactionRowVariant, TransactionRowProps } from './TransactionRow'
+export { TransactionList } from './TransactionList'
+export type { TransactionListProps } from './TransactionList'
+export { TransactionRowSkeleton } from './TransactionRowSkeleton'
+export type { TransactionRowSkeletonProps } from './TransactionRowSkeleton'

@@ -1,26 +1,9 @@
 'use client';
 
 /**
- * SelectField Component
- *
- * A select field component that integrates with TanStack Form
- * using shadcn/ui Select components.
- *
- * USAGE:
- * ```tsx
- * <form.AppField name="status">
- *   {(field) => (
- *     <SelectField
- *       label="Status"
- *       placeholder="Select status"
- *       options={[
- *         { value: 'active', label: 'Active' },
- *         { value: 'inactive', label: 'Inactive' },
- *       ]}
- *     />
- *   )}
- * </form.AppField>
- * ```
+ * @deprecated Use `Field` + `FieldLabel` + `Select` + `FieldError` from `@/components/ui/field`
+ * with `form.Field` from `@tanstack/react-form` instead.
+ * See `.claude/rules/tanstack.md` for the new pattern.
  */
 
 import { Label } from '@/components/ui/label';

@@ -23,7 +23,7 @@ export function BudgetChartSection({ chartData, totalSpent }: BudgetChartSection
 					<h3 className="text-md font-semibold">Répartition des dépenses</h3>
 					<span className="text-sm text-muted-foreground">Vue graphique par catégorie</span>
 				</div>
-				<div className="grid grid-cols-2 gap-6">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					<DonutChart data={chartData} height="lg" />
 					<ChartLegend items={chartData} total={totalSpent} />
 				</div>

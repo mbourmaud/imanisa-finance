@@ -61,7 +61,7 @@ export function PropertyLoansSection({
 				<LoansEmptyState onAddClick={onAddLoan} />
 			) : (
 				<div className="flex flex-col gap-4">
-					<div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-muted/30">
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 p-4 rounded-xl bg-muted/30">
 						<div className="text-center">
 							<p className="text-xs text-muted-foreground">Capital restant</p>
 							<p className="text-lg font-semibold tabular-nums">

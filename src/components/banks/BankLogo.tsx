@@ -12,6 +12,8 @@ interface BankLogoProps {
 	logo: string | null;
 	size?: 'sm' | 'md' | 'lg';
 	onLogoChange?: (newLogoUrl: string) => void;
+	/** When true, disables click interaction (for use inside buttons) */
+	disabled?: boolean;
 }
 
 // Get short name from bank name (first letters of each word)
@@ -37,6 +39,7 @@ export function BankLogo({
 	logo,
 	size = 'md',
 	onLogoChange,
+	disabled = false,
 }: BankLogoProps) {
 	const [isUploading, setIsUploading] = useState(false);
 	const [currentLogo, setCurrentLogo] = useState(logo);
@@ -45,7 +48,7 @@ export function BankLogo({
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleClick = () => {
-		if (isUploading) return;
+		if (isUploading || disabled) return;
 		fileInputRef.current?.click();
 	};
 
@@ -113,6 +116,32 @@ export function BankLogo({
 
 	const showLogo = currentLogo && !imageError;
 	const colorStyle = !showLogo ? ({ '--bank-color': bankColor } as React.CSSProperties) : undefined;
+
+	// When disabled, render as non-interactive div
+	if (disabled) {
+		return (
+			<div
+				className={`relative flex items-center justify-center rounded-lg font-semibold overflow-hidden ${sizeClasses[size]} ${
+					showLogo ? 'bg-transparent' : 'bg-[var(--bank-color)] text-white'
+				}`}
+				style={colorStyle}
+				aria-label={`Logo de ${bankName}`}
+			>
+				{showLogo ? (
+					<Image
+						src={currentLogo}
+						alt={`Logo ${bankName}`}
+						className="h-full w-full object-cover"
+						fill
+						unoptimized
+						onError={() => setImageError(true)}
+					/>
+				) : (
+					<span>{getShortName(bankName)}</span>
+				)}
+			</div>
+		);
+	}
 
 	return (
 		<div

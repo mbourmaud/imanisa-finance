@@ -1,20 +1,8 @@
 'use client';
 
 /**
- * FormActions Component
- *
- * A wrapper component for form action buttons (submit, cancel, etc.)
- * with consistent spacing and alignment.
- *
- * USAGE:
- * ```tsx
- * <FormActions>
- *   <Button type="button" variant="outline" onClick={onCancel}>
- *     Cancel
- *   </Button>
- *   <SubmitButton>Save</SubmitButton>
- * </FormActions>
- * ```
+ * @deprecated Use `DialogFooter` from `@/components/ui/dialog` for dialog forms,
+ * or compose buttons directly in your form component.
  */
 
 import { cn } from '@/lib/utils';

@@ -76,7 +76,7 @@ export function PropertyDetailLoanCard({
 					<Progress value={paidPercent} className="h-2" />
 				</div>
 
-				<div className="grid grid-cols-3 gap-4 pt-2 text-sm">
+				<div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2 text-sm">
 					<div className="flex flex-col">
 						<p className="text-xs text-muted-foreground">Mensualité</p>
 						<p className="font-medium tabular-nums">{formatCurrency(loan.monthlyPayment)}</p>

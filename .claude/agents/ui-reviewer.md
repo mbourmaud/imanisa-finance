@@ -1,116 +1,129 @@
 # UI Reviewer Agent
 
-Review UI code for compliance with project architecture rules.
+Review UI code for compliance with project architecture, shadcn/ui patterns, and accessibility.
 
-## Trigger
+## When to Use
 
-Use this agent when:
-- Reviewing PR/MR changes to components
+- After creating or modifying components
+- Reviewing PR/MR changes
 - Auditing existing UI code
 - Before merging UI-related changes
 
-## Checklist
+## Review Checklist
 
-### 1. No className in Pages
-
-```bash
-# Check for violations
-grep -rn "className=" src/app/ --include="*.tsx" | grep -v "layout.tsx"
-```
+### 1. No `className` in Pages
 
 Pages in `src/app/` must NEVER use `className=`. Use shadcn + business components.
+
+```bash
+grep -rn "className=" src/app/ --include="*.tsx" | grep -v "layout.tsx" | grep -v "loading.tsx" | grep -v "error.tsx"
+```
 
 ### 2. No Inline Styles
 
 ```bash
-# Check for style={{}} violations
-grep -rn "style={{" src/ --include="*.tsx" | grep -v "as.*CSSProperties"
+grep -rn "style={{" src/ --include="*.tsx"
 ```
 
-**Allowed:** `style={{ '--var': value } as CSSProperties}` for CSS variables
-**Forbidden:** `style={{ backgroundColor: x, width: y }}`
+- **Allowed**: `style={{ '--var': value } as CSSProperties}` for CSS variables
+- **Forbidden**: `style={{ backgroundColor: x, width: y }}`
 
-### 3. Correct File Naming
+### 3. Forms Use shadcn Field Pattern
+
+```bash
+# Old pattern (should not exist in new code)
+grep -rn "useAppForm\|AppField\|field\.TextField\|field\.SelectField" src/ --include="*.tsx" --include="*.ts"
+
+# New pattern (should exist)
+grep -rn "from '@/components/ui/field'" src/ --include="*.tsx"
+```
+
+Forms must use:
+- `useForm` from `@tanstack/react-form`
+- `Field`, `FieldLabel`, `FieldError`, `FieldGroup` from `@/components/ui/field`
+- Valibot schemas for validation
+- `mutateAsync` (not `mutate`) in onSubmit
+
+### 4. File Naming
 
 | Location | Convention |
 |----------|------------|
 | `src/components/ui/` | kebab-case (`button.tsx`) |
-| `src/components/[feature]/` | PascalCase (`AccountCard.tsx`) |
+| `src/components/{feature}/` | PascalCase (`AccountCard.tsx`) |
 
-### 4. No Lucide Re-exports
+### 5. TypeScript
 
-```bash
-# Icons should be imported directly from lucide-react
-grep -rn "from.*components/ui/icon" src/
-```
-
-Use `import { Plus } from 'lucide-react'` directly.
-
-### 5. No Custom Layout Primitives
-
-```bash
-# Check for forbidden components
-grep -rn "import.*Flex\|import.*Stack\|import.*Box\|import.*Grid" src/
-```
-
-Use Tailwind classes directly: `flex gap-4 items-center`
+- No `any` types anywhere
+- Proper interfaces for all props
+- Named exports matching filename
 
 ### 6. CVA for Variants
 
-Components with variants must use `cva`:
+Components with multiple visual states must use `cva`:
 
 ```typescript
 // ✅ Good
-const buttonVariants = cva('base-classes', { variants: {...} })
+const variants = cva('base', { variants: { variant: { ... } } })
 
 // ❌ Bad
 className={isActive ? 'active-classes' : 'inactive-classes'}
 ```
 
-### 7. Proper Dynamic Styling
+### 7. Dynamic Styling
 
 ```tsx
-// ✅ Correct - CSS variable
+// ✅ CSS variable pattern
 <div
   style={{ '--color': dynamicColor } as CSSProperties}
   className="bg-[var(--color)]"
 />
 
-// ❌ Wrong - Inline style
+// ❌ Inline style
 <div style={{ backgroundColor: dynamicColor }} />
 ```
+
+### 8. Accessibility
+
+- Semantic HTML elements
+- `aria-label` on icon-only buttons
+- `htmlFor` on labels linked to inputs
+- `aria-invalid` on inputs with errors
+- Focus management in dialogs/sheets
+
+### 9. shadcn Component Usage
+
+- Use `cn()` for className merging
+- Use `asChild` for polymorphic rendering
+- Don't modify shadcn source for app logic (create wrappers)
+- Use compound components (Dialog > DialogContent > DialogHeader)
+
+### 10. Layout
+
+- No custom Box, Stack, Row, Grid components
+- Use Tailwind flex/grid utilities directly in components
+- `gap-*` for spacing between elements
 
 ## Output Format
 
 ```markdown
 ## UI Review Results
 
-### ✅ Passed
+### Passed
 - No className in pages
 - No inline styles
+- Forms use new Field pattern
 
-### ❌ Violations Found
+### Issues Found
 
-#### style={{}} in src/components/accounts/MemberChip.tsx:36
-```tsx
-style={{ backgroundColor: memberColor }}
-```
-**Fix:** Use CSS variable pattern
-
-#### className in src/app/dashboard/page.tsx:15
-```tsx
-<div className="flex gap-4">
-```
-**Fix:** Extract to component or use existing shadcn component
+#### [Type] file:line
+Description of the issue
+**Fix:** How to correct it
 ```
 
-## Commands
+## Severity Levels
 
-```bash
-# Run full audit
-npm run lint:ui
-
-# Check specific patterns
-grep -rn "style={{" src/ --include="*.tsx"
-grep -rn "className=" src/app/ --include="*.tsx"
-```
+| Level | Examples |
+|-------|---------|
+| **Critical** | `any` types, inline styles in pages, manual form state |
+| **Warning** | Old `useAppForm` pattern, missing aria attributes |
+| **Info** | Naming inconsistencies, missing `cn()` usage |

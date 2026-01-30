@@ -49,15 +49,16 @@ src/
 ### UI Architecture
 - **Zero className in pages** - Use shadcn + business components
 - **Zero style={{}} anywhere** - Use Tailwind classes or CSS variables
-- **One layout primitive: Flex** - No Box, Stack, Row, Grid
+- **Tailwind flex/grid** for layout - No custom Box, Stack, Row, Grid
 - className allowed ONLY in `src/components/`
 - See `.claude/rules/ui-architecture.md` for details
 
-### Forms (TanStack Form + Valibot)
-- **ALWAYS use TanStack Form** - No manual useState for forms
-- Always use `useAppForm` with Valibot schema
+### Forms (TanStack Form + shadcn Field + Valibot)
+- **ALWAYS use `useForm`** from `@tanstack/react-form` - No manual useState
+- **ALWAYS use shadcn `Field` components** - `Field`, `FieldLabel`, `FieldError`, `FieldGroup`
 - Always use `mutateAsync` (not `mutate`) in onSubmit
-- One hook per entity: `useAccountForm`, `useMemberForm`
+- Valibot schemas in separate files, messages in French
+- **Old `useAppForm` pattern is deprecated** - Migrate to new pattern
 - See `.claude/rules/tanstack.md` for patterns
 
 ### State Management
@@ -93,11 +94,25 @@ All detailed patterns and examples are in `.claude/rules/`:
 | File | Content |
 |------|---------|
 | `security.md` | Security rules for public repo |
-| `ui-architecture.md` | shadcn/ui patterns, ESLint rules |
-| `tanstack.md` | Query, Form, Table patterns + Valibot |
+| `ui-architecture.md` | shadcn/ui patterns, layout, Field components |
+| `tanstack.md` | Query, Form (shadcn Field pattern), Table + Valibot |
 | `zustand.md` | Client state management, when to use |
 | `error-handling.md` | Messages FR, toast, ErrorState |
 | `testing.md` | Unit, integration, snapshots, E2E |
 | `code-style.md` | Naming, imports, commits |
 | `api-patterns.md` | Routes, repositories, use cases |
 | `performance.md` | React, Next.js, Query optimizations |
+| `nextjs-patterns.md` | Server/Client components, caching, streaming |
+| `shadcn-patterns.md` | CVA, composition, slot, accessibility |
+| `tailwind-v4.md` | @theme, OKLCH, dynamic values, @utility |
+
+## Agents & Skills
+
+| Agent/Skill | Purpose |
+|-------------|---------|
+| `agents/form-creator.md` | Create forms (TanStack Form + shadcn Field + Valibot) |
+| `agents/component-creator.md` | Create React components following patterns |
+| `agents/ui-reviewer.md` | Review UI code for architecture compliance |
+| `skills/form-scaffold.md` | Generate complete form files for an entity |
+| `skills/ui-audit.md` | Audit codebase for UI violations |
+| `skills/add-shadcn.md` | Install and configure shadcn components |

@@ -1,17 +1,9 @@
 'use client';
 
 /**
- * TextAreaField Component
- *
- * A textarea field component that integrates with TanStack Form
- * using shadcn/ui Textarea and Label components.
- *
- * USAGE:
- * ```tsx
- * <form.AppField name="description">
- *   {(field) => <TextAreaField label="Description" rows={4} />}
- * </form.AppField>
- * ```
+ * @deprecated Use `Field` + `FieldLabel` + `Textarea` + `FieldError` from `@/components/ui/field`
+ * with `form.Field` from `@tanstack/react-form` instead.
+ * See `.claude/rules/tanstack.md` for the new pattern.
  */
 
 import { Label } from '@/components/ui/label';

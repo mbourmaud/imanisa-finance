@@ -29,7 +29,7 @@ export default function AccountDetailPage() {
 	const { account } = page;
 
 	return (
-		<div className="flex flex-col gap-6">
+		<>
 			<AccountDetailHeader
 				accountName={account.name}
 				accountDescription={account.description}
@@ -165,6 +165,6 @@ export default function AccountDetailPage() {
 				variant="destructive"
 				onConfirm={page.confirmDeleteImport}
 			/>
-		</div>
+		</>
 	);
 }

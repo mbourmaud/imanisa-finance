@@ -67,7 +67,7 @@ export function PropertyCard({ property, formatCurrency }: PropertyCardProps) {
 							<Button
 								variant="ghost"
 								size="icon"
-								className="h-8 w-8 flex-shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+								className="h-10 w-10 flex-shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
 							>
 								<MoreHorizontal className="h-4 w-4" />
 							</Button>
@@ -94,7 +94,7 @@ export function PropertyCard({ property, formatCurrency }: PropertyCardProps) {
 				</div>
 
 				{/* Value & Equity */}
-				<div className="grid grid-cols-2 gap-4">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<PropertyValueBox
 						label="Valeur actuelle"
 						value={formatCurrency(property.currentValue)}
@@ -128,7 +128,7 @@ export function PropertyCard({ property, formatCurrency }: PropertyCardProps) {
 				)}
 
 				{/* Info Grid */}
-				<div className="grid grid-cols-3 gap-4 border-t border-border/40 pt-2">
+				<div className="grid grid-cols-3 gap-2 sm:gap-4 border-t border-border/40 pt-2">
 					<PropertyInfoItem icon={Home} label="Surface" value={`${property.surface} m²`} />
 					<PropertyInfoItem icon={Building2} label="Pièces" value={property.rooms} />
 					<PropertyInfoItem icon={Building2} label="Chambres" value={property.bedrooms} />

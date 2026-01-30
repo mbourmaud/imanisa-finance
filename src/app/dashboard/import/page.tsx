@@ -20,7 +20,7 @@ export default function ImportPage() {
 	const page = useImportPage();
 
 	return (
-		<div className="flex flex-col gap-8">
+		<>
 			<PageHeader
 				title="Import"
 				description="Importez vos relevés bancaires et conservez les fichiers bruts"
@@ -106,6 +106,6 @@ export default function ImportPage() {
 				variant="destructive"
 				onConfirm={page.confirmDeleteImport}
 			/>
-		</div>
+		</>
 	);
 }

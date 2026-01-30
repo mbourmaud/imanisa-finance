@@ -19,7 +19,7 @@ interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
 	({ className, title, description, actions, ...props }, ref) => {
 		return (
-			<div ref={ref} data-slot="page-header" className={cn('pb-6 sm:pb-8', className)} {...props}>
+			<div ref={ref} data-slot="page-header" className={cn(className)} {...props}>
 				<div className="flex items-start justify-between gap-4">
 					<div className="space-y-1 min-w-0">
 						<h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{title}</h1>
@@ -48,7 +48,7 @@ interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function SectionHeader({ className, title, description, action, ...props }: SectionHeaderProps) {
 	return (
-		<div data-slot="section-header" className={cn('pb-4', className)} {...props}>
+		<div data-slot="section-header" className={cn(className)} {...props}>
 			<div className="flex items-center justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<h2 className="text-lg sm:text-xl font-semibold tracking-tight">{title}</h2>

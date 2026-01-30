@@ -1,20 +1,8 @@
 'use client';
 
 /**
- * SubmitButton Component
- *
- * A submit button that integrates with TanStack Form state.
- * Shows loading spinner when form is submitting and disables
- * when submitting or validating.
- *
- * USAGE:
- * ```tsx
- * <form.AppForm>
- *   {(form) => (
- *     <SubmitButton>Save</SubmitButton>
- *   )}
- * </form.AppForm>
- * ```
+ * @deprecated Use a standard `Button` with `type="submit"` and `disabled={mutation.isPending}`
+ * instead. See `.claude/rules/tanstack.md` for the new pattern.
  */
 
 import { useStore } from '@tanstack/react-store';

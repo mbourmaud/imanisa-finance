@@ -8,22 +8,16 @@ import {
 	type CoOwnershipFormData,
 	type InsuranceFormData,
 	type LoanFormData,
-	type PropertyFormData,
 	type PropertyInsuranceFormData,
 	type UtilityContractFormData,
 	initialCoOwnershipFormData,
 	initialInsuranceFormData,
 	initialLoanFormData,
-	initialPropertyFormData,
 	initialPropertyInsuranceFormData,
 	initialUtilityContractFormData,
 } from '../types/form-types';
 import type {
 	InsuranceType,
-	MemberShare,
-	PropertyType,
-	PropertyUsage,
-	PropertyWithDetails,
 	UtilityContract,
 	UtilityType,
 } from '../types';
@@ -38,7 +32,6 @@ import {
 	usePropertyQuery,
 	useUpdateCoOwnershipMutation,
 	useUpdatePropertyInsuranceMutation,
-	useUpdatePropertyMutation,
 	useUpdateUtilityContractMutation,
 } from '..';
 
@@ -62,7 +55,6 @@ export function usePropertyDetailPage(propertyId: string) {
 	// Mutations
 	const createLoanMutation = useCreateLoanMutation();
 	const createLoanInsuranceMutation = useCreateLoanInsuranceMutation();
-	const updatePropertyMutation = useUpdatePropertyMutation();
 	const deletePropertyMutation = useDeletePropertyMutation();
 	const createPropertyInsuranceMutation = useCreatePropertyInsuranceMutation();
 	const updatePropertyInsuranceMutation = useUpdatePropertyInsuranceMutation();
@@ -107,10 +99,6 @@ export function usePropertyDetailPage(propertyId: string) {
 	const [deletingUtilityContractId, setDeletingUtilityContractId] = useState<string | null>(null);
 
 	const [isEditPropertyDialogOpen, setIsEditPropertyDialogOpen] = useState(false);
-	const [propertyFormData, setPropertyFormData] =
-		useState<PropertyFormData>(initialPropertyFormData);
-	const [editMemberShares, setEditMemberShares] = useState<MemberShare[]>([]);
-	const [propertyFormError, setPropertyFormError] = useState<string | null>(null);
 
 	const [showDeletePropertyDialog, setShowDeletePropertyDialog] = useState(false);
 
@@ -125,7 +113,6 @@ export function usePropertyDetailPage(propertyId: string) {
 	const isDeletingCoOwnership = deleteCoOwnershipMutation.isPending;
 	const isSubmittingUtilityContract =
 		createUtilityContractMutation.isPending || updateUtilityContractMutation.isPending;
-	const isSubmittingProperty = updatePropertyMutation.isPending;
 	const isDeletingProperty = deletePropertyMutation.isPending;
 
 	// =============================================================================
@@ -474,137 +461,6 @@ export function usePropertyDetailPage(propertyId: string) {
 		}
 	};
 
-	// Property edit form handlers
-	const handlePropertyInputChange = (field: keyof PropertyFormData, value: string) => {
-		setPropertyFormData((prev) => ({ ...prev, [field]: value }));
-	};
-
-	const resetPropertyForm = () => {
-		setPropertyFormData(initialPropertyFormData);
-		setEditMemberShares([]);
-		setPropertyFormError(null);
-	};
-
-	const openEditPropertyDialog = () => {
-		if (!property) return;
-		setPropertyFormData({
-			name: property.name,
-			type: property.type,
-			usage: property.usage,
-			address: property.address,
-			address2: property.address2 || '',
-			city: property.city,
-			postalCode: property.postalCode,
-			surface: property.surface.toString(),
-			rooms: property.rooms?.toString() || '',
-			bedrooms: property.bedrooms?.toString() || '',
-			purchasePrice: property.purchasePrice.toString(),
-			purchaseDate: new Date(property.purchaseDate).toISOString().split('T')[0],
-			notaryFees: property.notaryFees.toString(),
-			agencyFees: property.agencyFees?.toString() || '',
-			currentValue: property.currentValue.toString(),
-			rentAmount: property.rentAmount?.toString() || '',
-			rentCharges: property.rentCharges?.toString() || '',
-			notes: property.notes || '',
-		});
-		setEditMemberShares(
-			property.propertyMembers.map((pm) => ({
-				memberId: pm.memberId,
-				ownershipShare: pm.ownershipShare,
-			})),
-		);
-		setIsEditPropertyDialogOpen(true);
-	};
-
-	const handleAddMember = () => {
-		const availableMembers = members.filter(
-			(m) => !editMemberShares.some((ms) => ms.memberId === m.id),
-		);
-		if (availableMembers.length > 0) {
-			setEditMemberShares((prev) => [
-				...prev,
-				{ memberId: availableMembers[0].id, ownershipShare: 100 },
-			]);
-		}
-	};
-
-	const handleRemoveMember = (memberId: string) => {
-		setEditMemberShares((prev) => prev.filter((ms) => ms.memberId !== memberId));
-	};
-
-	const handleMemberChange = (index: number, memberId: string) => {
-		setEditMemberShares((prev) => prev.map((ms, i) => (i === index ? { ...ms, memberId } : ms)));
-	};
-
-	const handleShareChange = (index: number, share: number) => {
-		setEditMemberShares((prev) =>
-			prev.map((ms, i) => (i === index ? { ...ms, ownershipShare: share } : ms)),
-		);
-	};
-
-	const handlePropertySubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setPropertyFormError(null);
-
-		try {
-			if (!propertyFormData.name.trim()) throw new Error('Le nom est requis');
-			if (!propertyFormData.type) throw new Error('Le type est requis');
-			if (!propertyFormData.usage) throw new Error("L'usage est requis");
-			if (!propertyFormData.address.trim()) throw new Error("L'adresse est requise");
-			if (!propertyFormData.city.trim()) throw new Error('La ville est requise');
-			if (!propertyFormData.postalCode.trim()) throw new Error('Le code postal est requis');
-			if (!propertyFormData.surface) throw new Error('La surface est requise');
-			if (!propertyFormData.purchasePrice) throw new Error("Le prix d'achat est requis");
-			if (!propertyFormData.purchaseDate) throw new Error("La date d'achat est requise");
-			if (!propertyFormData.notaryFees) throw new Error('Les frais de notaire sont requis');
-			if (!propertyFormData.currentValue) throw new Error('La valeur actuelle est requise');
-
-			if (editMemberShares.length > 0) {
-				const totalShare = editMemberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0);
-				if (totalShare !== 100)
-					throw new Error('La somme des parts de propriété doit être égale à 100%');
-			}
-
-			await updatePropertyMutation.mutateAsync({
-				id: propertyId,
-				input: {
-					name: propertyFormData.name.trim(),
-					type: propertyFormData.type as PropertyType,
-					usage: propertyFormData.usage as PropertyUsage,
-					address: propertyFormData.address.trim(),
-					address2: propertyFormData.address2.trim() || null,
-					city: propertyFormData.city.trim(),
-					postalCode: propertyFormData.postalCode.trim(),
-					surface: Number.parseFloat(propertyFormData.surface),
-					rooms: propertyFormData.rooms ? Number.parseInt(propertyFormData.rooms, 10) : null,
-					bedrooms: propertyFormData.bedrooms
-						? Number.parseInt(propertyFormData.bedrooms, 10)
-						: null,
-					purchasePrice: Number.parseFloat(propertyFormData.purchasePrice),
-					purchaseDate: propertyFormData.purchaseDate,
-					notaryFees: Number.parseFloat(propertyFormData.notaryFees),
-					agencyFees: propertyFormData.agencyFees
-						? Number.parseFloat(propertyFormData.agencyFees)
-						: null,
-					currentValue: Number.parseFloat(propertyFormData.currentValue),
-					rentAmount: propertyFormData.rentAmount
-						? Number.parseFloat(propertyFormData.rentAmount)
-						: null,
-					rentCharges: propertyFormData.rentCharges
-						? Number.parseFloat(propertyFormData.rentCharges)
-						: null,
-					notes: propertyFormData.notes.trim() || null,
-					memberShares: editMemberShares.length > 0 ? editMemberShares : undefined,
-				},
-			});
-
-			setIsEditPropertyDialogOpen(false);
-			resetPropertyForm();
-		} catch (err) {
-			setPropertyFormError(err instanceof Error ? err.message : 'Une erreur est survenue');
-		}
-	};
-
 	// Delete property handler
 	const handleDeleteProperty = async () => {
 		try {
@@ -717,18 +573,6 @@ export function usePropertyDetailPage(propertyId: string) {
 		propertyEditDialog: {
 			isOpen: isEditPropertyDialogOpen,
 			setOpen: setIsEditPropertyDialogOpen,
-			formData: propertyFormData,
-			memberShares: editMemberShares,
-			formError: propertyFormError,
-			isSubmitting: isSubmittingProperty,
-			onInputChange: handlePropertyInputChange,
-			onAddMember: handleAddMember,
-			onRemoveMember: handleRemoveMember,
-			onMemberChange: handleMemberChange,
-			onShareChange: handleShareChange,
-			onSubmit: handlePropertySubmit,
-			reset: resetPropertyForm,
-			open: openEditPropertyDialog,
 		},
 
 		// Delete property dialog

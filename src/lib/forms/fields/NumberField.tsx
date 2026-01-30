@@ -1,17 +1,9 @@
 'use client';
 
 /**
- * NumberField Component
- *
- * A number input field component that integrates with TanStack Form
- * using shadcn/ui Input and Label components.
- *
- * USAGE:
- * ```tsx
- * <form.AppField name="amount">
- *   {(field) => <NumberField label="Amount" min={0} step={0.01} />}
- * </form.AppField>
- * ```
+ * @deprecated Use `Field` + `FieldLabel` + `Input` + `FieldError` from `@/components/ui/field`
+ * with `form.Field` from `@tanstack/react-form` instead.
+ * See `.claude/rules/tanstack.md` for the new pattern.
  */
 
 import { Input, type InputProps } from '@/components/ui/input';

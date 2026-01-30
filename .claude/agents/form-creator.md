@@ -1,214 +1,289 @@
 # Form Creator Agent
 
-Create forms following TanStack Form + Valibot patterns.
+Create forms using the **official shadcn/ui + TanStack Form + Valibot** pattern.
 
-## Trigger
+> Reference: https://ui.shadcn.com/docs/forms/tanstack-form
 
-Use this agent when:
-- Creating new forms
-- Adding form validation
-- Setting up form mutations
+## When to Use
 
-## Architecture
+- Creating new forms for any entity
+- Migrating old `useAppForm` forms to the new pattern
+- Adding form validation with Valibot
+
+## File Structure
 
 ```
 src/features/{feature}/
 ├── forms/
 │   └── {entity}-form-schema.ts   # Valibot schema
-├── hooks/
-│   └── use-{entity}-form.ts      # Form hook
 └── components/
-    └── {Entity}FormSheet.tsx     # Form UI
+    └── {Entity}FormSheet.tsx     # Form UI component
 ```
 
-## Templates
-
-### 1. Valibot Schema
+## Step 1: Valibot Schema
 
 Location: `src/features/{feature}/forms/{entity}-form-schema.ts`
 
 ```typescript
 import * as v from 'valibot'
 
-export const accountFormSchema = v.object({
+export const entityFormSchema = v.object({
   name: v.pipe(
     v.string(),
     v.minLength(1, 'Le nom est requis'),
-    v.maxLength(100, 'Le nom ne peut pas dépasser 100 caractères')
+    v.maxLength(100, 'Maximum 100 caractères')
   ),
-  type: v.picklist(
-    ['CHECKING', 'SAVINGS', 'INVESTMENT', 'LOAN'],
-    'Type de compte invalide'
-  ),
-  balance: v.optional(
-    v.pipe(
-      v.number(),
-      v.minValue(0, 'Le solde ne peut pas être négatif')
-    )
-  ),
-  bankId: v.pipe(
+  email: v.pipe(
     v.string(),
-    v.minLength(1, 'La banque est requise')
+    v.email('Adresse email invalide')
+  ),
+  type: v.picklist(['A', 'B'], 'Type invalide'),
+  amount: v.optional(
+    v.pipe(v.number(), v.minValue(0, 'Le montant ne peut pas être négatif'))
   ),
 })
 
-export type AccountFormValues = v.InferOutput<typeof accountFormSchema>
+export type EntityFormValues = v.InferOutput<typeof entityFormSchema>
 ```
 
-### 2. Form Hook
-
-Location: `src/features/{feature}/hooks/use-{entity}-form.ts`
-
-```typescript
-import { useAppForm } from '@/lib/forms'
-import { accountFormSchema, type AccountFormValues } from '../forms/account-form-schema'
-import { useCreateAccountMutation } from './use-accounts-query'
-
-interface UseAccountFormOptions {
-  defaultValues?: Partial<AccountFormValues>
-  onSuccess?: () => void
-}
-
-export function useAccountForm({ defaultValues, onSuccess }: UseAccountFormOptions = {}) {
-  const createMutation = useCreateAccountMutation()
-
-  const form = useAppForm({
-    defaultValues: {
-      name: '',
-      type: 'CHECKING' as const,
-      balance: 0,
-      bankId: '',
-      ...defaultValues,
-    },
-    validators: {
-      onChange: accountFormSchema,
-    },
-    onSubmit: async ({ value }) => {
-      // ALWAYS use mutateAsync, not mutate
-      await createMutation.mutateAsync(value)
-      onSuccess?.()
-    },
-  })
-
-  return {
-    form,
-    isSubmitting: createMutation.isPending,
-    error: createMutation.error,
-  }
-}
-```
-
-### 3. Form Component
+## Step 2: Form Component
 
 Location: `src/features/{feature}/components/{Entity}FormSheet.tsx`
 
 ```tsx
 'use client'
 
+import { useForm } from '@tanstack/react-form'
+import { toast } from 'sonner'
+
+import { Button } from '@/components/ui/button'
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useAccountForm } from '../hooks/use-account-form'
-import { getErrorMessage } from '@/shared/utils/error'
 
-interface AccountFormSheetProps {
+import { entityFormSchema } from '../forms/entity-form-schema'
+import { useCreateEntityMutation } from '../hooks/use-entities-query'
+
+interface EntityFormSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function AccountFormSheet({ open, onOpenChange }: AccountFormSheetProps) {
-  const { form, isSubmitting, error } = useAccountForm({
-    onSuccess: () => onOpenChange(false),
+export function EntityFormSheet({ open, onOpenChange }: EntityFormSheetProps) {
+  const createMutation = useCreateEntityMutation()
+
+  const form = useForm({
+    defaultValues: {
+      name: '',
+      type: 'A' as const,
+    },
+    validators: {
+      onSubmit: entityFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await createMutation.mutateAsync(value)
+      toast.success('Créé avec succès')
+      onOpenChange(false)
+    },
   })
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Nouveau compte</SheetTitle>
+          <SheetTitle>Nouveau</SheetTitle>
         </SheetHeader>
 
         <form
+          id="entity-form"
           onSubmit={(e) => {
             e.preventDefault()
             form.handleSubmit()
           }}
-          className="flex flex-col gap-4 mt-6"
         >
-          {/* Global error */}
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{getErrorMessage(error)}</AlertDescription>
-            </Alert>
-          )}
-
-          {/* Fields */}
-          <form.AppField name="name">
-            {(field) => <field.TextField label="Nom du compte" />}
-          </form.AppField>
-
-          <form.AppField name="type">
-            {(field) => (
-              <field.SelectField
-                label="Type"
-                options={[
-                  { value: 'CHECKING', label: 'Compte courant' },
-                  { value: 'SAVINGS', label: 'Épargne' },
-                  { value: 'INVESTMENT', label: 'Investissement' },
-                  { value: 'LOAN', label: 'Prêt' },
-                ]}
-              />
-            )}
-          </form.AppField>
-
-          <form.AppField name="balance">
-            {(field) => <field.NumberField label="Solde initial" />}
-          </form.AppField>
-
-          {/* Submit */}
-          <form.AppForm>
-            <form.SubmitButton disabled={isSubmitting}>
-              {isSubmitting ? 'Création...' : 'Créer le compte'}
-            </form.SubmitButton>
-          </form.AppForm>
+          <FieldGroup>
+            <form.Field
+              name="name"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor="entity-name">Nom</FieldLabel>
+                    <Input
+                      id="entity-name"
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+          </FieldGroup>
         </form>
+
+        <Field orientation="horizontal">
+          <Button type="button" variant="outline" onClick={() => form.reset()}>
+            Réinitialiser
+          </Button>
+          <Button type="submit" form="entity-form">
+            Créer
+          </Button>
+        </Field>
       </SheetContent>
     </Sheet>
   )
 }
 ```
 
-## Valibot Cheat Sheet
+## Field Patterns
 
-| Zod | Valibot |
-|-----|---------|
-| `z.string()` | `v.string()` |
-| `z.number()` | `v.number()` |
-| `z.string().min(1)` | `v.pipe(v.string(), v.minLength(1))` |
-| `z.string().email()` | `v.pipe(v.string(), v.email())` |
-| `z.object({...})` | `v.object({...})` |
-| `z.enum(['a', 'b'])` | `v.picklist(['a', 'b'])` |
-| `z.optional(...)` | `v.optional(...)` |
-| `z.infer<typeof schema>` | `v.InferOutput<typeof schema>` |
+### Text Input
+
+```tsx
+<form.Field
+  name="fieldName"
+  children={(field) => {
+    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+    return (
+      <Field data-invalid={isInvalid}>
+        <FieldLabel htmlFor="field-id">Label</FieldLabel>
+        <Input
+          id="field-id"
+          name={field.name}
+          value={field.state.value}
+          onBlur={field.handleBlur}
+          onChange={(e) => field.handleChange(e.target.value)}
+          aria-invalid={isInvalid}
+        />
+        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+      </Field>
+    )
+  }}
+/>
+```
+
+### Select
+
+```tsx
+<form.Field
+  name="type"
+  children={(field) => {
+    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+    return (
+      <Field data-invalid={isInvalid}>
+        <FieldLabel htmlFor="type">Type</FieldLabel>
+        <Select
+          name={field.name}
+          value={field.state.value}
+          onValueChange={field.handleChange}
+        >
+          <SelectTrigger id="type" aria-invalid={isInvalid}>
+            <SelectValue placeholder="Sélectionner" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="A">Option A</SelectItem>
+            <SelectItem value="B">Option B</SelectItem>
+          </SelectContent>
+        </Select>
+        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+      </Field>
+    )
+  }}
+/>
+```
+
+### Checkbox
+
+```tsx
+<form.Field
+  name="accepted"
+  children={(field) => {
+    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+    return (
+      <Field orientation="horizontal" data-invalid={isInvalid}>
+        <Checkbox
+          id="accepted"
+          name={field.name}
+          checked={field.state.value}
+          onCheckedChange={(checked) => field.handleChange(checked === true)}
+        />
+        <FieldLabel htmlFor="accepted" className="font-normal">
+          J'accepte les conditions
+        </FieldLabel>
+      </Field>
+    )
+  }}
+/>
+```
+
+### Switch
+
+```tsx
+<form.Field
+  name="notifications"
+  children={(field) => (
+    <Field orientation="horizontal">
+      <FieldContent>
+        <FieldTitle>Notifications</FieldTitle>
+        <FieldDescription>Recevoir les notifications par email</FieldDescription>
+      </FieldContent>
+      <Switch
+        id="notifications"
+        name={field.name}
+        checked={field.state.value}
+        onCheckedChange={field.handleChange}
+      />
+    </Field>
+  )}
+/>
+```
 
 ## Critical Rules
 
-1. **ALWAYS use TanStack Form** - Never manual `useState` for forms
-2. **ALWAYS use `mutateAsync`** - Not `mutate`, for proper loading tracking
-3. **Validation messages in French** - User-facing text
-4. **One hook per entity** - `useAccountForm`, `useMemberForm`
-5. **Schema separate from hook** - Reusable validation
+1. **ALWAYS use `useForm` from `@tanstack/react-form`** - NOT `useAppForm`
+2. **ALWAYS use `mutateAsync`** in onSubmit - NOT `mutate`
+3. **ALWAYS use shadcn `Field` components** from `@/components/ui/field`
+4. **NEVER use `useState` for form data**
+5. **Validation messages in French**
+6. **`data-invalid` on Field** + `aria-invalid` on input
+7. **`children` prop** on `form.Field` (not render function)
+8. **Unique `id` on every input** linked to `FieldLabel` via `htmlFor`
 
-## Error Messages Pattern
+## Valibot Quick Reference
 
 ```typescript
-// French, user-friendly messages
-v.minLength(1, 'Le nom est requis')
-v.email('Adresse email invalide')
-v.minValue(0, 'Le montant ne peut pas être négatif')
-v.maxLength(100, 'Maximum 100 caractères')
+v.string()                                  // String type
+v.number()                                  // Number type
+v.boolean()                                 // Boolean type
+v.pipe(v.string(), v.minLength(1, 'Msg'))   // String with min length
+v.pipe(v.string(), v.email('Msg'))          // Email
+v.picklist(['A', 'B'], 'Msg')              // Enum
+v.optional(v.string())                      // Optional
+v.array(v.string())                         // Array
+v.pipe(v.number(), v.minValue(0, 'Msg'))    // Number with min
 ```

@@ -37,7 +37,7 @@ export default function AccountsPage() {
 	}
 
 	return (
-		<div className="flex flex-col gap-8">
+		<>
 			<PageHeader
 				title="Comptes"
 				description="Gérez vos comptes bancaires et suivez vos soldes"
@@ -71,39 +71,35 @@ export default function AccountsPage() {
 				/>
 			</StatCardGrid>
 
-			<div className="flex flex-col gap-6">
-				{page.accountGroups.map((group) => (
-					<Card key={group.type} padding="lg">
-						<AccountTypeHeader
-							icon={group.icon}
-							title={group.label}
-							count={group.accounts.length}
-						/>
-						<div className="flex flex-col gap-2">
-							{group.accounts.map((account) => (
-								<AccountListItem
-									key={account.id}
-									id={account.id}
-									name={account.name}
-									bankName={account.bank?.name}
-									bankColor={account.bank?.color}
-									balance={account.balance}
-									currency={account.currency}
-								/>
-							))}
-						</div>
-					</Card>
-				))}
-
-				{!page.hasAccounts && (
-					<EmptyState
-						icon={Wallet}
-						title="Aucun compte"
-						description="Ajoutez votre premier compte pour commencer à suivre vos finances"
-						action={<AddAccountButton />}
+			{page.accountGroups.map((group) => (
+				<Card key={group.type} padding="lg">
+					<AccountTypeHeader
+						icon={group.icon}
+						title={group.label}
+						count={group.accounts.length}
 					/>
-				)}
-			</div>
-		</div>
+					{group.accounts.map((account) => (
+						<AccountListItem
+							key={account.id}
+							id={account.id}
+							name={account.name}
+							bankName={account.bank?.name}
+							bankColor={account.bank?.color}
+							balance={account.balance}
+							currency={account.currency}
+						/>
+					))}
+				</Card>
+			))}
+
+			{!page.hasAccounts && (
+				<EmptyState
+					icon={Wallet}
+					title="Aucun compte"
+					description="Ajoutez votre premier compte pour commencer à suivre vos finances"
+					action={<AddAccountButton />}
+				/>
+			)}
+		</>
 	);
 }

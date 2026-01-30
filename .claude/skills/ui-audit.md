@@ -8,52 +8,66 @@ Audit the codebase for UI architecture violations.
 /ui-audit
 ```
 
-## What It Does
+## What It Checks
 
-Scans the codebase for violations of:
-1. `className` in pages
-2. Inline `style={{}}` (except CSS variables)
-3. Forbidden imports (Flex, Icon wrapper)
-4. Wrong file naming conventions
+### 1. `className` in Pages
 
-## Execution Steps
-
-### Step 1: Check className in Pages
+Pages in `src/app/` must not use `className=`:
 
 ```bash
-grep -rn "className=" src/app/ --include="*.tsx" | grep -v "layout.tsx" | grep -v "loading.tsx" | grep -v "error.tsx"
+grep -rn "className=" src/app/ --include="*.tsx" | grep -v "layout.tsx" | grep -v "loading.tsx" | grep -v "error.tsx" | grep -v "not-found.tsx"
 ```
 
-Any results = violation.
-
-### Step 2: Check Inline Styles
+### 2. Inline Styles
 
 ```bash
 grep -rn "style={{" src/ --include="*.tsx"
 ```
 
-Filter out valid CSS variable patterns:
-- `style={{ '--var': value } as CSSProperties}` = OK
+Filter results:
+- `style={{ '--var': value } as CSSProperties}` = OK (CSS variable)
 - `style={{ backgroundColor: x }}` = VIOLATION
 
-### Step 3: Check Forbidden Imports
+### 3. Old Form Pattern
 
 ```bash
-# Icon wrapper (should use lucide-react directly)
-grep -rn "from.*components/ui/icon" src/
-
-# Flex wrapper (should use Tailwind)
-grep -rn "import.*Flex" src/
+# Should not exist in new code
+grep -rn "useAppForm\|from '@/lib/forms'" src/ --include="*.tsx" --include="*.ts"
+grep -rn "AppField\|field\.TextField\|field\.SelectField\|field\.NumberField" src/ --include="*.tsx"
 ```
 
-### Step 4: Check File Naming
+New forms must use:
+- `useForm` from `@tanstack/react-form`
+- `Field`, `FieldLabel`, `FieldError` from `@/components/ui/field`
+
+### 4. Manual Form State
+
+```bash
+# Forms using useState instead of TanStack Form
+grep -rn "useState.*form\|useState.*errors\|setErrors\|setFormData" src/ --include="*.tsx"
+```
+
+### 5. TypeScript `any`
+
+```bash
+grep -rn ": any\|as any\|<any>" src/ --include="*.ts" --include="*.tsx"
+```
+
+### 6. File Naming
 
 ```bash
 # ui/ should be kebab-case
 ls src/components/ui/*.tsx | xargs -I {} basename {} | grep -E "^[A-Z]"
 
 # feature/ should be PascalCase
-find src/components -type f -name "*.tsx" -not -path "*/ui/*" | xargs -I {} basename {} | grep -E "^[a-z].*[A-Z]"
+find src/components -type f -name "*.tsx" -not -path "*/ui/*" -not -path "*/__tests__/*" | xargs -I {} basename {} | grep -E "^[a-z]"
+```
+
+### 7. Icon Imports
+
+```bash
+# Should import from lucide-react directly
+grep -rn "from.*components/ui/icon" src/ --include="*.tsx"
 ```
 
 ## Output Format
@@ -63,38 +77,30 @@ find src/components -type f -name "*.tsx" -not -path "*/ui/*" | xargs -I {} base
 
 ## Summary
 - Total violations: X
-- className in pages: X
-- Inline styles: X
-- Forbidden imports: X
-- Naming issues: X
+- Critical: X (any, inline styles, manual forms)
+- Warning: X (old patterns, naming)
+- Info: X (suggestions)
 
-## className in Pages
-| File | Line | Code |
-|------|------|------|
-| src/app/dashboard/page.tsx | 15 | `<div className="flex">` |
+## Critical
 
-## Inline Styles
-| File | Line | Issue |
-|------|------|-------|
-| src/components/accounts/MemberChip.tsx | 36 | `style={{ backgroundColor }}` |
+### [Type] file:line
+Description
+**Fix:** How to correct
 
-## Forbidden Imports
-| File | Import |
-|------|--------|
-| src/components/auth/AuthErrorCard.tsx | `from '@/components/ui/icon'` |
+## Warning
 
-## Recommended Fixes
-1. Extract `className` from pages into components
-2. Replace `style={{ backgroundColor }}` with CSS variable pattern
-3. Import icons directly from `lucide-react`
+### [Type] file:line
+Description
+**Fix:** How to correct
+
+## Recommendations
+- List of suggested improvements
 ```
 
-## Quick Fix Commands
+## Severity
 
-```bash
-# Run lint to catch some violations
-npm run lint:ui
-
-# Find all style={{}} for manual review
-grep -rn "style={{" src/ --include="*.tsx" -A 1 -B 1
-```
+| Level | What |
+|-------|------|
+| Critical | `any` types, inline styles, manual form state, className in pages |
+| Warning | Old `useAppForm` pattern, naming issues |
+| Info | Missing `cn()`, optimization opportunities |

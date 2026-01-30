@@ -116,7 +116,7 @@ function formatCurrency(amount: number): string {
 
 export default function BudgetPage() {
 	return (
-		<div className="flex flex-col gap-8">
+		<>
 			<BudgetHeader />
 
 			<StatCardGrid columns={3}>
@@ -146,6 +146,6 @@ export default function BudgetPage() {
 			<BudgetCategoryGrid categories={categories} formatCurrency={formatCurrency} />
 
 			<BudgetChartSection chartData={chartData} totalSpent={totalSpent} />
-		</div>
+		</>
 	);
 }

@@ -4,114 +4,32 @@
  * Transactions Page
  *
  * Shows transaction history with filtering and search.
- * Uses the new component library for consistent UI.
+ * Connected to real data via TanStack Query hooks.
  */
 
 import {
+	AlertCircle,
 	ArrowDownLeft,
 	ArrowUpRight,
 	CreditCard,
 	ExportButton,
 	PageHeader,
+	Skeleton,
 	StatCard,
 	StatCardGrid,
+	StatCardSkeleton,
 	TransactionFilters,
 	TransactionListContainer,
 	TransactionListItem,
 } from '@/components';
+import {
+	useTransactionsQuery,
+	useTransactionSummaryQuery,
+} from '@/features/transactions';
 import { formatDate as formatDateUtil, formatMoney } from '@/shared/utils';
 
-// Mock transaction data
-const transactions = [
-	{
-		id: 'tx-1',
-		description: 'Carrefour Market',
-		amount: -125.4,
-		date: '2025-01-16',
-		category: 'Courses',
-		account: 'Compte principal',
-	},
-	{
-		id: 'tx-2',
-		description: 'Virement Salaire',
-		amount: 3200.0,
-		date: '2025-01-15',
-		category: 'Revenus',
-		account: 'Compte principal',
-	},
-	{
-		id: 'tx-3',
-		description: 'EDF',
-		amount: -89.0,
-		date: '2025-01-15',
-		category: 'Factures',
-		account: 'Compte principal',
-	},
-	{
-		id: 'tx-4',
-		description: 'Amazon Prime',
-		amount: -6.99,
-		date: '2025-01-14',
-		category: 'Abonnements',
-		account: 'Compte principal',
-	},
-	{
-		id: 'tx-5',
-		description: 'Restaurant Le Petit Bistrot',
-		amount: -52.0,
-		date: '2025-01-13',
-		category: 'Sorties',
-		account: 'Compte joint',
-	},
-	{
-		id: 'tx-6',
-		description: 'SNCF - Billet TGV',
-		amount: -85.0,
-		date: '2025-01-12',
-		category: 'Transport',
-		account: 'Compte principal',
-	},
-	{
-		id: 'tx-7',
-		description: 'Loyer Janvier',
-		amount: -950.0,
-		date: '2025-01-10',
-		category: 'Logement',
-		account: 'Compte joint',
-	},
-	{
-		id: 'tx-8',
-		description: 'Virement vers Livret A',
-		amount: -500.0,
-		date: '2025-01-05',
-		category: 'Épargne',
-		account: 'Compte principal',
-	},
-	{
-		id: 'tx-9',
-		description: 'Pharmacie',
-		amount: -23.5,
-		date: '2025-01-04',
-		category: 'Santé',
-		account: 'Compte principal',
-	},
-	{
-		id: 'tx-10',
-		description: 'Spotify',
-		amount: -9.99,
-		date: '2025-01-03',
-		category: 'Abonnements',
-		account: 'Compte principal',
-	},
-];
-
-const income = transactions.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0);
-const expenses = transactions
-	.filter((t) => t.amount < 0)
-	.reduce((s, t) => s + Math.abs(t.amount), 0);
-
-function formatDate(dateStr: string): string {
-	const date = new Date(dateStr);
+function formatDate(dateStr: string | Date): string {
+	const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
 	const today = new Date();
 	const yesterday = new Date(today);
 	yesterday.setDate(yesterday.getDate() - 1);
@@ -122,58 +40,126 @@ function formatDate(dateStr: string): string {
 	if (date.toDateString() === yesterday.toDateString()) {
 		return 'Hier';
 	}
-	return formatDateUtil(dateStr, 'D MMM');
+	return formatDateUtil(
+		typeof dateStr === 'string' ? dateStr : dateStr.toISOString(),
+		'D MMM',
+	);
+}
+
+function TransactionsLoading() {
+	return (
+		<>
+			<StatCardGrid columns={3}>
+				<StatCardSkeleton />
+				<StatCardSkeleton />
+				<StatCardSkeleton />
+			</StatCardGrid>
+
+			<div className="flex flex-col gap-3">
+				{Array.from({ length: 5 }).map((_, i) => (
+					<div key={`skeleton-${String(i)}`} className="flex items-center justify-between p-4">
+						<div className="flex items-center gap-4">
+							<Skeleton className="h-10 w-10 rounded-xl" />
+							<div className="space-y-2">
+								<Skeleton className="h-4 w-36" />
+								<Skeleton className="h-3 w-24" />
+							</div>
+						</div>
+						<div className="text-right space-y-2">
+							<Skeleton className="h-4 w-20 ml-auto" />
+							<Skeleton className="h-3 w-16 ml-auto" />
+						</div>
+					</div>
+				))}
+			</div>
+		</>
+	);
+}
+
+function TransactionsError() {
+	return (
+		<div className="flex flex-col items-center justify-center p-8 text-center">
+			<AlertCircle className="h-12 w-12 text-destructive mb-4" />
+			<h3 className="text-lg font-semibold">Impossible de charger les transactions</h3>
+			<p className="text-sm text-muted-foreground mt-2">
+				Vérifiez votre connexion et réessayez.
+			</p>
+		</div>
+	);
 }
 
 export default function TransactionsPage() {
+	const { data: transactionsData, isLoading, isError } = useTransactionsQuery();
+	const { data: summary } = useTransactionSummaryQuery();
+
+	if (isError) {
+		return (
+			<>
+				<PageHeader
+					title="Transactions"
+					description="Historique de toutes vos transactions"
+				/>
+				<TransactionsError />
+			</>
+		);
+	}
+
+	const transactions = transactionsData?.items ?? [];
+	const income = summary?.totalIncome ?? 0;
+	const expenses = summary?.totalExpenses ?? 0;
+
 	return (
-		<div className="flex flex-col gap-8">
+		<>
 			<PageHeader
 				title="Transactions"
 				description="Historique de toutes vos transactions"
 				actions={<ExportButton />}
 			/>
 
-			<StatCardGrid columns={3}>
-				<StatCard
-					label="Revenus"
-					value={`+${formatMoney(income)}`}
-					icon={ArrowDownLeft}
-					variant="teal"
-				/>
+			{isLoading ? (
+				<TransactionsLoading />
+			) : (
+				<>
+					<StatCardGrid columns={3}>
+						<StatCard
+							label="Revenus"
+							value={`+${formatMoney(income)}`}
+							icon={ArrowDownLeft}
+							variant="teal"
+						/>
+						<StatCard
+							label="Dépenses"
+							value={`-${formatMoney(expenses)}`}
+							icon={ArrowUpRight}
+							variant="coral"
+						/>
+						<StatCard
+							label="Solde net"
+							value={formatMoney(income - expenses)}
+							icon={CreditCard}
+							variant={income - expenses >= 0 ? 'teal' : 'coral'}
+						/>
+					</StatCardGrid>
 
-				<StatCard
-					label="Dépenses"
-					value={`-${formatMoney(expenses)}`}
-					icon={ArrowUpRight}
-					variant="coral"
-				/>
+					<TransactionFilters />
 
-				<StatCard
-					label="Solde net"
-					value={formatMoney(income - expenses)}
-					icon={CreditCard}
-					variant={income - expenses >= 0 ? 'teal' : 'coral'}
-				/>
-			</StatCardGrid>
-
-			<TransactionFilters />
-
-			<TransactionListContainer
-				title="Toutes les transactions"
-				subtitle={`${transactions.length} opérations`}
-			>
-				{transactions.map((tx) => (
-					<TransactionListItem
-						key={tx.id}
-						description={tx.description}
-						amount={tx.amount}
-						category={tx.category}
-						account={tx.account}
-						dateLabel={formatDate(tx.date)}
-					/>
-				))}
-			</TransactionListContainer>
-		</div>
+					<TransactionListContainer
+						title="Toutes les transactions"
+						subtitle={`${transactions.length} opération${transactions.length > 1 ? 's' : ''}`}
+					>
+						{transactions.map((tx) => (
+							<TransactionListItem
+								key={tx.id}
+								description={tx.description}
+								amount={tx.amount}
+								category={tx.category ?? 'Non catégorisé'}
+								account={tx.accountName}
+								dateLabel={formatDate(tx.date)}
+							/>
+						))}
+					</TransactionListContainer>
+				</>
+			)}
+		</>
 	);
 }

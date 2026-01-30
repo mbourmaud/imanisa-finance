@@ -14,7 +14,7 @@ export const transactionKeys = {
     [...transactionKeys.lists(), { filters, pagination }] as const,
   details: () => [...transactionKeys.all, 'detail'] as const,
   detail: (id: string) => [...transactionKeys.details(), id] as const,
-};
+}
 ```
 
 ### Query Hooks
@@ -26,7 +26,7 @@ export function useTransactionsQuery(filters, pagination) {
   return useQuery({
     queryKey: transactionKeys.list(filters, pagination),
     queryFn: () => transactionService.getAll(filters, pagination),
-  });
+  })
 }
 ```
 
@@ -34,14 +34,14 @@ export function useTransactionsQuery(filters, pagination) {
 
 ```typescript
 export function useCreateTransactionMutation() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (input: CreateTransactionInput) => transactionService.create(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: transactionKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: transactionKeys.lists() })
     },
-  });
+  })
 }
 ```
 
@@ -57,91 +57,293 @@ export function useCreateTransactionMutation() {
 
 ---
 
-## TanStack Form + Valibot
+## TanStack Form + shadcn/ui Field Pattern
 
-### Form Architecture
+> **Reference**: https://ui.shadcn.com/docs/forms/tanstack-form
 
-Each form follows this pattern:
+### Architecture Overview
+
+We use the **official shadcn/ui TanStack Form integration**. This means:
+
+- `useForm` from `@tanstack/react-form` directly (NOT a custom `useAppForm` wrapper)
+- `Field`, `FieldGroup`, `FieldError`, `FieldLabel` from `@/components/ui/field`
+- `Input`, `Select`, `Checkbox`, `Switch` from `@/components/ui/`
+- Valibot for validation schemas
+
+### File Structure
 
 ```
 src/features/[feature]/
 ├── forms/
 │   └── [entity]-form-schema.ts   # Valibot schema
 ├── components/
-│   └── [Entity]FormSheet.tsx     # Form component
+│   └── [Entity]FormSheet.tsx     # Form UI component
 └── hooks/
     └── use-[entities]-query.ts   # Query + mutations
 ```
 
-### Schema with Valibot
+### 1. Valibot Schema
 
 ```typescript
-import * as v from 'valibot';
+// src/features/accounts/forms/account-form-schema.ts
+import * as v from 'valibot'
 
 export const accountFormSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, 'Nom requis')),
-  type: v.picklist(['CHECKING', 'SAVINGS', 'INVESTMENT', 'LOAN']),
-  balance: v.optional(v.number()),
-});
+  name: v.pipe(
+    v.string(),
+    v.minLength(1, 'Le nom est requis'),
+    v.maxLength(100, 'Le nom ne peut pas dépasser 100 caractères')
+  ),
+  type: v.picklist(
+    ['CHECKING', 'SAVINGS', 'INVESTMENT', 'LOAN'],
+    'Type de compte invalide'
+  ),
+  balance: v.optional(
+    v.pipe(
+      v.number(),
+      v.minValue(0, 'Le solde ne peut pas être négatif')
+    )
+  ),
+})
 
-export type AccountFormValues = v.InferOutput<typeof accountFormSchema>;
+export type AccountFormValues = v.InferOutput<typeof accountFormSchema>
 ```
 
-### Form Hook with useAppForm
-
-```typescript
-import { useAppForm } from '@/lib/forms';
-
-export function useAccountForm({ onSuccess }: { onSuccess?: () => void }) {
-  const createMutation = useCreateAccountMutation();
-
-  const form = useAppForm({
-    defaultValues: { name: '', type: 'CHECKING', balance: 0 },
-    validators: { onChange: accountFormSchema },
-    onSubmit: async ({ value }) => {
-      await createMutation.mutateAsync(value);
-      onSuccess?.();
-    },
-  });
-
-  return { form, isSubmitting: createMutation.isPending };
-}
-```
-
-### Form Component
+### 2. Form Component (shadcn Field Pattern)
 
 ```tsx
-export function AccountFormSheet({ open, onOpenChange }: Props) {
-  const { form, isSubmitting } = useAccountForm({
-    onSuccess: () => onOpenChange(false),
-  });
+// src/features/accounts/components/AccountFormSheet.tsx
+'use client'
+
+import { useForm } from '@tanstack/react-form'
+import { toast } from 'sonner'
+
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
+
+import { accountFormSchema } from '../forms/account-form-schema'
+import { useCreateAccountMutation } from '../hooks/use-accounts-query'
+
+interface AccountFormSheetProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function AccountFormSheet({ open, onOpenChange }: AccountFormSheetProps) {
+  const createMutation = useCreateAccountMutation()
+
+  const form = useForm({
+    defaultValues: {
+      name: '',
+      type: 'CHECKING' as const,
+      balance: 0,
+    },
+    validators: {
+      onSubmit: accountFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await createMutation.mutateAsync(value)
+      toast.success('Compte créé avec succès')
+      onOpenChange(false)
+    },
+  })
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
-        <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}>
-          <form.AppField name="name">
-            {(field) => <field.TextField label="Nom du compte" />}
-          </form.AppField>
+        <SheetHeader>
+          <SheetTitle>Nouveau compte</SheetTitle>
+        </SheetHeader>
 
-          <form.AppForm>
-            <form.SubmitButton>Créer</form.SubmitButton>
-          </form.AppForm>
+        <form
+          id="account-form"
+          onSubmit={(e) => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+        >
+          <FieldGroup>
+            {/* Text field */}
+            <form.Field
+              name="name"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor="account-name">
+                      Nom du compte
+                    </FieldLabel>
+                    <Input
+                      id="account-name"
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="Mon compte courant"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+
+            {/* Select field */}
+            <form.Field
+              name="type"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor="account-type">
+                      Type de compte
+                    </FieldLabel>
+                    <Select
+                      name={field.name}
+                      value={field.state.value}
+                      onValueChange={field.handleChange}
+                    >
+                      <SelectTrigger
+                        id="account-type"
+                        aria-invalid={isInvalid}
+                      >
+                        <SelectValue placeholder="Sélectionner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CHECKING">Compte courant</SelectItem>
+                        <SelectItem value="SAVINGS">Épargne</SelectItem>
+                        <SelectItem value="INVESTMENT">Investissement</SelectItem>
+                        <SelectItem value="LOAN">Prêt</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+          </FieldGroup>
         </form>
+
+        <Field orientation="horizontal">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => form.reset()}
+          >
+            Réinitialiser
+          </Button>
+          <Button type="submit" form="account-form">
+            Créer le compte
+          </Button>
+        </Field>
       </SheetContent>
     </Sheet>
-  );
+  )
 }
+```
+
+### Key Pattern: Field with Validation
+
+Every field follows this structure:
+
+```tsx
+<form.Field
+  name="fieldName"
+  children={(field) => {
+    const isInvalid =
+      field.state.meta.isTouched && !field.state.meta.isValid
+    return (
+      <Field data-invalid={isInvalid}>
+        <FieldLabel htmlFor="unique-id">Label en français</FieldLabel>
+        <Input
+          id="unique-id"
+          name={field.name}
+          value={field.state.value}
+          onBlur={field.handleBlur}
+          onChange={(e) => field.handleChange(e.target.value)}
+          aria-invalid={isInvalid}
+        />
+        <FieldDescription>Texte d'aide optionnel</FieldDescription>
+        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+      </Field>
+    )
+  }}
+/>
+```
+
+### Available Field Components
+
+| shadcn Component | Use Case |
+|-----------------|----------|
+| `Field` | Container for a single field (handles error state) |
+| `FieldGroup` | Container for multiple fields (spacing) |
+| `FieldLabel` | Label element linked to input via `htmlFor` |
+| `FieldDescription` | Help text below label |
+| `FieldError` | Validation error display (accepts `errors` prop) |
+| `FieldSet` | HTML fieldset for grouped fields |
+| `FieldLegend` | Legend for a FieldSet |
+| `FieldSeparator` | Visual separator between field groups |
+| `FieldContent` | Wrapper for label + description in horizontal layout |
+| `FieldTitle` | Non-label title text for a field |
+| `InputGroup` | Group input with addons (icons, buttons) |
+
+### Field Orientations
+
+```tsx
+// Vertical (default) - label above input
+<Field>...</Field>
+
+// Horizontal - label and input side by side
+<Field orientation="horizontal">...</Field>
+
+// Responsive - vertical on mobile, horizontal on desktop
+<Field orientation="responsive">...</Field>
 ```
 
 ### Form Rules - CRITICAL
 
-1. **ALWAYS use TanStack Form** - No manual `useState` for form data
-2. **ALWAYS use `mutateAsync`** in onSubmit (not `mutate`) for loading tracking
-3. **Mappers obligatoires** - API → Form and Form → API, never direct binding
-4. **One hook per entity** - `useAccountForm`, `useTransactionForm`
-5. **Valibot schema** - onChange validation by default
-6. **No local state** - Everything through TanStack Form (except isolated mini-inputs)
+1. **ALWAYS use `useForm` from `@tanstack/react-form`** - No manual `useState` for form data
+2. **ALWAYS use `mutateAsync`** in onSubmit (not `mutate`) for proper error handling
+3. **ALWAYS use shadcn `Field` components** - Not custom field wrappers
+4. **Valibot for schemas** - Always in a separate file
+5. **Validation messages in French** - User-facing text
+6. **One schema per entity** - `accountFormSchema`, `memberFormSchema`
+7. **`data-invalid` on Field** + `aria-invalid` on input for error state styling
+8. **`children` prop** (not render function) on `form.Field`
 
 ### NEVER Do This
 
@@ -149,28 +351,51 @@ export function AccountFormSheet({ open, onOpenChange }: Props) {
 // ❌ FORBIDDEN - Manual form state with useState
 function MyForm() {
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
   const [errors, setErrors] = useState({})
-
-  const handleSubmit = async () => {
-    // Manual validation...
-    // Manual submission...
-  }
+  const handleSubmit = async () => { /* manual validation... */ }
 }
 
-// ✅ REQUIRED - TanStack Form with useAppForm
-function MyForm() {
-  const { form } = useMyEntityForm()
+// ❌ FORBIDDEN - Old useAppForm wrapper pattern
+import { useAppForm } from '@/lib/forms'
+const form = useAppForm({ ... })
+<form.AppField name="name">
+  {(field) => <field.TextField label="Nom" />}
+</form.AppField>
 
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }}>
-      <form.AppField name="name">
-        {(field) => <field.TextField label="Nom" />}
-      </form.AppField>
-    </form>
-  )
-}
+// ✅ REQUIRED - Official shadcn + TanStack Form pattern
+import { useForm } from '@tanstack/react-form'
+import { Field, FieldLabel, FieldError } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+
+const form = useForm({ ... })
+<form.Field
+  name="name"
+  children={(field) => (
+    <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+      <FieldLabel htmlFor="name">Nom</FieldLabel>
+      <Input
+        id="name"
+        value={field.state.value}
+        onChange={(e) => field.handleChange(e.target.value)}
+        onBlur={field.handleBlur}
+      />
+      {field.state.meta.isTouched && !field.state.meta.isValid && (
+        <FieldError errors={field.state.meta.errors} />
+      )}
+    </Field>
+  )}
+/>
 ```
+
+### Migration from Old Pattern
+
+The old pattern in `src/lib/forms/` (useAppForm, AppField, TextField, SelectField, etc.) is **deprecated**. When touching forms:
+
+1. Replace `useAppForm` with `useForm` from `@tanstack/react-form`
+2. Replace `<form.AppField>` with `<form.Field>`
+3. Replace `<field.TextField>` with `<Field>` + `<FieldLabel>` + `<Input>` + `<FieldError>`
+4. Replace `<field.SelectField>` with `<Field>` + `<Select>` components
+5. Remove imports from `@/lib/forms`
 
 ---
 
@@ -179,7 +404,7 @@ function MyForm() {
 ### Column Definitions
 
 ```typescript
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table'
 
 export function createTransactionColumns(): ColumnDef<Transaction>[] {
   return [
@@ -205,12 +430,12 @@ export function createTransactionColumns(): ColumnDef<Transaction>[] {
     },
     {
       accessorKey: 'amount',
-      header: () => <div className="text-right">Amount</div>,
+      header: () => <div className="text-right">Montant</div>,
       cell: ({ row }) => (
         <div className="text-right">{formatCurrency(row.original.amount)}</div>
       ),
     },
-  ];
+  ]
 }
 ```
 
@@ -229,7 +454,7 @@ const table = useReactTable({
   enableRowSelection: true,
   manualPagination: true,
   pageCount: totalPages,
-});
+})
 ```
 
 ---
@@ -246,3 +471,6 @@ const table = useReactTable({
 | `z.enum(['a', 'b'])` | `v.picklist(['a', 'b'])` |
 | `z.optional(z.string())` | `v.optional(v.string())` |
 | `z.infer<typeof schema>` | `v.InferOutput<typeof schema>` |
+| `z.boolean()` | `v.boolean()` |
+| `z.array(z.string())` | `v.array(v.string())` |
+| `z.string().refine(...)` | `v.pipe(v.string(), v.check(...))` |

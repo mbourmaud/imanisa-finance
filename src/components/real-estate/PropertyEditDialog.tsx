@@ -1,4 +1,8 @@
-'use client';
+'use client'
+
+import { useState } from 'react'
+import { useForm } from '@tanstack/react-form'
+import { toast } from 'sonner'
 
 import {
 	Button,
@@ -9,7 +13,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 	Input,
-	Label,
 	Loader2,
 	Plus,
 	Select,
@@ -18,329 +21,589 @@ import {
 	SelectTrigger,
 	SelectValue,
 	Skeleton,
-} from '@/components';
-import { FormErrorBanner } from './FormErrorBanner';
-import { MemberShareRow } from './MemberShareRow';
-
-type PropertyType = 'HOUSE' | 'APARTMENT';
-type PropertyUsage = 'PRIMARY' | 'SECONDARY' | 'RENTAL';
-
-interface Member {
-	id: string;
-	name: string;
-	color: string | null;
-}
-
-interface MemberShare {
-	memberId: string;
-	ownershipShare: number;
-}
-
-interface PropertyFormData {
-	name: string;
-	type: PropertyType | '';
-	usage: PropertyUsage | '';
-	address: string;
-	address2: string;
-	city: string;
-	postalCode: string;
-	surface: string;
-	rooms: string;
-	bedrooms: string;
-	purchasePrice: string;
-	purchaseDate: string;
-	notaryFees: string;
-	agencyFees: string;
-	currentValue: string;
-	rentAmount: string;
-	rentCharges: string;
-	notes: string;
-}
+} from '@/components'
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from '@/components/ui/field'
+import { propertyFormSchema } from '@/features/properties/forms/property-form-schema'
+import { useUpdatePropertyMutation } from '@/features/properties/hooks/use-properties-query'
+import type {
+	Member,
+	MemberShare,
+	PropertyType,
+	PropertyUsage,
+	PropertyWithDetails,
+} from '@/features/properties/types'
+import { MemberShareRow } from './MemberShareRow'
 
 interface PropertyEditDialogProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	formData: PropertyFormData;
-	memberShares: MemberShare[];
-	members: Member[];
-	loadingMembers: boolean;
-	onInputChange: (field: keyof PropertyFormData, value: string) => void;
-	onAddMember: () => void;
-	onRemoveMember: (memberId: string) => void;
-	onMemberChange: (index: number, memberId: string) => void;
-	onShareChange: (index: number, share: number) => void;
-	onSubmit: (e: React.FormEvent) => void;
-	error: string | null;
-	isSubmitting: boolean;
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	property: PropertyWithDetails
+	members: Member[]
+	loadingMembers?: boolean
 }
 
-/**
- * Dialog for editing property information
- */
 export function PropertyEditDialog({
 	open,
 	onOpenChange,
-	formData,
-	memberShares,
+	property,
 	members,
-	loadingMembers,
-	onInputChange,
-	onAddMember,
-	onRemoveMember,
-	onMemberChange,
-	onShareChange,
-	onSubmit,
-	error,
-	isSubmitting,
+	loadingMembers = false,
 }: PropertyEditDialogProps) {
-	const isRental = formData.usage === 'RENTAL';
-	const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0);
+	const updateMutation = useUpdatePropertyMutation()
+
+	const [memberShares, setMemberShares] = useState<MemberShare[]>(
+		property.propertyMembers.map((pm) => ({
+			memberId: pm.memberId,
+			ownershipShare: pm.ownershipShare,
+		})),
+	)
+
+	const form = useForm({
+		defaultValues: {
+			name: property.name,
+			type: property.type as string,
+			usage: property.usage as string,
+			address: property.address,
+			address2: property.address2 ?? '',
+			city: property.city,
+			postalCode: property.postalCode,
+			surface: property.surface.toString(),
+			rooms: property.rooms?.toString() ?? '',
+			bedrooms: property.bedrooms?.toString() ?? '',
+			purchasePrice: property.purchasePrice.toString(),
+			purchaseDate: new Date(property.purchaseDate).toISOString().split('T')[0],
+			notaryFees: property.notaryFees.toString(),
+			agencyFees: property.agencyFees?.toString() ?? '',
+			currentValue: property.currentValue.toString(),
+			rentAmount: property.rentAmount?.toString() ?? '',
+			rentCharges: property.rentCharges?.toString() ?? '',
+			notes: property.notes ?? '',
+		},
+		validators: {
+			onSubmit: propertyFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (memberShares.length > 0) {
+				const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)
+				if (totalShare !== 100) {
+					toast.error('La somme des parts de propriété doit être égale à 100%')
+					return
+				}
+			}
+
+			await updateMutation.mutateAsync({
+				id: property.id,
+				input: {
+					name: value.name.trim(),
+					type: value.type as PropertyType,
+					usage: value.usage as PropertyUsage,
+					address: value.address.trim(),
+					address2: value.address2?.trim() || null,
+					city: value.city.trim(),
+					postalCode: value.postalCode.trim(),
+					surface: Number.parseFloat(value.surface),
+					rooms: value.rooms ? Number.parseInt(value.rooms, 10) : null,
+					bedrooms: value.bedrooms ? Number.parseInt(value.bedrooms, 10) : null,
+					purchasePrice: Number.parseFloat(value.purchasePrice),
+					purchaseDate: value.purchaseDate,
+					notaryFees: Number.parseFloat(value.notaryFees),
+					agencyFees: value.agencyFees ? Number.parseFloat(value.agencyFees) : null,
+					currentValue: Number.parseFloat(value.currentValue),
+					rentAmount: value.rentAmount ? Number.parseFloat(value.rentAmount) : null,
+					rentCharges: value.rentCharges ? Number.parseFloat(value.rentCharges) : null,
+					notes: value.notes?.trim() || null,
+					memberShares: memberShares.length > 0 ? memberShares : undefined,
+				},
+			})
+
+			toast.success('Bien immobilier modifié avec succès')
+			onOpenChange(false)
+		},
+	})
+
+	const handleAddMember = () => {
+		const availableMembers = members.filter(
+			(m) => !memberShares.some((ms) => ms.memberId === m.id),
+		)
+		if (availableMembers.length > 0) {
+			setMemberShares((prev) => [
+				...prev,
+				{ memberId: availableMembers[0].id, ownershipShare: 100 },
+			])
+		}
+	}
+
+	const handleRemoveMember = (memberId: string) => {
+		setMemberShares((prev) => prev.filter((ms) => ms.memberId !== memberId))
+	}
+
+	const handleMemberChange = (index: number, memberId: string) => {
+		setMemberShares((prev) =>
+			prev.map((ms, i) => (i === index ? { ...ms, memberId } : ms)),
+		)
+	}
+
+	const handleShareChange = (index: number, share: number) => {
+		setMemberShares((prev) =>
+			prev.map((ms, i) => (i === index ? { ...ms, ownershipShare: share } : ms)),
+		)
+	}
+
+	const totalShare = memberShares.reduce((sum, ms) => sum + ms.ownershipShare, 0)
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+			<DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Modifier le bien immobilier</DialogTitle>
-					<DialogDescription>Modifiez les informations de votre bien immobilier.</DialogDescription>
+					<DialogDescription>
+						Modifiez les informations de votre bien immobilier.
+					</DialogDescription>
 				</DialogHeader>
-				<form onSubmit={onSubmit}>
-					<div className="flex flex-col gap-6">
-						{error && <FormErrorBanner message={error} />}
 
+				<form
+					id="property-edit-form"
+					onSubmit={(e) => {
+						e.preventDefault()
+						form.handleSubmit()
+					}}
+				>
+					<FieldGroup>
 						{/* Basic info */}
-						<div className="flex flex-col gap-4">
-							<p className="text-sm font-medium text-muted-foreground">Informations générales</p>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-name">Nom du bien *</Label>
-									<Input
-										id="edit-name"
-										placeholder="Appartement Paris 15"
-										value={formData.name}
-										onChange={(e) => onInputChange('name', e.target.value)}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-type">Type *</Label>
-									<Select
-										value={formData.type}
-										onValueChange={(value) => onInputChange('type', value)}
-									>
-										<SelectTrigger className="w-full">
-											<SelectValue placeholder="Sélectionner..." />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="APARTMENT">Appartement</SelectItem>
-											<SelectItem value="HOUSE">Maison</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-usage">Usage *</Label>
-									<Select
-										value={formData.usage}
-										onValueChange={(value) => onInputChange('usage', value)}
-									>
-										<SelectTrigger className="w-full">
-											<SelectValue placeholder="Sélectionner..." />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="PRIMARY">Résidence principale</SelectItem>
-											<SelectItem value="SECONDARY">Résidence secondaire</SelectItem>
-											<SelectItem value="RENTAL">Locatif</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-surface">Surface (m²) *</Label>
-									<Input
-										id="edit-surface"
-										type="number"
-										min="0"
-										step="0.01"
-										placeholder="65"
-										value={formData.surface}
-										onChange={(e) => onInputChange('surface', e.target.value)}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-rooms">Pièces</Label>
-									<Input
-										id="edit-rooms"
-										type="number"
-										min="0"
-										placeholder="3"
-										value={formData.rooms}
-										onChange={(e) => onInputChange('rooms', e.target.value)}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-bedrooms">Chambres</Label>
-									<Input
-										id="edit-bedrooms"
-										type="number"
-										min="0"
-										placeholder="2"
-										value={formData.bedrooms}
-										onChange={(e) => onInputChange('bedrooms', e.target.value)}
-									/>
-								</div>
-							</div>
+						<p className="text-sm font-medium text-muted-foreground">
+							Informations générales
+						</p>
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<form.Field
+								name="name"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-name">Nom du bien</FieldLabel>
+											<Input
+												id="edit-name"
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="Appartement Paris 15"
+											/>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="type"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-type">Type</FieldLabel>
+											<Select
+												name={field.name}
+												value={field.state.value}
+												onValueChange={(v) => field.handleChange(v)}
+											>
+												<SelectTrigger id="edit-type" className="w-full" aria-invalid={isInvalid}>
+													<SelectValue placeholder="Sélectionner..." />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="APARTMENT">Appartement</SelectItem>
+													<SelectItem value="HOUSE">Maison</SelectItem>
+												</SelectContent>
+											</Select>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="usage"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-usage">Usage</FieldLabel>
+											<Select
+												name={field.name}
+												value={field.state.value}
+												onValueChange={(v) => field.handleChange(v)}
+											>
+												<SelectTrigger id="edit-usage" className="w-full" aria-invalid={isInvalid}>
+													<SelectValue placeholder="Sélectionner..." />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="PRIMARY">Résidence principale</SelectItem>
+													<SelectItem value="SECONDARY">Résidence secondaire</SelectItem>
+													<SelectItem value="RENTAL">Locatif</SelectItem>
+												</SelectContent>
+											</Select>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="surface"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-surface">Surface (m²)</FieldLabel>
+											<Input
+												id="edit-surface"
+												name={field.name}
+												type="number"
+												min="0"
+												step="0.01"
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="65"
+											/>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="rooms"
+								children={(field) => (
+									<Field>
+										<FieldLabel htmlFor="edit-rooms">Pièces</FieldLabel>
+										<Input
+											id="edit-rooms"
+											name={field.name}
+											type="number"
+											min="0"
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											placeholder="3"
+										/>
+									</Field>
+								)}
+							/>
+							<form.Field
+								name="bedrooms"
+								children={(field) => (
+									<Field>
+										<FieldLabel htmlFor="edit-bedrooms">Chambres</FieldLabel>
+										<Input
+											id="edit-bedrooms"
+											name={field.name}
+											type="number"
+											min="0"
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											placeholder="2"
+										/>
+									</Field>
+								)}
+							/>
 						</div>
 
 						{/* Address */}
-						<div className="flex flex-col gap-4">
-							<p className="text-sm font-medium text-muted-foreground">Adresse</p>
-							<div className="flex flex-col gap-4">
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-address">Adresse *</Label>
-									<Input
-										id="edit-address"
-										placeholder="10 rue de Paris"
-										value={formData.address}
-										onChange={(e) => onInputChange('address', e.target.value)}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-address2">Complément d&apos;adresse</Label>
+						<p className="text-sm font-medium text-muted-foreground">Adresse</p>
+						<form.Field
+							name="address"
+							children={(field) => {
+								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor="edit-address">Adresse</FieldLabel>
+										<Input
+											id="edit-address"
+											name={field.name}
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											aria-invalid={isInvalid}
+											placeholder="10 rue de Paris"
+										/>
+										{isInvalid && <FieldError errors={field.state.meta.errors} />}
+									</Field>
+								)
+							}}
+						/>
+						<form.Field
+							name="address2"
+							children={(field) => (
+								<Field>
+									<FieldLabel htmlFor="edit-address2">
+										Complément d&apos;adresse
+									</FieldLabel>
 									<Input
 										id="edit-address2"
+										name={field.name}
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
 										placeholder="Bâtiment A, 3ème étage"
-										value={formData.address2}
-										onChange={(e) => onInputChange('address2', e.target.value)}
 									/>
-								</div>
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-									<div className="flex flex-col gap-2">
-										<Label htmlFor="edit-city">Ville *</Label>
-										<Input
-											id="edit-city"
-											placeholder="Paris"
-											value={formData.city}
-											onChange={(e) => onInputChange('city', e.target.value)}
-										/>
-									</div>
-									<div className="flex flex-col gap-2">
-										<Label htmlFor="edit-postalCode">Code postal *</Label>
-										<Input
-											id="edit-postalCode"
-											placeholder="75015"
-											value={formData.postalCode}
-											onChange={(e) => onInputChange('postalCode', e.target.value)}
-										/>
-									</div>
-								</div>
-							</div>
+								</Field>
+							)}
+						/>
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<form.Field
+								name="city"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-city">Ville</FieldLabel>
+											<Input
+												id="edit-city"
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="Paris"
+											/>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="postalCode"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-postalCode">
+												Code postal
+											</FieldLabel>
+											<Input
+												id="edit-postalCode"
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="75015"
+											/>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
 						</div>
 
 						{/* Purchase info */}
-						<div className="flex flex-col gap-4">
-							<p className="text-sm font-medium text-muted-foreground">Achat</p>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-purchasePrice">Prix d&apos;achat (€) *</Label>
-									<Input
-										id="edit-purchasePrice"
-										type="number"
-										min="0"
-										step="0.01"
-										placeholder="350000"
-										value={formData.purchasePrice}
-										onChange={(e) => onInputChange('purchasePrice', e.target.value)}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-purchaseDate">Date d&apos;achat *</Label>
-									<Input
-										id="edit-purchaseDate"
-										type="date"
-										value={formData.purchaseDate}
-										onChange={(e) => onInputChange('purchaseDate', e.target.value)}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-notaryFees">Frais de notaire (€) *</Label>
-									<Input
-										id="edit-notaryFees"
-										type="number"
-										min="0"
-										step="0.01"
-										placeholder="25000"
-										value={formData.notaryFees}
-										onChange={(e) => onInputChange('notaryFees', e.target.value)}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Label htmlFor="edit-agencyFees">Frais d&apos;agence (€)</Label>
-									<Input
-										id="edit-agencyFees"
-										type="number"
-										min="0"
-										step="0.01"
-										placeholder="10000"
-										value={formData.agencyFees}
-										onChange={(e) => onInputChange('agencyFees', e.target.value)}
-									/>
-								</div>
-							</div>
+						<p className="text-sm font-medium text-muted-foreground">Achat</p>
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<form.Field
+								name="purchasePrice"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-purchasePrice">
+												Prix d&apos;achat (€)
+											</FieldLabel>
+											<Input
+												id="edit-purchasePrice"
+												name={field.name}
+												type="number"
+												min="0"
+												step="0.01"
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="350000"
+											/>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="purchaseDate"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-purchaseDate">
+												Date d&apos;achat
+											</FieldLabel>
+											<Input
+												id="edit-purchaseDate"
+												name={field.name}
+												type="date"
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+											/>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="notaryFees"
+								children={(field) => {
+									const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+									return (
+										<Field data-invalid={isInvalid}>
+											<FieldLabel htmlFor="edit-notaryFees">
+												Frais de notaire (€)
+											</FieldLabel>
+											<Input
+												id="edit-notaryFees"
+												name={field.name}
+												type="number"
+												min="0"
+												step="0.01"
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												aria-invalid={isInvalid}
+												placeholder="25000"
+											/>
+											{isInvalid && <FieldError errors={field.state.meta.errors} />}
+										</Field>
+									)
+								}}
+							/>
+							<form.Field
+								name="agencyFees"
+								children={(field) => (
+									<Field>
+										<FieldLabel htmlFor="edit-agencyFees">
+											Frais d&apos;agence (€)
+										</FieldLabel>
+										<Input
+											id="edit-agencyFees"
+											name={field.name}
+											type="number"
+											min="0"
+											step="0.01"
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											placeholder="10000"
+										/>
+									</Field>
+								)}
+							/>
 						</div>
 
 						{/* Current value */}
-						<div className="flex flex-col gap-4">
-							<p className="text-sm font-medium text-muted-foreground">Valeur actuelle</p>
-							<div className="flex flex-col gap-2">
-								<Label htmlFor="edit-currentValue">Valeur estimée (€) *</Label>
-								<Input
-									id="edit-currentValue"
-									type="number"
-									min="0"
-									step="0.01"
-									placeholder="380000"
-									value={formData.currentValue}
-									onChange={(e) => onInputChange('currentValue', e.target.value)}
-								/>
-							</div>
-						</div>
+						<p className="text-sm font-medium text-muted-foreground">
+							Valeur actuelle
+						</p>
+						<form.Field
+							name="currentValue"
+							children={(field) => {
+								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor="edit-currentValue">
+											Valeur estimée (€)
+										</FieldLabel>
+										<Input
+											id="edit-currentValue"
+											name={field.name}
+											type="number"
+											min="0"
+											step="0.01"
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											aria-invalid={isInvalid}
+											placeholder="380000"
+										/>
+										{isInvalid && <FieldError errors={field.state.meta.errors} />}
+									</Field>
+								)
+							}}
+						/>
 
-						{/* Rental info */}
-						{isRental && (
-							<div className="flex flex-col gap-4">
-								<p className="text-sm font-medium text-muted-foreground">Informations locatives</p>
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-									<div className="flex flex-col gap-2">
-										<Label htmlFor="edit-rentAmount">Loyer mensuel (€)</Label>
-										<Input
-											id="edit-rentAmount"
-											type="number"
-											min="0"
-											step="0.01"
-											placeholder="1200"
-											value={formData.rentAmount}
-											onChange={(e) => onInputChange('rentAmount', e.target.value)}
-										/>
-									</div>
-									<div className="flex flex-col gap-2">
-										<Label htmlFor="edit-rentCharges">Charges locatives (€)</Label>
-										<Input
-											id="edit-rentCharges"
-											type="number"
-											min="0"
-											step="0.01"
-											placeholder="150"
-											value={formData.rentCharges}
-											onChange={(e) => onInputChange('rentCharges', e.target.value)}
-										/>
-									</div>
-								</div>
-							</div>
-						)}
+						{/* Rental info - conditionally shown */}
+						<form.Subscribe
+							selector={(state) => state.values.usage}
+							children={(usage) =>
+								usage === 'RENTAL' ? (
+									<>
+										<p className="text-sm font-medium text-muted-foreground">
+											Informations locatives
+										</p>
+										<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+											<form.Field
+												name="rentAmount"
+												children={(field) => (
+													<Field>
+														<FieldLabel htmlFor="edit-rentAmount">
+															Loyer mensuel (€)
+														</FieldLabel>
+														<Input
+															id="edit-rentAmount"
+															name={field.name}
+															type="number"
+															min="0"
+															step="0.01"
+															value={field.state.value}
+															onBlur={field.handleBlur}
+															onChange={(e) => field.handleChange(e.target.value)}
+															placeholder="1200"
+														/>
+													</Field>
+												)}
+											/>
+											<form.Field
+												name="rentCharges"
+												children={(field) => (
+													<Field>
+														<FieldLabel htmlFor="edit-rentCharges">
+															Charges locatives (€)
+														</FieldLabel>
+														<Input
+															id="edit-rentCharges"
+															name={field.name}
+															type="number"
+															min="0"
+															step="0.01"
+															value={field.state.value}
+															onBlur={field.handleBlur}
+															onChange={(e) => field.handleChange(e.target.value)}
+															placeholder="150"
+														/>
+													</Field>
+												)}
+											/>
+										</div>
+									</>
+								) : null
+							}
+						/>
 
 						{/* Members/Owners */}
 						<div className="flex flex-col gap-4">
-							<div className="flex justify-between items-center">
-								<p className="text-sm font-medium text-muted-foreground">Propriétaires</p>
+							<div className="flex items-center justify-between">
+								<p className="text-sm font-medium text-muted-foreground">
+									Propriétaires
+								</p>
 								{members.length > memberShares.length && (
-									<Button type="button" variant="outline" size="sm" onClick={onAddMember}>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={handleAddMember}
+									>
 										<Plus className="mr-1 h-3 w-3" />
 										Ajouter
 									</Button>
@@ -350,8 +613,8 @@ export function PropertyEditDialog({
 								<Skeleton className="h-10 w-full" />
 							) : memberShares.length === 0 ? (
 								<p className="text-sm text-muted-foreground">
-									Aucun propriétaire sélectionné. Cliquez sur &quot;Ajouter&quot; pour ajouter des
-									propriétaires.
+									Aucun propriétaire sélectionné. Cliquez sur
+									&quot;Ajouter&quot; pour ajouter des propriétaires.
 								</p>
 							) : (
 								<div className="flex flex-col gap-3">
@@ -359,8 +622,10 @@ export function PropertyEditDialog({
 										const availableMembers = members.filter(
 											(m) =>
 												m.id === ms.memberId ||
-												!memberShares.some((other) => other.memberId === m.id),
-										);
+												!memberShares.some(
+													(other) => other.memberId === m.id,
+												),
+										)
 										return (
 											<MemberShareRow
 												key={ms.memberId}
@@ -368,17 +633,23 @@ export function PropertyEditDialog({
 												ownershipShare={ms.ownershipShare}
 												members={members}
 												availableMembers={availableMembers}
-												onMemberChange={(memberId) => onMemberChange(index, memberId)}
-												onShareChange={(share) => onShareChange(index, share)}
-												onRemove={() => onRemoveMember(ms.memberId)}
+												onMemberChange={(memberId) =>
+													handleMemberChange(index, memberId)
+												}
+												onShareChange={(share) =>
+													handleShareChange(index, share)
+												}
+												onRemove={() => handleRemoveMember(ms.memberId)}
 											/>
-										);
+										)
 									})}
 									{memberShares.length > 0 && (
-										<p className="text-xs text-muted-foreground text-right">
+										<p className="text-right text-xs text-muted-foreground">
 											Total: {totalShare}%
 											{totalShare !== 100 && (
-												<span className="ml-1 text-destructive">(doit être 100%)</span>
+												<span className="ml-1 text-destructive">
+													(doit être 100%)
+												</span>
 											)}
 										</p>
 									)}
@@ -387,39 +658,50 @@ export function PropertyEditDialog({
 						</div>
 
 						{/* Notes */}
-						<div className="flex flex-col gap-2">
-							<Label htmlFor="edit-notes">Notes</Label>
-							<Input
-								id="edit-notes"
-								placeholder="Notes additionnelles..."
-								value={formData.notes}
-								onChange={(e) => onInputChange('notes', e.target.value)}
-							/>
-						</div>
-
-						<DialogFooter className="pt-4">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => onOpenChange(false)}
-								disabled={isSubmitting}
-							>
-								Annuler
-							</Button>
-							<Button type="submit" disabled={isSubmitting}>
-								{isSubmitting ? (
-									<span className="flex items-center gap-2">
-										<Loader2 className="h-4 w-4 animate-spin" />
-										Modification...
-									</span>
-								) : (
-									'Enregistrer'
-								)}
-							</Button>
-						</DialogFooter>
-					</div>
+						<form.Field
+							name="notes"
+							children={(field) => (
+								<Field>
+									<FieldLabel htmlFor="edit-notes">Notes</FieldLabel>
+									<Input
+										id="edit-notes"
+										name={field.name}
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										placeholder="Notes additionnelles..."
+									/>
+								</Field>
+							)}
+						/>
+					</FieldGroup>
 				</form>
+
+				<DialogFooter className="pt-4">
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() => onOpenChange(false)}
+						disabled={updateMutation.isPending}
+					>
+						Annuler
+					</Button>
+					<Button
+						type="submit"
+						form="property-edit-form"
+						disabled={updateMutation.isPending}
+					>
+						{updateMutation.isPending ? (
+							<span className="flex items-center gap-2">
+								<Loader2 className="h-4 w-4 animate-spin" />
+								Modification...
+							</span>
+						) : (
+							'Enregistrer'
+						)}
+					</Button>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
-	);
+	)
 }

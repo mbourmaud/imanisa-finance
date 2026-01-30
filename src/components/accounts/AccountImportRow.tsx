@@ -71,7 +71,7 @@ export function AccountImportRow({
 						size="sm"
 						onClick={onProcess}
 						disabled={isProcessing}
-						className="h-6 px-2 text-xs"
+						className="h-8 px-2 text-xs"
 					>
 						{isProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Traiter'}
 					</Button>
@@ -83,7 +83,7 @@ export function AccountImportRow({
 						onClick={onReprocess}
 						title="Retraiter"
 						disabled={isReprocessing}
-						className="h-6 w-6"
+						className="h-8 w-8"
 					>
 						{isReprocessing ? (
 							<Loader2 className="h-3 w-3 animate-spin" />
@@ -99,7 +99,7 @@ export function AccountImportRow({
 						onClick={onProcess}
 						title="Réessayer"
 						disabled={isProcessing}
-						className="h-6 w-6"
+						className="h-8 w-8"
 					>
 						{isProcessing ? (
 							<Loader2 className="h-3 w-3 animate-spin" />
@@ -113,7 +113,7 @@ export function AccountImportRow({
 					size="icon"
 					onClick={onDelete}
 					disabled={isDeleting}
-					className="h-6 w-6 text-muted-foreground"
+					className="h-8 w-8 text-muted-foreground"
 				>
 					{isDeleting ? (
 						<Loader2 className="h-3 w-3 animate-spin" />
