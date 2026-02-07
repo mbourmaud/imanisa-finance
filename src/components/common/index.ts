@@ -56,10 +56,10 @@ export type { MoneyDisplayFormat, MoneyDisplayProps } from './MoneyDisplay';
 export { MoneyDisplay } from './MoneyDisplay';
 
 // =============================================================================
-// DIALOGS
+// SHEETS
 // =============================================================================
 
-export { ConfirmDialog } from './ConfirmDialog';
+export { ConfirmSheet } from './ConfirmSheet';
 
 // =============================================================================
 // FEEDBACK & STATES

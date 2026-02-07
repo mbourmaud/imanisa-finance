@@ -119,7 +119,7 @@ export const AccountCard = forwardRef<HTMLDivElement, AccountCardProps>(
 		)
 
 		const cardClasses = cn(
-			'bg-card border rounded-2xl shadow-sm flex items-center justify-between gap-4 transition-colors',
+			'bg-card border rounded-2xl flex items-center justify-between gap-4 transition-colors',
 			cardVariantClasses[variant],
 			interactive && 'cursor-pointer group hover:bg-muted/50',
 			className,

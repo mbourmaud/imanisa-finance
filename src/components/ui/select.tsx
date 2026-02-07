@@ -14,9 +14,9 @@ type SelectSize = 'sm' | 'md' | 'lg';
 type SelectVariant = 'default' | 'glass';
 
 const selectTriggerSizeClasses: Record<SelectSize, string> = {
-	sm: 'h-8 px-2.5 text-xs',
-	md: 'h-9 px-3 text-sm',
-	lg: 'h-11 px-4 text-base',
+	sm: 'h-9 px-2.5 text-sm',
+	md: 'h-10 px-3 text-base',
+	lg: 'h-12 px-4 text-base',
 };
 
 const selectTriggerVariantClasses: Record<SelectVariant, string> = {
@@ -150,7 +150,7 @@ const SelectItem = forwardRef<
 		data-slot="select-item"
 		className={cn(
 			// Base styles
-			'relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none',
+			'relative flex w-full cursor-default items-center gap-2 rounded-sm py-2 pr-8 pl-2 text-base outline-hidden select-none',
 			// Focus/hover styles
 			'focus:bg-accent focus:text-accent-foreground',
 			// Icon styles

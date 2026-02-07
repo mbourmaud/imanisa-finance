@@ -2,6 +2,7 @@
 
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import { useHeaderStore } from '@/shared/stores';
 
 // =============================================================================
 // DASHBOARD HEADER COMPONENT
@@ -12,11 +13,14 @@ interface DashboardHeaderProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 /**
- * Sticky header for the dashboard layout on mobile devices.
- * Contains the sidebar trigger and app title.
+ * Sticky header for the dashboard layout.
+ * Displays page title/actions from the header store alongside the sidebar trigger.
  */
 const DashboardHeader = forwardRef<HTMLElement, DashboardHeaderProps>(
 	({ children, className, ...props }, ref) => {
+		const title = useHeaderStore((s) => s.title);
+		const actions = useHeaderStore((s) => s.actions);
+
 		return (
 			<header
 				ref={ref}
@@ -28,6 +32,15 @@ const DashboardHeader = forwardRef<HTMLElement, DashboardHeaderProps>(
 				{...props}
 			>
 				{children}
+
+				{title && (
+					<div className="flex flex-1 items-center justify-between gap-4">
+						<h1 className="text-base font-semibold truncate">{title}</h1>
+						{actions && (
+							<div className="flex items-center gap-2 shrink-0">{actions}</div>
+						)}
+					</div>
+				)}
 			</header>
 		);
 	},

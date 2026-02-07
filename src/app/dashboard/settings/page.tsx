@@ -1,39 +1,25 @@
-'use client';
+'use client'
 
 import {
-	AppearanceSection,
-	DataSection,
 	MembersSection,
-	NotificationsSection,
-	PageHeader,
 	ProfileSection,
-	SecuritySection,
 	SettingsAppInfo,
 	SettingsLayout,
-} from '@/components';
+} from '@/components'
+import { usePageHeader } from '@/shared/hooks'
 
 export default function SettingsPage() {
-	return (
-		<div className="flex flex-col gap-8">
-			<PageHeader title="Paramètres" description="Configurez votre application" />
+	usePageHeader('Paramètres')
 
-			<SettingsLayout
-				mainContent={
-					<>
-						<ProfileSection />
-						<MembersSection />
-						<AppearanceSection />
-						<DataSection />
-					</>
-				}
-				sidebarContent={
-					<>
-						<NotificationsSection />
-						<SecuritySection />
-						<SettingsAppInfo version="2.0.0" />
-					</>
-				}
-			/>
-		</div>
-	);
+	return (
+		<SettingsLayout
+			mainContent={
+				<>
+					<ProfileSection />
+					<MembersSection />
+				</>
+			}
+			sidebarContent={<SettingsAppInfo version="2.0.0" />}
+		/>
+	)
 }

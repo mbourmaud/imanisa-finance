@@ -1,7 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, ChevronDown, ChevronUp, Plus, Progress, Shield } from '@/components';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+	Button,
+	ChevronDown,
+	ChevronUp,
+	Loader2,
+	Plus,
+	Progress,
+	Shield,
+	Trash2,
+} from '@/components';
 
 interface LoanInsurance {
 	id: string;
@@ -29,6 +47,8 @@ interface Loan {
 interface PropertyDetailLoanCardProps {
 	loan: Loan;
 	onAddInsurance: (loanId: string) => void;
+	onDelete: (loanId: string) => void;
+	isDeleting: boolean;
 	formatCurrency: (amount: number) => string;
 }
 
@@ -38,6 +58,8 @@ interface PropertyDetailLoanCardProps {
 export function PropertyDetailLoanCard({
 	loan,
 	onAddInsurance,
+	onDelete,
+	isDeleting,
 	formatCurrency,
 }: PropertyDetailLoanCardProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -60,11 +82,48 @@ export function PropertyDetailLoanCard({
 						<p className="font-medium truncate">{loan.name}</p>
 						{loan.lender && <p className="text-sm text-muted-foreground">{loan.lender}</p>}
 					</div>
-					<div className="text-right shrink-0">
-						<p className="text-lg font-semibold tabular-nums">
-							{formatCurrency(loan.remainingAmount)}
-						</p>
-						<p className="text-xs text-muted-foreground">restant</p>
+					<div className="flex items-start gap-2 shrink-0">
+						<div className="text-right">
+							<p className="text-lg font-semibold tabular-nums">
+								{formatCurrency(loan.remainingAmount)}
+							</p>
+							<p className="text-xs text-muted-foreground">restant</p>
+						</div>
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-8 w-8 text-muted-foreground hover:text-destructive"
+									disabled={isDeleting}
+								>
+									{isDeleting ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<Trash2 className="h-4 w-4" />
+									)}
+									<span className="sr-only">Supprimer le prêt</span>
+								</Button>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Supprimer le prêt</AlertDialogTitle>
+									<AlertDialogDescription>
+										Êtes-vous sûr de vouloir supprimer le prêt « {loan.name} » ? Les assurances
+										emprunteur associées seront également supprimées.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Annuler</AlertDialogCancel>
+									<AlertDialogAction
+										onClick={() => onDelete(loan.id)}
+										className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+									>
+										Supprimer
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
 					</div>
 				</div>
 

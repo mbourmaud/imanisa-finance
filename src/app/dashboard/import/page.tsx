@@ -2,31 +2,30 @@
 
 import {
 	Card,
-	ConfirmDialog,
+	ConfirmSheet,
 	ImportDropZone,
 	ImportErrorBanner,
 	ImportFormGrid,
-	ImportHistorySection,
 	ImportRefreshButton,
-	ImportRow,
 	ImportStatsCard,
+	ImportTable,
 	Label,
-	PageHeader,
 } from '@/components';
 import { useImportPage } from '@/features/imports';
 import { SelectField } from '@/lib/forms';
+import { usePageHeader } from '@/shared/hooks';
 
 export default function ImportPage() {
 	const page = useImportPage();
 
+	usePageHeader(
+		'Import',
+		undefined,
+		<ImportRefreshButton onClick={() => page.refetchImports()} />,
+	);
+
 	return (
 		<>
-			<PageHeader
-				title="Import"
-				description="Importez vos relevés bancaires et conservez les fichiers bruts"
-				actions={<ImportRefreshButton onClick={() => page.refetchImports()} />}
-			/>
-
 			{page.uploadError && (
 				<ImportErrorBanner message={page.uploadError} onClose={page.closeUploadError} />
 			)}
@@ -84,20 +83,16 @@ export default function ImportPage() {
 				}
 			/>
 
-			<ImportHistorySection isLoading={page.isLoading} isEmpty={page.imports.length === 0}>
-				{page.imports.map((imp) => (
-					<ImportRow
-						key={imp.id}
-						data={imp}
-						bankName={page.getBankNameForImport(imp.bankKey)}
-						onProcess={page.handleProcess}
-						onReprocess={page.handleReprocess}
-						onDelete={() => page.onDeleteImportClick(imp.id)}
-					/>
-				))}
-			</ImportHistorySection>
+			<ImportTable
+				imports={page.imports}
+				isLoading={page.isLoading}
+				getBankName={page.getBankNameForImport}
+				onProcess={page.handleProcess}
+				onReprocess={page.handleReprocess}
+				onDelete={page.onDeleteImportClick}
+			/>
 
-			<ConfirmDialog
+			<ConfirmSheet
 				open={page.isDeleteDialogOpen}
 				onOpenChange={page.onDeleteImportDialogChange}
 				title="Supprimer l'import"

@@ -17,7 +17,6 @@ import {
 	LoanEmptyState,
 	LoanErrorCard,
 	LoanSummaryCard,
-	PageHeader,
 	Percent,
 	StatCard,
 	StatCardGrid,
@@ -26,6 +25,7 @@ import {
 } from '@/components';
 import { useLoansQuery } from '@/features/loans';
 import type { PropertyType } from '@/lib/prisma';
+import { usePageHeader } from '@/shared/hooks';
 import { formatMoney } from '@/shared/utils';
 
 function getPropertyIcon(type: PropertyType) {
@@ -46,10 +46,10 @@ export default function LoansPage() {
 
 	const totalMonthly = summary ? summary.totalMonthlyPayment + summary.totalInsurance : 0;
 
+	usePageHeader('Crédits');
+
 	return (
 		<div className="flex flex-col gap-8">
-			<PageHeader title="Crédits" description="Suivez vos emprunts et échéanciers" />
-
 			{isLoading && (
 				<>
 					<StatCardGrid columns={4}>

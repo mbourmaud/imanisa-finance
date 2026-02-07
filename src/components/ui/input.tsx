@@ -11,9 +11,9 @@ type InputSize = 'sm' | 'md' | 'lg';
 type InputVariant = 'default';
 
 const inputSizeClasses: Record<InputSize, string> = {
-	sm: 'h-8 px-2.5 py-1 text-xs',
-	md: 'h-9 px-3 py-1.5 text-sm',
-	lg: 'h-11 px-4 py-2 text-base',
+	sm: 'h-9 px-2.5 py-1 text-sm',
+	md: 'h-10 px-3 py-2 text-base',
+	lg: 'h-12 px-4 py-2.5 text-base',
 };
 
 const inputVariantClasses: Record<InputVariant, string> = {

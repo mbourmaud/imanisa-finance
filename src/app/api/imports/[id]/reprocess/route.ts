@@ -15,6 +15,7 @@ import {
 	rawImportRepository,
 	transactionRepository,
 } from '@/server/repositories';
+import { runCategorizationPipeline } from '@/server/services/categorization';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -130,6 +131,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
 			// Recalculate account balance after reprocess
 			await accountRepository.recalculateBalance(accountId);
+
+			// Run categorization pipeline (non-blocking: errors are caught internally)
+			runCategorizationPipeline(accountId).catch((error) => {
+				console.error('[Reprocess] Categorization pipeline error:', error);
+			});
 
 			return NextResponse.json({
 				success: true,

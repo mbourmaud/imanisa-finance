@@ -16,6 +16,7 @@ import {
 	rawImportRepository,
 	transactionRepository,
 } from '@/server/repositories';
+import { runCategorizationPipeline } from '@/server/services/categorization';
 
 interface RouteParams {
 	params: Promise<{ id: string }>;
@@ -120,6 +121,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
 			// Recalculate account balance after import
 			await accountRepository.recalculateBalance(accountId);
+
+			// Run categorization pipeline (non-blocking: errors are caught internally)
+			runCategorizationPipeline(accountId).catch((error) => {
+				console.error('[Import] Categorization pipeline error:', error);
+			});
 
 			// Build response message
 			let message = `Successfully imported ${importResult.inserted} transaction${importResult.inserted !== 1 ? 's' : ''}`;

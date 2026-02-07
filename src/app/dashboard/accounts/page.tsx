@@ -8,7 +8,6 @@ import {
 	CreditCard,
 	EmptyState,
 	LoadingSpinner,
-	PageHeader,
 	PiggyBank,
 	StatCard,
 	StatCardGrid,
@@ -16,6 +15,7 @@ import {
 	Wallet,
 } from '@/components';
 import { useAccountsPage } from '@/features/accounts';
+import { usePageHeader } from '@/shared/hooks';
 
 export default function AccountsPage() {
 	const page = useAccountsPage();
@@ -36,14 +36,10 @@ export default function AccountsPage() {
 		);
 	}
 
+	usePageHeader('Comptes', undefined, <AddAccountButton />);
+
 	return (
 		<>
-			<PageHeader
-				title="Comptes"
-				description="Gérez vos comptes bancaires et suivez vos soldes"
-				actions={<AddAccountButton />}
-			/>
-
 			<StatCardGrid columns={4}>
 				<StatCard
 					label="Solde total"

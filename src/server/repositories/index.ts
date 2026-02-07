@@ -1,5 +1,8 @@
 export { accountRepository } from './account-repository';
 export { bankRepository } from './bank-repository';
+export { categorizationLogRepository } from './categorization-log-repository';
+export { categoryRepository } from './category-repository';
+export { categoryRuleRepository } from './category-rule-repository';
 export {
 	type CreateCoOwnershipDTO,
 	coOwnershipRepository,
@@ -36,6 +39,7 @@ export {
 	type UpdatePropertyDTO,
 } from './property-repository';
 export { rawImportRepository } from './raw-import-repository';
+export { recurringPatternRepository } from './recurring-pattern-repository';
 export {
 	resetDemoTransactions,
 	type TransactionFilters,

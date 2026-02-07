@@ -46,7 +46,7 @@ describe('Sheet', () => {
 		const bodies = screen.getAllByTestId('body');
 		const body = getVisibleElement(bodies);
 		expect(body).toBeInTheDocument();
-		expect(body).toHaveClass('flex-1', 'overflow-y-auto', 'p-4', 'scrollbar-thin');
+		expect(body).toHaveClass('flex-1', 'overflow-y-auto', 'p-6', 'scrollbar-thin');
 		expect(body).toHaveAttribute('data-slot', 'sheet-body');
 	});
 
@@ -79,7 +79,7 @@ describe('Sheet', () => {
 		const title = getVisibleElement(titles);
 		expect(title).toBeInTheDocument();
 		expect(title.tagName).toBe('H2');
-		expect(title).toHaveClass('text-foreground', 'font-semibold');
+		expect(title).toHaveClass('text-foreground', 'text-lg', 'font-semibold');
 		expect(title).toHaveAttribute('data-slot', 'sheet-title');
 	});
 
@@ -121,7 +121,7 @@ describe('Sheet', () => {
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
-		expect(content).toHaveClass('sm:max-w-sm');
+		expect(content).toHaveClass('sm:max-w-md');
 	});
 
 	it('renders with size md', () => {
@@ -134,7 +134,7 @@ describe('Sheet', () => {
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
-		expect(content).toHaveClass('sm:max-w-md');
+		expect(content).toHaveClass('sm:max-w-lg');
 	});
 
 	it('renders with size lg', () => {
@@ -147,7 +147,7 @@ describe('Sheet', () => {
 		);
 		const contents = screen.getAllByTestId('content');
 		const content = getVisibleElement(contents);
-		expect(content).toHaveClass('sm:max-w-lg');
+		expect(content).toHaveClass('sm:max-w-xl');
 	});
 
 	it('renders with side left', () => {

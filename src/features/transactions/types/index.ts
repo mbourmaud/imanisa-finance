@@ -21,6 +21,23 @@ export interface Transaction {
 	metadata: Record<string, unknown>;
 	createdAt: Date;
 	updatedAt: Date;
+	account: {
+		id: string;
+		name: string;
+		type: string;
+		bank: {
+			id: string;
+			name: string;
+			color: string;
+		};
+		accountMembers: {
+			ownerShare: number;
+			member: {
+				id: string;
+				name: string;
+			};
+		}[];
+	};
 }
 
 export interface TransactionSummary {
@@ -59,6 +76,7 @@ export interface UpdateTransactionInput {
 
 export interface TransactionFilters {
 	accountId?: string;
+	memberId?: string;
 	type?: TransactionType;
 	categoryId?: string;
 	startDate?: Date;

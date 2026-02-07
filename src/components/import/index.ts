@@ -6,4 +6,5 @@ export type { ImportData } from './ImportRow';
 export { ImportRow } from './ImportRow';
 export { ImportStatsCard } from './ImportStatsCard';
 export { ImportFormGrid } from './ImportFormGrid';
+export { ImportTable } from './ImportTable';
 export { ImportUploadForm } from './ImportUploadForm';

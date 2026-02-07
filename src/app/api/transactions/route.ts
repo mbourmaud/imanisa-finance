@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
 		const accountId = searchParams.get('accountId');
 		if (accountId) filters.accountId = accountId;
 
+		const memberId = searchParams.get('memberId');
+		if (memberId) filters.memberId = memberId;
+
 		const type = searchParams.get('type');
 		if (type) filters.type = type as TransactionType;
 

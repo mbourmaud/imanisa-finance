@@ -15,13 +15,13 @@ describe('Textarea', () => {
 	it('renders with size sm', () => {
 		const { container } = render(<Textarea size="sm" />);
 		const textarea = container.querySelector('textarea');
-		expect(textarea).toHaveClass('min-h-[80px]', 'text-xs');
+		expect(textarea).toHaveClass('min-h-[80px]', 'text-sm');
 	});
 
 	it('renders with size md (default)', () => {
 		const { container } = render(<Textarea size="md" />);
 		const textarea = container.querySelector('textarea');
-		expect(textarea).toHaveClass('min-h-[100px]', 'text-sm');
+		expect(textarea).toHaveClass('min-h-[100px]', 'text-base');
 	});
 
 	it('renders with size lg', () => {

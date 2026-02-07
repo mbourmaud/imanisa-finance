@@ -7,7 +7,7 @@ import {
 	AccountLoadingState,
 	AccountNotFoundState,
 	AccountSettingsSheet,
-	ConfirmDialog,
+	ConfirmSheet,
 	FloatingToast,
 	TransactionsSection,
 } from '@/components';
@@ -142,7 +142,7 @@ export default function AccountDetailPage() {
 				loadMoreRef={page.loadMoreRef}
 			/>
 
-			<ConfirmDialog
+			<ConfirmSheet
 				open={page.deleteAccountOpen}
 				onOpenChange={page.setDeleteAccountOpen}
 				title="Supprimer le compte"
@@ -156,7 +156,7 @@ export default function AccountDetailPage() {
 				onConfirm={page.confirmDeleteAccount}
 			/>
 
-			<ConfirmDialog
+			<ConfirmSheet
 				open={page.isDeleteImportDialogOpen}
 				onOpenChange={page.onDeleteImportDialogChange}
 				title="Supprimer l'import"

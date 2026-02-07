@@ -1,48 +1,61 @@
-'use client';
+'use client'
 
 import {
-	AddAccountDialog,
-	BankAccountsSection,
+	AddAccountSheet,
+	BankSection,
 	BanksStatsSection,
-	InvestmentAccountsSection,
-	NarrowPageContainer,
-	PageHeader,
-} from '@/components';
-import { useBanksPage } from '@/features/banks';
+	EmptyState,
+	Landmark,
+} from '@/components'
+import { useBanksPage } from '@/features/banks'
+import { usePageHeader } from '@/shared/hooks'
 
 export default function BanksPage() {
-	const page = useBanksPage();
+	const page = useBanksPage()
+
+	usePageHeader('Banques')
+
+	if (page.isError) {
+		return (
+			<EmptyState
+				icon={Landmark}
+				title="Erreur de chargement"
+				description="Impossible de charger vos banques. Veuillez réessayer."
+			/>
+		)
+	}
 
 	return (
-		<NarrowPageContainer>
-			<PageHeader title="Banques" description="Gérez vos établissements et importez vos données" />
+		<>
+			<BanksStatsSection
+				summary={page.data?.summary}
+				isLoading={page.isLoading}
+			/>
 
-			<BanksStatsSection summary={page.data?.summary} loading={page.loading} error={page.error} />
-
-			<BankAccountsSection
+			<BankSection
+				title="Comptes bancaires"
 				banks={page.data?.bankAccounts}
-				loading={page.loading}
+				isLoading={page.isLoading}
+				skeletonCount={3}
 				onAddAccountClick={page.handleAddAccountClick}
-				getBankLogo={page.getBankLogo}
-				onLogoChange={page.handleLogoChange}
 			/>
 
-			<InvestmentAccountsSection
+			<BankSection
+				title="Investissements"
 				banks={page.data?.investmentAccounts}
-				loading={page.loading}
+				isLoading={page.isLoading}
+				skeletonCount={2}
 				onAddAccountClick={page.handleAddAccountClick}
-				getBankLogo={page.getBankLogo}
-				onLogoChange={page.handleLogoChange}
 			/>
 
-			<AddAccountDialog
+			<AddAccountSheet
 				open={page.showAddAccount}
 				onOpenChange={page.setShowAddAccount}
 				bankId={page.selectedBank?.id || ''}
 				bankName={page.selectedBank?.name || ''}
 				members={page.members}
-				onSuccess={page.refreshData}
+				onSuccess={page.handleAccountCreated}
 			/>
-		</NarrowPageContainer>
-	);
+		</>
+	)
 }

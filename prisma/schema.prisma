@@ -67,6 +67,7 @@ model Account {
   bank               Bank            @relation(fields: [bankId], references: [id])
   accountMembers     AccountMember[]
   rawImports         RawImport[]
+  recurringPatterns  RecurringPattern[]
   transactions       Transaction[]
 
   @@index([bankId])
@@ -115,6 +116,7 @@ model Category {
   color                 String                @default("#808080")
   parent                Category?             @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children              Category[]            @relation("CategoryHierarchy")
+  recurringPatterns     RecurringPattern[]
   rules                 CategoryRule[]
   transactionCategories TransactionCategory[]
 
@@ -122,16 +124,54 @@ model Category {
 }
 
 model CategoryRule {
-  id           String   @id @default(uuid())
+  id           String        @id @default(uuid())
   categoryId   String
   pattern      String
-  priority     Int      @default(0)
+  matchType    RuleMatchType @default(CONTAINS)
+  priority     Int           @default(0)
   sourceFilter String?
-  isActive     Boolean  @default(true)
-  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([categoryId])
   @@index([priority])
+}
+
+model RecurringPattern {
+  id                     String             @id @default(uuid())
+  description            String
+  normalizedDescription  String
+  amount                 Float
+  frequency              RecurringFrequency
+  tolerancePercent       Float              @default(10)
+  accountId              String?
+  categoryId             String?
+  isActive               Boolean            @default(true)
+  occurrenceCount        Int                @default(0)
+  lastSeenAt             DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  account                Account?           @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  category               Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([accountId])
+  @@index([categoryId])
+  @@index([normalizedDescription])
+}
+
+model CategorizationLog {
+  id               String   @id @default(uuid())
+  transactionCount Int
+  ruleMatches      Int      @default(0)
+  bankMatches      Int      @default(0)
+  aiMatches        Int      @default(0)
+  transferMatches  Int      @default(0)
+  duration         Int      @default(0)
+  estimatedCost    Float    @default(0)
+  errorMessage     String?
+  createdAt        DateTime @default(now())
 }
 
 model TransactionCategory {
@@ -425,6 +465,20 @@ enum CategorySource {
   BANK
   AUTO
   MANUAL
+}
+
+enum RuleMatchType {
+  EXACT
+  CONTAINS
+  STARTS_WITH
+  REGEX
+}
+
+enum RecurringFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUAL
 }
 
 

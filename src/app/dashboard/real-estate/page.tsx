@@ -1,14 +1,14 @@
 'use client';
 
 import {
-	CreatePropertyDialog,
+	CreatePropertySheet,
 	ErrorBanner,
 	LoanProgressCard,
-	PageHeader,
 	PropertiesGrid,
 	PropertiesStatsOverview,
 } from '@/components';
 import { formatCurrency, useRealEstatePage } from '@/features/properties';
+import { usePageHeader } from '@/shared/hooks';
 
 export default function RealEstatePage() {
 	const {
@@ -22,20 +22,18 @@ export default function RealEstatePage() {
 		setIsDialogOpen,
 	} = useRealEstatePage();
 
+	usePageHeader(
+		'Immobilier',
+		undefined,
+		<CreatePropertySheet
+			open={isDialogOpen}
+			onOpenChange={setIsDialogOpen}
+			members={members}
+		/>,
+	);
+
 	return (
 		<>
-			<PageHeader
-				title="Immobilier"
-				description="Gérez votre patrimoine immobilier"
-				actions={
-					<CreatePropertyDialog
-						open={isDialogOpen}
-						onOpenChange={setIsDialogOpen}
-						members={members}
-					/>
-				}
-			/>
-
 			{isError && (
 				<ErrorBanner message={error instanceof Error ? error.message : 'Une erreur est survenue'} />
 			)}

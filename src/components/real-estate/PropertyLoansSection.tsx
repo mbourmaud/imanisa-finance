@@ -7,6 +7,8 @@ interface PropertyLoansSectionProps {
 	loans: Loan[];
 	onAddLoan: () => void;
 	onAddInsurance: (loanId: string) => void;
+	onDeleteLoan: (loanId: string) => void;
+	deletingLoanId: string | null;
 }
 
 function formatCurrency(amount: number): string {
@@ -39,6 +41,8 @@ export function PropertyLoansSection({
 	loans,
 	onAddLoan,
 	onAddInsurance,
+	onDeleteLoan,
+	deletingLoanId,
 }: PropertyLoansSectionProps) {
 	const totalLoansRemaining = loans.reduce((sum, loan) => sum + loan.remainingAmount, 0);
 	const totalMonthlyPayment = loans.reduce((sum, l) => sum + l.monthlyPayment, 0);
@@ -85,6 +89,8 @@ export function PropertyLoansSection({
 								key={loan.id}
 								loan={loan}
 								onAddInsurance={onAddInsurance}
+								onDelete={onDeleteLoan}
+								isDeleting={deletingLoanId === loan.id}
 								formatCurrency={formatCurrency}
 							/>
 						))}

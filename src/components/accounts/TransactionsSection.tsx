@@ -98,7 +98,7 @@ export function TransactionsSection({
 							<Button
 								disabled={isUploading}
 								asChild
-								className="gap-2 rounded-xl shadow-md transition-all"
+								className="gap-2 rounded-xl transition-all"
 							>
 								<span>
 									{isUploading ? (
@@ -118,7 +118,7 @@ export function TransactionsSection({
 							placeholder="Rechercher une transaction..."
 							value={searchQuery}
 							onChange={(e) => onSearchChange(e.target.value)}
-							className="pl-12 h-12 text-base rounded-xl bg-background/60 border-border/30 transition-all shadow-sm"
+							className="pl-12 h-12 text-base rounded-xl bg-background/60 border-border/30 transition-all"
 						/>
 					</div>
 				</div>

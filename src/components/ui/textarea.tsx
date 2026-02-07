@@ -11,8 +11,8 @@ type TextareaSize = 'sm' | 'md' | 'lg';
 type TextareaVariant = 'default';
 
 const textareaSizeClasses: Record<TextareaSize, string> = {
-	sm: 'min-h-[80px] px-2.5 py-1.5 text-xs',
-	md: 'min-h-[100px] px-3 py-2 text-sm',
+	sm: 'min-h-[80px] px-2.5 py-1.5 text-sm',
+	md: 'min-h-[100px] px-3 py-2 text-base',
 	lg: 'min-h-[120px] px-4 py-3 text-base',
 };
 

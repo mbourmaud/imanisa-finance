@@ -26,6 +26,8 @@ import {
 	SelectValue,
 	X,
 } from '@/components';
+import { useAccountsQuery } from '@/features/accounts';
+import { useMembersQuery } from '@/features/members';
 import { useTransactionsQuery } from '../hooks/use-transactions-query';
 import type { Transaction, TransactionFilters, TransactionType } from '../types';
 import { createTransactionColumns } from './transaction-columns';
@@ -53,7 +55,7 @@ export function TransactionTable({
 	onDelete,
 	onCategorize,
 	onSelectionChange,
-	enableSelection = true,
+	enableSelection = false,
 	pageSizeOptions = [10, 20, 50, 100],
 }: TransactionTableProps) {
 	// Filters state
@@ -61,7 +63,16 @@ export function TransactionTable({
 	const [typeFilter, setTypeFilter] = useState<TransactionType | 'all'>(
 		initialFilters?.type ?? 'all',
 	);
-	const [accountFilter, setAccountFilter] = useState<string>(initialFilters?.accountId ?? 'all');
+	const [accountFilter, setAccountFilter] = useState<string>(
+		initialFilters?.accountId ?? 'all',
+	);
+	const [memberFilter, setMemberFilter] = useState<string>(
+		initialFilters?.memberId ?? 'all',
+	);
+
+	// Fetch accounts and members for filter dropdowns
+	const { data: accounts } = useAccountsQuery();
+	const { data: members } = useMembersQuery();
 
 	// Table state
 	const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }]);
@@ -78,8 +89,9 @@ export function TransactionTable({
 			search: search || undefined,
 			type: typeFilter !== 'all' ? typeFilter : undefined,
 			accountId: accountFilter !== 'all' ? accountFilter : undefined,
+			memberId: memberFilter !== 'all' ? memberFilter : undefined,
 		}),
-		[initialFilters, search, typeFilter, accountFilter],
+		[initialFilters, search, typeFilter, accountFilter, memberFilter],
 	);
 
 	// Fetch transactions
@@ -95,8 +107,9 @@ export function TransactionTable({
 				onEdit,
 				onDelete,
 				onCategorize,
+				enableSelection,
 			}),
-		[onEdit, onDelete, onCategorize],
+		[onEdit, onDelete, onCategorize, enableSelection],
 	);
 
 	// Handle row selection changes
@@ -131,9 +144,11 @@ export function TransactionTable({
 		setSearch('');
 		setTypeFilter('all');
 		setAccountFilter('all');
+		setMemberFilter('all');
 	};
 
-	const hasActiveFilters = search || typeFilter !== 'all' || accountFilter !== 'all';
+	const hasActiveFilters =
+		search || typeFilter !== 'all' || accountFilter !== 'all' || memberFilter !== 'all';
 
 	if (isError) {
 		return (
@@ -145,37 +160,72 @@ export function TransactionTable({
 
 	return (
 		<div className="flex flex-col gap-4">
-			{/* Filters */}
-			<div className="flex flex-col gap-4">
-				<div className="relative flex-1">
+			{/* Filters - single inline row */}
+			<div className="flex items-center gap-2 flex-wrap">
+				<div className="relative flex-1 max-w-sm">
 					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
-						placeholder="Rechercher une transaction..."
+						placeholder="Rechercher..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
 						className="pl-10"
 					/>
 				</div>
-				<div className="flex items-center gap-4">
-					<Select
-						value={typeFilter}
-						onValueChange={(v) => setTypeFilter(v as TransactionType | 'all')}
+				<Select
+					value={typeFilter}
+					onValueChange={(v) => setTypeFilter(v as TransactionType | 'all')}
+				>
+					<SelectTrigger className="w-[140px]">
+						<SelectValue placeholder="Type" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tous types</SelectItem>
+						<SelectItem value="income">Revenus</SelectItem>
+						<SelectItem value="expense">Dépenses</SelectItem>
+					</SelectContent>
+				</Select>
+				<Select
+					value={accountFilter}
+					onValueChange={(v) => setAccountFilter(v)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Compte" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tous les comptes</SelectItem>
+						{accounts?.map((account) => (
+							<SelectItem key={account.id} value={account.id}>
+								{account.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+				<Select
+					value={memberFilter}
+					onValueChange={(v) => setMemberFilter(v)}
+				>
+					<SelectTrigger className="w-[160px]">
+						<SelectValue placeholder="Personne" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Toutes les personnes</SelectItem>
+						{members?.map((member) => (
+							<SelectItem key={member.id} value={member.id}>
+								{member.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+				{hasActiveFilters && (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={clearFilters}
+						iconLeft={<X className="h-4 w-4" />}
 					>
-						<SelectTrigger className="w-[150px]">
-							<SelectValue placeholder="Type" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="all">Tous</SelectItem>
-							<SelectItem value="income">Revenus</SelectItem>
-							<SelectItem value="expense">Dépenses</SelectItem>
-						</SelectContent>
-					</Select>
-					{hasActiveFilters && (
-						<Button variant="ghost" onClick={clearFilters} iconLeft={<X className="h-4 w-4" />}>
-							Effacer
-						</Button>
-					)}
-				</div>
+						Effacer
+					</Button>
+				)}
 			</div>
 
 			{/* Table */}

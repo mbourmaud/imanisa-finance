@@ -15,22 +15,13 @@ type StatCardVariant = 'default' | 'coral' | 'teal' | 'purple' | 'gold' | 'mint'
 // VARIANT CLASSES
 // =============================================================================
 
-const cardVariantClasses: Record<StatCardVariant, string> = {
-	default: '',
-	coral: 'border-l-4 border-l-[oklch(0.7_0.2_25)]',
-	teal: 'border-l-4 border-l-[oklch(0.7_0.15_180)]',
-	purple: 'border-l-4 border-l-[oklch(0.65_0.18_290)]',
-	gold: 'border-l-4 border-l-[oklch(0.8_0.15_85)]',
-	mint: 'border-l-4 border-l-[oklch(0.7_0.15_160)]',
-};
-
 const iconVariantClasses: Record<StatCardVariant, string> = {
-	default: 'bg-primary text-primary-foreground',
-	coral: 'bg-[oklch(0.7_0.2_25)] text-white',
-	teal: 'bg-[oklch(0.7_0.15_180)] text-white',
-	purple: 'bg-[oklch(0.65_0.18_290)] text-white',
-	gold: 'bg-[oklch(0.8_0.15_85)] text-white',
-	mint: 'bg-[oklch(0.7_0.15_160)] text-white',
+	default: 'text-muted-foreground',
+	coral: 'text-[oklch(0.6_0.2_25)]',
+	teal: 'text-[oklch(0.55_0.15_180)]',
+	purple: 'text-[oklch(0.55_0.18_290)]',
+	gold: 'text-[oklch(0.65_0.15_85)]',
+	mint: 'text-[oklch(0.55_0.15_160)]',
 };
 
 // =============================================================================
@@ -57,26 +48,19 @@ const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
 				ref={ref}
 				data-slot="stat-card"
 				padding="md"
-				className={cn('transition-all', cardVariantClasses[variant], className)}
+				className={cn('gap-3 transition-all', className)}
 				{...props}
 			>
-				<div className="flex items-start justify-between gap-4">
-					<div className="min-w-0 flex-1">
-						<p className="text-xs sm:text-sm font-medium text-muted-foreground">{label}</p>
-						<p className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight tabular-nums">
-							{value}
-						</p>
-						{description && <p className="mt-1 text-xs text-muted-foreground">{description}</p>}
-					</div>
+				<div className="flex items-center justify-between">
+					<p className="text-sm font-medium text-muted-foreground">{label}</p>
 					{Icon && (
-						<div
-							className={cn(
-								'flex-shrink-0 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl',
-								iconVariantClasses[variant],
-							)}
-						>
-							<Icon className="h-5 w-5 sm:h-6 sm:w-6" />
-						</div>
+						<Icon className={cn('h-4 w-4', iconVariantClasses[variant])} />
+					)}
+				</div>
+				<div className="flex flex-col gap-1">
+					<p className="text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
+					{description && (
+						<p className="text-xs text-muted-foreground">{description}</p>
 					)}
 				</div>
 			</Card>
@@ -116,30 +100,22 @@ function StatCardGrid({ className, columns = 4, children, ...props }: StatCardGr
 // STAT CARD SKELETON
 // =============================================================================
 
-interface StatCardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-	/** Card color variant for the skeleton */
-	variant?: StatCardVariant;
-}
+interface StatCardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-function StatCardSkeleton({ className, variant = 'default', ...props }: StatCardSkeletonProps) {
+function StatCardSkeleton({ className, ...props }: StatCardSkeletonProps) {
 	return (
 		<Card
 			data-slot="stat-card-skeleton"
 			padding="md"
-			className={cn(cardVariantClasses[variant], 'animate-pulse', className)}
+			className={cn('gap-3 animate-pulse', className)}
 			{...props}
 		>
-			<div className="flex items-start justify-between gap-4">
-				<div className="min-w-0 flex-1 space-y-2">
-					<div className="h-4 w-24 rounded bg-muted" />
-					<div className="h-8 w-32 rounded bg-muted" />
-				</div>
-				<div
-					className={cn(
-						'flex-shrink-0 h-12 w-12 sm:h-14 sm:w-14 rounded-2xl opacity-50',
-						iconVariantClasses[variant],
-					)}
-				/>
+			<div className="flex items-center justify-between">
+				<div className="h-4 w-20 rounded bg-muted" />
+				<div className="h-4 w-4 rounded bg-muted" />
+			</div>
+			<div className="flex flex-col gap-1">
+				<div className="h-7 w-32 rounded bg-muted" />
 			</div>
 		</Card>
 	);

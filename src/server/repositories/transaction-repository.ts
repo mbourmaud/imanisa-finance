@@ -12,11 +12,19 @@ export interface TransactionWithAccount extends Transaction {
 	account: {
 		id: string;
 		name: string;
+		type: string;
 		bank: {
 			id: string;
 			name: string;
 			color: string;
 		};
+		accountMembers: {
+			ownerShare: number;
+			member: {
+				id: string;
+				name: string;
+			};
+		}[];
 	};
 	transactionCategory: {
 		categoryId: string;
@@ -31,6 +39,7 @@ export interface TransactionWithAccount extends Transaction {
 
 export interface TransactionFilters {
 	accountId?: string;
+	memberId?: string;
 	type?: TransactionType;
 	categoryId?: string;
 	startDate?: Date;
@@ -85,6 +94,9 @@ export const transactionRepository = {
 	): Promise<PaginatedResult<TransactionWithAccount>> {
 		const where: Prisma.TransactionWhereInput = {
 			...(filters?.accountId && { accountId: filters.accountId }),
+			...(filters?.memberId && {
+				account: { accountMembers: { some: { memberId: filters.memberId } } },
+			}),
 			...(filters?.type && { type: filters.type }),
 			...(filters?.categoryId && {
 				transactionCategory: { categoryId: filters.categoryId },
@@ -116,11 +128,23 @@ export const transactionRepository = {
 						select: {
 							id: true,
 							name: true,
+							type: true,
 							bank: {
 								select: {
 									id: true,
 									name: true,
 									color: true,
+								},
+							},
+							accountMembers: {
+								select: {
+									ownerShare: true,
+									member: {
+										select: {
+											id: true,
+											name: true,
+										},
+									},
 								},
 							},
 						},
@@ -165,11 +189,23 @@ export const transactionRepository = {
 					select: {
 						id: true,
 						name: true,
+						type: true,
 						bank: {
 							select: {
 								id: true,
 								name: true,
 								color: true,
+							},
+						},
+						accountMembers: {
+							select: {
+								ownerShare: true,
+								member: {
+									select: {
+										id: true,
+										name: true,
+									},
+								},
 							},
 						},
 					},

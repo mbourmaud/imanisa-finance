@@ -24,38 +24,39 @@ describe('StatCard', () => {
 	});
 
 	it('renders with variant coral', () => {
-		const { container } = render(<StatCard variant="coral" label="Test" value="100" />);
+		const { container } = render(<StatCard variant="coral" label="Coral" value="100" icon={Wallet} />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('border-l-4');
+		expect(screen.getByText('Coral')).toBeInTheDocument();
+		expect(container.querySelector('svg')).toBeInTheDocument();
 	});
 
 	it('renders with variant teal', () => {
-		const { container } = render(<StatCard variant="teal" label="Test" value="100" />);
+		const { container } = render(<StatCard variant="teal" label="Teal" value="200" icon={Wallet} />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('border-l-4');
+		expect(screen.getByText('Teal')).toBeInTheDocument();
 	});
 
 	it('renders with variant purple', () => {
-		const { container } = render(<StatCard variant="purple" label="Test" value="100" />);
+		const { container } = render(<StatCard variant="purple" label="Purple" value="300" icon={Wallet} />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('border-l-4');
+		expect(screen.getByText('Purple')).toBeInTheDocument();
 	});
 
 	it('renders with variant gold', () => {
-		const { container } = render(<StatCard variant="gold" label="Test" value="100" />);
+		const { container } = render(<StatCard variant="gold" label="Gold" value="400" icon={Wallet} />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('border-l-4');
+		expect(screen.getByText('Gold')).toBeInTheDocument();
 	});
 
 	it('renders with variant mint', () => {
-		const { container } = render(<StatCard variant="mint" label="Test" value="100" />);
+		const { container } = render(<StatCard variant="mint" label="Mint" value="500" icon={Wallet} />);
 		const card = container.querySelector('[data-slot="stat-card"]');
 		expect(card).toBeInTheDocument();
-		expect(card).toHaveClass('border-l-4');
+		expect(screen.getByText('Mint')).toBeInTheDocument();
 	});
 
 	it('renders with icon', () => {
@@ -163,18 +164,15 @@ describe('StatCardSkeleton', () => {
 		expect(skeleton).toHaveClass('animate-pulse');
 	});
 
-	it('renders with variant coral', () => {
-		const { container } = render(<StatCardSkeleton variant="coral" />);
-		const skeleton = container.querySelector('[data-slot="stat-card-skeleton"]');
-		expect(skeleton).toBeInTheDocument();
-		expect(skeleton).toHaveClass('border-l-4');
-	});
-
-	it('renders with variant teal', () => {
-		const { container } = render(<StatCardSkeleton variant="teal" />);
-		const skeleton = container.querySelector('[data-slot="stat-card-skeleton"]');
-		expect(skeleton).toBeInTheDocument();
-		expect(skeleton).toHaveClass('border-l-4');
+	it('renders multiple skeletons', () => {
+		const { container } = render(
+			<>
+				<StatCardSkeleton />
+				<StatCardSkeleton />
+			</>,
+		);
+		const skeletons = container.querySelectorAll('[data-slot="stat-card-skeleton"]');
+		expect(skeletons).toHaveLength(2);
 	});
 
 	it('accepts custom className', () => {

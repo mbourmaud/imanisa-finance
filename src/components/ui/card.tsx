@@ -10,17 +10,17 @@ type CardVariant = 'default' | 'elevated' | 'flat' | 'outlined';
 type CardPadding = 'none' | 'sm' | 'md' | 'lg';
 
 const variantClasses: Record<CardVariant, string> = {
-	default: 'bg-card border shadow-sm',
-	elevated: 'bg-card border shadow-md',
+	default: 'bg-card border',
+	elevated: 'bg-card border shadow-sm',
 	flat: 'bg-card/50',
 	outlined: 'bg-transparent border-2',
 };
 
 const paddingClasses: Record<CardPadding, string> = {
-	none: 'py-0',
-	sm: 'py-4',
-	md: 'py-6',
-	lg: 'py-8',
+	none: '',
+	sm: 'p-4',
+	md: 'p-5 sm:p-6',
+	lg: 'p-6 sm:p-8',
 };
 
 interface CardProps extends React.ComponentProps<'div'> {
@@ -51,7 +51,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
 		<div
 			data-slot="card-header"
 			className={cn(
-				'@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6',
+				'@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6',
 				className,
 			)}
 			{...props}
@@ -90,14 +90,14 @@ function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
-	return <div data-slot="card-content" className={cn('px-6', className)} {...props} />;
+	return <div data-slot="card-content" className={cn(className)} {...props} />;
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="card-footer"
-			className={cn('flex items-center px-6 [.border-t]:pt-6', className)}
+			className={cn('flex items-center [.border-t]:pt-6', className)}
 			{...props}
 		/>
 	);

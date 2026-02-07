@@ -123,7 +123,7 @@ See `.claude/rules/tanstack.md` for complete form patterns.
 - **Subtle borders** - `border-border/60`
 - **Muted colors** - `text-muted-foreground`
 - **Mobile-first** - Design for mobile first
-- **Primary color is CORAL** - Check `globals.css`
+- **Primary color is FOREST GREEN** - Check `globals.css`
 
 ## Never Use
 

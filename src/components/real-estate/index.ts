@@ -15,16 +15,16 @@ export { PropertyValueBox } from './PropertyValueBox';
 export { StatsCardSkeleton } from './StatsCardSkeleton';
 
 // =============================================================================
-// PROPERTY DETAIL DIALOGS
+// PROPERTY DETAIL SHEETS
 // =============================================================================
 
-export { LoanFormDialog } from './LoanFormDialog';
-export { LoanInsuranceFormDialog } from './LoanInsuranceFormDialog';
-export { PropertyInsuranceFormDialog } from './PropertyInsuranceFormDialog';
-export { CoOwnershipFormDialog } from './CoOwnershipFormDialog';
-export { UtilityContractFormDialog } from './UtilityContractFormDialog';
-export { PropertyEditDialog } from './PropertyEditDialog';
-export { PropertyDeleteDialog } from './PropertyDeleteDialog';
+export { LoanFormSheet } from './LoanFormSheet';
+export { LoanInsuranceFormSheet } from './LoanInsuranceFormSheet';
+export { PropertyInsuranceFormSheet } from './PropertyInsuranceFormSheet';
+export { CoOwnershipFormSheet } from './CoOwnershipFormSheet';
+export { UtilityContractFormSheet } from './UtilityContractFormSheet';
+export { PropertyEditSheet } from './PropertyEditSheet';
+export { PropertyDeleteSheet } from './PropertyDeleteSheet';
 
 // =============================================================================
 // PROPERTY DETAIL COMPONENTS
@@ -41,13 +41,13 @@ export { PropertyCoOwnershipSection } from './PropertyCoOwnershipSection';
 export { PropertyUtilityContractsSection } from './PropertyUtilityContractsSection';
 export { PropertyDetailSkeleton } from './PropertyDetailSkeleton';
 export { PropertyNotFoundState } from './PropertyNotFoundState';
-export { PropertyDetailDialogs } from './PropertyDetailDialogs';
+export { PropertyDetailSheets } from './PropertyDetailSheets';
 
 // =============================================================================
 // REAL ESTATE LIST PAGE
 // =============================================================================
 
-export { CreatePropertyDialog } from './CreatePropertyDialog';
+export { CreatePropertySheet } from './CreatePropertySheet';
 export { PropertyCard } from './PropertyCard';
 export { PropertiesGrid } from './PropertiesGrid';
 export { PropertiesStatsOverview } from './PropertiesStatsOverview';

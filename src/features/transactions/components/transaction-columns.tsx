@@ -20,6 +20,7 @@ import {
 	DropdownMenuTrigger,
 	MoreHorizontal,
 } from '@/components';
+import { getAccountTypeConfig } from '@/components/accounts/account-types';
 import type { Transaction } from '../types';
 
 /**
@@ -66,6 +67,7 @@ interface TransactionColumnsOptions {
 	onEdit?: (transaction: Transaction) => void;
 	onDelete?: (transaction: Transaction) => void;
 	onCategorize?: (transaction: Transaction) => void;
+	enableSelection?: boolean;
 }
 
 /**
@@ -74,9 +76,11 @@ interface TransactionColumnsOptions {
 export function createTransactionColumns(
 	options?: TransactionColumnsOptions,
 ): ColumnDef<Transaction>[] {
-	return [
-		// Selection column
-		{
+	const columns: ColumnDef<Transaction>[] = [];
+
+	// Selection column (only when enabled)
+	if (options?.enableSelection) {
+		columns.push({
 			id: 'select',
 			header: ({ table }) => (
 				<Checkbox
@@ -99,7 +103,10 @@ export function createTransactionColumns(
 			enableSorting: false,
 			enableHiding: false,
 			size: 40,
-		},
+		});
+	}
+
+	columns.push(
 		// Date column
 		{
 			accessorKey: 'date',
@@ -146,13 +153,50 @@ export function createTransactionColumns(
 				);
 			},
 		},
-		// Account column
+		// Bank column
 		{
-			accessorKey: 'accountName',
+			id: 'bank',
+			header: 'Banque',
+			cell: ({ row }) => {
+				const { account } = row.original;
+				return (
+					<div className="flex items-center gap-2">
+						<span
+							className="size-2.5 shrink-0 rounded-full"
+							style={{ backgroundColor: account.bank.color }}
+						/>
+						<span className="text-sm">{account.bank.name}</span>
+					</div>
+				);
+			},
+		},
+		// Account + type column
+		{
+			id: 'account',
 			header: 'Compte',
 			cell: ({ row }) => {
-				const accountName = row.getValue('accountName') as string;
-				return <span className="text-sm text-muted-foreground">{accountName}</span>;
+				const { account } = row.original;
+				const typeConfig = getAccountTypeConfig(account.type as Parameters<typeof getAccountTypeConfig>[0]);
+				return (
+					<div className="flex flex-col min-w-0">
+						<span className="text-sm truncate">{account.name}</span>
+						<span className="text-xs text-muted-foreground">{typeConfig.labelShort}</span>
+					</div>
+				);
+			},
+		},
+		// Person/member column
+		{
+			id: 'member',
+			header: 'Titulaire',
+			cell: ({ row }) => {
+				const { account } = row.original;
+				const members = account.accountMembers;
+				if (!members.length) {
+					return <span className="text-sm text-muted-foreground">—</span>;
+				}
+				const names = members.map((m) => m.member.name).join(', ');
+				return <span className="text-sm text-muted-foreground">{names}</span>;
 			},
 		},
 		// Amount column
@@ -231,7 +275,9 @@ export function createTransactionColumns(
 				);
 			},
 		},
-	];
+	);
+
+	return columns;
 }
 
 /**

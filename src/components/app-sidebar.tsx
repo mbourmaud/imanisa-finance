@@ -1,9 +1,12 @@
 'use client';
 
 import {
+	ArrowLeftRight,
 	Check,
 	ChevronRight,
 	ChevronsUpDown,
+	HandCoins,
+	Home,
 	Landmark,
 	LogOut,
 	Monitor,
@@ -47,9 +50,19 @@ import { useUser } from '@/lib/hooks/use-user';
 import { createClient } from '@/lib/supabase/client';
 import { useEntityStore } from '@/shared/stores/entity-store';
 
-const mainNavItems = [
+const menuNavItems = [
 	{ title: 'Banques', url: '/dashboard/banks', icon: Landmark },
+	{ title: 'Transactions', url: '/dashboard/transactions', icon: ArrowLeftRight },
 	{ title: 'Import', url: '/dashboard/import', icon: Upload },
+];
+
+const patrimoineNavItems = [
+	{ title: 'Immobilier', url: '/dashboard/real-estate', icon: Home },
+	{ title: 'Prêts', url: '/dashboard/loans', icon: HandCoins },
+];
+
+const gestionNavItems = [
+	{ title: 'Paramètres', url: '/dashboard/settings', icon: Settings },
 ];
 
 function NavItem({
@@ -76,8 +89,8 @@ function NavItem({
 					<div
 						className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-300 ${
 							isActive
-								? 'bg-primary text-white shadow-md shadow-primary/25'
-								: 'bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
+								? 'bg-primary text-white shadow-sm shadow-primary/15'
+								: 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
 						}`}
 					>
 						<Icon className="h-4 w-4" />
@@ -128,7 +141,7 @@ export function AppSidebar() {
 				<div className="flex items-center justify-between">
 					<Link href="/dashboard" className="flex items-center gap-3 group">
 						<div className="relative">
-							<div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/30 transition-transform duration-300 group-hover:scale-105">
+							<div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-sm shadow-primary/15 transition-transform duration-300 group-hover:scale-105">
 								<Wallet className="h-5 w-5 text-white" />
 							</div>
 							<div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-400 border-2 border-sidebar" />
@@ -215,8 +228,34 @@ export function AppSidebar() {
 					</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu className="space-y-1.5">
-							{mainNavItems.map((item) => (
-								<NavItem key={item.url} item={item} isActive={pathname === item.url} />
+							{menuNavItems.map((item) => (
+								<NavItem key={item.url} item={item} isActive={pathname.startsWith(item.url)} />
+							))}
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+
+				<SidebarGroup>
+					<SidebarGroupLabel className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+						Patrimoine
+					</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu className="space-y-1.5">
+							{patrimoineNavItems.map((item) => (
+								<NavItem key={item.url} item={item} isActive={pathname.startsWith(item.url)} />
+							))}
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+
+				<SidebarGroup>
+					<SidebarGroupLabel className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+						Gestion
+					</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu className="space-y-1.5">
+							{gestionNavItems.map((item) => (
+								<NavItem key={item.url} item={item} isActive={pathname.startsWith(item.url)} />
 							))}
 						</SidebarMenu>
 					</SidebarGroupContent>

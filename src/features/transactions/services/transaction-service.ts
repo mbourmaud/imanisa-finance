@@ -25,6 +25,7 @@ export const transactionService = {
 		const params = new URLSearchParams();
 
 		if (filters?.accountId) params.set('accountId', filters.accountId);
+		if (filters?.memberId) params.set('memberId', filters.memberId);
 		if (filters?.type) params.set('type', filters.type);
 		if (filters?.categoryId) params.set('categoryId', filters.categoryId);
 		if (filters?.startDate) params.set('startDate', filters.startDate.toISOString());

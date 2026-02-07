@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCreateLoanInsuranceMutation, useCreateLoanMutation } from '@/features/loans';
+import {
+	useCreateLoanInsuranceMutation,
+	useCreateLoanMutation,
+	useDeleteLoanMutation,
+} from '@/features/loans';
 import { useMembersQuery } from '@/features/members/hooks/use-members-query';
 import {
 	type CoOwnershipFormData,
@@ -55,6 +59,7 @@ export function usePropertyDetailPage(propertyId: string) {
 	// Mutations
 	const createLoanMutation = useCreateLoanMutation();
 	const createLoanInsuranceMutation = useCreateLoanInsuranceMutation();
+	const deleteLoanMutation = useDeleteLoanMutation();
 	const deletePropertyMutation = useDeletePropertyMutation();
 	const createPropertyInsuranceMutation = useCreatePropertyInsuranceMutation();
 	const updatePropertyInsuranceMutation = useUpdatePropertyInsuranceMutation();
@@ -97,6 +102,8 @@ export function usePropertyDetailPage(propertyId: string) {
 	);
 	const [utilityContractFormError, setUtilityContractFormError] = useState<string | null>(null);
 	const [deletingUtilityContractId, setDeletingUtilityContractId] = useState<string | null>(null);
+
+	const [deletingLoanId, setDeletingLoanId] = useState<string | null>(null);
 
 	const [isEditPropertyDialogOpen, setIsEditPropertyDialogOpen] = useState(false);
 
@@ -170,6 +177,17 @@ export function usePropertyDetailPage(propertyId: string) {
 			resetLoanForm();
 		} catch (err) {
 			setLoanFormError(err instanceof Error ? err.message : 'Une erreur est survenue');
+		}
+	};
+
+	const handleDeleteLoan = async (loanId: string) => {
+		setDeletingLoanId(loanId);
+		try {
+			await deleteLoanMutation.mutateAsync({ id: loanId, propertyId });
+		} catch {
+			// Loan deletion failed silently
+		} finally {
+			setDeletingLoanId(null);
 		}
 	};
 
@@ -505,6 +523,8 @@ export function usePropertyDetailPage(propertyId: string) {
 			isSubmitting: isSubmittingLoan,
 			onInputChange: handleLoanInputChange,
 			onSubmit: handleLoanSubmit,
+			onDelete: handleDeleteLoan,
+			deletingLoanId,
 			reset: resetLoanForm,
 		},
 

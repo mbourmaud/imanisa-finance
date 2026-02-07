@@ -13,19 +13,19 @@ describe('Input', () => {
 	it('renders with size sm', () => {
 		const { container } = render(<Input size="sm" />);
 		const input = container.querySelector('input');
-		expect(input).toHaveClass('h-8', 'text-xs');
+		expect(input).toHaveClass('h-9', 'text-sm');
 	});
 
 	it('renders with size md (default)', () => {
 		const { container } = render(<Input size="md" />);
 		const input = container.querySelector('input');
-		expect(input).toHaveClass('h-9', 'text-sm');
+		expect(input).toHaveClass('h-10', 'text-base');
 	});
 
 	it('renders with size lg', () => {
 		const { container } = render(<Input size="lg" />);
 		const input = container.querySelector('input');
-		expect(input).toHaveClass('h-11', 'text-base');
+		expect(input).toHaveClass('h-12', 'text-base');
 	});
 
 	it('renders with variant default', () => {
@@ -68,7 +68,7 @@ describe('Input', () => {
 	it('renders with all props combined', () => {
 		const { container } = render(<Input size="lg" type="email" placeholder="email@example.com" />);
 		const input = container.querySelector('input');
-		expect(input).toHaveClass('h-11');
+		expect(input).toHaveClass('h-12');
 		expect(input).toHaveAttribute('type', 'email');
 		expect(input).toHaveAttribute('placeholder', 'email@example.com');
 	});

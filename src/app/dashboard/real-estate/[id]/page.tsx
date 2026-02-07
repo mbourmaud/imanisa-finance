@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import {
 	PropertyCoOwnershipSection,
-	PropertyDetailDialogs,
+	PropertyDetailSheets,
 	PropertyDetailHeader,
 	PropertyDetailSkeleton,
 	PropertyInfoSection,
@@ -88,6 +88,8 @@ export default function PropertyDetailPage() {
 				loans={property.loans}
 				onAddLoan={() => loanDialog.setOpen(true)}
 				onAddInsurance={insuranceDialog.openForLoan}
+				onDeleteLoan={loanDialog.onDelete}
+				deletingLoanId={loanDialog.deletingLoanId}
 			/>
 
 			<PropertyInsuranceSection
@@ -114,7 +116,7 @@ export default function PropertyDetailPage() {
 				deletingContractId={utilityContractDialog.deletingContractId}
 			/>
 
-			<PropertyDetailDialogs
+			<PropertyDetailSheets
 				property={property}
 				members={members}
 				loadingMembers={loadingMembers}

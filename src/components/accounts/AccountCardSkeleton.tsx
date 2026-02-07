@@ -22,7 +22,7 @@ export const AccountCardSkeleton = forwardRef<HTMLDivElement, AccountCardSkeleto
 				ref={ref}
 				data-slot="account-card-skeleton"
 				className={cn(
-					'bg-card border rounded-2xl shadow-sm flex items-center justify-between gap-4 animate-pulse',
+					'bg-card border rounded-2xl flex items-center justify-between gap-4 animate-pulse',
 					cardVariantClasses[variant],
 					className,
 				)}

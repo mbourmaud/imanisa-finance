@@ -217,6 +217,13 @@ export function useOptimisticCreateTransaction() {
 						metadata: {},
 						createdAt: new Date(),
 						updatedAt: new Date(),
+						account: {
+							id: newTransaction.accountId,
+							name: '',
+							type: 'CHECKING',
+							bank: { id: '', name: '', color: '#888' },
+							accountMembers: [],
+						},
 					};
 					return {
 						...old,

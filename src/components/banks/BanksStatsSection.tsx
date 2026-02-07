@@ -5,38 +5,25 @@ import {
 	StatCardGrid,
 	StatCardSkeleton,
 	Wallet,
-} from '@/components';
-import type { BanksSummary } from '@/features/banks';
+} from '@/components'
+import { formatMoney } from '@/shared/utils/currency'
+import type { BanksSummary } from '@/features/banks'
 
 interface BanksStatsSectionProps {
-	summary: BanksSummary | undefined;
-	loading: boolean;
-	error: string | null;
+	summary: BanksSummary | undefined
+	isLoading: boolean
 }
 
-export function BanksStatsSection({ summary, loading, error }: BanksStatsSectionProps) {
-	if (loading) {
+export function BanksStatsSection({ summary, isLoading }: BanksStatsSectionProps) {
+	if (isLoading) {
 		return (
 			<StatCardGrid columns={3}>
-				<StatCardSkeleton variant="gold" />
-				<StatCardSkeleton variant="teal" />
-				<StatCardSkeleton variant="mint" />
+				<StatCardSkeleton />
+				<StatCardSkeleton />
+				<StatCardSkeleton />
 			</StatCardGrid>
-		);
+		)
 	}
-
-	if (error) {
-		return (
-			<div className="flex flex-col gap-6">
-				<span className="text-destructive">{error}</span>
-			</div>
-		);
-	}
-
-	const formattedBalance = new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-	}).format(summary?.totalBalance ?? 0);
 
 	return (
 		<StatCardGrid columns={3}>
@@ -53,7 +40,12 @@ export function BanksStatsSection({ summary, loading, error }: BanksStatsSection
 				label="Comptes actifs"
 				value={summary?.totalAccounts ?? 0}
 			/>
-			<StatCard variant="mint" icon={Wallet} label="Solde total" value={formattedBalance} />
+			<StatCard
+				variant="mint"
+				icon={Wallet}
+				label="Solde total"
+				value={formatMoney(summary?.totalBalance ?? 0, 'EUR', 'fr-FR')}
+			/>
 		</StatCardGrid>
-	);
+	)
 }

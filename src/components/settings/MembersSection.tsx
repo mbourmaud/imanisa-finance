@@ -6,13 +6,7 @@ import { toast } from 'sonner'
 
 import {
 	Button,
-	ConfirmDialog,
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
+	ConfirmSheet,
 	EmptyState,
 	Input,
 	MemberAvatar,
@@ -21,6 +15,12 @@ import {
 	SettingsMemberRow,
 	SettingsMemberSkeleton,
 	SettingsSectionCard,
+	Sheet,
+	SheetContent,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
 	Users,
 } from '@/components'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
@@ -133,16 +133,16 @@ export function MembersSection() {
 				title="Membres du foyer"
 				description="Gérez les membres associés aux comptes"
 				action={
-					<Dialog open={showAddMember} onOpenChange={setShowAddMember}>
-						<DialogTrigger asChild>
+					<Sheet open={showAddMember} onOpenChange={setShowAddMember}>
+						<SheetTrigger asChild>
 							<Button variant="outline" size="sm" iconLeft={<Plus className="h-4 w-4" />}>
 								Ajouter
 							</Button>
-						</DialogTrigger>
-						<DialogContent>
-							<DialogHeader>
-								<DialogTitle>Ajouter un membre</DialogTitle>
-							</DialogHeader>
+						</SheetTrigger>
+						<SheetContent side="right" size="sm">
+							<SheetHeader>
+								<SheetTitle>Ajouter un membre</SheetTitle>
+							</SheetHeader>
 							<form
 								id="add-member-form"
 								onSubmit={(e) => {
@@ -184,7 +184,7 @@ export function MembersSection() {
 									/>
 								</FieldGroup>
 							</form>
-							<DialogFooter>
+							<SheetFooter>
 								<Button variant="outline" onClick={() => setShowAddMember(false)}>
 									Annuler
 								</Button>
@@ -195,9 +195,9 @@ export function MembersSection() {
 								>
 									{createMutation.isPending ? 'Ajout...' : 'Ajouter'}
 								</Button>
-							</DialogFooter>
-						</DialogContent>
-					</Dialog>
+							</SheetFooter>
+						</SheetContent>
+					</Sheet>
 				}
 			>
 				<div className="flex flex-col gap-2">
@@ -233,14 +233,14 @@ export function MembersSection() {
 								onEdit={() => handleOpenEdit(member)}
 								onDelete={() => setDeleteMemberId(member.id)}
 								editDialog={
-									<Dialog
+									<Sheet
 										open={editingMember?.id === member.id}
 										onOpenChange={(open) => !open && setEditingMember(null)}
 									>
-										<DialogContent>
-											<DialogHeader>
-												<DialogTitle>Modifier le membre</DialogTitle>
-											</DialogHeader>
+										<SheetContent side="right" size="sm">
+											<SheetHeader>
+												<SheetTitle>Modifier le membre</SheetTitle>
+											</SheetHeader>
 											{editingMember?.id === member.id && (
 												<form
 													id={`edit-member-form-${member.id}`}
@@ -288,7 +288,7 @@ export function MembersSection() {
 													</FieldGroup>
 												</form>
 											)}
-											<DialogFooter>
+											<SheetFooter>
 												<Button variant="outline" onClick={() => setEditingMember(null)}>
 													Annuler
 												</Button>
@@ -299,9 +299,9 @@ export function MembersSection() {
 												>
 													{updateMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
 												</Button>
-											</DialogFooter>
-										</DialogContent>
-									</Dialog>
+											</SheetFooter>
+										</SheetContent>
+									</Sheet>
 								}
 							/>
 						))
@@ -309,7 +309,7 @@ export function MembersSection() {
 				</div>
 			</SettingsSectionCard>
 
-			<ConfirmDialog
+			<ConfirmSheet
 				open={deleteMemberId !== null}
 				onOpenChange={(open) => !open && setDeleteMemberId(null)}
 				title="Supprimer le membre"

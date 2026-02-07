@@ -3,12 +3,8 @@
 
 export * from './account';
 export * from './bank';
-// Budget & Categories
-export * from './budget';
 // Data Import
 export * from './import';
-// Investments
-export * from './investment';
 // Loans
 export * from './loan';
 // Core entities

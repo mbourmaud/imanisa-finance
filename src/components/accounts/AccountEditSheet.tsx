@@ -117,7 +117,7 @@ export function AccountEditSheet({
 						<Button
 							onClick={onSave}
 							disabled={isPending || !editName.trim()}
-							className="flex-1 h-12 rounded-xl shadow-md transition-all"
+							className="flex-1 h-12 rounded-xl transition-all"
 						>
 							{isPending ? (
 								<Loader2 className="h-4 w-4 animate-spin mr-2" />
