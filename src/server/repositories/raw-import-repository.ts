@@ -1,7 +1,7 @@
 /**
  * Raw Import Repository
  * Handles data access for RawImport records
- * This repository always uses Prisma (no demo mode) since it's for actual file storage tracking
+ * Handles data access for RawImport records (file storage tracking)
  */
 
 import type { RawImportStatus } from '@/lib/prisma';

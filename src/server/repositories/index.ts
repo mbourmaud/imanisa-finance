@@ -45,7 +45,6 @@ export {
 export { rawImportRepository } from './raw-import-repository';
 export { recurringPatternRepository } from './recurring-pattern-repository';
 export {
-	resetDemoTransactions,
 	type TransactionFilters,
 	transactionRepository,
 } from './transaction-repository';

@@ -1,9 +1,8 @@
 /**
  * Authentication utilities
- * Handles auth with Supabase and demo mode bypass
+ * Handles auth with Supabase
  */
 
-import { config } from './config';
 import { createClient } from './supabase/server';
 
 export interface User {
@@ -19,16 +18,8 @@ export interface Session {
 
 /**
  * Get the current session from Supabase
- * In demo mode, returns a fake session
  */
 export async function getSession(): Promise<Session | null> {
-	if (config.isDemoMode) {
-		return {
-			user: config.demoUser,
-			expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-		};
-	}
-
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -60,10 +51,6 @@ export async function getCurrentUser(): Promise<User | null> {
  * Check if user is authenticated
  */
 export async function isAuthenticated(): Promise<boolean> {
-	if (config.isDemoMode) {
-		return true;
-	}
-
 	const session = await getSession();
 	return session !== null;
 }
@@ -73,10 +60,6 @@ export async function isAuthenticated(): Promise<boolean> {
  * Use in API routes and server components
  */
 export async function requireAuth(): Promise<User> {
-	if (config.isDemoMode) {
-		return config.demoUser;
-	}
-
 	const user = await getCurrentUser();
 
 	if (!user) {
@@ -88,20 +71,12 @@ export async function requireAuth(): Promise<User> {
 
 /**
  * Get owner ID for the current user
- * In demo mode, returns the demo owner
  */
 export async function getCurrentOwnerId(): Promise<string> {
-	if (config.isDemoMode) {
-		return config.demoOwner.id;
-	}
-
 	const user = await getCurrentUser();
 	if (!user) {
 		throw new Error('Unauthorized');
 	}
-
-	// In real mode, lookup the owner from the database
-	// return await getOwnerByUserId(user.id);
 
 	return user.id;
 }

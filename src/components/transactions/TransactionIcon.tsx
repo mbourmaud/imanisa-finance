@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowDownLeft, ArrowRightLeft, CreditCard, type LucideIcon } from 'lucide-react'
-import * as React from 'react'
+import type * as React from 'react'
 import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 import type { TransactionType } from './transaction-types'

@@ -681,7 +681,3 @@ export const transactionRepository = {
 	},
 };
 
-// Re-export for backwards compatibility
-export function resetDemoTransactions() {
-	console.warn('resetDemoTransactions is deprecated, demo mode has been removed');
-}
