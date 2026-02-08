@@ -1,44 +1,44 @@
-'use client'
+'use client';
 
-import { CategoryBadge } from '@/components/transactions/CategoryBadge'
-import { formatMoneyCompact } from '@/shared/utils'
+import { CategoryBadge } from '@/components/transactions/CategoryBadge';
+import { formatMoneyCompact } from '@/shared/utils';
 
 interface TransactionCategory {
-	categoryId: string
+	categoryId: string;
 	category: {
-		id: string
-		name: string
-		icon: string
-		color: string
-	}
+		id: string;
+		name: string;
+		icon: string;
+		color: string;
+	};
 }
 
 interface TransactionRowProps {
-	id: string
-	date: string
-	description: string
-	amount: number
-	type: string
-	transactionCategory?: TransactionCategory | null
-	animationDelay?: number
+	id: string;
+	date: string;
+	description: string;
+	amount: number;
+	type: string;
+	transactionCategory?: TransactionCategory | null;
+	animationDelay?: number;
 }
 
 function formatRelativeDate(date: string): string {
-	const d = new Date(date)
-	const today = new Date()
-	const yesterday = new Date(today)
-	yesterday.setDate(yesterday.getDate() - 1)
+	const d = new Date(date);
+	const today = new Date();
+	const yesterday = new Date(today);
+	yesterday.setDate(yesterday.getDate() - 1);
 
 	if (d.toDateString() === today.toDateString()) {
-		return "Aujourd'hui"
+		return "Aujourd'hui";
 	}
 	if (d.toDateString() === yesterday.toDateString()) {
-		return 'Hier'
+		return 'Hier';
 	}
 	return new Intl.DateTimeFormat('fr-FR', {
 		day: 'numeric',
 		month: 'short',
-	}).format(d)
+	}).format(d);
 }
 
 /**
@@ -46,16 +46,14 @@ function formatRelativeDate(date: string): string {
  * Style aligned with the main transactions table.
  */
 export function TransactionRow({
-	id,
 	date,
 	description,
 	amount,
 	type,
 	transactionCategory,
-	animationDelay = 0,
 }: TransactionRowProps) {
-	const isIncome = type === 'INCOME'
-	const displayAmount = isIncome ? amount : -amount
+	const isIncome = type === 'INCOME';
+	const displayAmount = isIncome ? amount : -amount;
 
 	return (
 		<div className="flex items-center gap-4 p-3 px-4 border-b border-border/40 last:border-b-0 transition-colors hover:bg-muted/50">
@@ -77,5 +75,5 @@ export function TransactionRow({
 				{formatMoneyCompact(displayAmount)}
 			</span>
 		</div>
-	)
+	);
 }

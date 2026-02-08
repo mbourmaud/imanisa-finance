@@ -1,24 +1,24 @@
-'use client'
+'use client';
 
-import { Button, Loader2, Plus } from '@/components'
-import { MemberAvatar } from '@/components/members/MemberAvatar'
+import { Button, Loader2, Plus } from '@/components';
+import { MemberAvatar } from '@/components/members/MemberAvatar';
 
 interface Member {
-	id: string
-	name: string
-	color: string | null
+	id: string;
+	name: string;
+	color: string | null;
 }
 
 interface AddMemberDropdownProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	availableMembers: Member[]
-	onSelectMember: (memberId: string) => void
-	isPending?: boolean
-	pendingMemberId?: string
-	pendingMemberName?: string
-	pendingMemberColor?: string | null
-	disabled?: boolean
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	availableMembers: Member[];
+	onSelectMember: (memberId: string) => void;
+	isPending?: boolean;
+	pendingMemberId?: string;
+	pendingMemberName?: string;
+	pendingMemberColor?: string | null;
+	disabled?: boolean;
 }
 
 /**
@@ -32,7 +32,6 @@ export function AddMemberDropdown({
 	isPending = false,
 	pendingMemberId,
 	pendingMemberName,
-	pendingMemberColor,
 	disabled = false,
 }: AddMemberDropdownProps) {
 	return (
@@ -87,5 +86,5 @@ export function AddMemberDropdown({
 				</div>
 			)}
 		</div>
-	)
+	);
 }
