@@ -26,6 +26,7 @@ export const propertyService = {
 		const params = new URLSearchParams();
 		if (filters?.type) params.set('type', filters.type);
 		if (filters?.usage) params.set('usage', filters.usage);
+		if (filters?.memberId) params.set('memberId', filters.memberId);
 		if (filters?.search) params.set('search', filters.search);
 
 		const url = params.toString() ? `${API_BASE}?${params}` : API_BASE;

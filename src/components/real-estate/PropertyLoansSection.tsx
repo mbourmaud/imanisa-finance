@@ -2,6 +2,7 @@
 
 import { Button, Card, CreditCard, Plus, PropertyDetailLoanCard } from '@/components';
 import type { Loan } from '@/features/properties';
+import { formatMoneyCompact } from '@/shared/utils';
 
 interface PropertyLoansSectionProps {
 	loans: Loan[];
@@ -9,14 +10,6 @@ interface PropertyLoansSectionProps {
 	onAddInsurance: (loanId: string) => void;
 	onDeleteLoan: (loanId: string) => void;
 	deletingLoanId: string | null;
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
 }
 
 function LoansEmptyState({ onAddClick }: { onAddClick: () => void }) {
@@ -67,15 +60,15 @@ export function PropertyLoansSection({
 				<div className="flex flex-col gap-4">
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 p-4 rounded-xl bg-muted/30">
 						<div className="text-center">
-							<p className="text-xs text-muted-foreground">Capital restant</p>
+							<p className="text-xs text-muted-foreground">Capital remboursé</p>
 							<p className="text-lg font-semibold tabular-nums">
-								{formatCurrency(totalLoansRemaining)}
+								{formatMoneyCompact(loans.reduce((sum, l) => sum + l.initialAmount, 0) - totalLoansRemaining)}
 							</p>
 						</div>
 						<div className="text-center">
 							<p className="text-xs text-muted-foreground">Mensualités</p>
 							<p className="text-lg font-semibold tabular-nums">
-								{formatCurrency(totalMonthlyPayment)}
+								{formatMoneyCompact(totalMonthlyPayment)}
 							</p>
 						</div>
 						<div className="text-center">
@@ -91,7 +84,7 @@ export function PropertyLoansSection({
 								onAddInsurance={onAddInsurance}
 								onDelete={onDeleteLoan}
 								isDeleting={deletingLoanId === loan.id}
-								formatCurrency={formatCurrency}
+								formatCurrency={formatMoneyCompact}
 							/>
 						))}
 					</div>

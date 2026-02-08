@@ -4,6 +4,7 @@
  */
 
 import type { ParsedTransaction, ParseResult, Parser } from './types';
+import { decodeCsvBuffer } from './decode-csv';
 
 /**
  * Parse a CSV line handling quoted fields
@@ -84,10 +85,10 @@ export const caisseEpargneParser: Parser = {
 		const transactions: ParsedTransaction[] = [];
 
 		try {
-			// Convert ArrayBuffer to string if needed
-			// Caisse d'Épargne uses Windows-1252 encoding
+			// Convert ArrayBuffer to string with auto-detected encoding
+			// Caisse d'Épargne historically uses Windows-1252, but modern exports may be UTF-8
 			const text =
-				typeof content === 'string' ? content : new TextDecoder('windows-1252').decode(content);
+				typeof content === 'string' ? content : decodeCsvBuffer(content, 'windows-1252');
 
 			const lines = text.split(/\r?\n/).filter((line) => line.trim());
 

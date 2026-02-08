@@ -36,6 +36,13 @@ export {
 	utilityContractKeys,
 } from './hooks/use-utility-contracts-query';
 
+// TanStack Query Hooks - Property Documents
+export {
+	getDocumentDownloadUrl,
+	useDeletePropertyDocumentMutation,
+	useUploadPropertyDocumentMutation,
+} from './hooks/use-property-documents-query'
+
 // Page hooks
 export { formatCurrency, usePropertyDetailPage } from './hooks/use-property-detail-page';
 export { useRealEstatePage } from './hooks/use-real-estate-page';

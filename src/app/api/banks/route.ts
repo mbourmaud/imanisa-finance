@@ -17,7 +17,8 @@ export interface BankWithAccounts extends Bank {
 		name: string;
 		balance: number;
 		type: string;
-		members: { id: string; name: string; ownerShare: number }[];
+		exportUrl: string | null;
+		members: { id: string; name: string; ownerShare: number; color: string | null; avatarUrl: string | null }[];
 	}[];
 }
 
@@ -28,8 +29,11 @@ export interface BanksSummary {
 	totalBalance: number;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
 	try {
+		const { searchParams } = new URL(request.url);
+		const memberId = searchParams.get('memberId') ?? undefined;
+
 		// Get all banks from database
 		const allBanks = await bankRepository.getAll();
 
@@ -39,7 +43,15 @@ export async function GET() {
 
 		// Build response with all banks
 		const banks: BankWithAccounts[] = allBanks.map((bank) => {
-			const accounts = accountsByBank[bank.id] ?? [];
+			let accounts = accountsByBank[bank.id] ?? [];
+
+			// Filter accounts by member if specified
+			if (memberId) {
+				accounts = accounts.filter((acc) =>
+					acc.accountMembers.some((am) => am.member.id === memberId),
+				);
+			}
+
 			return {
 				...bank,
 				accountCount: accounts.length,
@@ -49,10 +61,13 @@ export async function GET() {
 					name: acc.name,
 					balance: acc.balance,
 					type: acc.type,
+					exportUrl: acc.exportUrl ?? null,
 					members: acc.accountMembers.map((am) => ({
 						id: am.member.id,
 						name: am.member.name,
 						ownerShare: am.ownerShare,
+						color: am.member.color,
+						avatarUrl: am.member.avatarUrl,
 					})),
 				})),
 			};
@@ -65,11 +80,15 @@ export async function GET() {
 		// Banks that have at least one account
 		const usedBanks = banks.filter((b) => b.accountCount > 0);
 
+		// Recalculate summary based on filtered accounts
+		const filteredTotalAccounts = banks.reduce((sum, b) => sum + b.accountCount, 0);
+		const filteredTotalBalance = banks.reduce((sum, b) => sum + b.totalBalance, 0);
+
 		const banksSummary: BanksSummary = {
 			totalBanksUsed: usedBanks.length,
 			totalBanksAvailable: allBanks.length,
-			totalAccounts: summary.totalAccounts,
-			totalBalance: summary.totalBalance,
+			totalAccounts: memberId ? filteredTotalAccounts : summary.totalAccounts,
+			totalBalance: memberId ? filteredTotalBalance : summary.totalBalance,
 		};
 
 		return NextResponse.json({

@@ -12,6 +12,7 @@ export interface LoanInsuranceWithMember extends LoanInsurance {
 		id: string;
 		name: string;
 		color: string | null;
+		avatarUrl: string | null;
 	};
 }
 
@@ -45,6 +46,7 @@ const loanInsuranceWithMemberInclude = {
 			id: true,
 			name: true,
 			color: true,
+			avatarUrl: true,
 		},
 	},
 } as const;

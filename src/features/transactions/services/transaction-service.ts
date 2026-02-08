@@ -111,12 +111,18 @@ export const transactionService = {
 	},
 
 	/**
-	 * Get transaction summary for a period
+	 * Get transaction summary with filters
 	 */
-	async getSummary(startDate?: Date, endDate?: Date): Promise<TransactionSummary> {
+	async getSummary(filters?: TransactionFilters): Promise<TransactionSummary> {
 		const params = new URLSearchParams();
-		if (startDate) params.set('startDate', startDate.toISOString());
-		if (endDate) params.set('endDate', endDate.toISOString());
+		if (filters?.startDate) params.set('startDate', filters.startDate.toISOString());
+		if (filters?.endDate) params.set('endDate', filters.endDate.toISOString());
+		if (filters?.accountId) params.set('accountId', filters.accountId);
+		if (filters?.memberId) params.set('memberId', filters.memberId);
+		if (filters?.type) params.set('type', filters.type);
+		if (filters?.categoryId) params.set('categoryId', filters.categoryId);
+		if (filters?.search) params.set('search', filters.search);
+		if (filters?.excludeInternal) params.set('excludeInternal', 'true');
 
 		const url = params.toString() ? `${API_BASE}/summary?${params}` : `${API_BASE}/summary`;
 		const response = await fetch(url);
@@ -126,6 +132,24 @@ export const transactionService = {
 		}
 
 		return response.json();
+	},
+
+	/**
+	 * Build export URL for CSV download with current filters
+	 */
+	getExportUrl(filters?: TransactionFilters): string {
+		const params = new URLSearchParams()
+		if (filters?.accountId) params.set('accountId', filters.accountId)
+		if (filters?.memberId) params.set('memberId', filters.memberId)
+		if (filters?.type) params.set('type', filters.type)
+		if (filters?.categoryId) params.set('categoryId', filters.categoryId)
+		if (filters?.startDate) params.set('startDate', filters.startDate.toISOString())
+		if (filters?.endDate) params.set('endDate', filters.endDate.toISOString())
+		if (filters?.search) params.set('search', filters.search)
+		if (filters?.excludeInternal) params.set('excludeInternal', 'true')
+
+		const query = params.toString()
+		return query ? `${API_BASE}/export?${query}` : `${API_BASE}/export`
 	},
 
 	/**
@@ -140,6 +164,21 @@ export const transactionService = {
 
 		if (!response.ok) {
 			throw new Error('Failed to categorize transactions');
+		}
+	},
+
+	/**
+	 * Bulk delete transactions
+	 */
+	async bulkDelete(transactionIds: string[]): Promise<void> {
+		const response = await fetch(`${API_BASE}/bulk-delete`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ transactionIds }),
+		});
+
+		if (!response.ok) {
+			throw new Error('Impossible de supprimer les transactions');
 		}
 	},
 

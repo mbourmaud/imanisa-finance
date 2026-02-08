@@ -20,6 +20,7 @@ import {
 	Trash2,
 } from '@/components';
 import type { InsuranceType } from '@/features/properties';
+import { formatDate, formatMoneyCompact } from '@/shared/utils';
 
 interface PropertyInsurance {
 	id: string;
@@ -40,22 +41,6 @@ interface PropertyInsuranceSectionProps {
 	onEdit: () => void;
 	onDelete: () => void;
 	isDeleting: boolean;
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
-}
-
-function formatDate(dateString: string): string {
-	return new Date(dateString).toLocaleDateString('fr-FR', {
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric',
-	});
 }
 
 function getInsuranceTypeLabel(type: InsuranceType): string {
@@ -162,19 +147,19 @@ export function PropertyInsuranceSection({
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
 						<div>
 							<p className="text-xs text-muted-foreground">Prime mensuelle</p>
-							<p className="font-medium tabular-nums">{formatCurrency(insurance.monthlyPremium)}</p>
+							<p className="font-medium tabular-nums">{formatMoneyCompact(insurance.monthlyPremium)}</p>
 							<p className="text-xs text-muted-foreground mt-0.5">
-								{formatCurrency(insurance.monthlyPremium * 12)}/an
+								{formatMoneyCompact(insurance.monthlyPremium * 12)}/an
 							</p>
 						</div>
 						<div>
 							<p className="text-xs text-muted-foreground">Date de début</p>
-							<p className="font-medium">{formatDate(insurance.startDate.toString())}</p>
+							<p className="font-medium">{formatDate(insurance.startDate.toString(), 'D MMMM YYYY')}</p>
 						</div>
 						{insurance.endDate && (
 							<div>
 								<p className="text-xs text-muted-foreground">Date de fin</p>
-								<p className="font-medium">{formatDate(insurance.endDate.toString())}</p>
+								<p className="font-medium">{formatDate(insurance.endDate.toString(), 'D MMMM YYYY')}</p>
 							</div>
 						)}
 					</div>

@@ -166,7 +166,7 @@ export function CreatePropertySheet({
 			<SheetTrigger asChild>
 				<Button iconLeft={<Plus className="h-4 w-4" />}>Ajouter un bien</Button>
 			</SheetTrigger>
-			<SheetContent side="right" size="lg">
+			<SheetContent side="right" size="lg" className="sm:max-w-2xl">
 				<SheetHeader>
 					<SheetTitle>Ajouter un bien immobilier</SheetTitle>
 					<SheetDescription>

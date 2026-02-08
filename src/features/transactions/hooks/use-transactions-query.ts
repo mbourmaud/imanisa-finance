@@ -6,11 +6,12 @@
  * the Zustand store depending on the use case.
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PaginatedResponse } from '@/shared/types';
 import { transactionService } from '../services/transaction-service';
 import type {
 	CreateTransactionInput,
+	RecurringPattern,
 	Transaction,
 	TransactionFilters,
 	TransactionPagination,
@@ -28,8 +29,9 @@ export const transactionKeys = {
 		[...transactionKeys.lists(), { filters, pagination }] as const,
 	details: () => [...transactionKeys.all, 'detail'] as const,
 	detail: (id: string) => [...transactionKeys.details(), id] as const,
-	summary: (startDate?: Date, endDate?: Date) =>
-		[...transactionKeys.all, 'summary', { startDate, endDate }] as const,
+	summary: (filters?: TransactionFilters) =>
+		[...transactionKeys.all, 'summary', { filters }] as const,
+	recurring: () => [...transactionKeys.all, 'recurring'] as const,
 };
 
 /**
@@ -48,6 +50,19 @@ export function useTransactionsQuery(
 }
 
 /**
+ * Hook to fetch transactions with infinite scroll
+ */
+export function useInfiniteTransactionsQuery(filters?: TransactionFilters, pageSize = 50) {
+	return useInfiniteQuery({
+		queryKey: [...transactionKeys.lists(), 'infinite', { filters, pageSize }],
+		queryFn: ({ pageParam }) => transactionService.getAll(filters, { page: pageParam, pageSize }),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) =>
+			lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+	});
+}
+
+/**
  * Hook to fetch a single transaction by ID
  */
 export function useTransactionQuery(id: string, options?: { enabled?: boolean }) {
@@ -62,15 +77,32 @@ export function useTransactionQuery(id: string, options?: { enabled?: boolean })
  * Hook to fetch transaction summary
  */
 export function useTransactionSummaryQuery(
-	startDate?: Date,
-	endDate?: Date,
+	filters?: TransactionFilters,
 	options?: { enabled?: boolean },
 ) {
 	return useQuery({
-		queryKey: transactionKeys.summary(startDate, endDate),
-		queryFn: () => transactionService.getSummary(startDate, endDate),
+		queryKey: transactionKeys.summary(filters),
+		queryFn: () => transactionService.getSummary(filters),
 		enabled: options?.enabled ?? true,
 	});
+}
+
+/**
+ * Hook to fetch recurring patterns
+ */
+export function useRecurringPatternsQuery(options?: { enabled?: boolean }) {
+	return useQuery<RecurringPattern[]>({
+		queryKey: transactionKeys.recurring(),
+		queryFn: async () => {
+			const response = await fetch('/api/recurring-patterns')
+			if (!response.ok) {
+				throw new Error('Failed to fetch recurring patterns')
+			}
+			return response.json()
+		},
+		staleTime: 5 * 60 * 1000,
+		enabled: options?.enabled ?? true,
+	})
 }
 
 /**
@@ -124,6 +156,21 @@ export function useDeleteTransactionMutation() {
 			// Invalidate lists
 			queryClient.invalidateQueries({ queryKey: transactionKeys.lists() });
 			// Invalidate summary
+			queryClient.invalidateQueries({ queryKey: [...transactionKeys.all, 'summary'] });
+		},
+	});
+}
+
+/**
+ * Hook to bulk delete transactions
+ */
+export function useBulkDeleteMutation() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (transactionIds: string[]) => transactionService.bulkDelete(transactionIds),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: transactionKeys.lists() });
 			queryClient.invalidateQueries({ queryKey: [...transactionKeys.all, 'summary'] });
 		},
 	});
@@ -203,25 +250,20 @@ export function useOptimisticCreateTransaction() {
 					const optimisticTransaction: Transaction = {
 						id: `temp-${Date.now()}`,
 						accountId: newTransaction.accountId,
-						accountName: '',
-						type: newTransaction.type === 'income' ? 'income' : 'expense',
+						type: newTransaction.type,
 						amount: newTransaction.amount,
 						currency: 'EUR',
 						description: newTransaction.description,
-						category: null,
-						categoryId: newTransaction.categoryId ?? null,
 						date: newTransaction.date,
-						isReconciled: false,
+						bankCategory: null,
 						isInternal: false,
-						linkedTransactionId: null,
-						metadata: {},
-						createdAt: new Date(),
-						updatedAt: new Date(),
+						importedAt: null,
+						transactionCategory: null,
 						account: {
 							id: newTransaction.accountId,
 							name: '',
 							type: 'CHECKING',
-							bank: { id: '', name: '', color: '#888' },
+							bank: { id: '', name: '', color: '#888', logo: null },
 							accountMembers: [],
 						},
 					};

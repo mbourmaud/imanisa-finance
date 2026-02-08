@@ -1,14 +1,15 @@
 'use client';
 
 import {
+	Button,
 	CreatePropertySheet,
-	ErrorBanner,
 	LoanProgressCard,
+	PageHeader,
+	Plus,
 	PropertiesGrid,
 	PropertiesStatsOverview,
 } from '@/components';
 import { formatCurrency, useRealEstatePage } from '@/features/properties';
-import { usePageHeader } from '@/shared/hooks';
 
 export default function RealEstatePage() {
 	const {
@@ -16,27 +17,23 @@ export default function RealEstatePage() {
 		summary,
 		isLoading,
 		isError,
-		error,
+		refetch,
 		members,
 		isDialogOpen,
 		setIsDialogOpen,
 	} = useRealEstatePage();
 
-	usePageHeader(
-		'Immobilier',
-		undefined,
-		<CreatePropertySheet
-			open={isDialogOpen}
-			onOpenChange={setIsDialogOpen}
-			members={members}
-		/>,
-	);
-
 	return (
 		<>
-			{isError && (
-				<ErrorBanner message={error instanceof Error ? error.message : 'Une erreur est survenue'} />
-			)}
+			<PageHeader
+				title="Biens immobiliers"
+				actions={
+					<Button onClick={() => setIsDialogOpen(true)}>
+						<Plus className="h-4 w-4" />
+						Ajouter un bien
+					</Button>
+				}
+			/>
 
 			<PropertiesStatsOverview
 				summary={summary}
@@ -56,8 +53,16 @@ export default function RealEstatePage() {
 			<PropertiesGrid
 				properties={properties}
 				isLoading={isLoading}
+				isError={isError}
+				onRetry={refetch}
 				formatCurrency={formatCurrency}
 				onAddClick={() => setIsDialogOpen(true)}
+			/>
+
+			<CreatePropertySheet
+				open={isDialogOpen}
+				onOpenChange={setIsDialogOpen}
+				members={members}
 			/>
 		</>
 	);

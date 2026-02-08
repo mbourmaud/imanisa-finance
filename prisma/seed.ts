@@ -92,34 +92,34 @@ const MEMBERS = [
 
 // Categories aligned with TransactionCategory enum
 const CATEGORIES = [
-	// Income
-	{ id: 'cat-salary', name: 'Salaire', icon: '💰', color: '#10B981' },
-	{ id: 'cat-freelance', name: 'Freelance', icon: '💼', color: '#34D399' },
-	{ id: 'cat-dividends', name: 'Dividendes', icon: '📈', color: '#6EE7B7' },
-	{ id: 'cat-rental-income', name: 'Revenus locatifs', icon: '🏠', color: '#A7F3D0' },
-	{ id: 'cat-refund', name: 'Remboursement', icon: '↩️', color: '#D1FAE5' },
-	{ id: 'cat-other-income', name: 'Autres revenus', icon: '💵', color: '#ECFDF5' },
-	// Expenses
-	{ id: 'cat-housing', name: 'Logement', icon: '🏠', color: '#EF4444' },
-	{ id: 'cat-utilities', name: 'Charges', icon: '💡', color: '#F97316' },
-	{ id: 'cat-groceries', name: 'Courses', icon: '🛒', color: '#FB923C' },
-	{ id: 'cat-restaurants', name: 'Restaurants', icon: '🍽️', color: '#FDBA74' },
-	{ id: 'cat-transport', name: 'Transport', icon: '🚗', color: '#3B82F6' },
-	{ id: 'cat-health', name: 'Santé', icon: '🏥', color: '#EC4899' },
-	{ id: 'cat-insurance', name: 'Assurance', icon: '🛡️', color: '#8B5CF6' },
-	{ id: 'cat-subscriptions', name: 'Abonnements', icon: '📱', color: '#6366F1' },
-	{ id: 'cat-shopping', name: 'Shopping', icon: '🛍️', color: '#A855F7' },
-	{ id: 'cat-leisure', name: 'Loisirs', icon: '🎮', color: '#D946EF' },
-	{ id: 'cat-travel', name: 'Voyages', icon: '✈️', color: '#14B8A6' },
-	{ id: 'cat-education', name: 'Éducation', icon: '📚', color: '#0EA5E9' },
-	{ id: 'cat-taxes', name: 'Impôts', icon: '🏛️', color: '#64748B' },
-	{ id: 'cat-fees', name: 'Frais bancaires', icon: '🏦', color: '#94A3B8' },
-	{ id: 'cat-savings', name: 'Épargne', icon: '🐷', color: '#22C55E' },
-	{ id: 'cat-investment', name: 'Investissement', icon: '📊', color: '#16A34A' },
-	{ id: 'cat-loan-payment', name: 'Crédit', icon: '🏦', color: '#DC2626' },
-	{ id: 'cat-other-expense', name: 'Autres dépenses', icon: '📦', color: '#CBD5E1' },
+	// Income — greens, teals, blues, purples
+	{ id: 'cat-salary', name: 'Salaire', icon: 'wallet', color: '#059669' },
+	{ id: 'cat-freelance', name: 'Freelance', icon: 'briefcase', color: '#0891B2' },
+	{ id: 'cat-dividends', name: 'Dividendes', icon: 'trending-up', color: '#7C3AED' },
+	{ id: 'cat-rental-income', name: 'Revenus locatifs', icon: 'key', color: '#2563EB' },
+	{ id: 'cat-refund', name: 'Remboursement', icon: 'undo-2', color: '#0D9488' },
+	{ id: 'cat-other-income', name: 'Autres revenus', icon: 'banknote', color: '#6D28D9' },
+	// Expenses — reds, oranges, pinks, indigos, cyans (all vibrant, no greys)
+	{ id: 'cat-housing', name: 'Logement', icon: 'home', color: '#DC2626' },
+	{ id: 'cat-utilities', name: 'Charges', icon: 'lightbulb', color: '#EA580C' },
+	{ id: 'cat-groceries', name: 'Courses', icon: 'shopping-cart', color: '#D97706' },
+	{ id: 'cat-restaurants', name: 'Restaurants', icon: 'utensils', color: '#B45309' },
+	{ id: 'cat-transport', name: 'Transport', icon: 'car', color: '#1D4ED8' },
+	{ id: 'cat-health', name: 'Santé', icon: 'heart-pulse', color: '#DB2777' },
+	{ id: 'cat-insurance', name: 'Assurance', icon: 'shield', color: '#4F46E5' },
+	{ id: 'cat-subscriptions', name: 'Abonnements', icon: 'tv', color: '#9333EA' },
+	{ id: 'cat-shopping', name: 'Shopping', icon: 'shopping-bag', color: '#C026D3' },
+	{ id: 'cat-leisure', name: 'Loisirs', icon: 'gamepad-2', color: '#E11D48' },
+	{ id: 'cat-travel', name: 'Voyages', icon: 'plane', color: '#0284C7' },
+	{ id: 'cat-education', name: 'Éducation', icon: 'book-open', color: '#0369A1' },
+	{ id: 'cat-taxes', name: 'Impôts', icon: 'landmark', color: '#B91C1C' },
+	{ id: 'cat-fees', name: 'Frais bancaires', icon: 'building', color: '#BE185D' },
+	{ id: 'cat-savings', name: 'Épargne', icon: 'piggy-bank', color: '#16A34A' },
+	{ id: 'cat-investment', name: 'Investissement', icon: 'bar-chart-3', color: '#15803D' },
+	{ id: 'cat-loan-payment', name: 'Crédit', icon: 'landmark', color: '#9F1239' },
+	{ id: 'cat-other-expense', name: 'Autres dépenses', icon: 'package', color: '#7E22CE' },
 	// Special
-	{ id: 'cat-transfer', name: 'Virement interne', icon: '🔄', color: '#9CA3AF' },
+	{ id: 'cat-transfer', name: 'Virement interne', icon: 'arrow-left-right', color: '#6366F1' },
 ];
 
 // Initial categorization rules for common French merchants/patterns
@@ -197,6 +197,8 @@ const INITIAL_RULES: {
 	// Housing
 	{ pattern: 'LOYER', categoryId: 'cat-housing', matchType: 'CONTAINS', priority: 100 },
 	{ pattern: 'SYNDIC', categoryId: 'cat-housing', matchType: 'CONTAINS', priority: 100 },
+	// SCI payments (PRLV to property management company)
+	{ pattern: 'SDC 21 RUE GUSTAVE CHARPENT', categoryId: 'cat-housing', matchType: 'CONTAINS', priority: 150 },
 ];
 
 async function main() {

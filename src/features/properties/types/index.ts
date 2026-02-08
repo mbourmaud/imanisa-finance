@@ -2,7 +2,7 @@
  * Property domain types
  */
 
-import type { InsuranceType, PropertyType, PropertyUsage, UtilityType } from '@/lib/prisma';
+import type { DiagnosticStatus, DiagnosticType, InsuranceType, PropertyType, PropertyUsage, UtilityType } from '@/lib/prisma';
 
 export interface Member {
 	id: string;
@@ -90,6 +90,28 @@ export interface UtilityContract {
 	updatedAt: string;
 }
 
+export interface PropertyDocument {
+	id: string
+	propertyId: string
+	name: string
+	storagePath: string
+	filename: string
+	fileSize: number
+	mimeType: string
+	createdAt: string
+}
+
+export interface PropertyDiagnosticData {
+	id: string;
+	propertyId: string;
+	type: DiagnosticType;
+	status: DiagnosticStatus;
+	value: string | null;
+	details: string | null;
+	date: string | null;
+	expiresAt: string | null;
+}
+
 export interface PropertyWithDetails {
 	id: string;
 	name: string;
@@ -116,6 +138,8 @@ export interface PropertyWithDetails {
 	loans: Loan[];
 	insurance: PropertyInsurance | null;
 	coOwnership: CoOwnership | null;
+	diagnostics: PropertyDiagnosticData[];
+	documents: PropertyDocument[];
 	utilityContracts: UtilityContract[];
 	_count: {
 		loans: number;
@@ -135,6 +159,7 @@ export interface PropertySummary {
 export interface PropertyFilters {
 	type?: PropertyType;
 	usage?: PropertyUsage;
+	memberId?: string;
 	search?: string;
 }
 
@@ -246,7 +271,7 @@ export interface UpdateUtilityContractInput {
 	notes?: string | null;
 }
 
-export type { PropertyType, PropertyUsage, InsuranceType, UtilityType };
+export type { DiagnosticStatus, DiagnosticType, PropertyType, PropertyUsage, InsuranceType, UtilityType };
 
 // Form types
 export type { PropertyFormData } from './form-types';

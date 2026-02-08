@@ -148,7 +148,7 @@ export const demoAccounts: DemoAccount[] = [
 	{
 		id: 'account-001',
 		name: 'Compte principal',
-		type: 'checking' as const,
+		type: 'CHECKING' as const,
 		bankId: 'bank-001',
 		balance: 2450.32,
 		currency: 'EUR',
@@ -162,7 +162,7 @@ export const demoAccounts: DemoAccount[] = [
 	{
 		id: 'account-002',
 		name: 'Compte joint',
-		type: 'checking' as const,
+		type: 'CHECKING' as const,
 		bankId: 'bank-002',
 		balance: 1234.56,
 		currency: 'EUR',
@@ -177,7 +177,7 @@ export const demoAccounts: DemoAccount[] = [
 	{
 		id: 'account-003',
 		name: 'Livret A',
-		type: 'savings' as const,
+		type: 'SAVINGS' as const,
 		bankId: 'bank-001',
 		balance: 22950.0,
 		currency: 'EUR',
@@ -191,7 +191,7 @@ export const demoAccounts: DemoAccount[] = [
 	{
 		id: 'account-004',
 		name: 'LDDS',
-		type: 'savings' as const,
+		type: 'SAVINGS' as const,
 		bankId: 'bank-001',
 		balance: 12000.0,
 		currency: 'EUR',
@@ -205,7 +205,7 @@ export const demoAccounts: DemoAccount[] = [
 	{
 		id: 'account-005',
 		name: 'LEP',
-		type: 'savings' as const,
+		type: 'SAVINGS' as const,
 		bankId: 'bank-005',
 		balance: 7700.0,
 		currency: 'EUR',
@@ -220,7 +220,7 @@ export const demoAccounts: DemoAccount[] = [
 	{
 		id: 'account-006',
 		name: 'PEA',
-		type: 'investment' as const,
+		type: 'INVESTMENT' as const,
 		bankId: 'bank-003',
 		balance: 45200.0,
 		currency: 'EUR',
@@ -234,7 +234,7 @@ export const demoAccounts: DemoAccount[] = [
 	{
 		id: 'account-007',
 		name: 'Assurance-vie',
-		type: 'investment' as const,
+		type: 'INVESTMENT' as const,
 		bankId: 'bank-004',
 		balance: 32100.0,
 		currency: 'EUR',
@@ -286,7 +286,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-salary-${monthOffset}`,
 			accountId: 'account-001',
-			type: 'income' as const,
+			type: 'INCOME' as const,
 			amount: 3200.0,
 			currency: 'EUR',
 			description: 'Virement salaire',
@@ -304,7 +304,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-rent-${monthOffset}`,
 			accountId: 'account-001',
-			type: 'expense' as const,
+			type: 'EXPENSE' as const,
 			amount: -950.0,
 			currency: 'EUR',
 			description: 'Loyer appartement',
@@ -322,7 +322,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-grocery-${monthOffset}-1`,
 			accountId: 'account-001',
-			type: 'expense' as const,
+			type: 'EXPENSE' as const,
 			amount: -127.43,
 			currency: 'EUR',
 			description: 'Carrefour',
@@ -339,7 +339,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-grocery-${monthOffset}-2`,
 			accountId: 'account-001',
-			type: 'expense' as const,
+			type: 'EXPENSE' as const,
 			amount: -89.21,
 			currency: 'EUR',
 			description: 'Leclerc',
@@ -357,7 +357,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-transport-${monthOffset}`,
 			accountId: 'account-001',
-			type: 'expense' as const,
+			type: 'EXPENSE' as const,
 			amount: -75.0,
 			currency: 'EUR',
 			description: 'Navigo mensuel',
@@ -375,7 +375,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-resto-${monthOffset}`,
 			accountId: 'account-001',
-			type: 'expense' as const,
+			type: 'EXPENSE' as const,
 			amount: -45.8,
 			currency: 'EUR',
 			description: 'Restaurant Le Petit Zinc',
@@ -393,7 +393,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-netflix-${monthOffset}`,
 			accountId: 'account-001',
-			type: 'expense' as const,
+			type: 'EXPENSE' as const,
 			amount: -17.99,
 			currency: 'EUR',
 			description: 'Netflix',
@@ -410,7 +410,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-spotify-${monthOffset}`,
 			accountId: 'account-001',
-			type: 'expense' as const,
+			type: 'EXPENSE' as const,
 			amount: -10.99,
 			currency: 'EUR',
 			description: 'Spotify',
@@ -428,7 +428,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-savings-out-${monthOffset}`,
 			accountId: 'account-001',
-			type: 'transfer' as const,
+			type: 'EXPENSE' as const,
 			amount: -500.0,
 			currency: 'EUR',
 			description: 'Virement vers Livret A',
@@ -445,7 +445,7 @@ function generateTransactions(): DemoTransaction[] {
 		transactions.push({
 			id: `tx-savings-in-${monthOffset}`,
 			accountId: 'account-003',
-			type: 'transfer' as const,
+			type: 'INCOME' as const,
 			amount: 500.0,
 			currency: 'EUR',
 			description: 'Virement depuis Compte principal',

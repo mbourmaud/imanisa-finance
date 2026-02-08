@@ -7,6 +7,8 @@ import type {
 	CoOwnership,
 	Loan,
 	Property,
+	PropertyDiagnostic,
+	PropertyDocument,
 	PropertyInsurance,
 	PropertyMember,
 	PropertyType,
@@ -24,6 +26,7 @@ export interface PropertyMemberWithDetails {
 		id: string;
 		name: string;
 		color: string | null;
+		avatarUrl: string | null;
 	};
 }
 
@@ -48,6 +51,7 @@ export interface LoanInsuranceWithMember {
 		id: string;
 		name: string;
 		color: string | null;
+		avatarUrl: string | null;
 	};
 }
 
@@ -59,6 +63,8 @@ export interface PropertyWithDetails extends PropertyWithMembers {
 	loans: LoanWithInsurances[];
 	insurance: PropertyInsurance | null;
 	coOwnership: CoOwnership | null;
+	diagnostics: PropertyDiagnostic[];
+	documents: PropertyDocument[];
 	utilityContracts: UtilityContract[];
 	_count: {
 		loans: number;
@@ -158,6 +164,7 @@ export const propertyRepository = {
 								id: true,
 								name: true,
 								color: true,
+							avatarUrl: true,
 							},
 						},
 					},
@@ -171,6 +178,7 @@ export const propertyRepository = {
 										id: true,
 										name: true,
 										color: true,
+									avatarUrl: true,
 									},
 								},
 							},
@@ -179,6 +187,8 @@ export const propertyRepository = {
 				},
 				insurance: true,
 				coOwnership: true,
+				diagnostics: true,
+				documents: { orderBy: { createdAt: 'desc' } },
 				utilityContracts: true,
 				_count: {
 					select: {
@@ -207,6 +217,7 @@ export const propertyRepository = {
 								id: true,
 								name: true,
 								color: true,
+							avatarUrl: true,
 							},
 						},
 					},
@@ -220,6 +231,7 @@ export const propertyRepository = {
 										id: true,
 										name: true,
 										color: true,
+									avatarUrl: true,
 									},
 								},
 							},
@@ -228,6 +240,8 @@ export const propertyRepository = {
 				},
 				insurance: true,
 				coOwnership: true,
+				diagnostics: true,
+				documents: { orderBy: { createdAt: 'desc' } },
 				utilityContracts: true,
 				_count: {
 					select: {
@@ -282,6 +296,7 @@ export const propertyRepository = {
 								id: true,
 								name: true,
 								color: true,
+							avatarUrl: true,
 							},
 						},
 					},
@@ -295,6 +310,7 @@ export const propertyRepository = {
 										id: true,
 										name: true,
 										color: true,
+									avatarUrl: true,
 									},
 								},
 							},
@@ -303,6 +319,8 @@ export const propertyRepository = {
 				},
 				insurance: true,
 				coOwnership: true,
+				diagnostics: true,
+				documents: { orderBy: { createdAt: 'desc' } },
 				utilityContracts: true,
 				_count: {
 					select: {
@@ -331,6 +349,7 @@ export const propertyRepository = {
 								id: true,
 								name: true,
 								color: true,
+							avatarUrl: true,
 							},
 						},
 					},
@@ -344,6 +363,7 @@ export const propertyRepository = {
 										id: true,
 										name: true,
 										color: true,
+									avatarUrl: true,
 									},
 								},
 							},
@@ -352,6 +372,8 @@ export const propertyRepository = {
 				},
 				insurance: true,
 				coOwnership: true,
+				diagnostics: true,
+				documents: { orderBy: { createdAt: 'desc' } },
 				utilityContracts: true,
 				_count: {
 					select: {

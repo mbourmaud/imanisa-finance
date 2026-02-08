@@ -2,25 +2,33 @@
  * Transaction domain types
  */
 
-export type TransactionType = 'income' | 'expense' | 'transfer';
+export type TransactionType = 'INCOME' | 'EXPENSE';
+
+export interface TransactionCategoryInfo {
+	transactionId: string;
+	categoryId: string;
+	source: string;
+	confidence: number;
+	category: {
+		id: string;
+		name: string;
+		icon: string;
+		color: string;
+	};
+}
 
 export interface Transaction {
 	id: string;
 	accountId: string;
-	accountName: string;
 	type: TransactionType;
 	amount: number;
 	currency: string;
 	description: string;
-	category: string | null;
-	categoryId: string | null;
 	date: Date;
-	isReconciled: boolean;
+	bankCategory: string | null;
 	isInternal: boolean;
-	linkedTransactionId: string | null;
-	metadata: Record<string, unknown>;
-	createdAt: Date;
-	updatedAt: Date;
+	importedAt: string | null;
+	transactionCategory: TransactionCategoryInfo | null;
 	account: {
 		id: string;
 		name: string;
@@ -29,23 +37,48 @@ export interface Transaction {
 			id: string;
 			name: string;
 			color: string;
+			logo: string | null;
 		};
 		accountMembers: {
 			ownerShare: number;
 			member: {
 				id: string;
 				name: string;
+				color: string | null;
+				avatarUrl: string | null;
 			};
 		}[];
 	};
 }
 
+export interface InternalTransfersSummary {
+	toSavings: number
+	toInvestment: number
+	toLoanRepayment: number
+	toOther: number
+	total: number
+}
+
 export interface TransactionSummary {
-	totalIncome: number;
-	totalExpenses: number;
-	netFlow: number;
-	transactionCount: number;
-	byCategory: CategorySummary[];
+	totalIncome: number
+	totalExpenses: number
+	netFlow: number
+	transactionCount: number
+	byCategory: CategorySummary[]
+	internalTransfers: InternalTransfersSummary
+	savingsRate: number
+}
+
+export interface RecurringPattern {
+	id: string
+	description: string
+	amount: number
+	frequency: 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'ANNUAL'
+	occurrenceCount: number
+	lastSeenAt: string | null
+	isActive: boolean
+	account: { id: string; name: string } | null
+	category: { id: string; name: string; icon: string; color: string } | null
 }
 
 export interface CategorySummary {

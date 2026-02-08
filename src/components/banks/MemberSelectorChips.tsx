@@ -1,9 +1,11 @@
-import { Button, ColorDot } from '@/components';
+import { Button } from '@/components';
+import { MemberAvatar } from '@/components/members/MemberAvatar';
 
 interface Member {
 	id: string;
 	name: string;
 	color: string | null;
+	avatarUrl?: string | null;
 }
 
 interface MemberSelectorChipsProps {
@@ -32,7 +34,7 @@ export function MemberSelectorChips({ members, selectedIds, onToggle }: MemberSe
 								: 'border border-transparent bg-muted/50 text-muted-foreground'
 						}`}
 					>
-						<ColorDot color={member.color || '#6b7280'} size="md" />
+						<MemberAvatar member={member} size="xs" />
 						<span>{member.name}</span>
 					</Button>
 				);

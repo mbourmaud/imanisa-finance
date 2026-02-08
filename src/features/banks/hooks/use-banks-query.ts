@@ -66,9 +66,16 @@ export const bankKeys = {
 // API SERVICE
 // =============================================================================
 
+export interface BankFilters {
+	memberId?: string
+}
+
 const bankService = {
-	async getAll(): Promise<BanksResponse> {
-		const response = await fetch('/api/banks')
+	async getAll(filters?: BankFilters): Promise<BanksResponse> {
+		const params = new URLSearchParams()
+		if (filters?.memberId) params.set('memberId', filters.memberId)
+		const url = params.toString() ? `/api/banks?${params}` : '/api/banks'
+		const response = await fetch(url)
 		if (!response.ok) throw new Error('Impossible de charger les banques')
 		return response.json()
 	},
@@ -81,10 +88,10 @@ const bankService = {
 /**
  * Hook to fetch all banks with their accounts
  */
-export function useBanksQuery() {
+export function useBanksQuery(filters?: BankFilters) {
 	return useQuery({
-		queryKey: bankKeys.list(),
-		queryFn: () => bankService.getAll(),
+		queryKey: [...bankKeys.list(), { filters }],
+		queryFn: () => bankService.getAll(filters),
 	})
 }
 

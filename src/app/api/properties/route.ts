@@ -32,7 +32,39 @@ export async function GET(request: NextRequest) {
 		if (search) filters.search = search;
 
 		const properties = await propertyRepository.getAll(filters);
-		const summary = await propertyRepository.getSummary();
+
+		// Compute summary from filtered properties
+		const byType: Record<string, { count: number; value: number }> = {}
+		const byUsage: Record<string, { count: number; value: number }> = {}
+		let totalValue = 0
+		let totalLoansRemaining = 0
+
+		for (const property of properties) {
+			totalValue += property.currentValue
+
+			const loansRemaining = property.loans?.reduce(
+				(sum: number, loan: { remainingAmount: number }) => sum + loan.remainingAmount,
+				0,
+			) ?? 0
+			totalLoansRemaining += loansRemaining
+
+			if (!byType[property.type]) byType[property.type] = { count: 0, value: 0 }
+			byType[property.type].count++
+			byType[property.type].value += property.currentValue
+
+			if (!byUsage[property.usage]) byUsage[property.usage] = { count: 0, value: 0 }
+			byUsage[property.usage].count++
+			byUsage[property.usage].value += property.currentValue
+		}
+
+		const summary = {
+			totalProperties: properties.length,
+			totalValue,
+			totalLoansRemaining,
+			totalEquity: totalValue - totalLoansRemaining,
+			byType,
+			byUsage,
+		}
 
 		return NextResponse.json({ properties, summary });
 	} catch (error) {

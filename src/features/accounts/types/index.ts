@@ -2,7 +2,7 @@
  * Account domain types
  */
 
-export type AccountType = 'checking' | 'savings' | 'investment' | 'credit';
+export type AccountType = 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'LOAN' | 'PEA' | 'CTO' | 'ASSURANCE_VIE' | 'CRYPTO' | 'REAL_ESTATE' | 'CREDIT';
 
 export interface Account {
 	id: string;
@@ -53,6 +53,7 @@ export interface UpdateAccountInput {
 export interface AccountFilters {
 	type?: AccountType;
 	bankId?: string;
+	memberId?: string;
 	isActive?: boolean;
 	search?: string;
 }

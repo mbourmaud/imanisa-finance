@@ -265,6 +265,8 @@ model Property {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   coOwnership      CoOwnership?
+  diagnostics      PropertyDiagnostic[]
+  documents        PropertyDocument[]
   loans            Loan[]
   insurance        PropertyInsurance?
   propertyMembers  PropertyMember[]
@@ -539,4 +541,53 @@ enum UtilityType {
   WATER
   INTERNET
   OTHER
+}
+
+enum DiagnosticType {
+  DPE
+  AMIANTE
+  TERMITES
+  ELECTRICITE
+  GAZ
+  PLOMB
+  ERP
+  CARREZ
+}
+
+enum DiagnosticStatus {
+  OK
+  WARNING
+  CRITICAL
+  INFO
+}
+
+model PropertyDocument {
+  id          String   @id @default(uuid())
+  propertyId  String
+  name        String
+  storagePath String
+  filename    String
+  fileSize    Int
+  mimeType    String
+  createdAt   DateTime @default(now())
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}
+
+model PropertyDiagnostic {
+  id           String           @id @default(uuid())
+  propertyId   String
+  type         DiagnosticType
+  status       DiagnosticStatus
+  value        String?
+  details      String?
+  date         DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  property     Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, type])
+  @@index([propertyId])
 }

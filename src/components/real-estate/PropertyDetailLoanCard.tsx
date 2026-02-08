@@ -20,6 +20,7 @@ import {
 	Shield,
 	Trash2,
 } from '@/components';
+import { MemberAvatar } from '@/components/members/MemberAvatar';
 
 interface LoanInsurance {
 	id: string;
@@ -27,8 +28,10 @@ interface LoanInsurance {
 	coveragePercent: number;
 	monthlyPremium: number;
 	member: {
+		id: string;
 		name: string;
 		color: string | null;
+		avatarUrl?: string | null;
 	};
 }
 
@@ -85,9 +88,9 @@ export function PropertyDetailLoanCard({
 					<div className="flex items-start gap-2 shrink-0">
 						<div className="text-right">
 							<p className="text-lg font-semibold tabular-nums">
-								{formatCurrency(loan.remainingAmount)}
+								{formatCurrency(loan.initialAmount - loan.remainingAmount)}
 							</p>
-							<p className="text-xs text-muted-foreground">restant</p>
+							<p className="text-xs text-muted-foreground">remboursé</p>
 						</div>
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
@@ -198,16 +201,7 @@ export function PropertyDetailLoanCard({
 											key={insurance.id}
 											className="flex items-center gap-3 p-3 rounded-lg bg-muted/30"
 										>
-											<div
-												className="flex items-center justify-center h-8 w-8 rounded-full text-xs font-medium text-white shrink-0 bg-[var(--member-color)]"
-												style={
-													{
-														'--member-color': insurance.member.color || '#6b7280',
-													} as React.CSSProperties
-												}
-											>
-												{insurance.member.name.charAt(0).toUpperCase()}
-											</div>
+											<MemberAvatar member={insurance.member} size="md" />
 											<div className="flex-1 min-w-0">
 												<div className="flex items-center gap-3 flex-wrap">
 													<p className="text-sm font-medium truncate">{insurance.member.name}</p>

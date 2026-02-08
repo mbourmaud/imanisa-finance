@@ -25,6 +25,10 @@ export {
 } from './loan-repository';
 export { memberRepository } from './member-repository';
 export {
+	type CreatePropertyDocumentDTO,
+	propertyDocumentRepository,
+} from './property-document-repository';
+export {
 	type CreatePropertyInsuranceDTO,
 	propertyInsuranceRepository,
 	type UpdatePropertyInsuranceDTO,

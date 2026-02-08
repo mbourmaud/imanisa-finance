@@ -18,11 +18,6 @@ export type AccountType =
 	| 'CRYPTO'
 	| 'REAL_ESTATE'
 	| 'CREDIT'
-	// Legacy lowercase types
-	| 'checking'
-	| 'savings'
-	| 'investment'
-	| 'credit'
 
 export interface AccountBank {
 	id: string
@@ -35,6 +30,7 @@ export interface AccountMember {
 	id: string
 	name: string
 	color?: string | null
+	avatarUrl?: string | null
 	ownerShare: number
 }
 
@@ -60,11 +56,6 @@ const accountTypeConfig: Record<string, { label: string; labelShort: string; ico
 	CRYPTO: { label: 'Crypto', labelShort: 'Crypto', icon: TrendingUp },
 	REAL_ESTATE: { label: 'Bien immobilier', labelShort: 'Immo', icon: Building },
 	CREDIT: { label: 'Crédit', labelShort: 'Crédit', icon: CreditCard },
-	// Legacy lowercase types
-	checking: { label: 'Compte courant', labelShort: 'Courant', icon: Wallet },
-	savings: { label: 'Livret', labelShort: 'Épargne', icon: PiggyBank },
-	investment: { label: 'Investissement', labelShort: 'Invest', icon: TrendingUp },
-	credit: { label: 'Crédit', labelShort: 'Crédit', icon: CreditCard },
 }
 
 const defaultConfig = { label: 'Compte', labelShort: 'Compte', icon: Wallet }

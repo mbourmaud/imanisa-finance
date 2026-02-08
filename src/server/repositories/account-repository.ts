@@ -17,6 +17,7 @@ export interface AccountWithMembers extends Account {
 			id: string;
 			name: string;
 			color: string | null;
+			avatarUrl: string | null;
 		};
 	}[];
 }
@@ -96,6 +97,7 @@ export const accountRepository = {
 								id: true,
 								name: true,
 								color: true,
+								avatarUrl: true,
 							},
 						},
 					},
@@ -149,6 +151,7 @@ export const accountRepository = {
 								id: true,
 								name: true,
 								color: true,
+								avatarUrl: true,
 							},
 						},
 					},
@@ -203,6 +206,7 @@ export const accountRepository = {
 								id: true,
 								name: true,
 								color: true,
+								avatarUrl: true,
 							},
 						},
 					},
@@ -242,6 +246,7 @@ export const accountRepository = {
 								id: true,
 								name: true,
 								color: true,
+								avatarUrl: true,
 							},
 						},
 					},

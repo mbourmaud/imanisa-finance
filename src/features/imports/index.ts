@@ -9,6 +9,7 @@ export type {
 	ImportFilters,
 	ProcessResult,
 	RawImport,
+	ReprocessPreview,
 	UploadResult,
 } from './hooks/use-imports-query';
 export {

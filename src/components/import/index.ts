@@ -1,5 +1,6 @@
 export { ImportDropZone } from './ImportDropZone';
 export { ImportErrorBanner } from './ImportErrorBanner';
+export { ImportFormatInfo } from './ImportFormatInfo';
 export { ImportHistorySection } from './ImportHistorySection';
 export { ImportRefreshButton } from './ImportRefreshButton';
 export type { ImportData } from './ImportRow';

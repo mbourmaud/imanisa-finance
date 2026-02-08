@@ -52,6 +52,14 @@ export const importKeys = {
 	detail: (id: string) => [...importKeys.all, 'detail', id] as const,
 };
 
+export interface ReprocessPreview {
+	affectedCount: number
+	newCount: number
+	minDate: string
+	maxDate: string
+	accountId: string
+}
+
 /**
  * API service functions
  */
@@ -114,6 +122,17 @@ const importService = {
 		}
 
 		return response.json();
+	},
+
+	async reprocessPreview(importId: string): Promise<ReprocessPreview> {
+		const response = await fetch(`/api/imports/${importId}/reprocess-preview`)
+
+		if (!response.ok) {
+			const data = await response.json()
+			throw new Error(data.error || 'Impossible de charger la prévisualisation')
+		}
+
+		return response.json()
 	},
 
 	async delete(importId: string): Promise<void> {

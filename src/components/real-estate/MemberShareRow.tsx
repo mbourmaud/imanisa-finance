@@ -7,22 +7,23 @@ import {
 	SelectTrigger,
 	SelectValue,
 	X,
-} from '@/components';
+} from '@/components'
+import { MemberAvatar } from '@/components/members/MemberAvatar'
 
 interface Member {
-	id: string;
-	name: string;
-	color: string | null;
+	id: string
+	name: string
+	color: string | null
 }
 
 interface MemberShareRowProps {
-	memberId: string;
-	ownershipShare: number;
-	members: Member[];
-	availableMembers: Member[];
-	onMemberChange: (memberId: string) => void;
-	onShareChange: (share: number) => void;
-	onRemove: () => void;
+	memberId: string
+	ownershipShare: number
+	members: Member[]
+	availableMembers: Member[]
+	onMemberChange: (memberId: string) => void
+	onShareChange: (share: number) => void
+	onRemove: () => void
 }
 
 /**
@@ -37,16 +38,18 @@ export function MemberShareRow({
 	onShareChange,
 	onRemove,
 }: MemberShareRowProps) {
-	const member = members.find((m) => m.id === memberId);
+	const member = members.find((m) => m.id === memberId)
 
 	return (
 		<div className="flex flex-row gap-4 rounded-lg bg-muted/30 p-3">
-			<div
-				className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium text-white bg-[var(--member-color)]"
-				style={{ '--member-color': member?.color || '#6b7280' } as React.CSSProperties}
-			>
-				{member?.name.charAt(0).toUpperCase()}
-			</div>
+			<MemberAvatar
+				member={{
+					id: memberId,
+					name: member?.name ?? '',
+					color: member?.color ?? null,
+				}}
+				size="md"
+			/>
 			<Select value={memberId} onValueChange={onMemberChange}>
 				<SelectTrigger className="flex-1">
 					<SelectValue />
@@ -80,5 +83,5 @@ export function MemberShareRow({
 				<X className="h-4 w-4" />
 			</Button>
 		</div>
-	);
+	)
 }

@@ -97,3 +97,31 @@ export const BANK_TEMPLATES = [
 	// { template: 'boursorama', label: 'Boursorama', parser: 'Boursorama CSV' },
 	// { template: 'bnp', label: 'BNP Paribas', parser: 'BNP CSV' },
 ] as const;
+
+/**
+ * Format info for each parser template
+ * Used client-side to show format expectations to the user
+ */
+export interface ParserFormatInfo {
+	delimiter: string
+	encoding: string
+	columns: string
+}
+
+export const PARSER_FORMAT_INFO: Record<string, ParserFormatInfo> = {
+	credit_mutuel: {
+		delimiter: 'point-virgule (;)',
+		encoding: 'Windows-1252 ou UTF-8',
+		columns: 'Date, Libellé, Débit, Crédit (ou Montant)',
+	},
+	caisse_epargne: {
+		delimiter: 'point-virgule (;)',
+		encoding: 'Windows-1252 ou UTF-8',
+		columns: 'Date comptable, Libellé simplifié, Catégorie, Débit, Crédit',
+	},
+	other: {
+		delimiter: 'auto-détecté (virgule, point-virgule, tabulation)',
+		encoding: 'UTF-8 ou Windows-1252',
+		columns: 'Date, Description/Libellé, Montant (ou Débit/Crédit)',
+	},
+};

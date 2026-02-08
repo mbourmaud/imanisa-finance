@@ -17,12 +17,15 @@ export interface TransactionWithAccount extends Transaction {
 			id: string;
 			name: string;
 			color: string;
+			logo: string | null;
 		};
 		accountMembers: {
 			ownerShare: number;
 			member: {
 				id: string;
 				name: string;
+				color: string | null;
+				avatarUrl: string | null;
 			};
 		}[];
 	};
@@ -65,6 +68,14 @@ export interface TransactionSummary {
 		count: number;
 		percentage: number;
 	}[];
+	internalTransfers: {
+		toSavings: number;
+		toInvestment: number;
+		toLoanRepayment: number;
+		toOther: number;
+		total: number;
+	};
+	savingsRate: number;
 }
 
 export interface ImportResult {
@@ -98,11 +109,19 @@ export const transactionRepository = {
 				account: { accountMembers: { some: { memberId: filters.memberId } } },
 			}),
 			...(filters?.type && { type: filters.type }),
-			...(filters?.categoryId && {
-				transactionCategory: { categoryId: filters.categoryId },
-			}),
-			...(filters?.startDate && { date: { gte: filters.startDate } }),
-			...(filters?.endDate && { date: { lte: filters.endDate } }),
+			...(filters?.categoryId === 'uncategorized'
+				? { transactionCategory: null }
+				: filters?.categoryId
+					? { transactionCategory: { categoryId: filters.categoryId } }
+					: {}),
+			...(filters?.startDate || filters?.endDate
+				? {
+						date: {
+							...(filters?.startDate && { gte: filters.startDate }),
+							...(filters?.endDate && { lte: filters.endDate }),
+						},
+					}
+				: {}),
 			...(filters?.minAmount !== undefined && {
 				amount: { gte: filters.minAmount },
 			}),
@@ -134,6 +153,7 @@ export const transactionRepository = {
 									id: true,
 									name: true,
 									color: true,
+									logo: true,
 								},
 							},
 							accountMembers: {
@@ -143,6 +163,8 @@ export const transactionRepository = {
 										select: {
 											id: true,
 											name: true,
+											color: true,
+											avatarUrl: true,
 										},
 									},
 								},
@@ -195,6 +217,7 @@ export const transactionRepository = {
 								id: true,
 								name: true,
 								color: true,
+								logo: true,
 							},
 						},
 						accountMembers: {
@@ -204,6 +227,8 @@ export const transactionRepository = {
 									select: {
 										id: true,
 										name: true,
+										color: true,
+										avatarUrl: true,
 									},
 								},
 							},
@@ -406,6 +431,16 @@ export const transactionRepository = {
 	},
 
 	/**
+	 * Delete multiple transactions by IDs
+	 */
+	async deleteMany(ids: string[]): Promise<number> {
+		const result = await prisma.transaction.deleteMany({
+			where: { id: { in: ids } },
+		});
+		return result.count;
+	},
+
+	/**
 	 * Delete transactions for an account within a date range
 	 * Used for reprocessing imports
 	 */
@@ -448,37 +483,80 @@ export const transactionRepository = {
 	},
 
 	/**
-	 * Get transaction summary for a period
+	 * Get transaction summary with filters
 	 */
 	async getSummary(
-		startDate?: Date,
-		endDate?: Date,
-		accountId?: string,
+		filters?: TransactionFilters,
 	): Promise<TransactionSummary> {
-		const where: Prisma.TransactionWhereInput = {
-			isInternal: false,
-			...(startDate && { date: { gte: startDate } }),
-			...(endDate && { date: { lte: endDate } }),
-			...(accountId && { accountId }),
+		const dateFilter: Prisma.DateTimeFilter | undefined =
+			filters?.startDate && filters?.endDate
+				? { gte: filters.startDate, lte: filters.endDate }
+				: filters?.startDate
+					? { gte: filters.startDate }
+					: filters?.endDate
+						? { lte: filters.endDate }
+						: undefined;
+
+		const baseFilter: Prisma.TransactionWhereInput = {
+			...(filters?.accountId && { accountId: filters.accountId }),
+			...(filters?.memberId && {
+				account: { accountMembers: { some: { memberId: filters.memberId } } },
+			}),
+			...(filters?.type && { type: filters.type }),
+			...(filters?.categoryId === 'uncategorized'
+				? { transactionCategory: null }
+				: filters?.categoryId
+					? { transactionCategory: { categoryId: filters.categoryId } }
+					: {}),
+			...(dateFilter && { date: dateFilter }),
+			...(filters?.search && {
+				description: { contains: filters.search, mode: 'insensitive' },
+			}),
 		};
 
-		const transactions = await prisma.transaction.findMany({
-			where,
-			include: {
-				transactionCategory: {
-					include: {
-						category: {
-							select: {
-								id: true,
-								name: true,
-								icon: true,
-								color: true,
+		// Pass 1: Non-internal transactions (income/expenses/categories)
+		const nonInternalWhere: Prisma.TransactionWhereInput = {
+			isInternal: false,
+			...baseFilter,
+		};
+
+		// Pass 2: Internal transactions (transfers between accounts)
+		const internalWhere: Prisma.TransactionWhereInput = {
+			isInternal: true,
+			...baseFilter,
+		};
+
+		const [transactions, internalTx] = await Promise.all([
+			prisma.transaction.findMany({
+				where: nonInternalWhere,
+				include: {
+					transactionCategory: {
+						include: {
+							category: {
+								select: {
+									id: true,
+									name: true,
+									icon: true,
+									color: true,
+								},
 							},
 						},
 					},
 				},
-			},
-		});
+			}),
+			prisma.transaction.findMany({
+				where: internalWhere,
+				include: {
+					transactionCategory: {
+						include: {
+							category: {
+								select: { id: true },
+							},
+						},
+					},
+				},
+			}),
+		]);
 
 		let totalIncome = 0;
 		let totalExpenses = 0;
@@ -488,10 +566,10 @@ export const transactionRepository = {
 		>();
 
 		for (const tx of transactions) {
-			if (tx.amount > 0) {
+			if (tx.type === 'INCOME') {
 				totalIncome += tx.amount;
 			} else {
-				totalExpenses += Math.abs(tx.amount);
+				totalExpenses += tx.amount;
 			}
 
 			if (tx.transactionCategory?.category) {
@@ -505,7 +583,7 @@ export const transactionRepository = {
 				};
 				categoryMap.set(cat.id, {
 					...existing,
-					amount: existing.amount + Math.abs(tx.amount),
+					amount: existing.amount + tx.amount,
 					count: existing.count + 1,
 				});
 			}
@@ -521,12 +599,42 @@ export const transactionRepository = {
 			percentage: totalExpenses > 0 ? (data.amount / totalExpenses) * 100 : 0,
 		}));
 
+		// Compute internal transfers breakdown
+		let toSavings = 0;
+		let toInvestment = 0;
+		let toLoanRepayment = 0;
+		let toOther = 0;
+
+		for (const tx of internalTx) {
+			// Outgoing transfers (EXPENSE type = money leaving account)
+			if (tx.type === 'EXPENSE') {
+				const catId = tx.transactionCategory?.category?.id;
+				const amount = tx.amount;
+				if (catId === 'cat-savings') toSavings += amount;
+				else if (catId === 'cat-investment') toInvestment += amount;
+				else if (catId === 'cat-loan-payment') toLoanRepayment += amount;
+				else toOther += amount;
+			}
+		}
+
+		const transfersTotal = toSavings + toInvestment + toLoanRepayment + toOther;
+		const savingsRate =
+			totalIncome > 0 ? ((toSavings + toInvestment) / totalIncome) * 100 : 0;
+
 		return {
 			totalIncome,
 			totalExpenses,
 			netFlow: totalIncome - totalExpenses,
 			transactionCount: transactions.length,
 			byCategory: byCategory.sort((a, b) => b.amount - a.amount),
+			internalTransfers: {
+				toSavings,
+				toInvestment,
+				toLoanRepayment,
+				toOther,
+				total: transfersTotal,
+			},
+			savingsRate,
 		};
 	},
 

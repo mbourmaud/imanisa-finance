@@ -5,6 +5,7 @@ interface AccountMember {
 	name: string;
 	ownerShare: number;
 	color?: string | null;
+	avatarUrl?: string | null;
 }
 
 interface Account {
@@ -29,6 +30,7 @@ export function BankAccountsList({ accounts }: BankAccountsListProps) {
 					id: m.id,
 					name: m.name,
 					color: m.color || undefined,
+					avatarUrl: m.avatarUrl || undefined,
 				}));
 
 				return (

@@ -3,13 +3,15 @@
 import { useCallback, useState } from 'react'
 
 import { useMembersQuery } from '@/features/members'
+import { useSelectedMemberId } from '@/shared/hooks'
 import { useBanksQuery, useInvalidateBanks } from './use-banks-query'
 import type { Bank } from './use-banks-query'
 
 export type { Bank }
 
 export function useBanksPage() {
-	const banksQuery = useBanksQuery()
+	const memberId = useSelectedMemberId()
+	const banksQuery = useBanksQuery(memberId ? { memberId } : undefined)
 	const membersQuery = useMembersQuery()
 	const invalidateBanks = useInvalidateBanks()
 

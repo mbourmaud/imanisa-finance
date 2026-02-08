@@ -133,7 +133,7 @@ export const TransactionRow = forwardRef<HTMLDivElement, TransactionRowProps>(
 						<div className="flex items-center gap-2 text-xs text-muted-foreground">
 							{showCategory && transaction.category && (
 								<>
-									<span>{transaction.category.name}</span>
+									<CategoryBadge category={transaction.category} size="sm" />
 									{showAccount && transaction.accountName && <span>·</span>}
 								</>
 							)}

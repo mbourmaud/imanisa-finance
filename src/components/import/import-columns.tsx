@@ -7,6 +7,7 @@
  */
 
 import type { ColumnDef } from '@tanstack/react-table';
+import Link from 'next/link';
 import {
 	AlertCircle,
 	Badge,
@@ -17,6 +18,7 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
+	Eye,
 	FileSpreadsheet,
 	Loader2,
 	MoreHorizontal,
@@ -231,6 +233,14 @@ export function createImportColumns(options: ImportColumnsOptions): ColumnDef<Im
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
+							{imp.status === 'PROCESSED' && imp.account && (
+								<DropdownMenuItem asChild>
+									<Link href={`/dashboard/transactions?accountId=${imp.account.id}`}>
+										<Eye className="mr-2 h-4 w-4" />
+										Voir les transactions
+									</Link>
+								</DropdownMenuItem>
+							)}
 							{imp.status === 'PENDING' && (
 								<DropdownMenuItem onClick={() => options.onProcess(imp.id, imp.account?.id)}>
 									<RefreshCw className="mr-2 h-4 w-4" />

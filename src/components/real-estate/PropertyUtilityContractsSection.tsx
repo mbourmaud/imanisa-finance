@@ -26,6 +26,7 @@ import type {
 	UtilityContract as PropertyUtilityContract,
 	UtilityType,
 } from '@/features/properties';
+import { formatMoneyCompact } from '@/shared/utils';
 
 interface PropertyUtilityContractsSectionProps {
 	contracts: PropertyUtilityContract[];
@@ -33,14 +34,6 @@ interface PropertyUtilityContractsSectionProps {
 	onEditContract: (contract: PropertyUtilityContract) => void;
 	onDeleteContract: (contractId: string) => void;
 	deletingContractId: string | null;
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
 }
 
 function getUtilityTypeLabel(type: UtilityType): string {
@@ -119,7 +112,7 @@ export function PropertyUtilityContractsSection({
 						</div>
 						<div className="flex flex-col items-center">
 							<p className="text-xs text-muted-foreground">Total mensuel</p>
-							<p className="text-lg font-semibold tabular-nums">{formatCurrency(totalMonthly)}</p>
+							<p className="text-lg font-semibold tabular-nums">{formatMoneyCompact(totalMonthly)}</p>
 						</div>
 					</div>
 					<div className="flex flex-col gap-3">
@@ -140,9 +133,9 @@ export function PropertyUtilityContractsSection({
 													</span>
 												</div>
 												<p className="text-sm text-muted-foreground tabular-nums">
-													{formatCurrency(contract.monthlyAmount)}/mois
+													{formatMoneyCompact(contract.monthlyAmount)}/mois
 													<span className="text-xs ml-1">
-														({formatCurrency(contract.monthlyAmount * 12)}/an)
+														({formatMoneyCompact(contract.monthlyAmount * 12)}/an)
 													</span>
 												</p>
 											</div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, Users } from '@/components';
+import { MemberAvatar } from '@/components/members/MemberAvatar';
 
 interface PropertyMemberInfo {
 	id: string;
@@ -10,6 +11,7 @@ interface PropertyMemberInfo {
 		id: string;
 		name: string;
 		color: string | null;
+		avatarUrl?: string | null;
 	};
 }
 
@@ -31,12 +33,7 @@ export function PropertyOwnersSection({ propertyMembers }: PropertyOwnersSection
 					<div className="flex flex-wrap gap-3">
 						{propertyMembers.map((pm) => (
 							<div key={pm.id} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-muted/30">
-								<div
-									className="flex items-center justify-center shrink-0 h-10 w-10 rounded-full text-sm font-medium text-white bg-[var(--member-color)]"
-									style={{ '--member-color': pm.member.color || '#6b7280' } as React.CSSProperties}
-								>
-									{pm.member.name.charAt(0).toUpperCase()}
-								</div>
+								<MemberAvatar member={pm.member} size="lg" />
 								<div className="flex flex-col">
 									<p className="font-medium">{pm.member.name}</p>
 									<p className="text-sm text-muted-foreground">{pm.ownershipShare}%</p>

@@ -1,14 +1,15 @@
-'use client';
+'use client'
 
-import { Button, Loader2, X } from '@/components';
+import { Button, Loader2, X } from '@/components'
+import { MemberAvatar } from '@/components/members/MemberAvatar'
 
 interface MemberChipProps {
-	memberId: string;
-	memberName: string;
-	memberColor: string | null;
-	isRemoving?: boolean;
-	onRemove: () => void;
-	disabled?: boolean;
+	memberId: string
+	memberName: string
+	memberColor: string | null
+	isRemoving?: boolean
+	onRemove: () => void
+	disabled?: boolean
 }
 
 /**
@@ -28,16 +29,16 @@ export function MemberChip({
 				isRemoving ? 'opacity-50' : ''
 			}`}
 		>
-			<div
-				className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-medium bg-[var(--member-color)]"
-				style={{ '--member-color': memberColor || '#6b7280' } as React.CSSProperties}
-			>
-				{isRemoving ? (
+			{isRemoving ? (
+				<div className="flex items-center justify-center h-5 w-5 rounded-full bg-muted">
 					<Loader2 className="h-3 w-3 animate-spin" />
-				) : (
-					memberName.charAt(0).toUpperCase()
-				)}
-			</div>
+				</div>
+			) : (
+				<MemberAvatar
+					member={{ id: memberId, name: memberName, color: memberColor }}
+					size="xs"
+				/>
+			)}
 			<span className="font-medium">{memberName}</span>
 			<Button
 				variant="ghost"
@@ -49,5 +50,5 @@ export function MemberChip({
 				<X className="h-3 w-3" />
 			</Button>
 		</div>
-	);
+	)
 }

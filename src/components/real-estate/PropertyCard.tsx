@@ -38,7 +38,7 @@ export function PropertyCard({ property, formatCurrency }: PropertyCardProps) {
 	const isRentalProperty = property.usage === 'RENTAL';
 
 	return (
-		<Card padding="lg" className="overflow-hidden">
+		<Card padding="lg" className="group overflow-hidden">
 			<div className="flex flex-col gap-4">
 				{/* Header */}
 				<div className="flex flex-row justify-between">

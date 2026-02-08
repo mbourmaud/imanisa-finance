@@ -1,10 +1,11 @@
-'use client';
+'use client'
 
-import { useMemo } from 'react';
-import type { LucideIcon } from 'lucide-react';
-import { CreditCard, PiggyBank, TrendingUp, Wallet } from 'lucide-react';
-import { useAccountsQuery } from '@/features/accounts';
-import { formatMoneyCompact } from '@/shared/utils';
+import { useMemo } from 'react'
+import type { LucideIcon } from 'lucide-react'
+import { CreditCard, PiggyBank, TrendingUp, Wallet } from 'lucide-react'
+import { useAccountsQuery } from '@/features/accounts'
+import { useSelectedMemberId } from '@/shared/hooks'
+import { formatMoneyCompact } from '@/shared/utils'
 
 interface ApiAccount {
 	id: string;
@@ -36,22 +37,19 @@ const accountTypeConfig: Record<string, { label: string; icon: LucideIcon }> = {
 	SAVINGS: { label: 'Épargne', icon: PiggyBank },
 	INVESTMENT: { label: 'Investissements', icon: TrendingUp },
 	LOAN: { label: 'Crédits', icon: CreditCard },
-	checking: { label: 'Comptes courants', icon: Wallet },
-	savings: { label: 'Épargne', icon: PiggyBank },
-	investment: { label: 'Investissements', icon: TrendingUp },
-	credit: { label: 'Crédits', icon: CreditCard },
 };
 
 function getOwnerShare(account: ApiAccount): number {
-	return account.accountMembers?.[0]?.ownerShare ?? 100;
+	return account.accountMembers?.reduce((sum, m) => sum + (m.ownerShare ?? 0), 0) ?? 100;
 }
 
 export function useAccountsPage() {
+	const memberId = useSelectedMemberId()
 	const {
 		data: accounts = [],
 		isLoading,
 		isError,
-	} = useAccountsQuery() as {
+	} = useAccountsQuery(memberId ? { memberId } : undefined) as {
 		data: ApiAccount[] | undefined;
 		isLoading: boolean;
 		isError: boolean;
@@ -91,17 +89,17 @@ export function useAccountsPage() {
 
 	// Calculate totals by type for stat cards
 	const checkingTotal = useMemo(() => {
-		const checkingAccounts = accountsByType.CHECKING || accountsByType.checking || [];
+		const checkingAccounts = accountsByType.CHECKING || [];
 		return checkingAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
 	}, [accountsByType]);
 
 	const savingsTotal = useMemo(() => {
-		const savingsAccounts = accountsByType.SAVINGS || accountsByType.savings || [];
+		const savingsAccounts = accountsByType.SAVINGS || [];
 		return savingsAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
 	}, [accountsByType]);
 
 	const investmentTotal = useMemo(() => {
-		const investmentAccounts = accountsByType.INVESTMENT || accountsByType.investment || [];
+		const investmentAccounts = accountsByType.INVESTMENT || [];
 		return investmentAccounts.reduce((s, a) => s + a.balance * (getOwnerShare(a) / 100), 0);
 	}, [accountsByType]);
 

@@ -2,6 +2,7 @@
 
 import { Card, Home } from '@/components';
 import type { PropertyUsage } from '@/features/properties';
+import { formatDate, formatMoneyCompact } from '@/shared/utils';
 
 interface PropertyInfoSectionProps {
 	surface: number;
@@ -16,22 +17,6 @@ interface PropertyInfoSectionProps {
 	rentCharges: number | null;
 	usage: PropertyUsage;
 	notes: string | null;
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
-}
-
-function formatDate(dateString: string): string {
-	return new Date(dateString).toLocaleDateString('fr-FR', {
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric',
-	});
 }
 
 function DetailItem({
@@ -57,7 +42,7 @@ function CurrencyItem({ label, value }: { label: string; value: number | null | 
 	return (
 		<div className="flex flex-col">
 			<p className="text-xs text-muted-foreground">{label}</p>
-			<p className="font-medium tabular-nums">{formatCurrency(value)}</p>
+			<p className="font-medium tabular-nums">{formatMoneyCompact(value)}</p>
 		</div>
 	);
 }
@@ -104,7 +89,7 @@ export function PropertyInfoSection({
 							<CurrencyItem label="Prix d'achat" value={purchasePrice} />
 							<CurrencyItem label="Frais de notaire" value={notaryFees} />
 							<CurrencyItem label="Frais d'agence" value={agencyFees} />
-							<DetailItem label="Date d'achat" value={formatDate(purchaseDate)} />
+							<DetailItem label="Date d'achat" value={formatDate(purchaseDate, 'D MMMM YYYY')} />
 						</div>
 					</div>
 					<div className="flex flex-col gap-3">

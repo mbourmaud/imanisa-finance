@@ -1,18 +1,20 @@
 'use client';
 
+import { useForm } from '@tanstack/react-form';
 import { useQuery } from '@tanstack/react-query';
 import { useStore } from '@tanstack/react-store';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { PARSER_FORMAT_INFO, type ParserFormatInfo } from '@/features/import';
 import {
 	importFormSchema,
+	type ReprocessPreview,
 	useDeleteImportMutation,
 	useImportsQuery,
 	useProcessImportMutation,
 	useReprocessImportMutation,
 	useUploadImportMutation,
 } from '@/features/imports';
-import { useAppForm } from '@/lib/forms';
 
 interface Bank {
 	id: string;
@@ -25,12 +27,16 @@ interface Bank {
 		bankId: string;
 		type: string;
 		balance: number;
+		exportUrl: string | null;
 	}[];
 }
 
 export function useImportPage() {
 	const [dragActive, setDragActive] = useState(false);
 	const [deleteImportId, setDeleteImportId] = useState<string | null>(null);
+	const [reprocessPreview, setReprocessPreview] = useState<ReprocessPreview | null>(null);
+	const [reprocessImportId, setReprocessImportId] = useState<string | null>(null);
+	const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
 	// Queries
 	const {
@@ -51,7 +57,7 @@ export function useImportPage() {
 	const banks = banksData?.banks ?? [];
 
 	// Form
-	const form = useAppForm({
+	const form = useForm({
 		defaultValues: {
 			bankId: '',
 			accountId: '',
@@ -72,6 +78,19 @@ export function useImportPage() {
 	}, [selectedBankId, banks]);
 
 	const selectedBank = banks.find((b) => b.id === selectedBankId);
+
+	// Selected account (for exportUrl)
+	const selectedAccount = useMemo(() => {
+		if (!selectedAccountId) return null;
+		return filteredAccounts.find((a) => a.id === selectedAccountId) ?? null;
+	}, [selectedAccountId, filteredAccounts]);
+
+	// Format info for the selected bank's parser
+	const selectedFormatInfo: ParserFormatInfo | null = useMemo(() => {
+		if (!selectedBank) return null;
+		const template = selectedBank.template || 'other';
+		return PARSER_FORMAT_INFO[template] ?? PARSER_FORMAT_INFO.other ?? null;
+	}, [selectedBank]);
 
 	// Mutations
 	const uploadMutation = useUploadImportMutation();
@@ -193,17 +212,47 @@ export function useImportPage() {
 	);
 
 	const handleReprocess = useCallback(
-		async (importId: string, accountId?: string) => {
-			if (!accountId) return;
+		async (importId: string, _accountId?: string) => {
+			setIsLoadingPreview(true);
 			try {
-				await reprocessMutation.mutateAsync({ importId, accountId });
-				toast.success('Import retraité avec succès');
+				const response = await fetch(`/api/imports/${importId}/reprocess-preview`);
+				if (!response.ok) {
+					const data = await response.json();
+					toast.error(data.error || 'Impossible de préparer le retraitement');
+					return;
+				}
+				const preview: ReprocessPreview = await response.json();
+				setReprocessPreview(preview);
+				setReprocessImportId(importId);
 			} catch (err) {
-				toast.error(err instanceof Error ? err.message : 'Échec du retraitement');
+				toast.error(err instanceof Error ? err.message : 'Échec de la prévisualisation');
+			} finally {
+				setIsLoadingPreview(false);
 			}
 		},
-		[reprocessMutation],
+		[],
 	);
+
+	const confirmReprocess = useCallback(async () => {
+		if (!reprocessImportId || !reprocessPreview) return;
+		try {
+			await reprocessMutation.mutateAsync({
+				importId: reprocessImportId,
+				accountId: reprocessPreview.accountId,
+			});
+			toast.success('Import retraité avec succès');
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Échec du retraitement');
+		} finally {
+			setReprocessPreview(null);
+			setReprocessImportId(null);
+		}
+	}, [reprocessImportId, reprocessPreview, reprocessMutation]);
+
+	const cancelReprocess = useCallback(() => {
+		setReprocessPreview(null);
+		setReprocessImportId(null);
+	}, []);
 
 	const confirmDeleteImport = useCallback(async () => {
 		if (!deleteImportId) return;
@@ -260,6 +309,8 @@ export function useImportPage() {
 		noBanksHelpText,
 		noAccountsHelpText,
 		accountPlaceholder,
+		selectedFormatInfo,
+		selectedAccountExportUrl: selectedAccount?.exportUrl ?? null,
 
 		// State
 		isLoading,
@@ -291,5 +342,12 @@ export function useImportPage() {
 
 		// Computed
 		isDeleteDialogOpen: deleteImportId !== null,
+
+		// Reprocess preview
+		reprocessPreview,
+		isLoadingPreview,
+		isReprocessDialogOpen: reprocessPreview !== null,
+		confirmReprocess,
+		cancelReprocess,
 	};
 }

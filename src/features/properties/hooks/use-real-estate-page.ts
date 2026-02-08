@@ -1,20 +1,23 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useMembersQuery } from '@/features/members/hooks/use-members-query';
-import { usePropertiesQuery } from '..';
+import { useState } from 'react'
+import { useMembersQuery } from '@/features/members/hooks/use-members-query'
+import { useSelectedMemberId } from '@/shared/hooks'
+import { usePropertiesQuery } from '..'
 
 export function useRealEstatePage() {
-	// TanStack Query hooks
-	const { data, isLoading, isError, error } = usePropertiesQuery();
-	const { data: members = [] } = useMembersQuery();
+	const memberId = useSelectedMemberId()
+	const { data, isLoading, isError, error, refetch } = usePropertiesQuery(
+		memberId ? { memberId } : undefined,
+	)
+	const { data: members = [] } = useMembersQuery()
 
 	// Dialog state
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [isDialogOpen, setIsDialogOpen] = useState(false)
 
 	// Derived data from query
-	const properties = data?.properties ?? [];
-	const summary = data?.summary ?? null;
+	const properties = data?.properties ?? []
+	const summary = data?.summary ?? null
 
 	return {
 		// Query state
@@ -23,6 +26,7 @@ export function useRealEstatePage() {
 		isLoading,
 		isError,
 		error,
+		refetch,
 
 		// Members
 		members,
@@ -30,5 +34,5 @@ export function useRealEstatePage() {
 		// Dialog state
 		isDialogOpen,
 		setIsDialogOpen,
-	};
+	}
 }

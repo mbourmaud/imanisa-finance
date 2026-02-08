@@ -19,6 +19,7 @@ import {
 	Plus,
 	Trash2,
 } from '@/components';
+import { formatMoneyCompact } from '@/shared/utils';
 
 interface CoOwnership {
 	id: string;
@@ -34,14 +35,6 @@ interface PropertyCoOwnershipSectionProps {
 	onEdit: () => void;
 	onDelete: () => void;
 	isDeleting: boolean;
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
 }
 
 export function PropertyCoOwnershipSection({
@@ -120,13 +113,13 @@ export function PropertyCoOwnershipSection({
 						<div className="flex flex-col">
 							<p className="text-xs text-muted-foreground">Charges trimestrielles</p>
 							<p className="font-medium tabular-nums">
-								{formatCurrency(coOwnership.quarterlyAmount)}
+								{formatMoneyCompact(coOwnership.quarterlyAmount)}
 							</p>
 						</div>
 						<div className="flex flex-col">
 							<p className="text-xs text-muted-foreground">Charges annuelles</p>
 							<p className="font-medium tabular-nums">
-								{formatCurrency(coOwnership.quarterlyAmount * 4)}
+								{formatMoneyCompact(coOwnership.quarterlyAmount * 4)}
 							</p>
 						</div>
 					</div>

@@ -6,10 +6,11 @@
 
 export {
 	BANK_TEMPLATES,
+	PARSER_FORMAT_INFO,
 	getAllParsers,
 	getParser,
 	getParserInfo,
 	parseImport,
 } from './parsers';
 
-export type { ParsedPosition, ParsedTransaction, ParseResult, Parser } from './parsers';
+export type { ParsedPosition, ParsedTransaction, ParserFormatInfo, ParseResult, Parser } from './parsers';

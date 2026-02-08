@@ -602,13 +602,8 @@ export function usePropertyDetailPage(propertyId: string) {
 			isDeleting: isDeletingProperty,
 			onDelete: handleDeleteProperty,
 		},
+
 	};
 }
 
-export function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
-}
+export { formatMoneyCompact as formatCurrency } from '@/shared/utils'

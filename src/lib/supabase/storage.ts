@@ -7,6 +7,7 @@ import { createClient } from './server';
 
 const IMPORTS_BUCKET = 'imports';
 const BANK_LOGOS_BUCKET = 'bank-logos';
+const PROPERTY_DOCUMENTS_BUCKET = 'property-documents';
 
 export interface UploadResult {
 	path: string;
@@ -349,4 +350,124 @@ export async function getBankLogoPublicUrl(path: string): Promise<string> {
 	const supabase = await createClient();
 	const { data } = supabase.storage.from(BANK_LOGOS_BUCKET).getPublicUrl(path);
 	return data.publicUrl;
+}
+
+// ============================================================================
+// Property Document Storage Functions
+// ============================================================================
+
+const ALLOWED_DOCUMENT_TYPES = [
+	'application/pdf',
+	'image/png',
+	'image/jpeg',
+	'image/jpg',
+	'image/webp',
+];
+const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024; // 20MB
+
+export interface DocumentValidationResult {
+	valid: boolean;
+	error: string | null;
+}
+
+/**
+ * Validate a property document file
+ */
+export function validateDocumentFile(fileSize: number, mimeType: string): DocumentValidationResult {
+	if (!ALLOWED_DOCUMENT_TYPES.includes(mimeType)) {
+		return {
+			valid: false,
+			error: `Type de fichier non supporté. Formats acceptés : PDF, PNG, JPG, WEBP.`,
+		};
+	}
+
+	if (fileSize > MAX_DOCUMENT_SIZE) {
+		return {
+			valid: false,
+			error: `Fichier trop volumineux. Taille maximale : 20 Mo. Taille du fichier : ${(fileSize / (1024 * 1024)).toFixed(1)} Mo.`,
+		};
+	}
+
+	return { valid: true, error: null };
+}
+
+/**
+ * Upload a property document to Supabase Storage
+ */
+export async function uploadPropertyDocument(
+	propertyId: string,
+	file: File | Buffer,
+	filename: string,
+): Promise<UploadResult> {
+	try {
+		const supabase = await createClient();
+		const timestamp = Date.now();
+		const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+		const path = `${propertyId}/${timestamp}_${sanitizedFilename}`;
+
+		const { error } = await supabase.storage
+			.from(PROPERTY_DOCUMENTS_BUCKET)
+			.upload(path, file, {
+				cacheControl: '3600',
+				upsert: false,
+			});
+
+		if (error) {
+			console.error('[Storage] Property document upload error:', error);
+			return { path: '', error: new Error(error.message) };
+		}
+
+		return { path, error: null };
+	} catch (err) {
+		console.error('[Storage] Property document upload exception:', err);
+		return { path: '', error: err instanceof Error ? err : new Error('Upload failed') };
+	}
+}
+
+/**
+ * Delete a property document from Supabase Storage
+ */
+export async function deletePropertyDocument(path: string): Promise<DeleteResult> {
+	try {
+		const supabase = await createClient();
+
+		const { error } = await supabase.storage
+			.from(PROPERTY_DOCUMENTS_BUCKET)
+			.remove([path]);
+
+		if (error) {
+			return { error: new Error(error.message) };
+		}
+
+		return { error: null };
+	} catch (err) {
+		return { error: err instanceof Error ? err : new Error('Delete failed') };
+	}
+}
+
+/**
+ * Get a signed URL for downloading a property document
+ */
+export async function getPropertyDocumentSignedUrl(
+	path: string,
+	expiresIn: number = 3600,
+): Promise<{ url: string | null; error: Error | null }> {
+	try {
+		const supabase = await createClient();
+
+		const { data, error } = await supabase.storage
+			.from(PROPERTY_DOCUMENTS_BUCKET)
+			.createSignedUrl(path, expiresIn);
+
+		if (error) {
+			return { url: null, error: new Error(error.message) };
+		}
+
+		return { url: data.signedUrl, error: null };
+	} catch (err) {
+		return {
+			url: null,
+			error: err instanceof Error ? err : new Error('Failed to create signed URL'),
+		};
+	}
 }

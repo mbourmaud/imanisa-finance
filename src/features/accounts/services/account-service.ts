@@ -21,6 +21,7 @@ export const accountService = {
 		const params = new URLSearchParams();
 		if (filters?.type) params.set('type', filters.type);
 		if (filters?.bankId) params.set('bankId', filters.bankId);
+		if (filters?.memberId) params.set('memberId', filters.memberId);
 		if (filters?.isActive !== undefined) params.set('isActive', String(filters.isActive));
 		if (filters?.search) params.set('search', filters.search);
 
@@ -33,7 +34,12 @@ export const accountService = {
 
 		const data = await response.json();
 		// API returns { accounts, summary } - extract accounts array
-		return data.accounts ?? data;
+		const accounts: Account[] = data.accounts ?? data;
+		// Normalize type to uppercase (Prisma enum standard)
+		return accounts.map((account) => ({
+			...account,
+			type: account.type.toUpperCase() as Account['type'],
+		}));
 	},
 
 	/**
@@ -46,7 +52,11 @@ export const accountService = {
 			throw new Error('Failed to fetch account');
 		}
 
-		return response.json();
+		const account: Account = await response.json();
+		return {
+			...account,
+			type: account.type.toUpperCase() as Account['type'],
+		};
 	},
 
 	/**

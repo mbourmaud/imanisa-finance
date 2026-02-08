@@ -30,6 +30,8 @@ export { PropertyDeleteSheet } from './PropertyDeleteSheet';
 // PROPERTY DETAIL COMPONENTS
 // =============================================================================
 
+export { PropertyDiagnosticsSection } from './PropertyDiagnosticsSection';
+export { PropertyDocumentsSection } from './PropertyDocumentsSection';
 export { PropertyDetailLoanCard } from './PropertyDetailLoanCard';
 export { PropertyDetailHeader } from './PropertyDetailHeader';
 export { PropertyStatsSummary } from './PropertyStatsSummary';

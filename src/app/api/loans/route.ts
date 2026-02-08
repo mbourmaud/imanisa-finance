@@ -17,24 +17,30 @@ export async function GET(request: Request) {
 			search: searchParams.get('search') || undefined,
 		};
 
-		// Get loans with details
+		// Get loans with details (already filtered by memberId/propertyId)
 		const loans = await loanRepository.getAll(filters);
 
-		// Get summary statistics
-		const summary = await loanRepository.getSummary(filters.propertyId);
+		// Compute summary from filtered loans
+		const totalRemaining = loans.reduce((sum, l) => sum + l.remainingAmount, 0)
+		const totalMonthlyPayment = loans.reduce((sum, l) => sum + l.monthlyPayment, 0)
+		const averageRate = loans.length > 0
+			? Math.round((loans.reduce((sum, l) => sum + l.rate, 0) / loans.length) * 100) / 100
+			: 0
 
-		// Calculate total insurance from all loan insurances
-		let totalInsurance = 0;
+		let totalInsurance = 0
 		for (const loan of loans) {
 			for (const insurance of loan.loanInsurances) {
-				totalInsurance += insurance.monthlyPremium;
+				totalInsurance += insurance.monthlyPremium
 			}
 		}
 
 		return NextResponse.json({
 			loans,
 			summary: {
-				...summary,
+				totalLoans: loans.length,
+				totalRemaining,
+				totalMonthlyPayment,
+				averageRate,
 				totalInsurance,
 			},
 		});

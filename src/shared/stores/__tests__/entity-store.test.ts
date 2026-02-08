@@ -1,118 +1,98 @@
-import { act } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useEntityStore } from '../entity-store';
-
-// Mock demo entities
-vi.mock('@/lib/demo', () => ({
-	demoEntities: [
-		{ id: 'entity-all', name: 'Famille', type: 'family', ownerIds: ['owner-1', 'owner-2'] },
-		{ id: 'entity-1', name: 'Alice', type: 'individual', ownerIds: ['owner-1'] },
-		{ id: 'entity-2', name: 'Bob', type: 'individual', ownerIds: ['owner-2'] },
-	],
-}));
+import { act } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { useEntityStore } from '../entity-store'
 
 describe('useEntityStore', () => {
 	beforeEach(() => {
 		// Reset store state between tests
 		useEntityStore.setState({
-			selectedEntityId: 'entity-all',
-		});
-	});
+			entities: [
+				{ id: 'family', name: 'Famille', type: 'family', memberIds: ['member-1', 'member-2'] },
+				{ id: 'member-member-1', name: 'Alice', type: 'individual', memberIds: ['member-1'] },
+				{ id: 'member-member-2', name: 'Bob', type: 'individual', memberIds: ['member-2'] },
+			],
+			selectedEntityId: 'family',
+		})
+	})
 
 	describe('initial state', () => {
 		it('should have default entity selected', () => {
-			expect(useEntityStore.getState().selectedEntityId).toBe('entity-all');
-		});
-
-		it('should have entities from demo', () => {
-			expect(useEntityStore.getState().entities).toHaveLength(3);
-		});
-	});
+			expect(useEntityStore.getState().selectedEntityId).toBe('family')
+		})
+	})
 
 	describe('setSelectedEntity', () => {
 		it('should update selected entity ID', () => {
-			const { setSelectedEntity } = useEntityStore.getState();
+			const { setSelectedEntity } = useEntityStore.getState()
 
 			act(() => {
-				setSelectedEntity('entity-1');
-			});
+				setSelectedEntity('member-member-1')
+			})
 
-			expect(useEntityStore.getState().selectedEntityId).toBe('entity-1');
-		});
-	});
+			expect(useEntityStore.getState().selectedEntityId).toBe('member-member-1')
+		})
+	})
 
-	describe('selectedEntity computed', () => {
-		it('should return the selected entity object', () => {
-			const state = useEntityStore.getState();
-			expect(state.selectedEntity).toEqual({
-				id: 'entity-all',
-				name: 'Famille',
-				type: 'family',
-				ownerIds: ['owner-1', 'owner-2'],
-			});
-		});
-
-		it('should return null for non-existent entity using getOwnerIds', () => {
-			// Set non-existent entity
-			useEntityStore.setState({ selectedEntityId: 'non-existent' });
-
-			// Verify through getOwnerIds which checks the entity
-			const ownerIds = useEntityStore.getState().getOwnerIds();
-			expect(ownerIds).toEqual([]);
-		});
-
-		it('should find individual entity when selected', () => {
-			// Use setSelectedEntity action
-			useEntityStore.getState().setSelectedEntity('entity-1');
-
-			// Verify the entity was selected
-			expect(useEntityStore.getState().selectedEntityId).toBe('entity-1');
-			// And getOwnerIds reflects it
-			expect(useEntityStore.getState().getOwnerIds()).toEqual(['owner-1']);
-		});
-	});
-
-	describe('getOwnerIds', () => {
-		it('should return owner IDs for family entity', () => {
-			const { getOwnerIds } = useEntityStore.getState();
-			const ownerIds = getOwnerIds();
-
-			expect(ownerIds).toEqual(['owner-1', 'owner-2']);
-		});
-
-		it('should return owner IDs for individual entity', () => {
-			const { setSelectedEntity, getOwnerIds } = useEntityStore.getState();
+	describe('setEntities', () => {
+		it('should update entities and keep selection if valid', () => {
+			const { setEntities } = useEntityStore.getState()
 
 			act(() => {
-				setSelectedEntity('entity-1');
-			});
+				setEntities([
+					{ id: 'family', name: 'Famille', type: 'family', memberIds: ['m-1'] },
+					{ id: 'member-m-1', name: 'Charlie', type: 'individual', memberIds: ['m-1'] },
+				])
+			})
 
-			const ownerIds = getOwnerIds();
-			expect(ownerIds).toEqual(['owner-1']);
-		});
+			expect(useEntityStore.getState().entities).toHaveLength(2)
+			expect(useEntityStore.getState().selectedEntityId).toBe('family')
+		})
 
-		it('should return empty array for non-existent entity', () => {
+		it('should reset to family if current selection becomes invalid', () => {
+			useEntityStore.setState({ selectedEntityId: 'member-old' })
+
 			act(() => {
-				useEntityStore.setState({ selectedEntityId: 'non-existent' });
-			});
+				useEntityStore.getState().setEntities([
+					{ id: 'family', name: 'Famille', type: 'family', memberIds: ['m-1'] },
+					{ id: 'member-m-1', name: 'Charlie', type: 'individual', memberIds: ['m-1'] },
+				])
+			})
 
-			const { getOwnerIds } = useEntityStore.getState();
-			const ownerIds = getOwnerIds();
+			expect(useEntityStore.getState().selectedEntityId).toBe('family')
+		})
+	})
 
-			expect(ownerIds).toEqual([]);
-		});
-	});
+	describe('getSelectedMemberId', () => {
+		it('should return undefined for family entity', () => {
+			const { getSelectedMemberId } = useEntityStore.getState()
+			expect(getSelectedMemberId()).toBeUndefined()
+		})
+
+		it('should return member ID for individual entity', () => {
+			const { setSelectedEntity, getSelectedMemberId } = useEntityStore.getState()
+
+			act(() => {
+				setSelectedEntity('member-member-1')
+			})
+
+			expect(useEntityStore.getState().getSelectedMemberId()).toBe('member-1')
+		})
+
+		it('should return undefined for non-existent entity', () => {
+			useEntityStore.setState({ selectedEntityId: 'non-existent' })
+			expect(useEntityStore.getState().getSelectedMemberId()).toBeUndefined()
+		})
+	})
 
 	describe('persistence', () => {
 		it('should persist selectedEntityId', () => {
-			const { setSelectedEntity } = useEntityStore.getState();
+			const { setSelectedEntity } = useEntityStore.getState()
 
 			act(() => {
-				setSelectedEntity('entity-2');
-			});
+				setSelectedEntity('member-member-2')
+			})
 
-			// Verify the state changed
-			expect(useEntityStore.getState().selectedEntityId).toBe('entity-2');
-		});
-	});
-});
+			expect(useEntityStore.getState().selectedEntityId).toBe('member-member-2')
+		})
+	})
+})

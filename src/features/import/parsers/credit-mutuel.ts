@@ -4,6 +4,7 @@
  */
 
 import type { ParsedTransaction, ParseResult, Parser } from './types';
+import { decodeCsvBuffer } from './decode-csv';
 
 /**
  * Parse a CSV line handling quoted fields
@@ -76,9 +77,9 @@ export const creditMutuelParser: Parser = {
 		const transactions: ParsedTransaction[] = [];
 
 		try {
-			// Convert ArrayBuffer to string if needed
+			// Convert ArrayBuffer to string with auto-detected encoding
 			const text =
-				typeof content === 'string' ? content : new TextDecoder('windows-1252').decode(content);
+				typeof content === 'string' ? content : decodeCsvBuffer(content, 'windows-1252');
 
 			const lines = text.split(/\r?\n/).filter((line) => line.trim());
 

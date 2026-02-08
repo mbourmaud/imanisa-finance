@@ -12,6 +12,7 @@ export interface LoanInsuranceWithMember extends LoanInsurance {
 		id: string;
 		name: string;
 		color: string | null;
+		avatarUrl: string | null;
 	};
 }
 
@@ -27,6 +28,7 @@ export interface LoanWithDetails extends Loan {
 		id: string;
 		name: string;
 		color: string | null;
+		avatarUrl: string | null;
 	} | null;
 	loanInsurances: LoanInsuranceWithMember[];
 }
@@ -89,6 +91,7 @@ const loanWithDetailsInclude = {
 			id: true,
 			name: true,
 			color: true,
+			avatarUrl: true,
 		},
 	},
 	loanInsurances: {
@@ -98,6 +101,7 @@ const loanWithDetailsInclude = {
 					id: true,
 					name: true,
 					color: true,
+					avatarUrl: true,
 				},
 			},
 		},

@@ -6,14 +6,12 @@ import {
 	BanksStatsSection,
 	EmptyState,
 	Landmark,
+	PageHeader,
 } from '@/components'
 import { useBanksPage } from '@/features/banks'
-import { usePageHeader } from '@/shared/hooks'
 
 export default function BanksPage() {
 	const page = useBanksPage()
-
-	usePageHeader('Banques')
 
 	if (page.isError) {
 		return (
@@ -27,6 +25,8 @@ export default function BanksPage() {
 
 	return (
 		<>
+			<PageHeader title="Banques" />
+
 			<BanksStatsSection
 				summary={page.data?.summary}
 				isLoading={page.isLoading}

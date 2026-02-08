@@ -18,12 +18,11 @@ import {
 	Users,
 	Wallet,
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -48,6 +47,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useUser } from '@/lib/hooks/use-user';
 import { createClient } from '@/lib/supabase/client';
+import { useEntitySync } from '@/shared/hooks';
 import { useEntityStore } from '@/shared/stores/entity-store';
 
 const menuNavItems = [
@@ -56,14 +56,11 @@ const menuNavItems = [
 	{ title: 'Import', url: '/dashboard/import', icon: Upload },
 ];
 
-const patrimoineNavItems = [
-	{ title: 'Immobilier', url: '/dashboard/real-estate', icon: Home },
+const immobilierNavItems = [
+	{ title: 'Biens', url: '/dashboard/real-estate', icon: Home },
 	{ title: 'Prêts', url: '/dashboard/loans', icon: HandCoins },
 ];
 
-const gestionNavItems = [
-	{ title: 'Paramètres', url: '/dashboard/settings', icon: Settings },
-];
 
 function NavItem({
 	item,
@@ -108,6 +105,7 @@ export function AppSidebar() {
 	const router = useRouter();
 	const { theme, setTheme } = useTheme();
 	const { entities, selectedEntityId, setSelectedEntity } = useEntityStore();
+	useEntitySync();
 	const { avatarUrl, fullName, email } = useUser();
 
 	const selectedEntity = entities.find((e) => e.id === selectedEntityId);
@@ -237,29 +235,17 @@ export function AppSidebar() {
 
 				<SidebarGroup>
 					<SidebarGroupLabel className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-						Patrimoine
+						Immobilier
 					</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu className="space-y-1.5">
-							{patrimoineNavItems.map((item) => (
+							{immobilierNavItems.map((item) => (
 								<NavItem key={item.url} item={item} isActive={pathname.startsWith(item.url)} />
 							))}
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
 
-				<SidebarGroup>
-					<SidebarGroupLabel className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-						Gestion
-					</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenu className="space-y-1.5">
-							{gestionNavItems.map((item) => (
-								<NavItem key={item.url} item={item} isActive={pathname.startsWith(item.url)} />
-							))}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
 			</SidebarContent>
 
 			{/* Footer */}
@@ -271,23 +257,12 @@ export function AppSidebar() {
 							type="button"
 							className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors"
 						>
-							{avatarUrl ? (
-								<Image
-									src={avatarUrl}
-									alt={fullName ?? 'Avatar'}
-									referrerPolicy="no-referrer"
-									className="h-10 w-10 rounded-full border-2 border-primary/20 object-cover"
-									width={40}
-									height={40}
-									unoptimized
-								/>
-							) : (
-								<Avatar className="h-10 w-10 border-2 border-primary/20">
-									<AvatarFallback className="bg-gradient-to-br from-primary/20 to-purple-500/20 text-sm font-bold text-primary">
-										{getInitials()}
-									</AvatarFallback>
-								</Avatar>
-							)}
+							<Avatar className="h-10 w-10 border-2 border-primary/20">
+								{avatarUrl && <AvatarImage src={avatarUrl} alt={fullName ?? 'Avatar'} referrerPolicy="no-referrer" />}
+								<AvatarFallback className="bg-gradient-to-br from-primary/20 to-purple-500/20 text-sm font-bold text-primary">
+									{getInitials()}
+								</AvatarFallback>
+							</Avatar>
 							<div className="flex-1 text-left min-w-0">
 								<p className="text-sm font-semibold truncate">{fullName ?? 'Utilisateur'}</p>
 								{email && <p className="text-[11px] text-muted-foreground truncate">{email}</p>}
@@ -300,9 +275,11 @@ export function AppSidebar() {
 							<User className="mr-3 h-4 w-4 text-muted-foreground" />
 							Profil
 						</DropdownMenuItem>
-						<DropdownMenuItem className="rounded-lg p-2.5">
-							<Settings className="mr-3 h-4 w-4 text-muted-foreground" />
-							Paramètres
+						<DropdownMenuItem asChild className="rounded-lg p-2.5 cursor-pointer">
+							<Link href="/dashboard/settings">
+								<Settings className="mr-3 h-4 w-4 text-muted-foreground" />
+								Paramètres
+							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuSeparator className="my-2" />
 						<DropdownMenuSub>

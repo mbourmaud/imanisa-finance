@@ -4,7 +4,7 @@ import * as React from 'react'
 import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 import type { TransactionType } from './transaction-types'
-import { formatCurrency } from './transaction-utils'
+import { formatMoney, type CurrencyCode } from '@/shared/utils'
 
 export interface TransactionAmountProps extends React.HTMLAttributes<HTMLDivElement> {
 	amount: number
@@ -39,7 +39,7 @@ export const TransactionAmount = forwardRef<HTMLDivElement, TransactionAmountPro
 				{...props}
 			>
 				{sign}
-				{formatCurrency(amount, currency)}
+				{formatMoney(amount, currency as CurrencyCode)}
 			</div>
 		)
 	},

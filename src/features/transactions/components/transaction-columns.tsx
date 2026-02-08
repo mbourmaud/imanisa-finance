@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * Transaction Table Columns
@@ -6,68 +6,101 @@
  * Column definitions for the transactions data table using TanStack Table.
  */
 
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table'
 import {
-	ArrowDownLeft,
-	ArrowUpRight,
 	Button,
 	Checkbox,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 	MoreHorizontal,
-} from '@/components';
-import { getAccountTypeConfig } from '@/components/accounts/account-types';
-import type { Transaction } from '../types';
+} from '@/components'
+import { Repeat } from 'lucide-react'
+import { formatMoneyCompact } from '@/shared/utils'
+import { CategoryBadge } from '@/components/transactions/CategoryBadge'
+import { MemberAvatarGroup } from '@/components/members/MemberAvatarGroup'
+import { BankLogo } from '@/components/banks/BankLogo'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip'
+import type { Transaction } from '../types'
 
-/**
- * Format currency for display
- */
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-	}).format(amount);
+interface CategoryOption {
+	id: string
+	name: string
+	icon: string
+	color: string
+}
+
+export interface RecurringInfo {
+	id: string
+	description: string
+	amount: number
+	frequency: 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'ANNUAL'
+	occurrenceCount: number
+	categoryName?: string
+}
+
+const FREQUENCY_LABELS: Record<string, string> = {
+	WEEKLY: 'Hebdomadaire',
+	MONTHLY: 'Mensuel',
+	QUARTERLY: 'Trimestriel',
+	ANNUAL: 'Annuel',
+}
+
+/** Client-side normalization matching server-side normalizeDescription */
+function normalizeDescription(description: string): string {
+	return description
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toUpperCase()
+		.trim()
 }
 
 /**
  * Format date for display
  */
 function formatDate(date: Date | string): string {
-	const d = typeof date === 'string' ? new Date(date) : date;
+	const d = typeof date === 'string' ? new Date(date) : date
 	return new Intl.DateTimeFormat('fr-FR', {
 		day: 'numeric',
 		month: 'short',
-		year: 'numeric',
-	}).format(d);
+	}).format(d)
 }
 
 /**
  * Format relative date (today, yesterday, etc.)
  */
 function formatRelativeDate(date: Date | string): string {
-	const d = typeof date === 'string' ? new Date(date) : date;
-	const today = new Date();
-	const yesterday = new Date(today);
-	yesterday.setDate(yesterday.getDate() - 1);
+	const d = typeof date === 'string' ? new Date(date) : date
+	const today = new Date()
+	const yesterday = new Date(today)
+	yesterday.setDate(yesterday.getDate() - 1)
 
 	if (d.toDateString() === today.toDateString()) {
-		return "Aujourd'hui";
+		return "Aujourd'hui"
 	}
 	if (d.toDateString() === yesterday.toDateString()) {
-		return 'Hier';
+		return 'Hier'
 	}
-	return formatDate(d);
+	return formatDate(d)
 }
 
 interface TransactionColumnsOptions {
-	onEdit?: (transaction: Transaction) => void;
-	onDelete?: (transaction: Transaction) => void;
-	onCategorize?: (transaction: Transaction) => void;
-	enableSelection?: boolean;
+	onEdit?: (transaction: Transaction) => void
+	onDelete?: (transaction: Transaction) => void
+	onCategorize?: (transactionId: string, categoryId: string) => void
+	categories?: CategoryOption[]
+	/** Map of normalized description → recurring pattern info */
+	recurringMap?: Map<string, RecurringInfo>
+	enableSelection?: boolean
 }
 
 /**
@@ -76,7 +109,7 @@ interface TransactionColumnsOptions {
 export function createTransactionColumns(
 	options?: TransactionColumnsOptions,
 ): ColumnDef<Transaction>[] {
-	const columns: ColumnDef<Transaction>[] = [];
+	const columns: ColumnDef<Transaction>[] = []
 
 	// Selection column (only when enabled)
 	if (options?.enableSelection) {
@@ -103,7 +136,7 @@ export function createTransactionColumns(
 			enableSorting: false,
 			enableHiding: false,
 			size: 40,
-		});
+		})
 	}
 
 	columns.push(
@@ -112,126 +145,134 @@ export function createTransactionColumns(
 			accessorKey: 'date',
 			header: 'Date',
 			cell: ({ row }) => {
-				const date = row.getValue('date') as Date;
+				const date = row.getValue('date') as Date
 				return (
-					<div className="flex flex-col">
-						<span className="text-sm font-medium">{formatRelativeDate(date)}</span>
-						<span className="text-xs text-muted-foreground">{formatDate(date)}</span>
-					</div>
-				);
+					<span className="text-sm whitespace-nowrap">{formatRelativeDate(date)}</span>
+				)
 			},
 			sortingFn: 'datetime',
+			size: 110,
 		},
-		// Description column
+		// Description + Category column
 		{
 			accessorKey: 'description',
 			header: 'Description',
 			cell: ({ row }) => {
-				const transaction = row.original;
-				const isIncome = transaction.type === 'income';
+				const transaction = row.original
+				const cat = transaction.transactionCategory?.category
+				const recurring = options?.recurringMap?.get(
+					normalizeDescription(transaction.description),
+				)
 
 				return (
-					<div className="flex items-center gap-3">
-						<div
-							className={`flex items-center justify-center rounded-lg h-9 w-9 shrink-0 ${
-								isIncome ? 'bg-emerald-500/10' : 'bg-muted'
-							}`}
-						>
-							{isIncome ? (
-								<ArrowDownLeft className="h-4 w-4 text-emerald-500" />
-							) : (
-								<ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+					<div className="flex flex-col min-w-0 gap-0.5">
+						<div className="flex items-center gap-1.5 min-w-0">
+							<span className="text-sm font-medium truncate">{transaction.description}</span>
+							{recurring && (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="shrink-0 inline-flex items-center justify-center rounded-full bg-primary/10 text-primary h-4 w-4">
+											<Repeat className="h-2.5 w-2.5 stroke-[2.5]" />
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>
+										{FREQUENCY_LABELS[recurring.frequency]} · {recurring.occurrenceCount} occurrences
+									</TooltipContent>
+								</Tooltip>
 							)}
 						</div>
-						<div className="flex flex-col min-w-0">
-							<span className="font-medium truncate">{transaction.description}</span>
-							<span className="text-xs text-muted-foreground">
-								{transaction.category || 'Non catégorisé'}
-							</span>
-						</div>
+						{cat ? (
+							<CategoryBadge
+								category={{ id: cat.id, name: cat.name, icon: cat.icon, color: cat.color }}
+							/>
+						) : (
+							<span className="text-xs text-muted-foreground">Non catégorisé</span>
+						)}
 					</div>
-				);
+				)
 			},
 		},
-		// Bank column
-		{
-			id: 'bank',
-			header: 'Banque',
-			cell: ({ row }) => {
-				const { account } = row.original;
-				return (
-					<div className="flex items-center gap-2">
-						<span
-							className="size-2.5 shrink-0 rounded-full"
-							style={{ backgroundColor: account.bank.color }}
-						/>
-						<span className="text-sm">{account.bank.name}</span>
-					</div>
-				);
-			},
-		},
-		// Account + type column
+		// Account column (bank logo + name)
 		{
 			id: 'account',
 			header: 'Compte',
 			cell: ({ row }) => {
-				const { account } = row.original;
-				const typeConfig = getAccountTypeConfig(account.type as Parameters<typeof getAccountTypeConfig>[0]);
+				const { account } = row.original
+
 				return (
-					<div className="flex flex-col min-w-0">
-						<span className="text-sm truncate">{account.name}</span>
-						<span className="text-xs text-muted-foreground">{typeConfig.labelShort}</span>
+					<div className="flex items-center gap-2">
+						<BankLogo
+							bankId={account.bank.id}
+							bankName={account.bank.name}
+							bankColor={account.bank.color}
+							logo={account.bank.logo}
+							size="sm"
+							disabled
+						/>
+						<div className="flex flex-col min-w-0 gap-0.5">
+							<span className="text-sm font-medium truncate">{account.name}</span>
+							<span className="text-xs text-muted-foreground truncate">{account.bank.name}</span>
+						</div>
 					</div>
-				);
+				)
 			},
+			size: 220,
 		},
-		// Person/member column
+		// Members column
 		{
-			id: 'member',
-			header: 'Titulaire',
+			id: 'members',
+			header: '',
 			cell: ({ row }) => {
-				const { account } = row.original;
-				const members = account.accountMembers;
-				if (!members.length) {
-					return <span className="text-sm text-muted-foreground">—</span>;
-				}
-				const names = members.map((m) => m.member.name).join(', ');
-				return <span className="text-sm text-muted-foreground">{names}</span>;
+				const members = row.original.account.accountMembers
+				const memberData = members.map((m) => ({
+					id: m.member.id,
+					name: m.member.name,
+					color: m.member.color,
+					avatarUrl: m.member.avatarUrl,
+				}))
+
+				if (memberData.length === 0) return null
+
+				return <MemberAvatarGroup members={memberData} size="sm" />
 			},
+			enableSorting: false,
+			size: 80,
 		},
 		// Amount column
 		{
 			accessorKey: 'amount',
 			header: () => <div className="text-right">Montant</div>,
 			cell: ({ row }) => {
-				const transaction = row.original;
-				const amount = transaction.amount;
-				const isIncome = transaction.type === 'income';
-				const displayAmount = isIncome ? amount : -amount;
+				const transaction = row.original
+				const amount = transaction.amount
+				const isIncome = transaction.type === 'INCOME'
+				const displayAmount = isIncome ? amount : -amount
 
 				return (
 					<span
-						className={`font-medium text-right tabular-nums ${isIncome ? 'text-emerald-600' : ''}`}
+						className={`text-sm font-medium text-right tabular-nums whitespace-nowrap ${isIncome ? 'text-emerald-600' : ''}`}
 					>
 						{isIncome ? '+' : ''}
-						{formatCurrency(displayAmount)}
+						{formatMoneyCompact(displayAmount)}
 					</span>
-				);
+				)
 			},
 			sortingFn: (rowA, rowB) => {
 				const amountA =
-					rowA.original.type === 'income' ? rowA.original.amount : -rowA.original.amount;
+					rowA.original.type === 'INCOME' ? rowA.original.amount : -rowA.original.amount
 				const amountB =
-					rowB.original.type === 'income' ? rowB.original.amount : -rowB.original.amount;
-				return amountA - amountB;
+					rowB.original.type === 'INCOME' ? rowB.original.amount : -rowB.original.amount
+				return amountA - amountB
 			},
+			size: 120,
 		},
 		// Actions column
 		{
 			id: 'actions',
 			enableHiding: false,
 			cell: ({ row }) => {
-				const transaction = row.original;
+				const transaction = row.original
+				const categories = options?.categories ?? []
 
 				return (
 					<DropdownMenu>
@@ -247,37 +288,49 @@ export function createTransactionColumns(
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							<DropdownMenuLabel>Actions</DropdownMenuLabel>
-							<DropdownMenuItem onClick={() => navigator.clipboard.writeText(transaction.id)}>
-								Copier l&apos;ID
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							{options?.onCategorize && (
-								<DropdownMenuItem onClick={() => options.onCategorize?.(transaction)}>
-									Catégoriser
-								</DropdownMenuItem>
+							{categories.length > 0 && options?.onCategorize && (
+								<DropdownMenuSub>
+									<DropdownMenuSubTrigger>Catégoriser</DropdownMenuSubTrigger>
+									<DropdownMenuSubContent className="max-h-80 overflow-y-auto">
+										{categories.map((cat) => (
+											<DropdownMenuItem
+												key={cat.id}
+												onClick={() => options.onCategorize?.(transaction.id, cat.id)}
+											>
+												<CategoryBadge category={cat} size="sm" />
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuSubContent>
+								</DropdownMenuSub>
 							)}
 							{options?.onEdit && (
-								<DropdownMenuItem onClick={() => options.onEdit?.(transaction)}>
-									Modifier
-								</DropdownMenuItem>
+								<>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem onClick={() => options.onEdit?.(transaction)}>
+										Modifier
+									</DropdownMenuItem>
+								</>
 							)}
 							{options?.onDelete && (
-								<DropdownMenuItem
-									onClick={() => options.onDelete?.(transaction)}
-									className="text-destructive"
-								>
-									Supprimer
-								</DropdownMenuItem>
+								<>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem
+										onClick={() => options.onDelete?.(transaction)}
+										className="text-destructive"
+									>
+										Supprimer
+									</DropdownMenuItem>
+								</>
 							)}
 						</DropdownMenuContent>
 					</DropdownMenu>
-				);
+				)
 			},
+			size: 50,
 		},
-	);
+	)
 
-	return columns;
+	return columns
 }
 
 /**
@@ -290,8 +343,8 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			accessorKey: 'date',
 			header: 'Date',
 			cell: ({ row }) => {
-				const date = row.getValue('date') as Date;
-				return <span className="text-sm text-muted-foreground">{formatRelativeDate(date)}</span>;
+				const date = row.getValue('date') as Date
+				return <span className="text-sm text-muted-foreground">{formatRelativeDate(date)}</span>
 			},
 			sortingFn: 'datetime',
 			size: 100,
@@ -301,15 +354,18 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			accessorKey: 'description',
 			header: 'Description',
 			cell: ({ row }) => {
-				const transaction = row.original;
+				const transaction = row.original
+				const cat = transaction.transactionCategory?.category
 				return (
 					<div className="flex flex-col min-w-0">
 						<span className="text-sm font-medium truncate">{transaction.description}</span>
-						{transaction.category && (
-							<span className="text-xs text-muted-foreground">{transaction.category}</span>
+						{cat && (
+							<CategoryBadge
+								category={{ id: cat.id, name: cat.name, icon: cat.icon, color: cat.color }}
+							/>
 						)}
 					</div>
-				);
+				)
 			},
 		},
 		// Amount column (compact)
@@ -317,10 +373,10 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 			accessorKey: 'amount',
 			header: () => <div className="text-right">Montant</div>,
 			cell: ({ row }) => {
-				const transaction = row.original;
-				const amount = transaction.amount;
-				const isIncome = transaction.type === 'income';
-				const displayAmount = isIncome ? amount : -amount;
+				const transaction = row.original
+				const amount = transaction.amount
+				const isIncome = transaction.type === 'INCOME'
+				const displayAmount = isIncome ? amount : -amount
 
 				return (
 					<span
@@ -329,11 +385,11 @@ export function createCompactTransactionColumns(): ColumnDef<Transaction>[] {
 						}`}
 					>
 						{isIncome ? '+' : ''}
-						{formatCurrency(displayAmount)}
+						{formatMoneyCompact(displayAmount)}
 					</span>
-				);
+				)
 			},
 			size: 120,
 		},
-	];
+	]
 }

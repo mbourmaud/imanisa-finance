@@ -1,6 +1,7 @@
 'use client';
 
 import { Building2, CreditCard, Landmark, StatCard, StatCardGrid, Wallet } from '@/components';
+import { formatMoneyCompact } from '@/shared/utils';
 
 interface PropertyStatsSummaryProps {
 	currentValue: number;
@@ -9,14 +10,6 @@ interface PropertyStatsSummaryProps {
 	totalLoansRemaining: number;
 	totalInvestment: number;
 	loansCount: number;
-}
-
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
 }
 
 export function PropertyStatsSummary({
@@ -33,14 +26,14 @@ export function PropertyStatsSummary({
 		<StatCardGrid columns={4}>
 			<StatCard
 				label="Valeur actuelle"
-				value={formatCurrency(currentValue)}
+				value={formatMoneyCompact(currentValue)}
 				icon={Building2}
 				variant="default"
 				description={`${appreciation >= 0 ? '+' : ''}${appreciation.toFixed(1)}% depuis l'achat`}
 			/>
 			<StatCard
 				label="Équité"
-				value={formatCurrency(equity)}
+				value={formatMoneyCompact(equity)}
 				icon={Wallet}
 				variant="teal"
 				description={
@@ -49,14 +42,14 @@ export function PropertyStatsSummary({
 			/>
 			<StatCard
 				label="Crédits restants"
-				value={formatCurrency(totalLoansRemaining)}
+				value={formatMoneyCompact(totalLoansRemaining)}
 				icon={CreditCard}
 				variant="default"
 				description={`${loansCount} prêt${loansCount !== 1 ? 's' : ''}`}
 			/>
 			<StatCard
 				label="Investissement total"
-				value={formatCurrency(totalInvestment)}
+				value={formatMoneyCompact(totalInvestment)}
 				icon={Landmark}
 				variant="default"
 				description="Prix + frais"

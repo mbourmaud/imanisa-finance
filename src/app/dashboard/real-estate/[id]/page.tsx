@@ -6,6 +6,8 @@ import {
 	PropertyDetailSheets,
 	PropertyDetailHeader,
 	PropertyDetailSkeleton,
+	PropertyDiagnosticsSection,
+	PropertyDocumentsSection,
 	PropertyInfoSection,
 	PropertyInsuranceSection,
 	PropertyLoansSection,
@@ -92,6 +94,8 @@ export default function PropertyDetailPage() {
 				deletingLoanId={loanDialog.deletingLoanId}
 			/>
 
+			<PropertyDiagnosticsSection diagnostics={property.diagnostics} />
+
 			<PropertyInsuranceSection
 				insurance={property.insurance}
 				onAdd={() => propertyInsuranceDialog.open(false)}
@@ -114,6 +118,11 @@ export default function PropertyDetailPage() {
 				onEditContract={utilityContractDialog.open}
 				onDeleteContract={utilityContractDialog.onDelete}
 				deletingContractId={utilityContractDialog.deletingContractId}
+			/>
+
+			<PropertyDocumentsSection
+				propertyId={propertyId}
+				documents={property.documents}
 			/>
 
 			<PropertyDetailSheets

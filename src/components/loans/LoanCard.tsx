@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link';
 import {
 	ArrowDown,
@@ -7,6 +10,8 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	ChevronDown,
+	ChevronUp,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
@@ -18,10 +23,14 @@ import {
 	MoreHorizontal,
 	Percent,
 	Progress,
+	Shield,
+	Sigma,
+	FileSpreadsheet,
 	type LucideIcon,
 } from '@/components';
+import { LoanAmortizationTable } from './LoanAmortizationTable';
 import { LoanInfoBox } from './LoanInfoBox';
-import { formatMoney } from '@/shared/utils';
+import { formatMoney, formatMoneyCompact } from '@/shared/utils';
 
 interface LoanInsurance {
 	monthlyPremium: number;
@@ -41,6 +50,7 @@ export interface LoanData {
 	initialAmount: number;
 	remainingAmount: number;
 	monthlyPayment: number;
+	startDate: string;
 	endDate: string | null;
 	loanInsurances: LoanInsurance[];
 }
@@ -50,12 +60,11 @@ interface LoanCardProps {
 	icon: LucideIcon;
 }
 
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('fr-FR', {
-		style: 'currency',
-		currency: 'EUR',
-		maximumFractionDigits: 0,
-	}).format(amount);
+function calculateTotalMonths(startDate: string, endDate: string | null): number {
+	if (!endDate) return 0
+	const start = new Date(startDate)
+	const end = new Date(endDate)
+	return Math.max(0, (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()))
 }
 
 function calculateRemainingMonths(endDate: string | null): number {
@@ -85,12 +94,22 @@ function formatRemainingTime(endDate: string | null): string {
  * Card displaying a single loan with all its details
  */
 export function LoanCard({ loan, icon: Icon }: LoanCardProps) {
+	const [showAmortization, setShowAmortization] = useState(false)
 	const progress = ((loan.initialAmount - loan.remainingAmount) / loan.initialAmount) * 100;
 	const remainingMonths = calculateRemainingMonths(loan.endDate);
 	const loanInsuranceTotal = loan.loanInsurances.reduce((sum, ins) => sum + ins.monthlyPremium, 0);
+	const canShowAmortization = loan.rate > 0 && loan.monthlyPayment > 0
+
+	const totalMonths = calculateTotalMonths(loan.startDate, loan.endDate)
+	const hasFullData = totalMonths > 0 && loan.monthlyPayment > 0
+	const interestCost = hasFullData ? Math.max(0, loan.monthlyPayment * totalMonths - loan.initialAmount) : 0
+	const insuranceCost = hasFullData ? loanInsuranceTotal * totalMonths : 0
+	const insuranceRate = loan.initialAmount > 0 && loanInsuranceTotal > 0
+		? (loanInsuranceTotal * 12 / loan.initialAmount) * 100
+		: 0
 
 	return (
-		<Card className="border-border/60">
+		<Card className="group border-border/60">
 			<CardHeader className="pb-3">
 				<div className="flex flex-row justify-between items-start">
 					<div className="flex flex-row gap-4">
@@ -112,9 +131,9 @@ export function LoanCard({ loan, icon: Icon }: LoanCardProps) {
 					<div className="flex flex-row gap-4">
 						<div className="flex flex-col gap-1 items-end hidden sm:flex">
 							<span className="text-2xl font-semibold tabular-nums">
-								{formatCurrency(loan.remainingAmount)}
+								{formatMoneyCompact(loan.initialAmount - loan.remainingAmount)}
 							</span>
-							<span className="text-xs text-muted-foreground">Capital restant</span>
+							<span className="text-xs text-muted-foreground">Capital remboursé</span>
 						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
@@ -141,19 +160,19 @@ export function LoanCard({ loan, icon: Icon }: LoanCardProps) {
 			</CardHeader>
 			<CardContent>
 				<div className="flex flex-col gap-4">
-					{/* Mobile: Show remaining amount */}
+					{/* Mobile: Show repaid amount */}
 					<div className="flex flex-col gap-1 sm:hidden">
 						<span className="text-2xl font-semibold tabular-nums">
-							{formatCurrency(loan.remainingAmount)}
+							{formatMoneyCompact(loan.initialAmount - loan.remainingAmount)}
 						</span>
-						<span className="text-xs text-muted-foreground">Capital restant</span>
+						<span className="text-xs text-muted-foreground">Capital remboursé</span>
 					</div>
 
 					{/* Progress Bar */}
 					<div className="flex flex-col gap-2">
 						<div className="flex flex-row justify-between">
 							<span className="text-xs text-muted-foreground">
-								Remboursé: {formatCurrency(loan.initialAmount - loan.remainingAmount)}
+								Remboursé: {formatMoneyCompact(loan.initialAmount - loan.remainingAmount)}
 							</span>
 							<span className="text-xs font-medium">{progress.toFixed(1)}%</span>
 						</div>
@@ -165,7 +184,7 @@ export function LoanCard({ loan, icon: Icon }: LoanCardProps) {
 						<LoanInfoBox
 							icon={Euro}
 							label="Mensualité"
-							value={formatCurrency(loan.monthlyPayment)}
+							value={formatMoneyCompact(loan.monthlyPayment)}
 							sublabel={
 								loanInsuranceTotal > 0
 									? `+ ${formatMoney(loanInsuranceTotal)} assurance`
@@ -187,10 +206,71 @@ export function LoanCard({ loan, icon: Icon }: LoanCardProps) {
 						<LoanInfoBox
 							icon={ArrowDown}
 							label="Montant initial"
-							value={formatCurrency(loan.initialAmount)}
+							value={formatMoneyCompact(loan.initialAmount)}
 							sublabel="Emprunté"
 						/>
 					</div>
+
+					{/* Cost Grid */}
+					{hasFullData && (
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2 border-t border-border/40">
+							<LoanInfoBox
+								icon={Percent}
+								label="Taux assurance"
+								value={insuranceRate > 0 ? `${insuranceRate.toFixed(2)}%` : '—'}
+								sublabel="TAEA"
+							/>
+							<LoanInfoBox
+								icon={Euro}
+								label="Coût intérêts"
+								value={formatMoneyCompact(interestCost)}
+								sublabel="Sur la durée totale"
+							/>
+							<LoanInfoBox
+								icon={Shield}
+								label="Coût assurance"
+								value={insuranceCost > 0 ? formatMoneyCompact(insuranceCost) : '—'}
+								sublabel="Sur la durée totale"
+							/>
+							<LoanInfoBox
+								icon={Sigma}
+								label="Coût total"
+								value={formatMoneyCompact(interestCost + insuranceCost)}
+								sublabel="Intérêts + assurance"
+							/>
+						</div>
+					)}
+
+					{/* Amortization Table */}
+					{canShowAmortization && (
+						<div className="pt-2 border-t border-border/40">
+							<button
+								type="button"
+								onClick={() => setShowAmortization(!showAmortization)}
+								className="flex items-center justify-between w-full text-left py-1 cursor-pointer rounded-lg px-2 -mx-2 hover:bg-muted/50 transition-colors"
+							>
+								<div className="flex items-center gap-2">
+									<FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
+									<span className="text-sm font-medium">Tableau d'amortissement</span>
+								</div>
+								{showAmortization ? (
+									<ChevronUp className="h-4 w-4 text-muted-foreground" />
+								) : (
+									<ChevronDown className="h-4 w-4 text-muted-foreground" />
+								)}
+							</button>
+							{showAmortization && (
+								<div className="mt-3">
+									<LoanAmortizationTable
+										initialAmount={loan.initialAmount}
+										rate={loan.rate}
+										monthlyPayment={loan.monthlyPayment}
+										startDate={loan.startDate}
+									/>
+								</div>
+							)}
+						</div>
+					)}
 				</div>
 			</CardContent>
 		</Card>
