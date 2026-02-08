@@ -11,19 +11,24 @@ export async function GET(request: Request) {
 		const supabase = await createClient();
 		const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-		if (!error) {
-			// Get the authenticated user
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
+		// If exchange fails, the middleware may have already consumed the PKCE flow.
+		// Check if we already have a valid session from the middleware.
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
+		if (!error || user) {
 			if (user) {
 				// Sync user to Prisma database using repository
 				const email = user.email || '';
 				const name = user.user_metadata?.name || user.user_metadata?.full_name || null;
 				const avatarUrl = user.user_metadata?.avatar_url || null;
 
-				await userRepository.syncFromAuth(user.id, email, name, avatarUrl);
+				try {
+					await userRepository.syncFromAuth(user.id, email, name, avatarUrl);
+				} catch (syncError) {
+					console.error('[auth/callback] Failed to sync user:', syncError);
+				}
 			}
 
 			const forwardedHost = request.headers.get('x-forwarded-host');

@@ -16,7 +16,7 @@ export default function AuthCodeErrorPage() {
 		<AuthErrorContainer>
 			<AuthErrorBackground />
 			<AuthErrorLogo />
-			<AuthErrorCard onRetry={() => router.push('/login')} />
+			<AuthErrorCard onRetry={() => router.push('/')} />
 			<AuthErrorFooter />
 		</AuthErrorContainer>
 	);
