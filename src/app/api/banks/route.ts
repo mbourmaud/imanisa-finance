@@ -100,6 +100,14 @@ export async function GET(request: Request) {
 		});
 	} catch (error) {
 		console.error('Error fetching banks:', error);
-		return NextResponse.json({ error: 'Failed to fetch banks' }, { status: 500 });
+		const message = error instanceof Error ? error.message : 'Unknown error';
+		return NextResponse.json(
+			{
+				error: 'Failed to fetch banks',
+				debug: process.env.NODE_ENV === 'production' ? message : undefined,
+				hasDbUrl: !!process.env.DATABASE_URL,
+			},
+			{ status: 500 },
+		);
 	}
 }
