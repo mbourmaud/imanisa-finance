@@ -2,12 +2,17 @@
 	"$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
 	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
 	"files": {
-		"includes": ["src/**", "*.json", "*.ts", "*.mts", "!**/public/mockServiceWorker.js"]
+		"includes": ["src/**", "*.json", "*.ts", "*.mts", "!**/public/mockServiceWorker.js", "!drone-status.json"]
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
 			"recommended": true,
+			"correctness": {
+				"noChildrenProp": "off",
+				"noUnusedImports": "warn",
+				"noUnusedFunctionParameters": "warn"
+			},
 			"style": {
 				"noNonNullAssertion": "off"
 			},
@@ -17,7 +22,8 @@
 				"useKeyWithClickEvents": "warn",
 				"useButtonType": "warn",
 				"noSvgWithoutTitle": "warn",
-				"useSemanticElements": "warn"
+				"useSemanticElements": "warn",
+				"useAriaPropsSupportedByRole": "warn"
 			},
 			"performance": {
 				"noImgElement": "warn"
