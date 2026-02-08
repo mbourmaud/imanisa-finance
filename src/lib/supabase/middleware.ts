@@ -37,14 +37,26 @@ export async function updateSession(request: NextRequest) {
 		data: { user },
 	} = await supabase.auth.getUser();
 
-	// Protected routes - redirect to login if not authenticated
-	if (
-		!user &&
-		request.nextUrl.pathname.startsWith('/dashboard') &&
-		process.env.NEXT_PUBLIC_DEMO_MODE !== 'true'
-	) {
+	const pathname = request.nextUrl.pathname;
+
+	// Protected routes - redirect to home if not authenticated
+	if (!user && pathname.startsWith('/dashboard')) {
 		const url = request.nextUrl.clone();
-		url.pathname = '/login';
+		url.pathname = '/';
+		return NextResponse.redirect(url);
+	}
+
+	// Authenticated users on home page → redirect to dashboard
+	if (user && pathname === '/') {
+		const url = request.nextUrl.clone();
+		url.pathname = '/dashboard';
+		return NextResponse.redirect(url);
+	}
+
+	// Authenticated users on old login page → redirect to dashboard
+	if (user && pathname === '/login') {
+		const url = request.nextUrl.clone();
+		url.pathname = '/dashboard';
 		return NextResponse.redirect(url);
 	}
 

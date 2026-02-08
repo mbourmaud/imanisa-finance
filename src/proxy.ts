@@ -6,19 +6,9 @@
  */
 
 import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
-// Check if demo mode is enabled
-const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
-
 export async function proxy(request: NextRequest) {
-	// In demo mode, bypass all auth checks
-	if (isDemoMode) {
-		return NextResponse.next();
-	}
-
-	// Use Supabase session management
 	return await updateSession(request);
 }
 
