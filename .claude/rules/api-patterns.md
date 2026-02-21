@@ -67,22 +67,9 @@ export async function POST(request: Request) {
 - Repositories return domain entities, not Prisma types
 - Centralized export via `src/server/repositories/index.ts`
 
-## Use Cases (Application Layer)
+## Business Logic (Application Layer)
 
-```typescript
-export class CreateAccountUseCase {
-  constructor(
-    private accountRepository: AccountRepository,
-    private memberRepository: MemberRepository
-  ) {}
-
-  async execute(input: CreateAccountInput): Promise<Account> {
-    // Validation
-    // Business logic
-    // Persistence
-  }
-}
-```
+Business logic lives in **domain services** (pure logic in `src/domain/services/`) and **feature hooks** (orchestration in `src/features/*/hooks/`). There are no separate UseCase classes — API routes call repositories directly for simple CRUD, and domain services for complex operations.
 
 ## Feature Structure
 

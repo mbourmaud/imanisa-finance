@@ -28,15 +28,14 @@ Filter results:
 - `style={{ '--var': value } as CSSProperties}` = OK (CSS variable)
 - `style={{ backgroundColor: x }}` = VIOLATION
 
-### 3. Old Form Pattern
+### 3. Form Pattern
 
 ```bash
-# Should not exist in new code
-grep -rn "useAppForm\|from '@/lib/forms'" src/ --include="*.tsx" --include="*.ts"
-grep -rn "AppField\|field\.TextField\|field\.SelectField\|field\.NumberField" src/ --include="*.tsx"
+# Verify all forms use the correct pattern
+grep -rn "from '@/components/ui/field'" src/ --include="*.tsx"
 ```
 
-New forms must use:
+All forms must use:
 - `useForm` from `@tanstack/react-form`
 - `Field`, `FieldLabel`, `FieldError` from `@/components/ui/field`
 
@@ -102,5 +101,5 @@ Description
 | Level | What |
 |-------|------|
 | Critical | `any` types, inline styles, manual form state, className in pages |
-| Warning | Old `useAppForm` pattern, naming issues |
+| Warning | Manual `useState` for form state, naming issues |
 | Info | Missing `cn()`, optimization opportunities |

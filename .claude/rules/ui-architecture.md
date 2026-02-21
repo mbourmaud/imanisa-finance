@@ -131,4 +131,4 @@ See `.claude/rules/tanstack.md` for complete form patterns.
 - Custom Stack, Row, Grid, Box components - use Tailwind utilities
 - `className` in pages - create components
 - `style={{}}` anywhere - use Tailwind classes
-- `useAppForm` / old form wrappers - use `useForm` + shadcn Field
+- Manual `useState` for form state - use `useForm` + shadcn Field

@@ -1,5 +1,13 @@
 # Testing Strategy
 
+> **Status:** This document describes the **target testing strategy**. Current state:
+> - ~21 tests (8 UI component, 5 business component, 2 store, 3 API/service, 1 schema, 1 sanity)
+> - No domain layer tests yet (target: 100% coverage)
+> - No E2E/Playwright configured yet (target: critical user flows)
+> - No snapshot tests yet (target: all UI component variants)
+>
+> All examples below are the patterns to follow when adding new tests.
+
 ## Vue d'ensemble
 
 | Type | Cible | Outil | Couverture |

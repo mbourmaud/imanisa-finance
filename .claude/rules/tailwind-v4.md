@@ -198,25 +198,7 @@ const color = isError ? "red" : "green"
 
 ### 6. className in Pages
 
-```tsx
-// ❌ Pages full of utility classes
-export default function DashboardPage() {
-  return (
-    <div className="flex flex-col gap-6 p-8">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-    </div>
-  )
-}
-
-// ✅ Use business components
-export default function DashboardPage() {
-  return (
-    <PageLayout>
-      <PageHeader title="Dashboard" />
-    </PageLayout>
-  )
-}
-```
+See `ui-architecture.md` Rule 1 — zero `className` in page files.
 
 ---
 

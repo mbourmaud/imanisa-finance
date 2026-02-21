@@ -65,7 +65,7 @@ export function useCreateTransactionMutation() {
 
 We use the **official shadcn/ui TanStack Form integration**. This means:
 
-- `useForm` from `@tanstack/react-form` directly (NOT a custom `useAppForm` wrapper)
+- `useForm` from `@tanstack/react-form` directly
 - `Field`, `FieldGroup`, `FieldError`, `FieldLabel` from `@/components/ui/field`
 - `Input`, `Select`, `Checkbox`, `Switch` from `@/components/ui/`
 - Valibot for validation schemas
@@ -355,13 +355,6 @@ function MyForm() {
   const handleSubmit = async () => { /* manual validation... */ }
 }
 
-// ❌ FORBIDDEN - Old useAppForm wrapper pattern
-import { useAppForm } from '@/lib/forms'
-const form = useAppForm({ ... })
-<form.AppField name="name">
-  {(field) => <field.TextField label="Nom" />}
-</form.AppField>
-
 // ✅ REQUIRED - Official shadcn + TanStack Form pattern
 import { useForm } from '@tanstack/react-form'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
@@ -386,16 +379,6 @@ const form = useForm({ ... })
   )}
 />
 ```
-
-### Migration from Old Pattern
-
-The old pattern in `src/lib/forms/` (useAppForm, AppField, TextField, SelectField, etc.) is **deprecated**. When touching forms:
-
-1. Replace `useAppForm` with `useForm` from `@tanstack/react-form`
-2. Replace `<form.AppField>` with `<form.Field>`
-3. Replace `<field.TextField>` with `<Field>` + `<FieldLabel>` + `<Input>` + `<FieldError>`
-4. Replace `<field.SelectField>` with `<Field>` + `<Select>` components
-5. Remove imports from `@/lib/forms`
 
 ---
 

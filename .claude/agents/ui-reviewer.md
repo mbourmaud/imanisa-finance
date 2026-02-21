@@ -31,11 +31,9 @@ grep -rn "style={{" src/ --include="*.tsx"
 ### 3. Forms Use shadcn Field Pattern
 
 ```bash
-# Old pattern (should not exist in new code)
-grep -rn "useAppForm\|AppField\|field\.TextField\|field\.SelectField" src/ --include="*.tsx" --include="*.ts"
-
-# New pattern (should exist)
+# Verify forms use the correct pattern
 grep -rn "from '@/components/ui/field'" src/ --include="*.tsx"
+grep -rn "useForm.*@tanstack/react-form" src/ --include="*.tsx"
 ```
 
 Forms must use:
@@ -125,5 +123,5 @@ Description of the issue
 | Level | Examples |
 |-------|---------|
 | **Critical** | `any` types, inline styles in pages, manual form state |
-| **Warning** | Old `useAppForm` pattern, missing aria attributes |
+| **Warning** | Manual `useState` for form state, missing aria attributes |
 | **Info** | Naming inconsistencies, missing `cn()` usage |

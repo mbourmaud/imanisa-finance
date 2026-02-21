@@ -7,7 +7,6 @@ Create forms using the **official shadcn/ui + TanStack Form + Valibot** pattern.
 ## When to Use
 
 - Creating new forms for any entity
-- Migrating old `useAppForm` forms to the new pattern
 - Adding form validation with Valibot
 
 ## File Structure
@@ -265,7 +264,7 @@ export function EntityFormSheet({ open, onOpenChange }: EntityFormSheetProps) {
 
 ## Critical Rules
 
-1. **ALWAYS use `useForm` from `@tanstack/react-form`** - NOT `useAppForm`
+1. **ALWAYS use `useForm` from `@tanstack/react-form`**
 2. **ALWAYS use `mutateAsync`** in onSubmit - NOT `mutate`
 3. **ALWAYS use shadcn `Field` components** from `@/components/ui/field`
 4. **NEVER use `useState` for form data**

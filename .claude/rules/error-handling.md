@@ -234,33 +234,38 @@ export const accountFormSchema = v.object({
 
 ### Affichage des erreurs de champ
 
+Use the shadcn `FieldError` component from `@/components/ui/field`:
+
 ```tsx
-// src/lib/forms/components/FieldError.tsx
-export function FieldError({ field }: { field: AnyFieldApi }) {
-  if (!field.state.meta.isTouched || field.state.meta.isValid) {
-    return null;
-  }
+import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 
-  const errors = field.state.meta.errors
-    .map((err) => (typeof err === 'string' ? err : err?.message))
-    .filter(Boolean);
-
-  if (errors.length === 0) return null;
-
-  return (
-    <p className="text-sm text-destructive mt-1">
-      {errors[0]} {/* Afficher seulement la première erreur */}
-    </p>
-  );
-}
+<form.Field
+  name="name"
+  children={(field) => {
+    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+    return (
+      <Field data-invalid={isInvalid}>
+        <FieldLabel htmlFor="name">Nom</FieldLabel>
+        <Input id="name" value={field.state.value} ... />
+        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+      </Field>
+    );
+  }}
+/>
 ```
 
 ### Erreur globale de formulaire
 
 ```tsx
 function AccountForm() {
-  const { form } = useAccountForm();
   const mutation = useCreateAccountMutation();
+  const form = useForm({
+    defaultValues: { name: '' },
+    validators: { onSubmit: accountFormSchema },
+    onSubmit: async ({ value }) => {
+      await mutation.mutateAsync(value);
+    },
+  });
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}>
@@ -273,10 +278,26 @@ function AccountForm() {
         </Alert>
       )}
 
-      {/* Champs... */}
-      <form.AppField name="name">
-        {(field) => <field.TextField label="Nom" />}
-      </form.AppField>
+      {/* Champs avec shadcn Field */}
+      <form.Field
+        name="name"
+        children={(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor="name">Nom</FieldLabel>
+              <Input
+                id="name"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                aria-invalid={isInvalid}
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
     </form>
   );
 }

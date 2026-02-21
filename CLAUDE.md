@@ -34,10 +34,16 @@ src/
 │   ├── common/            # Generic reusable components
 │   └── [feature]/         # Feature-specific components
 ├── domain/                # Domain layer (entities, services)
-├── features/              # Application layer (hooks, forms, use cases)
-├── lib/                   # Shared utilities
-├── server/repositories/   # Infrastructure layer (Prisma)
-└── shared/                # Constants, utils
+├── features/              # Application layer (hooks, forms, components)
+├── generated/             # Generated code (Prisma client)
+├── hooks/                 # Shared React hooks
+├── lib/                   # Auth, Prisma, query client, Supabase
+├── mocks/                 # Test mocks
+├── schemas/               # Shared Valibot schemas
+├── server/                # Server-only (repositories, services)
+├── shared/                # Constants, stores, utils
+├── styles/                # Global CSS
+└── tests/                 # Test setup and utilities
 ```
 
 ## Critical Rules
@@ -58,7 +64,6 @@ src/
 - **ALWAYS use shadcn `Field` components** - `Field`, `FieldLabel`, `FieldError`, `FieldGroup`
 - Always use `mutateAsync` (not `mutate`) in onSubmit
 - Valibot schemas in separate files, messages in French
-- **Old `useAppForm` pattern is deprecated** - Migrate to new pattern
 - See `.claude/rules/tanstack.md` for patterns
 
 ### State Management
@@ -74,7 +79,7 @@ src/
 - Utiliser `getErrorMessage()` pour extraire les messages
 - See `.claude/rules/error-handling.md` for patterns
 
-### Testing
+### Testing (target strategy - see testing.md for current status)
 - **Domain** : 100% couverture, tests unitaires purs
 - **UI Kit** : 100% couverture, snapshots + comportement
 - **API** : Tests d'intégration avec mocks
@@ -100,7 +105,7 @@ All detailed patterns and examples are in `.claude/rules/`:
 | `error-handling.md` | Messages FR, toast, ErrorState |
 | `testing.md` | Unit, integration, snapshots, E2E |
 | `code-style.md` | Naming, imports, commits |
-| `api-patterns.md` | Routes, repositories, use cases |
+| `api-patterns.md` | Routes, repositories, domain services |
 | `performance.md` | React, Next.js, Query optimizations |
 | `nextjs-patterns.md` | Server/Client components, caching, streaming |
 | `shadcn-patterns.md` | CVA, composition, slot, accessibility |
